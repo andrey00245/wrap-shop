@@ -1,0 +1,108 @@
+@font-face {
+  font-family: 'Font Awesome 5 Pro';
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url("../webfonts/fa-solid-900.eot");
+  src: url("../webfonts/fa-solid-900.eot?#iefix") format("embedded-opentype"), url("../webfonts/fa-solid-900.woff2") format("woff2"), url("../webfonts/fa-solid-900.woff") format("woff"), url("../webfonts/fa-solid-900.ttf") format("truetype"), url("../webfonts/fa-solid-900.svg#fontawesome") format("svg"); }
+@font-face {
+  font-family: 'Font Awesome 5 Brands';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../webfonts/fa-brands-400.eot");
+  src: url("../webfonts/fa-brands-400.eot?#iefix") format("embedded-opentype"), url("../webfonts/fa-brands-400.woff2") format("woff2"), url("../webfonts/fa-brands-400.woff") format("woff"), url("../webfonts/fa-brands-400.ttf") format("truetype"), url("../webfonts/fa-brands-400.svg#fontawesome") format("svg"); }
+@font-face {
+  font-family: 'Font Awesome 5 Pro';
+  font-style: normal;
+  font-weight: 300;
+  font-display: block;
+  src: url("../webfonts/fa-light-300.eot");
+  src: url("../webfonts/fa-light-300.eot?#iefix") format("embedded-opentype"), url("../webfonts/fa-light-300.woff2") format("woff2"), url("../webfonts/fa-light-300.woff") format("woff"), url("../webfonts/fa-light-300.ttf") format("truetype"), url("../webfonts/fa-light-300.svg#fontawesome") format("svg"); }
+@font-face {
+  font-family: 'Font Awesome 5 Regular';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("../webfonts/fa-regular-400.eot");
+  src: url("../webfonts/fa-regular-400.eot?#iefix") format("embedded-opentype"), url("../webfonts/fa-regular-400.woff2") format("woff2"), url("../webfonts/fa-regular-400.woff") format("woff"), url("../webfonts/fa-regular-400.ttf") format("truetype"), url("../webfonts/fa-regular-400.svg#fontawesome") format("svg"); }
+.fa,
+.fas,
+.far,
+.fal,
+.fad,
+.fab {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1; }
+.fal {
+  font-family: 'Font Awesome 5 Pro';
+  font-weight: 300; }
+.fab {
+  font-family: 'Font Awesome 5 Brands';
+  font-weight: 400;}
+.far {
+  font-family: 'Font Awesome 5 Regular';
+  font-weight: 400; }
+.fas {
+  font-family: 'Font Awesome 5 Pro';
+  font-weight: 900; }
+.fa-phone:before { content: "\f095"; }
+.fa-chevron-right:before { content: "\f054"; }
+.fa-chevron-left:before { content: "\f053"; }
+.fa-chevron-up:before { content: "\f077"; }
+.fa-chevron-down:before { content: "\f078"; }
+.fa-shopping-cart:before { content: "\f07a"; }
+.fa-microphone:before { content: "\f130"; }
+.fa-times:before { content: "\f00d"; }
+.fa-bars:before { content: "\f0c9"; }
+.fa-search:before { content: "\f002"; }
+.fa-facebook-f:before { content: "\f39e"; }
+.fa-instagram:before { content: "\f16d"; }
+.fa-telegram-plane:before { content: "\f3fe"; }
+.fa-youtube:before { content: "\f167"; }
+.fa-mobile-alt:before { content: "\f3cd"; }
+.fa-envelope:before { content: "\f0e0"; }
+.fa-map-marker-alt:before { content: "\f3c5"; }
+.fa-fax:before { content: "\f1ac"; }
+.fa-comments:before { content: "\f086"; }
+.fa-key:before { content: "\f084"; }
+.fa-check:before { content: "\f00c"; }
+.fa-sun:before { content: "\f185"; }
+.fa-moon:before { content: "\f186"; }
+.fa-heart:before { content: "\f004"; }
+.fa-user:before { content: "\f007"; }
+.fa-user-check:before { content: "\f4fc"; }
+.fa-play:before { content: "\f04b"; }
+.fa-th:before { content: "\f00a"; }
+.fa-th-list:before { content: "\f00b"; }
+.fa-shipping-fast:before { content: "\f48b"; }
+.fa-wallet:before { content: "\f555"; }
+.fa-shield-check:before { content: "\f2f7"; }
+.fa-trash:before { content: "\f1f8"; }
+.fa-star:before { content: "\f005"; }
+.fa-sort-amount-down-alt:before { content: "\f884"; }
+.fa-sort-amount-up-alt:before { content: "\f885"; }
+.fa-sort-alt:before { content: "\f883"; }
+.fa-filter:before { content: "\f0b0"; }
+.fa-exclamation-circle:before { content: "\f06a"; }
+.fa-check-circle:before { content: "\f058"; }
+.fa-tag:before { content: "\f02b"; }
+.fa-gift-card:before { content: "\f663"; }
+.fa-user:before { content: "\f007"; }
+.fa-user-edit:before { content: "\f4ff"; }
+.fa-address-card:before { content: "\f3c5"; }
+.fa-box-full:before { content: "\f49c"; }
+.fa-eye:before { content: "\f06e"; }
+.fa-smile:before { content: "\f118"; }
+.fa-minus:before { content: "\f068"; }
+.fa-plus:before { content: "\f067"; }
+.fa-book-open:before { content: "\f518"; }
+.fa-calendar-alt:before { content: "\f073"; }
+.fa-th-large:before { content: "\f009"; }
+.fa-search-plus:before { content: "\f00e"; }
+.fa-bell:before { content: "\f0f3"; }

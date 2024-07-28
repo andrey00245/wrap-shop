@@ -1,4 +1,4 @@
-<div class="home-banner wrap" id="swiper">
+<div class="home-banner wrap" id="topBannersSlider">
   <div class="swiper">
     <div class="swiper-wrapper">
       <div class="swiper-slide home-banner-item">
@@ -35,27 +35,3 @@
     </div>
   </div>
 </div>
-
-@push('scripts')
-<script src="{{asset('js/jquery/jquery.min.js')}}"></script>
-<script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
-<script type="text/javascript">
-  jQuery(document).ready(function ($) {
-    jQuery('.home-banner .swiper-slide').css('display', 'block');
-    var homeBanner = new Swiper("#swiper .swiper", {
-      navigation: {
-        nextEl: "#swiper .swiper-button-next",
-        prevEl: "#swiper .swiper-button-prev",
-      },
-      pagination: {
-        el: "#swiper .swiper-pagination",
-        clickable: true,
-      },
-      lazy: true,
-      autoplay: {
-        delay: 3000,
-      },
-    });
-  });
-</script>
-@endpush

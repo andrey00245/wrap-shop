@@ -1,39 +1,36 @@
 <header class="header ">
   <div class="head-top row">
     <div class="head-top-wrap flex-justify wrap">
-      <form class="head-lang flex-center" action=""
-            method="post" enctype="multipart/form-data" id="form-language">
-        <button class="button language-select active" type="button" name="uk-ua">Ua</button>
-        <button class="button language-select" type="button" name="ru-ru">Ru</button>
-        <button class="button language-select" type="button" name="en-gb">En</button>
+      <div class="head-lang flex-center">
+        <a href="{{ LaravelLocalization::getLocalizedURL('uk') }}" class="button language-select {{LaravelLocalization::getCurrentLocale() === 'uk' ? 'active' : ''}}">Ua</a>
+        <a href="{{ LaravelLocalization::getLocalizedURL('ru') }}" class="button language-select {{LaravelLocalization::getCurrentLocale() === 'ru' ? 'active' : ''}}">Ru</a>
+        <a href="{{ LaravelLocalization::getLocalizedURL('en') }}" class="button language-select {{LaravelLocalization::getCurrentLocale() === 'en' ? 'active' : ''}}">En</a>
         <input type="hidden" name="code" value="">
+      </div>
 
-        <input type="hidden" name="redirect_route" value="common/home">
-        <input type="hidden" name="redirect_query" value="">
-        <input type="hidden" name="redirect_ssl" value="">
-      </form>
+      <div class="head-theme" style="padding: 0; background-color: transparent"></div>
 
-      <form class="head-theme flex-center" action="http://localhost:8888/index.php?route=common/theme/theme"
-            method="post" enctype="multipart/form-data" id="form-theme">
-        <button class="button theme-select  fas fa-sun" type="button" name="light"></button>
-        <button class="button theme-select  active  far fa-moon" type="button" name="dark"></button>
-        <input type="hidden" name="code" value="">
-        <input type="hidden" name="redirect_route" value="http://localhost:8888/">
-      </form>
+{{--      <form class="head-theme flex-center" action="http://localhost:8888/index.php?route=common/theme/theme"--}}
+{{--            method="post" enctype="multipart/form-data" id="form-theme">--}}
+{{--        <button class="button theme-select  fas fa-sun" type="button" name="light"></button>--}}
+{{--        <button class="button theme-select  active  far fa-moon" type="button" name="dark"></button>--}}
+{{--        <input type="hidden" name="code" value="">--}}
+{{--        <input type="hidden" name="redirect_route" value="http://localhost:8888/">--}}
+{{--      </form>--}}
       <nav class="head-menu">
         <ul class="menu">
 
-          <li><a href="http://localhost:8888/videoogljadi/" title="Відеоогляди">Відеоогляди</a></li>
+          <li><a href="" title="Відеоогляди">Відеоогляди</a></li>
 
-          <li><a href="http://localhost:8888/dostavka-ta-oplata/" title="Доставка">Доставка</a></li>
+          <li><a href="" title="Доставка">Доставка</a></li>
 
-          <li><a href="http://localhost:8888/novini-ta-akcii/" title="Новини">Новини</a></li>
+          <li><a href="" title="Новини">Новини</a></li>
 
-          <li><a href="http://localhost:8888/pro-wrap-shop/" title="Про нас">Про нас</a></li>
+          <li><a href="" title="Про нас">Про нас</a></li>
 
-          <li><a href="http://localhost:8888/kontakty/" title="Контакти">Контакти</a></li>
+          <li><a href="" title="Контакти">Контакти</a></li>
 
-          <li><a href="http://localhost:8888/privacy-policy/" title="Оферта">Оферта</a></li>
+          <li><a href="" title="Оферта">Оферта</a></li>
         </ul>
       </nav>
       <div class="head-social flex-center">
@@ -51,7 +48,7 @@
     <div class="head-boot flex-justify wrap">
       <div class="head-catalog-open button">
         <div class="butt-menu"><span></span></div>
-        Каталог товарів
+        {{__('header.catalog_products')}}
       </div>
       <div class="head-catalog-bg"></div>
       <nav class="head-catalog">
@@ -316,32 +313,21 @@
       </div>
       <div class="head-buttons">
         <div class="search-popup-open button search far fa-search"></div>
-        <button onclick="cartPopup();" class="button cart-open far fa-shopping-cart dropdown-toggle"><span
+        <button class="button cart-open far fa-shopping-cart dropdown-toggle"><span
             id="cart-total" class="cart-total flex-center">0</span></button>
-        <div id="cart-popup" class="popup-right">
-          <div class="title">У Вашому кошику</div>
-          <div class="cart-popup-body">
-            <ul>
-              <li>
-                <div class="cart-mini-empty">
 
-                  <img loading="lazy" src="catalog/view/theme/wrapshop/image/empty.png" alt="Кошик порожній"
-                       title="Кошик порожній">
-                  <span>Кошик порожній</span>
-                  Але це ніколи не пізно виправити :)
-                </div>
-                <div class="cart-mini-button">
-                  <div class="continion colord" onclick="cartPopup();">За покупками</div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div class="close button fal fa-times"></div>
-        </div>
-        <div id="wishlist-total" class="button heart login-show far fa-heart"><span
+        {{--если не залогинен то открываем менюшку для авторизации иначе ссылки на личный кабинет--}}
+        @if(true)
+        <div id="wishlist-total" class="button heart login-show far fa-heart login-popup-open"><span
             class="wishlist-total flex-center">0</span></div>
-        <div class="button userform-open login-show far fa-user"></div>
+        <div class="button userform-open login-show far fa-user login-popup-open"></div>
+        @else
+          <a href="https://wrap.shop/index.php?route=account/wishlist" id="wishlist-total" title="Закладки (0)" class="button heart far fa-heart"><span class="wishlist-total flex-center">0</span></a>
+          <a href="https://wrap.shop/account/" title="Особистий кабінет" class="button user far fa-user-check"></a>
+        @endif
+
         <div class="head-top-open button"><i class="far fa-bars"></i></div>
+
       </div>
     </div>
   </div>

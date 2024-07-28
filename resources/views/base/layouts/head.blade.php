@@ -1,11 +1,11 @@
 <head>
-  <style>.yNHHyP-marker-view .IPAZAH-content-container > * {
-      pointer-events: none
-    }
+{{--  <style>.yNHHyP-marker-view .IPAZAH-content-container > * {--}}
+{{--      pointer-events: none--}}
+{{--    }--}}
 
-    .yNHHyP-marker-view .IPAZAH-content-container.HJDHPx-interactive > * {
-      pointer-events: auto
-    }</style>
+{{--    .yNHHyP-marker-view .IPAZAH-content-container.HJDHPx-interactive > * {--}}
+{{--      pointer-events: auto--}}
+{{--    }</style>--}}
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,14 +14,15 @@
   <meta name="description" content="Інтернет-магазин автостайлінгу - Wrap Shop">
 
   <link href="{{mix('build/css/style-dark.css')}}" rel="stylesheet" type="text/css">
-  <link rel="preload" href="{{ asset('assets/fonts/DINPro-Light.woff2') }}" as="font" type="font/woff2" crossorigin="">
-  <link rel="preload" href="{{asset('assets/fonts/DINPro.woff2')}}" as="font" type="font/woff2" crossorigin="">
-  <link rel="preload" href="{{asset('assets/fonts/DINPro-Medium.woff2')}}" as="font" type="font/woff2" crossorigin="">
-  <link rel="preload" href="{{asset('assets/fonts/DINPro-Bold.woff2')}}" as="font" type="font/woff2" crossorigin="">
-  <link rel="preload" href="{{asset('assets/fonts/Gilroy-Regular.woff2')}}" as="font" type="font/woff2" crossorigin="">
-  <link rel="preload" href="{{asset('assets/fonts/Gilroy-Medium.woff2')}}" as="font" type="font/woff2" crossorigin="">
-  <link rel="preload" href="{{asset('assets/fonts/Gilroy-Semibold.woff2')}}" as="font" type="font/woff2" crossorigin="">
-  <link rel="preload" href="{{asset('assets/fonts/Gilroy-Bold.woff2')}}" as="font" type="font/woff2" crossorigin="">
+  <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login.css')}}">
+{{--  <link rel="preload" href="{{ asset('assets/fonts/DINPro-Light.woff2') }}" as="font" type="font/woff2" crossorigin="">--}}
+{{--  <link rel="preload" href="{{asset('assets/fonts/DINPro.woff2')}}" as="font" type="font/woff2" crossorigin="">--}}
+{{--  <link rel="preload" href="{{asset('assets/fonts/DINPro-Medium.woff2')}}" as="font" type="font/woff2" crossorigin="">--}}
+{{--  <link rel="preload" href="{{asset('assets/fonts/DINPro-Bold.woff2')}}" as="font" type="font/woff2" crossorigin="">--}}
+{{--  <link rel="preload" href="{{asset('assets/fonts/Gilroy-Regular.woff2')}}" as="font" type="font/woff2" crossorigin="">--}}
+{{--  <link rel="preload" href="{{asset('assets/fonts/Gilroy-Medium.woff2')}}" as="font" type="font/woff2" crossorigin="">--}}
+{{--  <link rel="preload" href="{{asset('assets/fonts/Gilroy-Semibold.woff2')}}" as="font" type="font/woff2" crossorigin="">--}}
+{{--  <link rel="preload" href="{{asset('assets/fonts/Gilroy-Bold.woff2')}}" as="font" type="font/woff2" crossorigin="">--}}
   <link rel="stylesheet" href="{{asset('assets/css/fonts.css')}}" type="text/css" media="screen">
   <link rel="stylesheet" href="{{asset('assets/css/font-awesome.css')}}" type="text/css" media="screen">
 
@@ -84,56 +85,56 @@
   <!-- End Google Tag Manager -->
 
 
-  <style>
+{{--  <style>--}}
 
-    .swiper-slide {
-      display: none;
-    }
+{{--    .swiper-slide {--}}
+{{--      display: none;--}}
+{{--    }--}}
 
-    .home-banner .swiper-slide:first-child,
-    .product-page-center .product-slider .swiper-slide:first-child,
-    .product-default .image .swiper-slide:first-child {
-      display: block;
-    }
+{{--    .home-banner .swiper-slide:first-child,--}}
+{{--    .product-page-center .product-slider .swiper-slide:first-child,--}}
+{{--    .product-default .image .swiper-slide:first-child {--}}
+{{--      display: block;--}}
+{{--    }--}}
 
-    .home-category .swiper-slide:nth-child(-n+2),
-    #productViewed .swiper-slide:nth-child(-n+2),
-    #homeLatest .swiper-slide:nth-child(-n+2),
-    #homeBestseller .swiper-slide:nth-child(-n+2) {
-      display: flex;
-    }
+{{--    .home-category .swiper-slide:nth-child(-n+2),--}}
+{{--    #productViewed .swiper-slide:nth-child(-n+2),--}}
+{{--    #homeLatest .swiper-slide:nth-child(-n+2),--}}
+{{--    #homeBestseller .swiper-slide:nth-child(-n+2) {--}}
+{{--      display: flex;--}}
+{{--    }--}}
 
-    @media screen and (min-width: 479px) {
-      #homeLatest .swiper-slide:nth-child(-n+3),
-      #productViewed .swiper-slide:nth-child(-n+3),
-      #homeBestseller .swiper-slide:nth-child(-n+3) {
-        display: flex;
-      }
-    }
+{{--    @media screen and (min-width: 479px) {--}}
+{{--      #homeLatest .swiper-slide:nth-child(-n+3),--}}
+{{--      #productViewed .swiper-slide:nth-child(-n+3),--}}
+{{--      #homeBestseller .swiper-slide:nth-child(-n+3) {--}}
+{{--        display: flex;--}}
+{{--      }--}}
+{{--    }--}}
 
-    @media screen and (min-width: 767px) {
-      .home-category .swiper-slide:nth-child(-n+3) {
-        display: flex;
-      }
-    }
+{{--    @media screen and (min-width: 767px) {--}}
+{{--      .home-category .swiper-slide:nth-child(-n+3) {--}}
+{{--        display: flex;--}}
+{{--      }--}}
+{{--    }--}}
 
-    @media screen and (min-width: 1331px) {
-      #homeLatest .swiper-slide:nth-child(-n+4),
-      #productViewed .swiper-slide:nth-child(-n+4),
-      #homeBestseller .swiper-slide:nth-child(-n+4) {
-        display: flex;
-      }
-    }
+{{--    @media screen and (min-width: 1331px) {--}}
+{{--      #homeLatest .swiper-slide:nth-child(-n+4),--}}
+{{--      #productViewed .swiper-slide:nth-child(-n+4),--}}
+{{--      #homeBestseller .swiper-slide:nth-child(-n+4) {--}}
+{{--        display: flex;--}}
+{{--      }--}}
+{{--    }--}}
 
-    .swiper-slide img {
-      height: initial;
-    }
+{{--    .swiper-slide img {--}}
+{{--      height: initial;--}}
+{{--    }--}}
 
-    .hide {
-      display: none !important
-    }
+{{--    .hide {--}}
+{{--      display: none !important--}}
+{{--    }--}}
 
-  </style>
+{{--  </style>--}}
 
 
   <!-- Google tag (gtag.js) -->

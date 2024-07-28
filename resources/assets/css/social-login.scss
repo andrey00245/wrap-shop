@@ -1,0 +1,624 @@
+@charset "UTF-8";
+a,
+button,
+input,
+textarea {
+  border-radius: 0;
+}
+button:focus {
+  outline: 0;
+}
+.onclick {
+  cursor: pointer;
+}
+.none {
+  display: none;
+}
+.clearfix::after {
+  display: block;
+  content: "";
+  clear: both;
+}
+.form {
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+.form p {
+  font-size: 17px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 24px;
+}
+@media (max-width: 767px) {
+  .form p {
+    font-size: 15px;
+  }
+}
+.form .form-group {
+  position: relative;
+}
+.slerror {
+  color: #fd7b7c;
+}
+.form-group.has-error .form-field,
+.iti.has-error .form-field {
+  border-color: orange;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.form-group.has-error .form-field+.slerror,
+.iti.has-error .form-field+.slerror {
+  text-align: left;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 0;
+  display: block;
+  position: absolute;
+  top: -20px;
+}
+.form-group.has-error .form-field+.slerror:before,
+.iti.has-error .form-field+.slerror:before {
+  content: "\f06a";
+  font-family: 'Font Awesome 5 Regular';
+  font-weight: 400;
+  display: inline-block;
+  margin-right: 5px;
+}
+.form-group.has-error .form-field+.slerror,
+.iti.has-error .form-field+.slerror,
+.alert-warning,
+.alert-danger {
+  color: #fd7b7c;
+  border-color: #eed8d4;
+}
+.form-group.has-error .form-field+.slerror,
+.iti.has-error .form-field+.slerror,
+.form-group.has-error .form-field,
+.iti.has-error .form-field {
+  border-color: #fd7b7c;
+}
+.form-group .form-field.readonly {
+  background: #fafafa !important;
+  pointer-events: none;
+}
+div#slagreep {
+  font-size: 12px;
+  padding-bottom: 12px;
+  font-weight: 600;
+}
+.form input[type="email"]:-ms-input-placeholder,
+.form input[type="password"]:-ms-input-placeholder,
+.form input[type="tel"]:-ms-input-placeholder,
+.form input[type="text"]:-ms-input-placeholder,
+.form select:-ms-input-placeholder,
+.form textarea:-ms-input-placeholder {
+  color: #000;
+}
+.form input[type="email"]::placeholder,
+.form input[type="password"]::placeholder,
+.form input[type="tel"]::placeholder,
+.form input[type="text"]::placeholder,
+.form select::placeholder,
+.form textarea::placeholder {
+  color: #000;
+}
+.form input[type="email"]:focus,
+.form input[type="password"]:focus,
+.form input[type="tel"]:focus,
+.form input[type="text"]:focus,
+.form select:focus,
+.form textarea:focus {
+  outline: 0;
+  border-color: #53a545;
+}
+.form select {
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: "";
+  background: url('../img/arrow_down_black.png') 96% 19px no-repeat;
+}
+@media (max-width: 767px) {
+  .form select {
+    background-position-y: 20px;
+  }
+}
+.form .upload_files {
+  display: -ms-flexbox;
+  display: flex;
+  margin-bottom: 23px;
+}
+.form .attachments_text {
+  font-family: Rubik-Light;
+  font-size: 18px;
+  line-height: 40px;
+  margin-right: 10px;
+}
+.form .upload_files .upload_btn {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1px solid #c4c4c4;
+  transition: all 0.2s;
+}
+.form .upload_files .upload_btn svg {
+  width: 20px;
+  height: 18px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  fill: #53a545;
+}
+.form .upload_files .upload_btn input[type="file"] {
+  display: none;
+}
+.form-group .iti--separate-dial-code .iti__selected-flag {
+  background-color: rgba(0,0,0,0) !important;
+  max-height: 60px !important;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+.form-group .iti--separate-dial-code .iti__selected-flag:hover {
+  background-color: rgba(0,0,0,0) !important;
+}
+.checkbox.is_checkbox input[type=checkbox].input-checkbox_reg {
+  margin-right: 5px;
+  position: relative;
+}
+.form-group required {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  transition: 0.2s ease all;
+  -moz-transition: 0.2s ease all;
+  -webkit-transition: 0.2s ease all;
+  z-index: 22;
+  width: 42px;
+  background-color: rgba(242,222,222,0.22);
+  height: 42px;
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+  text-align: center;
+  padding: 13px;
+  border-left: 1px solid #ddd;
+}
+.form-group required:after {
+  content: "\f314";
+  display: inline-block;
+  font: normal normal normal 18px/1 'Ionicons';
+  font-size: 10px;
+  color: #777;
+}
+#popup-registration .form-group .control-label {
+  font-size: 17px;
+  line-height: 22px;
+  color: rgba(0,0,0,.5);
+  margin-bottom: 5px;
+}
+.input-checkbox_reg {
+  background: #fff;
+  width: 18px;
+  height: 18px;
+  box-shadow: 0 0 0 0 #ab0000 inset;
+  transition: all 0.2s ease-in-out;
+  -webkit-appearance: none;
+  -webkit-font-smoothing: inherit;
+  position: relative;
+  cursor: pointer;
+  vertical-align: -4px;
+  outline: 0;
+  border: 1px solid;
+  border-radius: 4px;
+  border-color: #cccccc;
+}
+.input-checkbox_reg:checked:after {
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  opacity: 1;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=100);
+  content: "";
+  display: block;
+  width: 6px;
+  height: 10px;
+  border-top: 2px solid #1f90bb;
+  border-left: 2px solid #1f90bb;
+  transform: rotate(-135deg);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+.input-checkbox_reg:after {
+  content: "\f00c";
+  display: inline-block;
+  font: normal normal normal 18px/1 FontAwesome;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  position: absolute;
+  right: 2px;
+  font-size: 14px;
+  top: 2px;
+  color: #fff;
+}
+.input-checkbox_reg:hover {
+  border-color: #cccccc;
+}
+.form-group .input-radio {
+  margin-right: 5px;
+}
+.input-radio_reg {
+  width: 18px;
+  height: 18px;
+  box-shadow: 0 0 0 0 green inset;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  cursor: pointer;
+  vertical-align: -4px;
+  outline: 0;
+  border: 1px solid;
+  border-radius: 50%;
+  color: #777;
+  font: inherit;
+  padding: 0;
+  -webkit-appearance: none;
+  -webkit-font-smoothing: inherit;
+  background: transparent;
+  line-height: normal;
+  margin: 4px 0 0;
+}
+.input-radio_reg:checked {
+  border: none;
+  box-shadow: 0 0 0 10px #1f90bb inset;
+}
+.input-radio_reg:checked:after {
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  opacity: 1;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=100);
+}
+.input-radio_reg:after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: scale(0.2);
+  transform: scale(0.2);
+  transition: all 0.2s ease-in-out 0.1s;
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  margin-top: -2px;
+  background-color: #fff;
+  border-radius: 50%;
+}
+.login-button {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 186px;
+  padding-left: 50px;
+  position: relative;
+  font-weight: 500;
+  text-align: center;
+}
+a.login-button,
+a.login-button:hover {
+  color: #797979;
+}
+.login-button:focus {
+  outline: 0;
+}
+@media (max-width: 991px) {
+  .social_block .social-icon {
+    min-width: 150px;
+    max-width: 150px;
+  }
+}
+@media (max-width: 450px) {
+  .social_block .social-icon {
+    min-width: 145px !important;
+    max-width: 145px;
+    width: 145px;
+    margin: 4px auto;
+  }
+  .social_block .login-facebook-logo,
+  .social_block .login-google-logo,
+  .social_block .login-twitter-logo,
+  .social_block .login-telegram-logo,
+  .social_block .login-apple-logo,
+  .social_block .login-discord-logo,
+  .social_block .login-reddit-logo,
+  .social_block .login-linkedin-logo {
+    left: 9px;
+    top: -7px;
+  }
+}
+@media (max-width: 335px) {
+  .social_block .social-icon {
+    min-width: 100px !important;
+    max-width: 100px;
+    width: 100px;
+    margin: 4px auto;
+  }
+  .social_block .social-icon .social-container-box {
+    padding: 9px 9px 0 0;
+    height: 40px;
+    max-width: 150px;
+  }
+  .social_block .social-icon .login-button {
+    padding-left: 32px;
+    font-size: 11px;
+  }
+  .social_block .login-facebook-logo,
+  .social_block .login-google-logo,
+  .social_block .login-twitter-logo,
+  .social_block .login-telegram-logo,
+  .social_block .login-apple-logo,
+  .social_block .login-discord-logo,
+  .social_block .login-reddit-logo,
+  .social_block .login-linkedin-logo {
+    left: 5px;
+    top: -3px;
+    width: 25px;
+  }
+}
+/*.popup-overlay {
+	display: none;
+	right: 0;
+}*/
+.popup-window {
+  display: none;
+}
+.btn-close-popup {
+  position: absolute;
+  z-index: 99;
+  width: 34px;
+  height: 34px;
+  top: 0;
+  right: 0;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+.btn-close-popup:after,
+.btn-close-popup:before {
+  content: "";
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: #95a0a6;
+  position: absolute;
+  top: 50%;
+  margin-top: -1px;
+  left: 50%;
+  margin-left: -11px;
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+.btn-close-popup:after {
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+.btn-close-popup:hover:after,
+.btn-close-popup:hover:before {
+  background-color: #1b1f21;
+}
+.popup-window p {
+  font-weight: bold;
+  padding-bottom: 20px;
+}
+.popup-social {
+  padding: 5px 0 5px;
+}
+.popup-social .social_block {
+  margin-bottom: 20px;
+  column-gap: 20px;
+}
+.popup-social .social_block .soc_ico {
+  width: 50px;
+  height: 50px;
+  border: 1px solid;
+}
+.social_block .soc_ico svg {
+  transition: all 0.2s;
+  width: 25px;
+  height: 25px;
+}
+.social_block .soc_ico:hover.facebook {
+  background-color: #1877f2;
+}
+.social_block .soc_ico:hover.google {
+  background-color: #ea4335;
+}
+.social_block .soc_ico:hover.twitter {
+  background-color: #1da1f2;
+}
+.social_block .soc_ico:hover.telegram {
+  background-color: #0088cc;
+}
+.social_block .soc_ico:hover.apple {
+  background-color: #000000;
+}
+.social_block .soc_ico:hover.discord {
+  background-color: #7289da;
+}
+.social_block .soc_ico:hover.reddit {
+  background-color: #FF5700;
+}
+.social_block .soc_ico:hover.reddit svg path {
+  fill: #fff !important;
+}
+.social_block .soc_ico:hover.linkedin {
+  background-color: #0078d4;
+}
+.social_block .soc_ico:hover {
+  border-color: transparent;
+}
+.social_block .soc_ico:hover svg {
+  fill: #fff;
+}
+.social_block .social-icon {
+  display: inline-block;
+  min-width: 150px;
+  margin: 4px 5px 0 0;
+}
+.social_block .social-icon:first-child {
+  padding-left: 0;
+}
+.social_block .social-icon:last-child {
+  padding-right: 0;
+}
+.social_block .social-icon .social-container-box {
+  border: 1px solid #bfc0c6;
+  background-color: #fff;
+  border-radius: 5px;
+  text-align: left;
+  padding: 14px 14px 0 0;
+  height: 50px;
+  cursor: pointer;
+  max-width: 150px;
+  margin: 0 auto;
+}
+.social_block .social-icon .social-container-box:hover {
+  box-shadow: 0 0px 5px #eaeaec;
+}
+.social_block .login-facebook-logo,
+.social_block .login-google-logo,
+.social_block .login-twitter-logo,
+.social_block .login-telegram-logo,
+.social_block .login-apple-logo,
+.social_block .login-discord-logo,
+.social_block .login-reddit-logo,
+.social_block .login-linkedin-logo {
+  position: absolute;
+  left: 9px;
+  top: -6px;
+}
+.popup-social .social_block .social-container {
+  min-width: 133px;
+}
+@media (max-width: 767px) {
+  .popup-window {
+    width: 100%;
+    height: 100%;
+  }
+  .popup-window .inner {
+    max-height: 100%;
+  }
+  #popup-login .form .send_btn {
+    margin: 0 auto 25px !important;
+  }
+  .form-group .iti--separate-dial-code .iti__selected-flag {
+    max-height: 50px !important;
+  }
+  .input-icon {
+    top: 18px;
+  }
+}
+.popup-window .reg_block {
+  border-top: 1px solid #e5e5e5;
+  padding-top: 10px;
+}
+#popup-registration .login-show:hover,
+.popup-window .forgot_password:hover,
+.popup-window .reg_form_link:hover {
+  border-bottom: 1px dashed;
+}
+#popup-forgot_password-sucess .login-show {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: center;
+}
+.reg-confirm-eye.active,
+.reg-password-eye.active,
+.password-eye.active {
+  background-position: -2px 22px;
+}
+.reg-confirm-eye,
+.reg-password-eye,
+.password-eye {
+  background: url('../img/login_sprite.png') -2px 44px;
+  background-position-x: -2px;
+  background-position-y: 44px;
+  right: 10px;
+  position: absolute;
+  top: 20px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  border: 0;
+}
+@media (max-width: 767px) {
+  .reg-confirm-eye,
+  .reg-password-eye,
+  .password-eye {
+    top: 16px;
+  }
+}
+.datetime,
+.date,
+.time {
+  position: relative;
+  display: unset;
+}
+.datetime i,
+.date i,
+.time i {
+  position: absolute;
+  color: gray;
+  right: 14px;
+  top: calc(50% - 0.5em);
+}
+.input-icon {
+  position: absolute;
+  left: 0;
+  top: 23px;
+  border-right: 1px solid #c4c4c4;
+  padding: 0 10px;
+}
+.form-group.has-error .icon-error {
+  color: #fd7b7c;
+  border-color: #fd7b7c;
+}
+#popup-login .form-group.group-email input[type="email"]:focus+.input-icon,
+#popup-login .form-group.group-password input[type="password"]:focus+.input-icon,
+#popup-login .form-group.group-password input[type="text"]:focus+.input-icon{
+  outline: 0;
+  border-color: #53a545;
+}
+#popup-login .form-group.group-email,
+#popup-login .form-group.group-password {
+
+  position: relative;
+}
+#popup-login .form-group.group-email input[type="email"],
+#popup-login .form-group.group-password input[type="text"],
+#popup-login .form-group.group-password input[type="password"],
+#popup-forgot_password .form-group.group-email input[type="email"] {
+  padding: 0 24px 0 45px !important;
+}
+.no-overflow {
+  overflow: hidden;
+}
+.simplecheckout-left-column .simplecheckout-block .popup-social p {padding-bottom: 12px}
+#simplecheckout_login #column-login {
+  display: none;
+}

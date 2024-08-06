@@ -1,5 +1,5 @@
 <section class="home-about">
-  <img loading="lazy" src="" title="Wrap-Shop" alt="Wrap-Shop" width="1512" height="549">
+  <img loading="lazy" src="{{asset('assets/img/about.webp')}}" title="Wrap-Shop" alt="Wrap-Shop" width="1512" height="549">
 
 {{--    <video width="1512" height="549" autoplay muted loop>--}}
 {{--        <source src="image/catalog/video-preview/1.mp4" type="video/mp4">--}}
@@ -7,7 +7,7 @@
 {{--      </video>--}}
 
   <div class="home-about-text"> fdsfsdfsdfsd </div>
-  <div class="home-about-play  button" data-src="" data-fancybox="about-play">
+  <div class="home-about-play  button" data-src="{{asset('assets/video/video.mp4')}}" data-fancybox="about-play">
     <i class="far fa-play button colord"></i>
   </div>
 </section>
@@ -24,14 +24,14 @@
       <p>WrapShop - це найбільша мережа магазинів і установчих центрів, де ви можете купити автомобільні плівки (антигравійна, тонувальна, атермальна, вінілова), інструмент для роботи з автомобільними плівками (тонувальний інструмент, турбосушка), матеріали для детейлінгу. Ми - піонери на ринку автомобільних плівок і були першими, хто привіз у 2008 році поліуретанову плівку в Україну. Ми є прямим імпортером і офіційним дистриб'ютором таких брендів, як 3M, SunTek, LLumar, PremiumShield, Madico, Meguiar's, Lake </p>
       <p>WrapShop - це найбільша мережа магазинів і установчих центрів, де ви можете купити автомобільні плівки (антигравійна, тонувальна, атермальна, вінілова), інструмент для роботи з автомобільними плівками (тонувальний інструмент, турбосушка), матеріали для детейлінгу. Ми - піонери на ринку автомобільних плівок і були першими, хто привіз у 2008 році поліуретанову плівку в Україну. Ми є прямим імпортером і офіційним дистриб'ютором таких брендів, як 3M, SunTek, LLumar, PremiumShield, Madico, Meguiar's, Lake</p>
     </div>
-    <span class="seo-btn show"><i class="fas fa-chevron-right"></i>fdsfdsfsdf</span>
-    <span class="seo-btn collapse" style="display: none"><i class="fas fa-chevron-right"></i>fdsfdfdsfdsfd </span>
+    <span class="seo-btn show"><i class="fas fa-chevron-right"></i>{{__('header_footer.read_more')}}</span>
+    <span class="seo-btn collapse" style="display: none"><i class="fas fa-chevron-right"></i>{{__('header_footer.read_less')}}</span>
   </div>
   <div class="ellipse orange"></div>
   <div class="wrap flex-justify">
     <div class="foot-info">
       <div class="foot-logo">
-        <a href="/" title="Wrap-Shop"><img loading="lazy" src="catalog/view/theme/wrapshop/image/logo.png" alt="Wrap-Shop" title="Wrap-Shop" width="118" height="124"></a>
+        <a href="/" title="Wrap-Shop"><img loading="lazy" src="{{asset('assets/img/logo.png')}}" alt="Wrap-Shop" title="Wrap-Shop" width="118" height="124"></a>
       </div>
     </div>
     <nav class="foot-catalog foot-item">
@@ -103,13 +103,18 @@
       </ul>
     </nav>
     <nav class="foot-menu foot-item">
-      <div class="title">32321321312</div>
+      <div class="title">{{__('header_footer.information')}}</div>
       <ul class="menu">
-        <li><a href="#" target="_blank" title="Offers">Offers</a></li>
+        <li><a href="" title="{{__('header_footer.video_reviews')}}">{{__('header_footer.video_reviews')}}</a></li>
+        <li><a href="" title="{{__('header_footer.delivery')}}">{{__('header_footer.delivery')}}</a></li>
+        <li><a href="" title="{{__('header_footer.news')}}">{{__('header_footer.news')}}</a></li>
+        <li><a href="" title="{{__('header_footer.about_us')}}">{{__('header_footer.about_us')}}</a></li>
+        <li><a href="" title="{{__('header_footer.contact_us')}}">{{__('header_footer.contact_us')}}</a></li>
+        <li><a href="" target="_blank" title="{{__('header_footer.offers')}}">{{__('header_footer.offers')}}</a></li>
       </ul>
     </nav>
     <div class="foot-add foot-item">
-      <div class="title">12321312</div>
+      <div class="title">{{__('header_footer.our_office')}}</div>
       <a href="#" target="_blank" title="32321321312">32321321312</a>
 
       <a href="#" target="_blank" title="32321321312">32321321312</a>
@@ -125,7 +130,7 @@
     </div>
 
     <div class="foot-contact foot-item">
-      <div class="title">Контакти</div>
+      <div class="title">{{__('header_footer.contact_us')}}</div>
       <a href="tel:+38000000000" class="phone" ><span>+38</span>00000000</a>
       <a href="mailto:ааааааааааа" class="email" title="ааааааааааа" >ааааааааааа</a>
       <div class="social">
@@ -133,12 +138,29 @@
         <a href="#" title="Instagram" target="_blank" class="fab fa-instagram"></a>
       </div>
     </div>
-    <div class="foot-copir">ааааааааааа</div>
+    <div class="foot-copir">{{__('header_footer.all_rights_reserved', ['year'=> date('Y')])}}</div>
   </div>
+
   <div class="foot-form foot-item">
     <div class="wrap">
-      <div class="title">ааааааааааа</div>
-      {ocdw_form_builder_2}
+      <div class="title">{{__('header_footer.subscribe')}}</div>
+{{--      <div id="ocdw_form_builder-block-2">--}}
+{{--        <div class="inner-center">--}}
+          <div class="alert-block"></div>
+          <form id="ocdw_form_builder-form-2">
+            <div class="inner-box">
+              <div class="fields-block">
+                <div data-error-row="5" data-field-type="email" class="field-col-1 ">
+                  <div class="inner-field">
+                    <input name="email" class="form-control" type="email" value="" placeholder="Email">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="save-form button button-loading foot-form-send">{{__('header_footer.subscribe_btn')}}</button>
+          </form>
+{{--        </div>--}}
+{{--      </div>--}}
     </div>
   </div>
 </footer>
@@ -189,16 +211,14 @@
 {{--{% for script in scripts %}--}}
 {{--<script src="{{ script }}" type="text/javascript"defer></script>--}}
 {{--{% endfor %}--}}
-{{--<link rel="stylesheet" href="catalog/view/theme/wrapshop/css/jquery.fancybox.min.css" media="screen">--}}
-{{--<script src="catalog/view/theme/wrapshop/js/jquery.fancybox.min.js" defer></script>--}}
+<link rel="stylesheet" href="https://wrap.shop/catalog/view/theme/wrapshop/css/jquery.fancybox.min.css" media="screen">
+<script src="https://wrap.shop/catalog/view/theme/wrapshop/js/jquery.fancybox.min.js" defer></script>
 
 
 @stack('scripts')
 
 
 <script>
-
-  // map
   function initMap() {
     const map = new google.maps.Map(document.getElementById("map"), {
       center: { lat: 50.4126427, lng: 30.5161722 },
@@ -207,31 +227,29 @@
       disableDefaultUI: true,
     });
 
+    const linkHref = document.createElement("a")
+    linkHref.href="https://maps.app.goo.gl/EYgRqUsBU19i7m1k8";
+    linkHref.target="_blank";
+
     const beachFlagImg = document.createElement("img");
-    beachFlagImg.src = "catalog/view/theme/wrapshop/image/icon/marker.png";
+    beachFlagImg.src = "{{asset('assets/img/marker.png')}}";
     beachFlagImg.width = "122";
     beachFlagImg.height = "130";
-    const marker = new google.maps.Marker({
-      url: 'https://maps.app.goo.gl/EYgRqUsBU19i7m1k8',
-    });
+
+    linkHref.appendChild(beachFlagImg);
+
     const markerView = new google.maps.marker.AdvancedMarkerView({
       map,
       position: { lat: 50.411282921548, lng: 30.51737119923972 },
-      content: beachFlagImg,
+      content: linkHref,
       title: "Wrap Shop",
     });
-
-    markerView.addListener("click", () => {
-      window.location.href = marker.url;
-      window.open(marker.url, '_blank');
-    });
-
   }
   window.initMap = initMap;
   // map
   window.onload = function() {
     setTimeout(() => {
-      $('#map-script').attr('src', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyA2Y99tMi-FLtesGscVuHm2qfHEEoIn3jo&callback=initMap&libraries=marker,places&v=beta&language=uk');
+      $('#map-script').attr('src', 'https://maps.googleapis.com/maps/api/js?key={{config('app.google_map_key')}}&callback=initMap&libraries=marker,places&v=beta&language={{LaravelLocalization::getCurrentLocale()}}');
     },3000);
   }
 </script>
@@ -300,7 +318,7 @@
 
   $('input[type="tel"]').on('click', function() {
     $(this).prev('.notice-text').remove();
-    $(this).before('<span class="notice-text">112312312312</span>');
+    $(this).before('<span class="notice-text">{{__('footer.phone_notice')}}</span>');
   });
 
   $('input[type="tel"]').on('blur', function() {

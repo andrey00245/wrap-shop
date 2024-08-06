@@ -4,8 +4,6 @@ const mask = (selector) => {
     function setMask() {
         let matrix = '+###############';
 
-        console.log(maskList)
-
         maskList.forEach(item => {
             let code = item.code.replace(/[\s#]/g, ''),
                 phone = this.value.replace(/[\s#-)(]/g, '');
@@ -33,8 +31,5 @@ const mask = (selector) => {
     });
 };
 
-
-console.log(1)
 mask("#tel-phone-loginpopup");
 mask("#input-telephone");
-console.log(2)

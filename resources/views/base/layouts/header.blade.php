@@ -5,7 +5,7 @@
         <a href="{{ LaravelLocalization::getLocalizedURL('uk') }}" class="button language-select {{LaravelLocalization::getCurrentLocale() === 'uk' ? 'active' : ''}}">Ua</a>
         <a href="{{ LaravelLocalization::getLocalizedURL('ru') }}" class="button language-select {{LaravelLocalization::getCurrentLocale() === 'ru' ? 'active' : ''}}">Ru</a>
         <a href="{{ LaravelLocalization::getLocalizedURL('en') }}" class="button language-select {{LaravelLocalization::getCurrentLocale() === 'en' ? 'active' : ''}}">En</a>
-        <input type="hidden" name="code" value="">
+{{--        <input type="hidden" name="code" value="">--}}
       </div>
 
       <div class="head-theme" style="padding: 0; background-color: transparent"></div>
@@ -19,18 +19,12 @@
 {{--      </form>--}}
       <nav class="head-menu">
         <ul class="menu">
-
-          <li><a href="" title="Відеоогляди">Відеоогляди</a></li>
-
-          <li><a href="" title="Доставка">Доставка</a></li>
-
-          <li><a href="" title="Новини">Новини</a></li>
-
-          <li><a href="" title="Про нас">Про нас</a></li>
-
-          <li><a href="" title="Контакти">Контакти</a></li>
-
-          <li><a href="" title="Оферта">Оферта</a></li>
+          <li><a href="" title="{{__('header_footer.video_reviews')}}">{{__('header_footer.video_reviews')}}</a></li>
+          <li><a href="" title="{{__('header_footer.delivery')}}">{{__('header_footer.delivery')}}</a></li>
+          <li><a href="" title="{{__('header_footer.news')}}">{{__('header_footer.news')}}</a></li>
+          <li><a href="" title="{{__('header_footer.about_us')}}">{{__('header_footer.about_us')}}</a></li>
+          <li><a href="" title="{{__('header_footer.contact_us')}}">{{__('header_footer.contact_us')}}</a></li>
+          <li><a href="" title="{{__('header_footer.offers')}}">{{__('header_footer.offers')}}</a></li>
         </ul>
       </nav>
       <div class="head-social flex-center">
@@ -38,7 +32,7 @@
         <a href="##" title="Instagram" target="_blank" class="fab fa-instagram"></a>
       </div>
       <div class="head-phone flex-center">
-        <div class="title">Телефон</div>
+        <div class="title">{{__('header_footer.phone')}}</div>
         <a href="tel:+380660003202"><span>+38</span> 066 000 32 02</a>
       </div>
       <div class="head-top-close button"><i class="fal fa-times"></i></div>
@@ -48,7 +42,7 @@
     <div class="head-boot flex-justify wrap">
       <div class="head-catalog-open button">
         <div class="butt-menu"><span></span></div>
-        {{__('header.catalog_products')}}
+        {{__('header_footer.catalog_products')}}
       </div>
       <div class="head-catalog-bg"></div>
       <nav class="head-catalog">
@@ -303,12 +297,12 @@
       </nav>
       <div class="head-logo">
         <a href="http://localhost:8888/" title="Wrap.Shop">
-          <img loading="lazy" src="https://wrap.shop/image/catalog/logo.png"
+          <img loading="lazy" src="{{asset('assets/img/logo.png')}}"
                title="Wrap.Shop" alt="Wrap.Shop" width="93"
                height="98"></a>
       </div>
       <div class="head-phone-mobil">
-        <div class="title">Телефон</div>
+        <div class="title">{{__('header_footer.phone')}}</div>
         <a href="tel:+380660003202"><span>+38</span> 066 000 32 02</a>
       </div>
       <div class="head-buttons">

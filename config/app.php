@@ -97,6 +97,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+  'google_map_key' => env('GOOGLE_MAP_KEY',''),
+
     'key' => env('APP_KEY'),
 
     'previous_keys' => [

@@ -1,0 +1,59 @@
+* {touch-action: manipulation;}
+
+
+@font-face {
+  font-family: 'DINPro';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../fonts/DINPro-Light.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DINPro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/DINPro.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DINPro';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/DINPro-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DINPro';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/DINPro-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Gilroy';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/Gilroy-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Gilroy';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/Gilroy-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Gilroy';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/Gilroy-Semibold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Gilroy';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/Gilroy-Bold.woff2') format('woff2');
+}

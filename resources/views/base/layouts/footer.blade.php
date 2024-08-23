@@ -6,8 +6,14 @@
 {{--        Your browser does not support the video tag.--}}
 {{--      </video>--}}
 
-  <div class="home-about-text"> fdsfsdfsdfsd </div>
-  <div class="home-about-play  button" data-src="{{asset('assets/video/video.mp4')}}" data-fancybox="about-play">
+
+  <div class="home-about-text">
+    <h2 class="title">Стайлінг – наше життя</h2>
+    <p style="margin-bottom: 0; padding: 0; touch-action: manipulation;"><span style="font-size: 14px;">Wrap.Shop - ваш путівник у світ автомобільного вдосконалення та тюнінгу.</span></p>
+    <p style="margin-bottom: 0; padding: 0; touch-action: manipulation;"><span style="font-size: 14px;">Кольорові та захисні плівки, інструменти для майстрів, продукти для догляду та детейлінгу, повний тюнінг авто - усе тут.</span></p>
+  </div>
+
+  <div class="home-about-play button" data-src="{{asset('assets/video/video.mp4')}}" data-fancybox="about-play">
     <i class="far fa-play button colord"></i>
   </div>
 </section>
@@ -31,7 +37,7 @@
   <div class="wrap flex-justify">
     <div class="foot-info">
       <div class="foot-logo">
-        <a href="/" title="Wrap-Shop"><img loading="lazy" src="{{asset('assets/img/logo.png')}}" alt="Wrap-Shop" title="Wrap-Shop" width="118" height="124"></a>
+        <a href="{{route('index')}}" title="Wrap-Shop"><img loading="lazy" src="{{asset('assets/img/logo.png')}}" alt="Wrap-Shop" title="Wrap-Shop" width="118" height="124"></a>
       </div>
     </div>
     <nav class="foot-catalog foot-item">
@@ -104,14 +110,7 @@
     </nav>
     <nav class="foot-menu foot-item">
       <div class="title">{{__('header_footer.information')}}</div>
-      <ul class="menu">
-        <li><a href="" title="{{__('header_footer.video_reviews')}}">{{__('header_footer.video_reviews')}}</a></li>
-        <li><a href="" title="{{__('header_footer.delivery')}}">{{__('header_footer.delivery')}}</a></li>
-        <li><a href="" title="{{__('header_footer.news')}}">{{__('header_footer.news')}}</a></li>
-        <li><a href="" title="{{__('header_footer.about_us')}}">{{__('header_footer.about_us')}}</a></li>
-        <li><a href="" title="{{__('header_footer.contact_us')}}">{{__('header_footer.contact_us')}}</a></li>
-        <li><a href="" target="_blank" title="{{__('header_footer.offers')}}">{{__('header_footer.offers')}}</a></li>
-      </ul>
+      @include('base.layouts.menu')
     </nav>
     <div class="foot-add foot-item">
       <div class="title">{{__('header_footer.our_office')}}</div>
@@ -187,8 +186,7 @@
 {{--<script src="catalog/view/javascript/sociallogin/sociallogin.js" type="text/javascript"defer></script>--}}
 {{--<script src="catalog/view/javascript/sap_sms/sap_sms.js" type="text/javascript"defer></script>--}}
 @push('scripts')
-  <script src="{{mix('build/js/app.js')}}" type="text/javascript"></script>
-  <script src="{{mix('build/js/mask.js')}}" type="text/javascript"></script>
+
 @endpush
 
 
@@ -211,10 +209,16 @@
 {{--{% for script in scripts %}--}}
 {{--<script src="{{ script }}" type="text/javascript"defer></script>--}}
 {{--{% endfor %}--}}
-<link rel="stylesheet" href="https://wrap.shop/catalog/view/theme/wrapshop/css/jquery.fancybox.min.css" media="screen">
-<script src="https://wrap.shop/catalog/view/theme/wrapshop/js/jquery.fancybox.min.js" defer></script>
+<script src="{{asset('js/fancybox/fancybox.umd.js')}}"></script>
+<link rel="stylesheet" href="{{asset('js/fancybox/fancybox.css')}}" media="screen">
 
+<script>
 
+</script>
+
+<script src="{{asset('js/jquery/jquery.min.js')}}"></script>
+<script src="{{mix('build/js/app.js')}}" type="text/javascript"></script>
+<script src="{{mix('build/js/mask.js')}}" type="text/javascript"></script>
 @stack('scripts')
 
 
@@ -318,7 +322,7 @@
 
   $('input[type="tel"]').on('click', function() {
     $(this).prev('.notice-text').remove();
-    $(this).before('<span class="notice-text">{{__('footer.phone_notice')}}</span>');
+    $(this).before('<span class="notice-text">{{__('header_footer.phone_notice')}}</span>');
   });
 
   $('input[type="tel"]').on('blur', function() {
@@ -326,7 +330,7 @@
   });
 </script>
 <script src="//code.tidio.co/qzgrxeqydewl3hb2slszufoiu8sb9we7.js" async></script>
-<script type="text/javascript">
+<script type="text/javascript" async>
   (function(d, w, s) {
     var widgetHash = 'mayoy83q3bdx7xddnztw', gcw = d.createElement(s); gcw.type = 'text/javascript'; gcw.async = true;
     gcw.src = '//widgets.binotel.com/getcall/widgets/'+ widgetHash +'.js';

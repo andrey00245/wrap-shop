@@ -18,5 +18,8 @@ return [
   'subscribe_btn' => 'Отправить',
   'all_rights_reserved' => 'Все права защищены. © :year',
 
+  'home' => 'Главная'
+
+
 ];
 ?>

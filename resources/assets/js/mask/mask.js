@@ -32,4 +32,5 @@ const mask = (selector) => {
 };
 
 mask("#tel-phone-loginpopup");
+mask("#edit_telephone");
 mask("#input-telephone");

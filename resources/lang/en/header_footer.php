@@ -20,6 +20,8 @@ return [
   'subscribe_btn' => 'Sending',
   'all_rights_reserved' => 'All rights reserved. © :year',
 
+  'home' => 'Home'
+
 
 ];
 ?>

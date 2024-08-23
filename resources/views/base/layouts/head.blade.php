@@ -9,9 +9,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Інтернет-магазин автостайлінгу - Wrap Shop</title>
+  <title>fsdfsdfsdfsdfsd</title>
 {{--  <base href="http://localhost:8888/">--}}
-  <meta name="description" content="Інтернет-магазин автостайлінгу - Wrap Shop">
+  <meta name="description" content="fdsfdsfdsfdsf">
 
   <link href="{{mix('build/css/style-dark.css')}}" rel="stylesheet" type="text/css">
   <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login.css')}}">
@@ -28,15 +28,17 @@
 
   <link rel="stylesheet" href="{{asset('assets/css/swiper-bundle.min.css')}}" media="screen">
 
+  @stack('styles')
+
 
 {{--  <link rel="stylesheet" href="catalog/view/theme/wrapshop/css/?1234" media="screen">--}}
 {{--  <script src="catalog/view/theme/wrapshop/js/lazyloadmin.js" defer></script>--}}
 
 
-  <link rel="alternate" hreflang="uk-ua" href="http://localhost:8888/">
-  <link rel="alternate" hreflang="x-default" href="http://localhost:8888/">
-  <link rel="alternate" hreflang="ru-ua" href="http://localhost:8888/ru/">
-  <link rel="alternate" hreflang="en-gb" href="http://localhost:8888/en/">
+  <link rel="alternate" hreflang="uk-ua" href="{{LaravelLocalization::getLocalizedURL('uk')}}">
+  <link rel="alternate" hreflang="x-default" href="{{LaravelLocalization::getLocalizedURL('uk')}}">
+  <link rel="alternate" hreflang="ru-ua" href="{{LaravelLocalization::getLocalizedURL('ru')}}">
+  <link rel="alternate" hreflang="en-gb" href="{{LaravelLocalization::getLocalizedURL('en')}}">
 
 
 {{--  <link href="http://localhost:8888/" rel="canonical">--}}

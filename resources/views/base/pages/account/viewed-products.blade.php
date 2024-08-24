@@ -2,13 +2,13 @@
 
 @section('account.content')
   <div id="content" class="page-account-right">
-    <h1>Переглянуті товари</h1>
+    <h1>{{__('personal-account.reviewed-products.title')}}</h1>
     <div class="account-products-list flex-wrap">
       <div class="item product-default" data-ids="101" id="productViewedItem1">
         <div class="top flex-justify">
-          <div class="sku">Код: 11059</div>
+          <div class="sku">{{__('general-translate.product_card.code')}} 11059</div>
           <div class="wishlist">
-            <button type="button" class="button far fa-heart" title="В закладки"
+            <button type="button" class="button far fa-heart" title="{{__('general-translate.product_card.add_wishlist')}}"
                     onclick="wishlist.add('432');"></button>
           </div>
         </div>
@@ -113,7 +113,7 @@
         <div class="bottom flex-center">
           <div class="price">3360.00 ₴<span class="price-unit-xvr"></span></div>
           <button class="button colord remarketing_cart_button" onclick="cart.add('432');" data-product_id="432"><i
-              class="fas fa-chevron-right"></i>Купити
+              class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
           </button>
         </div>
       </div>

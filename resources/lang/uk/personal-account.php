@@ -19,7 +19,41 @@ return [
     'telephone' => 'Телефон',
     'change_password' => 'Змінити пароль',
     'save_changes' => 'Зберегти зміни',
-  ]
+  ],
+  'you-addresses' => [
+    'title' => 'Список адрес доставки',
+    'edit' => 'Редагувати',
+    'delete' => 'Видалити',
+    'are-you-sure' => 'Ви впевнені?',
+    'back' => 'Назад',
+    'new-address' => 'Нова адреса',
+  ],
+  'editing-adding-address' => [
+    'title' => 'Редагування/Додавання адреси',
+    'locality' => 'Населений пункт',
+    'branch-address' => 'Відділення / Адреса',
+    'enter-city' => 'Введіть місто',
+    'enter-address' => 'Введіть адресу',
+    'save' => 'Зберегти',
+  ],
+  'order-history' => [
+    'title' => 'Історія замовлень',
+    'order-id' => '№ Замовлення',
+    'date-added' => 'Додано',
+    'total' => 'Вартість',
+    'statuses' => [
+      'new' => 'Нове'
+    ],
+    'continue' => 'Продовжити',
+    'you_have_not_shopped_yet' => 'Ви ще не здійснювали покупок!',
+    'showing_from_pages' => 'Показано з :num_1 по :num_2 із :num_3 (:num_4 сторінок)',
+  ],
+  'you-wishlist' => [
+    'title' => 'Ваш вішліст',
+  ],
 
+  'reviewed-products' => [
+    'title' => 'Переглянуті товари',
+  ],
 ];
 ?>

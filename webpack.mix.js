@@ -5,9 +5,11 @@ mix.js('resources/assets/js/sliders.js', 'public/build/js').version();
 mix.js('resources/assets/js/mask/mask.js', 'public/build/js').version();
 mix.js('resources/assets/js/delivery_tabs.js', 'public/build/js').version();
 
-mix.css('resources/assets/css/reset.css', 'public/build/css').version();
-mix.sass('resources/assets/css/style-dark.scss', 'public/build/css').version();
-mix.sass('resources/assets/css/social-login.scss', 'public/build/css').version();
-mix.sass('resources/assets/css/style-information-dark.scss', 'public/build/css').version();
-mix.sass('resources/assets/css/style-blog-dark.scss', 'public/build/css').version();
-mix.sass('resources/assets/css/account-dark.scss', 'public/build/css').version();
+mix.css('resources/assets/scss/reset.css', 'public/build/css').version();
+mix.sass('resources/assets/scss/style-dark.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/social-login.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/style-information-dark.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/style-blog-dark.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/account-dark.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/style-category-dark.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/all-dark.scss', 'public/build/css').version();

@@ -1,13 +1,13 @@
 @extends('base.pages.account.layout')
 
 @section('account.content')
-  <h1>Ваш вішліст</h1>
+  <h1>{{__('personal-account.you-wishlist.title')}}</h1>
   <div class="account-products-list flex-wrap">
     <div class="item product-default" data-ids="102" id="homeSpecialItem1">
       <div class="top flex-justify">
-        <div class="sku">Код: 10528</div>
+        <div class="sku">{{__('general-translate.product_card.code')}} 10528</div>
         <div class="wishlist">
-          <a href="https://wrap.shop/index.php?route=account/wishlist&amp;remove=126" title="Видалити"
+          <a href="https://wrap.shop/index.php?route=account/wishlist&amp;remove=126" title="{{__('general-translate.product_card.remove')}}"
              class="fal fa-times"></a>
         </div>
       </div>
@@ -55,7 +55,7 @@
       <div class="bottom flex-center">
         <div class="price">2562.00 ₴<span class="price-unit-xvr"></span></div>
         <button class="button colord remarketing_cart_button" onclick="cart.add('126');" data-product_id="126"><i
-            class="fas fa-chevron-right"></i>Купити
+            class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
         </button>
       </div>
     </div>

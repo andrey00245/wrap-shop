@@ -40,9 +40,18 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
       return view('base.pages.account.personal-data');
     })->name('personal-data');
 
-    Route::get('/address', function () {
-      return view('base.pages.account.address');
-    })->name('address');
+    Route::group(['prefix' => '/address'], function() {
+      Route::get('/', function () {
+        return view('base.pages.account.address.index');
+      })->name('address');
+      Route::get('/create', function () {
+        return view('base.pages.account.address.create');
+      })->name('account.address.create');
+      Route::get('/edit', function () {
+        return view('base.pages.account.address.edit');
+      })->name('account.address.edit');
+    });
+
 
     Route::get('/order', function () {
       return view('base.pages.account.order');
@@ -56,6 +65,10 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
       return view('base.pages.account.wishlist');
     })->name('wishlist');
   });
+
+  Route::get('/products', function () {
+    return view('base.pages.products');
+  })->name('products');
 
 
 

@@ -1,7 +1,12 @@
 <?php
 
+use App\Http\Controllers\SyncProductImagesController;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+use App\Http\Controllers\SyncProductController;
+
+Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']);
+Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
 
 
 Route::group(['prefix' => LaravelLocalization::setLocale(),

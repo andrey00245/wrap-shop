@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Http\Enums;
+
+class ProductAttributeEnum
+{
+    const CATEGORY_EXPENSES = '66438fce-8a45-11ec-0a80-041c0004f4a2';
+    const SITE = '4386e3d0-1f41-11ee-0a80-09c000003c4d';
+    const SITE_CATEGORY = '2d1446bc-1f40-11ee-0a80-114d00003c24';
+    const NAME = '7e95b291-9342-11ed-0a80-072100109a0f';
+    const BRAND = '7e95b70a-9342-11ed-0a80-072100109a11';
+    const SERIES = 'a8241b25-1f3b-11ee-0a80-062200399427';
+    const APPLICATION = '2e9c4fd4-1f24-11ee-0a80-13d90035bbfd';
+    const ADVANTAGES = '2e9c510d-1f24-11ee-0a80-13d90035bbfe';
+    const PURPOSE = '7e95b81a-9342-11ed-0a80-072100109a12';
+    const MATERIAL = '7e95b9db-9342-11ed-0a80-072100109a14';
+    const STRUCTURE = '7e95baee-9342-11ed-0a80-072100109a15';
+    const MAIN_SHADE = 'a15a8448-3c12-11ee-0a80-004e000997a3';
+    const ROLL_M2 = '7e95bc68-9342-11ed-0a80-072100109a17';
+    const WIDTH_M = '7e95bd25-9342-11ed-0a80-072100109a18';
+    const THICKNESS = '7e95be86-9342-11ed-0a80-072100109a1a';
+    const APPLICATION_METHOD = '7e95bfe7-9342-11ed-0a80-072100109a1c';
+    const MATERIAL_STRETCHING_PERCENT = '7e95c0b5-9342-11ed-0a80-072100109a1d';
+    const PROTECTIVE_LINER = '7e95c17a-9342-11ed-0a80-072100109a1e';
+    const SURFACE_TEMPERATURE = '7e95c231-9342-11ed-0a80-072100109a1f';
+    const ROOM_TEMPERATURE = '2e9c4c13-1f24-11ee-0a80-13d90035bbfc';
+    const MASTER_QUALIFICATION = '65010efd-1f22-11ee-0a80-03a0003652cb';
+    const ADHESION = '7e95c86c-9342-11ed-0a80-072100109a24';
+    const SERVICE_LIFE = '7e95cae0-9342-11ed-0a80-072100109a26';
+    const STORAGE_TERM = '7e95cbff-9342-11ed-0a80-072100109a27';
+    const WARRANTY = '7e95ce35-9342-11ed-0a80-072100109a29';
+    const PRODUCTION_TECHNOLOGY = '7e95cf5f-9342-11ed-0a80-072100109a2a';
+    const COUNTRY_OF_MANUFACTURER = '927f3dbb-00e0-11ef-0a80-0ff10001955e';
+    const QUANTITY_STEP = 'a74610fb-41b3-11ee-0a80-13bd001088e9';
+    const DEFAULT_QUANTITY = 'a74614c5-41b3-11ee-0a80-13bd001088ea';
+    const MINIMUM_ORDER_QUANTITY = 'a74615f2-41b3-11ee-0a80-13bd001088eb';
+    const STOCK_QUANTITY_1 = 'c3445e88-48c1-11ee-0a80-0b12000d01c4';
+    const STOCK_QUANTITY_2 = 'c34460ad-48c1-11ee-0a80-0b12000d01c5';
+    const STOCK_QUANTITY_3 = 'c3446408-48c1-11ee-0a80-0b12000d01c6';
+
+    // Опционально: добавить методы для получения данных или обработки
+}

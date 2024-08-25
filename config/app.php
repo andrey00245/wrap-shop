@@ -125,4 +125,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'my_store' => [
+        'username' => env('MOY_SKLAD_USERNAME', 'default_username'),
+        'password' => env('MOY_SKLAD_PASSWORD', 'default_password'),
+    ]
 ];

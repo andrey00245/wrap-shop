@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\IndexController;
 use App\Http\Controllers\SyncProductImagesController;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -9,12 +10,11 @@ Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
 
 
+
 Route::group(['prefix' => LaravelLocalization::setLocale(),
   'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
 
-  Route::get('/', function () {
-    return view('base.pages.main');
-  })->name('index');
+  Route::get('/', [IndexController::class,'__invoke'])->name('index');
 
   Route::get('/shipping-and-payment', function () {
     return view('base.pages.delivery');
@@ -74,8 +74,5 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   Route::get('/products', function () {
     return view('base.pages.products');
   })->name('products');
-
-
-
 });
 

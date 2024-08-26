@@ -16,6 +16,9 @@
   <div class="home-about-play button" data-src="{{asset('assets/video/video.mp4')}}" data-fancybox="about-play">
     <i class="far fa-play button colord"></i>
   </div>
+  <div class="home-about-play button" data-src="{{asset('assets/video/video.mp4')}}" data-fancybox="about-play">
+    <i class="far fa-play button colord"></i>
+  </div>
 </section>
 
 
@@ -209,14 +212,11 @@
 {{--{% for script in scripts %}--}}
 {{--<script src="{{ script }}" type="text/javascript"defer></script>--}}
 {{--{% endfor %}--}}
-<script src="{{asset('js/fancybox/fancybox.umd.js')}}"></script>
-<link rel="stylesheet" href="{{asset('js/fancybox/fancybox.css')}}" media="screen">
 
-<script>
-
-</script>
+<link rel="stylesheet" href="{{asset('assets/css/jquery.fancybox.min.css')}}" media="screen">
 
 <script src="{{asset('js/jquery/jquery.min.js')}}"></script>
+<script src="{{asset('js/fancybox/jquery.fancybox.min.js')}}"></script>
 <script src="{{mix('build/js/app.js')}}" type="text/javascript"></script>
 <script src="{{mix('build/js/mask.js')}}" type="text/javascript"></script>
 @stack('scripts')

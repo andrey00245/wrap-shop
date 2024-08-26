@@ -4,8 +4,10 @@ mix.js('resources/assets/js/app.js', 'public/build/js').version();
 mix.js('resources/assets/js/sliders.js', 'public/build/js').version();
 mix.js('resources/assets/js/mask/mask.js', 'public/build/js').version();
 mix.js('resources/assets/js/delivery_tabs.js', 'public/build/js').version();
+mix.js('resources/assets/js/auth.js', 'public/build/js').version();
 
 mix.css('resources/assets/scss/reset.css', 'public/build/css').version();
+mix.sass('resources/assets/scss/form.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/social-login.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-information-dark.scss', 'public/build/css').version();

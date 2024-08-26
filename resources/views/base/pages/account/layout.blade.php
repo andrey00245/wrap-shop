@@ -10,11 +10,15 @@
       <div class="page-account-left row">
         <div class="info flex-center">
           <div class="avatar flex-center"><i class="fal fa-user"></i></div>
-          <div class="right">
-            <span class="user">User name</span>
-            <a href="#" class="link g_id_signout" title="{{__('personal-account.account.logout')}}">{{__('personal-account.account.logout')}}</a>
-          </div>
-          <div class="account-menu-open button"><i class="far fa-bars"></i></div>
+            <div class="right">
+                <span class="user">User name</span>
+                <a href="#" class="link g_id_signout" title="{{ __('personal-account.account.logout') }}">{{ __('personal-account.account.logout') }}</a>
+
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </div>
+            <div class="account-menu-open button"><i class="far fa-bars"></i></div>
         </div>
         <nav class="menu">
           <ul>

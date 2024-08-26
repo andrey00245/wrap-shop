@@ -10,8 +10,6 @@ use App\Http\Controllers\SyncProductController;
 Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']);
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
 
-
-
 Route::group(['prefix' => LaravelLocalization::setLocale(),
   'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
 
@@ -57,7 +55,6 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
         return view('base.pages.account.address.edit');
       })->name('account.address.edit');
     });
-
 
     Route::get('/order', function () {
       return view('base.pages.account.order');

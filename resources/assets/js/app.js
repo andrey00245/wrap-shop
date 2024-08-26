@@ -138,28 +138,4 @@ $(document).ready(function () {
     $("html").addClass('no-overflow');
     $(e).fadeIn().addClass('active');
   }
-
-
-  Fancybox.bind('[data-fancybox="about-play"]', {
-    loop: true,
-    arrows: true,
-    buttons: [
-      'slideShow',
-      'thumbs',
-      'close'
-    ],
-    transitionEffect: 'fade',
-  });
-
-  Fancybox.bind('[data-fancybox="videoreview"]', {
-    loop: true,
-    arrows: true,
-    buttons: [
-      'slideShow',
-      'thumbs',
-      'close'
-    ],
-    transitionEffect: 'fade',
-  });
-
 })

@@ -6,7 +6,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\View\View;
 
-class IndexController extends Controller
+class ProductController extends Controller
 {
   /**
    * Handle the incoming request.
@@ -26,7 +26,7 @@ class IndexController extends Controller
     $categories = $products->take(5)->flatMap(function ($product) {
       return $product->categories;
     })->unique('id');
-    return view('base.pages.main', compact(
+    return view('base.pages.products', compact(
         'categories',
         'products',
         'mainCategories'

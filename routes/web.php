@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SyncProductImagesController;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -71,8 +72,6 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
     })->name('wishlist');
   });
 
-  Route::get('/products', function () {
-    return view('base.pages.products');
-  })->name('products');
+  Route::get('/products', [ProductController::class,'__invoke'])->name('products');
 });
 

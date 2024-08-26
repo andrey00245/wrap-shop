@@ -1,7 +1,7 @@
-<section class="home-products row" id="homeBestseller">
+<section class="home-products row" id="homeLatest">
   <div class="wrap">
     <div class="home-products-top flex-justify">
-      <h2 class="home-title">{!! __('general-translate.leaders_of_sales') !!}</h2>
+      <h2 class="home-title">{!! __('general-translate.latest') !!}</h2>
     </div>
     <div class="home-products-nav">
       <div data-cat="all" class="item button active all">{{__('general-translate.all')}}</div>
@@ -12,7 +12,7 @@
     <div class="home-products-list swiper">
       <div class="swiper-wrapper" aria-live="polite">
       @foreach($products->take(5) as $key => $product)
-          <div class="swiper-slide home-products-item product-default" data-ids="{{$product->categories->value('id')}}" id="homeBestsellerItem{{$key}}"
+          <div class="swiper-slide home-products-item product-default" data-ids="{{$product->categories->value('id')}}" id="homeLatest{{$key}}"
                role="group">
             <div class="product-default-texts-wrapper">
               <div class="top flex-justify">

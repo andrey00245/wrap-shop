@@ -69,6 +69,13 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
     })->name('wishlist');
   });
 
-  Route::get('/products', [ProductController::class,'__invoke'])->name('products');
+
+
+  Route::group(['prefix' => '/products'], function(){
+    Route::get('/', [ProductController::class,'index'])->name('products.index');
+    Route::get('/{product}', [ProductController::class,'show'])->name('products.show');
+
+  });
+
 });
 

@@ -31,7 +31,7 @@
             <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
               <i class="far fa-search-plus colord" data-src="{{$product->getMedia('images')->first()->getUrl()}}"
                  data-fancybox="gallery{{$product->id}}" data-caption="{{$product->name}}"></i>
-              <a href="#"
+              <a href="{{route('products.show', ['product'=>$product->id])}}"
                  title="{{$product->name}}" class="swiper-wrapper"
                  id="swiper-wrapper-c1ba02d97e25995b" aria-live="polite">
                 @foreach($product->getMedia('images') as $key => $image)
@@ -54,10 +54,10 @@
             <div class="product-default-texts-wrapper">
 
               <div class="category">{{$product->categories->value('name')}}</div>
-              <a href="#"
+              <a href="{{route('products.show', ['product'=>$product->id])}}"
                  title="{{$product->name}}" class="name">{{$product->name}}</a>
               <div class="bottom flex-center">
-                <div class="price">2573.00 ₴<span class="price-unit-xvr"></span></div>
+                <div class="price">{{number_format($product->prices->where('price_type_id', 2)->first()->price, 2, '.', '')}} ₴<span class="price-unit-xvr"></span></div>
                 <button class="button colord remarketing_cart_button" data-product_id="{{$product->id}}">
                   <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
               </div>

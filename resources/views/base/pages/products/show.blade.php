@@ -134,7 +134,7 @@
         </div>
         <div class="center flex-justify">
           @php
-            $count=2
+            $count=30
           @endphp
           <div class="left">
             <div class="info flex-center">
@@ -152,7 +152,7 @@
                 {{--                <span class="text_price_XVR label-name">{{__('product-show.price')}} </span>--}}
                 <div class="flex-center price-wrap">
                   <span class="item-price"
-                        data-discount='{"0": {"discountFrom": 0, "price": {{$product->prices->where('price_type_id', 2)->first()->price}}},"1": {"discountFrom": 1, "price": 5700},"2": {"discountFrom": 2, "price": 5300}}'
+                        data-discount='{"0": {"discountFrom": 0, "price": {{$product->prices->where('price_type_id', 2)->first()->price}}},"1": {"discountFrom": 10, "price": 5700},"2": {"discountFrom": 25, "price": 5300}}'
                         data-value="{{number_format($product->prices->where('price_type_id', 2)->first()->price, 2, '.', '')}}"><span
                       class="only-price">{{number_format($product->prices->where('price_type_id', 2)->first()->price, 2, '.', '')}}</span> ₴</span>
                   <span class="label-lenght">за 1 м.п.</span><span class="cur">$152</span>

@@ -384,7 +384,19 @@ a.login-button:hover {
 }*/
 .popup-window {
   display: none;
+  animation: fadeEffect 0.5s;
 }
+
+@keyframes fadeEffect {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
 .btn-close-popup {
   position: absolute;
   z-index: 99;
@@ -428,13 +440,25 @@ a.login-button:hover {
 }
 .popup-social .social_block {
   margin-bottom: 20px;
-  column-gap: 20px;
+  column-gap: 5px;
+  display: flex;
 }
 .popup-social .social_block .soc_ico {
-  width: 50px;
-  height: 50px;
-  border: 1px solid;
+  //width: 50px;
+  //height: 50px;
+  //border: 1px solid;
 }
+
+.social_block{
+  .button_social{
+    width: 100%;
+    text-align: center;
+    border: 1px solid #FFFFFF33;
+    border-radius: 3px;
+    padding: 17.5px 0;
+  }
+}
+
 .social_block .soc_ico svg {
   transition: all 0.2s;
   width: 25px;
@@ -621,4 +645,56 @@ a.login-button:hover {
 .simplecheckout-left-column .simplecheckout-block .popup-social p {padding-bottom: 12px}
 #simplecheckout_login #column-login {
   display: none;
+}
+
+#popup-registration .or-text-wrapp{
+  margin-bottom: 14px;
+
+}
+
+.popup-window .register-description{
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  color: white;
+  text-transform: uppercase;
+
+}
+
+.or-text-wrapp{
+  display: flex;
+  align-items: center;
+  margin-bottom: 50px;
+  .left-line, .right-line{
+    width: 100%;
+    height: 1px;
+  }
+  .left-line{
+    background: linear-gradient(90deg, #FFFFFF14 0%, #FFFFFF14 80%, #FFFFFF00 90%, #FFFFFF00 100%);
+  }
+  .right-line{
+    background: linear-gradient(-90deg, #FFFFFF14 0%, #FFFFFF14 80%, #FFFFFF00 90%, #FFFFFF00 100%);
+  }
+  .text{
+    color: #FFFFFF80;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
+.popup-window .login-info-text{
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  padding-bottom: 9px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  opacity: 50%;
+  margin-bottom: 0;
+}
+
+.password-group {
+  display: none;
+  animation: fadeEffect 0.5s;
 }

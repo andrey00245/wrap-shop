@@ -46,9 +46,26 @@ class ProductController extends Controller
    */
   public function show(Product $product): View
   {
-//    $product->with(['media', 'categories']);
+    $products = Product::query()
+      ->whereHas('prices', function ($query) {
+        $query->where('price_type_id', 2)
+          ->where('price', '!=', 0);
+      })
+      ->whereHas('media')
+      ->whereHas('categories')
+      ->with(['media', 'categories'])
+      ->paginate(6);
+
+    $mainCategories = Category::query()->whereNull('parent_id')->get();
+
+    $categories = $products->take(5)->flatMap(function ($product) {
+      return $product->categories;
+    })->unique('id');
+
     return view('base.pages.products.show', [
-      'product' => $product
+      'product' => $product,
+      'products' => $products,
+      'categories' => $categories,
     ]);
   }
 

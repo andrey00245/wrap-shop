@@ -14,6 +14,7 @@ return [
   'want-to-learn-more' => 'Хочеш дізнатися більше?',
   'order-a-consultation' => 'Замовити консультацію',
   'show-all' => 'Показати всі',
+  'show-less' => 'Згорнути',
   'delivery' => 'Доставка',
   'delivery-description' => 'Самовивіз, Нова пошта, Кур\'єр Нова пошта, Адресна доставка (Київ)',
   'payment' => 'Оплата',
@@ -30,6 +31,10 @@ return [
   'expiration-date' => 'Термін зберігання',
   'expiration-date-val' => ':month місяці',
   'quantity-in-stock' => 'Вибачте, кількість в наявності :max',
+  'choose' => 'Обрати',
+  'max-quantity' => 'Макс.: :max',
+  'select-max' => 'Обрати максимум',
+  'discont-text' => 'Замовте більше на <span class="count-for-discont">0</span> і заощаджуйте <span class="saving-val">0</span> ₴',
 
 
 

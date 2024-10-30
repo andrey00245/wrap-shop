@@ -21,7 +21,7 @@
       <div class="product-page-left">
         <div class="code-wishlist-wrapper">
           <div class="sku deskopt">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
-          <div class="wishlist">
+          <div class="wishlist desktop">
             <button type="button" title="В закладки" class="button far fa-heart"></button>
           </div>
         </div>
@@ -67,7 +67,8 @@
             <div class="item flex-justify hide">Технологія виробництва <span class="label">литий вініл</span></div>
             <div class="item flex-justify hide">Країна-виробник <span class="label">США</span></div>
           </div>
-          <div class="button colord">{{__('product-show.show-all')}}</div>
+          <div id="show-all" style="display: none" class="button">{{__('product-show.show-all')}}</div>
+          <div id="show-less" style="display: none" class="button">{{__('product-show.show-less')}}</div>
         </div>
       </div>
       <div class="product-page-center">
@@ -78,8 +79,8 @@
           </div>
         </div>
         <div
-          class="product-slider swiper swiper-initialized swiper-horizontal swiper-pointer-events swiper-backface-hidden">
-          <div class="swiper-wrapper" id="swiper-wrapper-7678320ca9d103785" aria-live="polite">
+          class="product-slider swiper">
+          <div class="swiper-wrapper">
 
             @foreach($product->getMedia('images') as $key => $image)
               <a
@@ -94,39 +95,34 @@
                      alt="Плівка глянцева Avery Gloss Metallic Brown CB1630001">
               </a>
             @endforeach
-
           </div>
-          <div class="swiper-button-next product-slider-button button swiper-button-disabled swiper-button-lock"
+          <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+
+        <div class="nav-slider-wrapper">
+          <div class="product-slider-nav swiper">
+            <div class="swiper-wrapper" id="swiper-wrapper-3d5845e6fc3b91055" aria-live="polite">
+
+              @foreach($product->getMedia('images') as $key => $image)
+                <div
+                  class="swiper-slide item swiper-slide-visible swiper-slide-active swiper-slide-thumb-active"
+                  role="group">
+                  <img data-src="{{$image->getUrl('preview')}}"
+                       title="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
+                       alt="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
+                       src="{{$image->getUrl('preview')}}">
+                </div>
+              @endforeach
+            </div>
+
+            <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+          </div>
+          <div class="swiper-button-next button"
                tabindex="-1" role="button" aria-label="Next slide"
                aria-disabled="true"></div>
-          <div class="swiper-button-prev product-slider-button button swiper-button-disabled swiper-button-lock"
+          <div class="swiper-button-prev button"
                tabindex="-1" role="button" aria-label="Previous slide"
                aria-disabled="true"></div>
-          <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
-        <div
-          class="product-slider-nav swiper swiper-initialized swiper-horizontal swiper-pointer-events swiper-free-mode swiper-watch-progress swiper-backface-hidden swiper-thumbs">
-          <div class="swiper-wrapper" id="swiper-wrapper-3d5845e6fc3b91055" aria-live="polite">
-
-            @foreach($product->getMedia('images') as $key => $image)
-              <div
-                class="swiper-slide item button swiper-slide-visible swiper-slide-active swiper-slide-thumb-active"
-                role="group">
-                <img data-src="{{$image->getUrl('preview')}}"
-                     title="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
-                     alt="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
-                     src="{{$image->getUrl('preview')}}">
-              </div>
-            @endforeach
-
-          </div>
-          <div class="thumbs-button-next"
-               tabindex="-1" role="button" aria-label="Next slide"
-               aria-disabled="true"></div>
-          <div class="thumbs-button-next"
-               tabindex="-1" role="button" aria-label="Previous slide"
-               aria-disabled="true"></div>
-
-          <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+        </div>
       </div>
       <div class="product-page-right">
         <div class="top flex-justify">
@@ -166,7 +162,7 @@
                   10 м.п. і більше: <span class="colord">5700 ₴</span> <span class="cur">| 142.5 $</span>
                 </div>
                 <div class="item-btn">
-                  <span class="select-quantity">Обрати</span>
+                  <span data-quantity="10" class="select-quantity">{{__('product-show.choose')}}</span>
                 </div>
               </li>
 
@@ -175,7 +171,7 @@
                   25 м.п. і більше: <span class="colord">5300 ₴</span> <span class="cur">| 132.5 $</span>
                 </div>
                 <div class="item-btn">
-                  <span class="select-quantity">Обрати</span>
+                  <span data-quantity="25" class="select-quantity">{{__('product-show.choose')}}</span>
                 </div>
               </li>
             </ul>
@@ -202,13 +198,10 @@
                   </div>
 
                   <div class="max-value-group">
-                    <span class="max-value">Макс.: 89.8</span>
-                    <span class="select-max">Обрати максимум</span>
+                    <span class="max-value">{{__('product-show.max-quantity', ['max' => $count])}}</span>
+                    <span class="select-max" data-quantity="{{$count}}">{{__('product-show.select-max')}}</span>
                   </div>
-
                 </div>
-
-
               </div>
             </div>
 
@@ -216,7 +209,9 @@
               <div class="default">
                 <div class="top-wrapper">
                   <span class="text-total-summ">{{__('product-show.total')}} </span>
-                  <span class="text-discount">Замовте більше на 9 і заощаджуйте 1200 ₴</span>
+                  <span class="text-discount">
+                    {!! __('product-show.discont-text')  !!}
+                  </span>
                 </div>
                 <span class="autocalc-product-price"><span class="total-price">0.00</span> ₴</span>
               </div>
@@ -250,25 +245,32 @@
       </div>
       <div class="product-page-bottom flex-justify">
         <div class="item delivery">
-          <span class="icon"><img width="98" height="66" src="{{asset('assets/img/icons/delivery.svg')}}" alt="{{__('product-show.delivery')}}"></span>
+          <span class="icon"><img width="98" height="66" src="{{asset('assets/img/icons/delivery.svg')}}"
+                                  alt="{{__('product-show.delivery')}}"></span>
           <span class="title">{{__('product-show.delivery')}}</span>
           <p>{{__('product-show.delivery-description')}}</p>
         </div>
         <div class="item pay">
-          <span class="icon"><img width="98" height="66" src="{{asset('assets/img/icons/credit-card.svg')}}" alt="{{__('product-show.payment')}}"></span>
+          <span class="icon"><img width="98" height="66" src="{{asset('assets/img/icons/credit-card.svg')}}"
+                                  alt="{{__('product-show.payment')}}"></span>
           <span class="title">{{__('product-show.payment')}}</span>
           <p><img alt="{{__('product-show.payment')}}" src="{{asset('assets/img/pay.svg')}}"
                   style="width: 350px; float: left;" class="note-float-left"><br></p>
         </div>
         <div class="item garant">
-          <span class="icon"><img width="68" height="79" src="{{asset('assets/img/icons/protection.svg')}}" alt="{{__('product-show.guarantee')}}"></span>
+          <span class="icon"><img width="68" height="79" src="{{asset('assets/img/icons/protection.svg')}}"
+                                  alt="{{__('product-show.guarantee')}}"></span>
           <span class="title">{{__('product-show.guarantee')}}</span>
           <p>{{__('product-show.guarantee-description', ['month' => 12])}}</p>
         </div>
       </div>
 
-      <div class="title-mobil">Плівка глянцева Avery Gloss Metallic Brown CB1630001</div>
-      <div class="sku mobil">Код: 10769</div>
+      <div class="code-wishlist-wrapper mobil">
+        <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
+        <div class="wishlist">
+          <button type="button" title="В закладки" class="button far fa-heart"></button>
+        </div>
+      </div>
     </div>
     <div class="product-page-info flex-justify wrap">
       <div class="item">
@@ -322,6 +324,10 @@
       </div>
     </div>
   </section>
+
+  @include('base.components.examples-of-work')
+  @include('base.components.latest')
+
 
   @push('scripts')
     <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>

@@ -1,14 +1,21 @@
 <?php
 return [
   'login_register' => [
-    'enter' => 'Вход',
+    'enter_register' => 'Вход / Регистрация',
     'register' => 'Регистрация',
     'register_on_website' => 'Регистрация на сайте',
-    'enter_phone' => 'Вход с помощью телефона',
+    'enter_phone' => 'Вход с помощью телефона или email',
+    'enter_phone_or_email_placeholder' => 'Введите номер телефона или Email',
+
     'enter_social_network' => 'Войти с помощью социальной сети',
     'enter_email_password' => 'Войти с помощью email и пароля',
     'sign_in' => 'Войти',
+    'create_a_profile' => 'Создать профиль',
+
+
     'forgot_password' => 'Забыли пароль?',
+    'recover_password' => 'Восстановить пароль',
+
     'show_password_text' => 'Показать пароль в виде обычного текста. Предупреждение: это отобразит ваш пароль на экране.',
     'password_placeholder' => 'Пароль',
     'dont_have_a_profile' => 'У Вас еще нет своего профиля?',
@@ -19,18 +26,23 @@ return [
     'enter_with_new_password' => 'Войти с новым паролем',
     'firstname' => 'Имя',
     'lastname' => 'Фамилия',
-    'mobile' => 'Мобильній',
+    'mobile' => 'Мобильный',
     'password' => 'Пароль',
+    'or' => 'Или',
+    'enter_password' => 'Введите пароль',
     'buyer_group' => 'Группа покупателей',
     'terms_and_conditions' => 'Регистрируясь, вы соглашаетесь с условиями положения об обработке и защите персональных данных и пользовательским соглашением',
     'already_registered' => 'Вы уже зарегистрировались?',
     'succes_registration_message' => 'Поздравляем, ваша регистрация прошла успешно, Большое спасибо!',
+    'register_conditions' => 'Регистрируясь, вы соглашаетесь с условиями положения об обработке 
+<br>
+и защите персональных данных и пользовательским соглашением',
   ],
   'cart_popup' => [
-    'cart_title' => 'В Вашей корзине',
+    'cart_title' => 'Корзина',
     'cart_is_empty' => 'Ваша корзина пуста!',
     'not_late_to_fix_it' => 'Но это никогда не поздно исправить :)',
-    'shopping' => 'За покупками',
+    'shopping' => 'В каталог',
   ],
   'search_popup' => [
     'search_title' => 'Поиск по сайту',

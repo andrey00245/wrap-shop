@@ -10,10 +10,11 @@
           {{__('popup.cart_popup.not_late_to_fix_it')}}
         </div>
         <div class="cart-mini-button">
-          <div class="continion colord close-cart-popup">{{__('popup.cart_popup.shopping')}}</div>
+          <div class="continion colord close-cart-popup"><i class="fas fa-chevron-right"></i>{{__('popup.cart_popup.shopping')}}</div>
         </div>
       </li>
     </ul>
+    @include('base.components.bestseller-cart')
   </div>
   <div class="close button fal fa-times close-cart-popup"></div>
 </div>

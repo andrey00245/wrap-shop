@@ -1,4 +1,7 @@
+import {popupSliderInitialization} from "./sliderPopupInitialization";
+
 $(document).ready(function () {
+  popupSliderInitialization('cartProductSlider');
 
   let scroll = $(window).scrollTop();
   slideHeader(scroll);
@@ -113,6 +116,14 @@ $(document).ready(function () {
     $("html").removeClass('no-overflow');
   })
 
+  $("#button-verify-loginpopup").click(function (){
+    $(".password-group").show()
+    if($(".password-group").hasClass('active')){
+      return open_pop_up("#popup-registration");
+    }
+    $(".password-group").addClass('active')
+  })
+
   $(".login-show").click(function () {
     $(".registration-show").removeClass('active');
     $(".login-show").addClass('active');
@@ -131,11 +142,15 @@ $(document).ready(function () {
 
   function open_pop_up(e) {
     $("#credential_picker_container").toggle();
-    $(".popup-window").fadeOut();
+    // $(".popup-window").fadeOut();
+    $(".popup-window").hide()
+
     $(".popup-window").removeClass('active');
     $(".popup-overlay").addClass('active');
     // $(".popup-overlay").fadeIn();
     $("html").addClass('no-overflow');
-    $(e).fadeIn().addClass('active');
+    // $(e).fadeIn().addClass('active');
+    $(e).show().addClass('active');
+
   }
 })

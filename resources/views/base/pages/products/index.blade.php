@@ -7,11 +7,9 @@
     <link rel="stylesheet" href="{{mix('build/css/all-dark.css')}}">
     <link rel="stylesheet" href="{{mix('build/css/style-category-dark.css')}}">
   @endpush
-
+  <div class="products-background"></div>
   <section class="category-page row">
-    <div class="category-top"
-         style="background-image: url(&quot;https://wrap.shop/image/catalog/category/webp/cat/fon_wrap_webp.webp&quot;);"
-         data-background="https://wrap.shop/image/catalog/category/webp/cat/fon_wrap_webp.webp">
+    <div class="category-top">
       <nav class="category-breadcrumbs">
         <ul class="flex-center">
           <li><a href="https://wrap.shop/" title="Головна" class="button"><i class="far fa-chevron-left"></i>Головна</a>
@@ -46,7 +44,7 @@
             </button>
           </div>
         </div>
-        <div class="ocf-container ocf-category-60 ocf-theme-light ocf-mobile-1 ocf-mobile-left ocf-vertical ocf-left"
+        <div class="ocf-container ocf-theme-light ocf-mobile-1 ocf-mobile-left ocf-vertical ocf-left"
              id="ocf-module-1">
           <link rel="stylesheet" href="">
 
@@ -63,7 +61,7 @@
               <div class="ocf-filter-list ocf-clearfix">
 
 
-                <div class="ocf-filter ocf-open" id="ocf-filter-2-0-1">
+                <div class="ocf-filter ocf-dropdown ocf-open" id="ocf-filter-2-0-1">
                   <div class="ocf-filter-body">
                     <div class="ocf-filter-header" data-ocf="expand">
                       <span class="ocf-active-label"></span>
@@ -125,7 +123,7 @@
                 </div>
 
 
-                <div class="ocf-filter ocf-open" id="ocf-filter-1-0-1">
+                <div class="ocf-filter ocf-open ocf-dropdown" id="ocf-filter-1-0-1">
                   <div class="ocf-filter-body">
                     <div class="ocf-filter-header" data-ocf="expand">
                       <span class="ocf-active-label"></span>
@@ -244,7 +242,7 @@
                 </div>
 
 
-                <div class="ocf-filter ocf-open" id="ocf-filter-40-2-1">
+                <div class="ocf-filter ocf-open ocf-dropdown" id="ocf-filter-40-2-1">
                   <div class="ocf-filter-body">
                     <div class="ocf-filter-header" data-ocf="expand">
                       <span class="ocf-active-label"></span>
@@ -2013,9 +2011,7 @@
       </div>
       <div class="category-right" id="content">
 
-        <div class="category-right-top flex-justify"
-             data-background="catalog/view/theme/wrapshop/image/icon/head-top.png"
-             style="background-image: url(&quot;catalog/view/theme/wrapshop/image/icon/head-top.png&quot;);">
+        <div class="category-right-top flex-justify">
           <div class="category-sort flex-justify">
             <div class="label">Сортувати за:</div>
             <div class="category-sort-close button"><i class="fal fa-times"></i></div>
@@ -2045,10 +2041,28 @@
           <div class="button-sort category-sort-open button"><i class="fal fa-sort-alt"></i>Сортування</div>
         </div>
         <div class="category-products flex-wrap">
+          <a href="https://wrap.shop/plivky/kolorovi-plivky/?ocf=F1S0V11" title="3m color" class="category-products-item product-default product-layout banner product-grid">
+            <img class="vertical" src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-vert.webp" alt="3m color" title="3m color" src="/image/catalog/category/webp/banners catalog/1-3m-vert.webp">
+            <img class="gorizont" src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-gor.webp" alt="3m color" title="3m color">
+          </a>
           @foreach($products as $product)
             <div class="category-products-item product-default product-layout product-grid"
                  id="categoryProductsItem{{$product->id}}">
+              <div class="sale statuses list">
+                <div class="category-status category-status-1 status-inline text rectangle "
+                     style=" color:#ffffff; background-color:#d04b4b;">
+                  {{__('general-translate.sales_hit')}}
+                </div>
+              </div>
+              <div class="product-default-texts-wrapper">
+
               <div class="top flex-justify">
+                <div class="sale statuses grid">
+                  <div class="category-status category-status-1 status-inline text rectangle "
+                       style=" color:#ffffff; background-color:#d04b4b;">
+                    {{__('general-translate.sales_hit')}}
+                  </div>
+                </div>
                 <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
                 <div class="review grid">
                   <i class="fal fa-star"></i>
@@ -2069,12 +2083,8 @@
                           title="{{__('general-translate.product_card.add_wishlist')}}"></button>
                 </div>
               </div>
-              <div class="sale statuses">
-                <div class="category-status category-status-1 status-inline text rectangle "
-                     style=" color:#ffffff; background-color:#d04b4b;">
-                  {{__('general-translate.sales_hit')}}
-                </div>
               </div>
+
               <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
                 <i class="far fa-search-plus colord" data-src="{{$product->getMedia('images')->first()->getUrl()}}"
                    data-fancybox="gallery{{$product->id}}" data-caption="{{$product->name}}"></i>
@@ -2098,23 +2108,11 @@
                     </div>
                   @endforeach
                 </a>
-                <div class="swiper-button-next button" tabindex="0" role="button" aria-label="Next slide"></div>
-                <div class="swiper-button-prev button" tabindex="-1" role="button" aria-label="Previous slide"></div>
+{{--                <div class="swiper-button-next button" tabindex="0" role="button" aria-label="Next slide"></div>--}}
+{{--                <div class="swiper-button-prev button" tabindex="-1" role="button" aria-label="Previous slide"></div>--}}
                 <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
-              <div class="review list">
-                <i class="fal fa-star"></i>
-                <i class="fal fa-star"></i>
-                <i class="fal fa-star"></i>
-                <i class="fal fa-star"></i>
-                <i class="fal fa-star"></i>
-                <div class="rating-result" style="width: 100%">
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                </div>
-              </div>
+              <div class="product-default-texts-wrapper list">
+
               <div class="center">
                 <div class="category">{{$product->categories->value('name')}}</div>
                 <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->name}}"
@@ -2126,19 +2124,14 @@
                 <button class="button colord remarketing_cart_button" data-product_id="{{$product->id}}"><i
                     class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
               </div>
-              <div class="params">
-                <div class="item flex-column">Призначення <span class="label">декоративна</span></div>
-                <div class="item flex-column">Структура <span class="label">сатинова</span></div>
               </div>
+{{--              <div class="params">--}}
+{{--                <div class="item flex-column">Призначення <span class="label">декоративна</span></div>--}}
+{{--                <div class="item flex-column">Структура <span class="label">сатинова</span></div>--}}
+{{--              </div>--}}
             </div>
 
           @endforeach
-
-          {{--          <a href="https://wrap.shop/plivky/kolorovi-plivky/?ocf=F1S0V11" title="3m color" class="category-products-item product-default product-layout banner product-grid">--}}
-          {{--            <img class="vertical" data-src="/image/catalog/category/webp/banners catalog/1-3m-vert.webp" alt="3m color" title="3m color" src="/image/catalog/category/webp/banners catalog/1-3m-vert.webp">--}}
-          {{--            <img class="gorizont" data-src="/image/catalog/category/webp/banners catalog/1-3m-gor.webp" alt="3m color" title="3m color">--}}
-          {{--          </a>--}}
-
 
         </div>
 
@@ -2172,14 +2165,15 @@
 
   @push('scripts')
     <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
-    <script>
-      let categoryProductsItem = new Swiper(".category-products-item .image", {
-        navigation: {
-          nextEl: ".category-products-item .image .swiper-button-next",
-          prevEl: ".category-products-item .image .swiper-button-prev",
-        },
-        lazy: true,
-      });
-    </script>
+{{--    <script>--}}
+{{--      let categoryProductsItem = new Swiper(".category-products-item .image", {--}}
+{{--        navigation: {--}}
+{{--          nextEl: ".category-products-item .image .swiper-button-next",--}}
+{{--          prevEl: ".category-products-item .image .swiper-button-prev",--}}
+{{--        },--}}
+{{--        lazy: true,--}}
+{{--      });--}}
+{{--    </script>--}}
+    <script src="{{mix('build/js/productIndex.js')}}"></script>
   @endpush
 @endsection

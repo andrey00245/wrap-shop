@@ -3,6 +3,7 @@
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SyncProductImagesController;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\SyncProductController;
@@ -69,13 +70,24 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
     })->name('wishlist');
   });
 
-
-
   Route::group(['prefix' => '/products'], function(){
     Route::get('/', [ProductController::class,'index'])->name('products.index');
     Route::get('/{product}', [ProductController::class,'show'])->name('products.show');
-
   });
+
+  Route::get('/checkout', function () {
+    $products = Product::query()
+      ->whereHas('prices', function ($query) {
+        $query->where('price_type_id', 2)
+          ->where('price', '!=', 0);
+      })
+      ->whereHas('media')
+      ->whereHas('categories')
+      ->with(['media', 'categories'])
+      ->paginate(6);
+
+    return view('base.pages.checkout.index', compact('products'));
+  })->name('checkout');
 
 });
 

@@ -15,19 +15,12 @@
 
       <div class="head-theme" style="padding: 0; background-color: transparent"></div>
 
-      {{--      <form class="head-theme flex-center" action="http://localhost:8888/index.php?route=common/theme/theme"--}}
-      {{--            method="post" enctype="multipart/form-data" id="form-theme">--}}
-      {{--        <button class="button theme-select  fas fa-sun" type="button" name="light"></button>--}}
-      {{--        <button class="button theme-select  active  far fa-moon" type="button" name="dark"></button>--}}
-      {{--        <input type="hidden" name="code" value="">--}}
-      {{--        <input type="hidden" name="redirect_route" value="http://localhost:8888/">--}}
-      {{--      </form>--}}
       <nav class="head-menu">
         @include('base.layouts.menu')
       </nav>
       <div class="head-social flex-center">
-        <a href="##" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
-        <a href="##" title="Instagram" target="_blank" class="fab fa-instagram"></a>
+        <a href="#" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
+        <a href="#" title="Instagram" target="_blank" class="fab fa-instagram"></a>
       </div>
       <div class="head-phone flex-center">
         <div class="title">{{__('header_footer.phone')}}</div>
@@ -36,60 +29,6 @@
       <div class="head-top-close button"><i class="fal fa-times"></i></div>
     </div>
   </div>
-
-
-  {{--  <div class="head-top row">--}}
-  {{--    <div class="head-top-wrap flex-justify wrap">--}}
-  {{--      <form class="head-lang flex-center" action="https://wrap.shop/index.php?route=common/language/language" method="post" enctype="multipart/form-data" id="form-language">--}}
-  {{--        <button class="button language-select active" type="button" name="uk-ua">Ua</button>--}}
-  {{--        <button class="button language-select" type="button" name="ru-ru">Ru</button>--}}
-  {{--        <button class="button language-select" type="button" name="en-gb">En</button>--}}
-  {{--        <input type="hidden" name="code" value="">--}}
-
-  {{--        <input type="hidden" name="redirect_route" value="extension/ocdevwizard/blog/category">--}}
-  {{--        <input type="hidden" name="redirect_query" value="&amp;ocdw_blog_path=12">--}}
-  {{--        <input type="hidden" name="redirect_ssl" value="1">--}}
-  {{--      </form>--}}
-  {{--      <div class="head-lang flex-center">--}}
-  {{--                <a href="{{ LaravelLocalization::getLocalizedURL('uk') }}" class="button language-select {{LaravelLocalization::getCurrentLocale() === 'uk' ? 'active' : ''}}">Ua</a>--}}
-  {{--                <a href="{{ LaravelLocalization::getLocalizedURL('ru') }}" class="button language-select {{LaravelLocalization::getCurrentLocale() === 'ru' ? 'active' : ''}}">Ru</a>--}}
-  {{--                <a href="{{ LaravelLocalization::getLocalizedURL('en') }}" class="button language-select {{LaravelLocalization::getCurrentLocale() === 'en' ? 'active' : ''}}">En</a>--}}
-  {{--                <input type="hidden" name="code" value="">--}}
-  {{--              </div>--}}
-  {{--      <form class="head-theme flex-center" action="https://wrap.shop/index.php?route=common/theme/theme" method="post" enctype="multipart/form-data" id="form-theme">--}}
-  {{--        <button class="button theme-select  fas fa-sun" type="button" name="light"></button>--}}
-  {{--        <button class="button theme-select  active  far fa-moon" type="button" name="dark"></button>--}}
-  {{--        <input type="hidden" name="code" value="">--}}
-  {{--        <input type="hidden" name="redirect_route" value="https://wrap.shop/pro-wrap-shop/">--}}
-  {{--      </form>--}}
-  {{--      <nav class="head-menu">--}}
-  {{--        <ul class="menu">--}}
-
-  {{--          <li><a href="https://wrap.shop/videoogljadi/" title="Відеоогляди">Відеоогляди</a></li>--}}
-
-  {{--          <li><a href="https://wrap.shop/dostavka-ta-oplata/" title="Доставка">Доставка</a></li>--}}
-
-  {{--          <li><a href="https://wrap.shop/novini-ta-akcii/" title="Новини та акції">Новини та акції</a></li>--}}
-
-  {{--          <li class="active"><a href="https://wrap.shop/pro-wrap-shop/" title="Про нас">Про нас</a></li>--}}
-
-  {{--          <li><a href="https://wrap.shop/kontakty/" title="Контакти">Контакти</a></li>--}}
-
-  {{--          <li><a href="https://wrap.shop/privacy-policy/" title="Оферта">Оферта</a></li>--}}
-  {{--        </ul>--}}
-  {{--      </nav>--}}
-  {{--      <div class="head-social flex-center">--}}
-  {{--        <a href="##" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>--}}
-  {{--        <a href="##" title="Instagram" target="_blank" class="fab fa-instagram"></a>--}}
-  {{--      </div>--}}
-  {{--      <div class="head-phone flex-center">--}}
-  {{--        <div class="title">Телефон</div>--}}
-  {{--        <a href="tel:+380660003202"><span>+38</span> 066 000 32 02</a>--}}
-  {{--      </div>--}}
-  {{--      <div class="head-top-close button"><i class="fal fa-times"></i></div>--}}
-  {{--    </div>--}}
-  {{--  </div>--}}
-
 
   <div class="fixed-header">
     <div class="head-boot flex-justify wrap">
@@ -359,7 +298,6 @@
         <a href="tel:+380660003202"><span>+38</span> 066 000 32 02</a>
       </div>
       <div class="head-buttons">
-
         <div class="search-popup-open button search far fa-search"></div>
         <button class="button cart-open far fa-shopping-cart dropdown-toggle"><span
             id="cart-total" class="cart-total flex-center">0</span></button>

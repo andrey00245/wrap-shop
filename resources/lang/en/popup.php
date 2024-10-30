@@ -1,13 +1,17 @@
 <?php
 return [
   'login_register' => [
-    'enter' => 'Login to your account here',
+    'enter_register' => 'Login to your account here / Sign up',
     'register' => 'Sign up',
     'register_on_website' => 'Register on the site',
-    'enter_phone' => 'Sign in with phone',
+    'enter_phone' => 'Sign in with phone or email',
+    'enter_phone_or_email_placeholder' => 'Enter phone number or Email',
+
     'enter_social_network' => 'Login as a social network user',
     'enter_email_password' => 'Login',
     'sign_in' => 'Sign in',
+    'create_a_profile' => 'Create a profile',
+    'recover_password' => 'Recover password',
     'forgot_password' => 'Forgot password?',
     'show_password_text' => 'Show password as plain text. Warning: this will display your password on screen.',
     'password_placeholder' => 'Password',
@@ -21,16 +25,21 @@ return [
     'lastname' => 'Last Name',
     'mobile' => 'Mobile',
     'password' => 'Password',
+    'or' => 'Or',
+    'enter_password' => 'Enter Password',
     'buyer_group' => 'Buyer group',
     'terms_and_conditions' => 'By registering, you agree to the terms of the provision on the collection and protection of personal data and the user agreement',
     'already_registered' => 'Already registered?',
     'succes_registration_message' => 'Congratulations, your registration was successful, thank you very much!',
+
+    'register_conditions' => 'By registering, you agree to the terms of the processing <br>
+    and protection of personal data and the user agreement',
   ],
   'cart_popup' => [
-    'cart_title' => 'In your cart',
+    'cart_title' => 'Cart',
     'cart_is_empty' => 'Your shopping cart is empty!',
     'not_late_to_fix_it' => 'But it\'s never too late to fix it :)',
-    'shopping' => 'Shopping',
+    'shopping' => 'To the catalog',
   ],
   'search_popup' => [
     'search_title' => 'Search by site',

@@ -14,6 +14,7 @@ return [
   'want-to-learn-more' => 'Want to learn more?',
   'order-a-consultation' => 'Order a consultation',
   'show-all' => 'Show all',
+  'show-less' => 'Collapse',
   'delivery' => 'Delivery',
   'delivery-description' => 'Pickup, Nova Poshta, Courier Nova Poshta, Address delivery (Kyiv)',
   'payment' => 'Payment',
@@ -30,6 +31,11 @@ return [
   'expiration-date' => 'Expiration date',
   'expiration-date-val' => ':month month',
   'quantity-in-stock' => 'Sorry, quantity in stock :max',
+  'choose' => 'Choose',
+  'max-quantity' => 'Max: :max',
+  'select-max' => 'Choose maximum',
+  'discont-text' => 'Order more <span class="count-for-discont">0</span> and save <span class="saving-val">0</span> ₴',
+
 
 
 

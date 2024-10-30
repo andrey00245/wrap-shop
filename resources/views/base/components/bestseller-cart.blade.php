@@ -1,18 +1,17 @@
-<section class="home-products row" id="homeBestseller">
-  <div class="wrap">
-    <div class="home-products-top flex-justify">
-      <h2 class="home-title">{!! __('general-translate.leaders_of_sales') !!}</h2>
+<section class="popup-products row" id="cartProductSlider">
+  <div class="home-products-top flex-justify">
+    <h2 class="popup-title"><span class="colord">рекомендуємо</span></h2>
+    <div class="line" data-background="{{asset('assets/img/head-top.png')}}catalog/view/theme/wrapshop/image/icon/head-top.png" style="background-image: url('{{asset('assets/img/head-top.png')}}');"></div>
+    <div class="home-slide-button flex-justify">
+      <div class="swiper-button-next button" tabindex="0" role="button" aria-label="Next slide" aria-controls="swiper-wrapper-c52685b9106c91423" aria-disabled="false"></div>
+      <div class="swiper-button-prev button swiper-button-disabled" tabindex="-1" role="button" aria-label="Previous slide" aria-controls="swiper-wrapper-c52685b9106c91423" aria-disabled="true"></div>
     </div>
-    <div class="home-products-nav">
-      <div data-cat="all" class="item button active all">{{__('general-translate.all')}}</div>
-      @foreach($categories as $category)
-        <div data-cat="{{$category->id}}" class="item button">{{$category->name}}</div>
-      @endforeach
-    </div>
-    <div class="home-products-list swiper">
+  </div>
+
+    <div class="home-products-list popup-list swiper">
       <div class="swiper-wrapper" aria-live="polite">
       @foreach($products->take(5) as $key => $product)
-          <div class="swiper-slide home-products-item product-default" data-ids="{{$product->categories->value('id')}}" id="homeBestsellerItem{{$key}}"
+          <div class="swiper-slide home-products-item cart-product-item product-default" data-ids="{{$product->categories->value('id')}}" id="homeBestsellerItem{{$key}}"
                role="group">
             <div class="product-default-texts-wrapper">
               <div class="top flex-justify">
@@ -33,8 +32,6 @@
 
             </div>
             <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
-              <i class="far fa-search-plus colord" data-src="{{$product->getMedia('images')->first()->getUrl()}}"
-                 data-fancybox="gallery{{$product->id}}" data-caption="{{$product->name}}"></i>
               <a href="{{route('products.show', ['product'=>$product->id])}}"
                  title="{{$product->name}}" class="swiper-wrapper"
                  id="swiper-wrapper-c1ba02d97e25995b" aria-live="polite">
@@ -83,14 +80,5 @@
           </div>
         @endforeach
       </div>
-      <div class="swiper_button_wrapper">
-        <div class="line" data-background="{{asset('assets/img/head-top.png')}}" style="background-image: url({{asset('assets/img/head-top.png')}});"></div>
-        <div class="home-slide-button flex-justify">
-          <div class="swiper-button-next button" tabindex="0" role="button" aria-label="Next slide" aria-disabled="false"></div>
-          <div class="swiper-button-prev button" tabindex="-1" role="button" aria-label="Previous slide" aria-disabled="true"></div>
-        </div>
-      </div>
-      <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
-
-  </div>
+    </div>
 </section>

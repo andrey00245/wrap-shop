@@ -3,7 +3,7 @@
     <div class="swiper-wrapper">
       @foreach($mainCategories as $mainCategory)
         <a href="" class="swiper-slide home-category-item flex-justify" title="" >
-          <figure class="img flex-center"><img loading="lazy" src="" srcset="" alt="" title=""></figure>
+          <figure class="img flex-center"><img loading="lazy" src="{{$mainCategory->getImage()}}" srcset="" alt="" title=""></figure>
           <div class="right">
             <div class="name">{{$mainCategory->name}}</div>
             <div class="link button" ><i class="fas fa-chevron-right"></i>{{__('general-translate.view')}}</div>

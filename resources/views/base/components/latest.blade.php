@@ -5,14 +5,14 @@
     </div>
     <div class="home-products-nav">
       <div data-cat="all" class="item button active all">{{__('general-translate.all')}}</div>
-      @foreach($categories as $category)
+      @foreach($latestCategory as $category)
         <div data-cat="{{$category->id}}" class="item button">{{$category->name}}</div>
       @endforeach
     </div>
     <div class="home-products-list swiper">
       <div class="swiper-wrapper" aria-live="polite">
-      @foreach($products->take(5) as $key => $product)
-          <div class="swiper-slide home-products-item product-default" data-ids="{{$product->categories->value('id')}}" id="homeLatest{{$key}}"
+      @foreach($products as $key => $product)
+          <div class="swiper-slide home-products-item product-default" data-ids="{{$product->category->id}}" id="homeLatest{{$key}}"
                role="group">
             <div class="product-default-texts-wrapper">
               <div class="top flex-justify">
@@ -53,11 +53,11 @@
               <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
             <div class="product-default-texts-wrapper">
 
-              <div class="category">{{$product->categories->value('name')}}</div>
+              <div class="category">{{$product->category->name}}</div>
               <a href="{{route('products.show', ['product'=>$product->id])}}"
                  title="{{$product->name}}" class="name">{{$product->name}}</a>
               <div class="bottom flex-center">
-                <div class="price">{{number_format($product->prices->where('price_type_id', 2)->first()->price, 2, '.', '')}} ₴<span class="price-unit-xvr"></span></div>
+                <div class="price">{{number_format($product->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
                 <button class="button colord remarketing_cart_button" data-product_id="{{$product->id}}">
                   <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
               </div>

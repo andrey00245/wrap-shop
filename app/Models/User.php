@@ -21,6 +21,8 @@ class User extends Authenticatable
         'email',
         'password',
         'last_name',
+        'verification_code',
+        'verification_code_expires_at'
     ];
 
     /**
@@ -44,5 +46,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function routeNotificationForTurboSms()
+    {
+        return $this->phone;
     }
 }

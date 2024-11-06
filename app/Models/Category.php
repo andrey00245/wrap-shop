@@ -4,10 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Translatable\HasTranslations;
 
-class Category extends Model
+class Category extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory,
+        InteractsWithMedia,
+        HasTranslations;
+
+    protected $translatable = ['name'];
 
     /**
      * The attributes that are mass assignable.
@@ -19,18 +27,47 @@ class Category extends Model
         'parent_id',
     ];
 
-    public function products()
+    protected $casts = [
+        'name' => 'json',
+    ];
+
+    public function registerMediaConversions(?Media $media = null): void
     {
-        return $this->belongsToMany(Product::class, 'product_categories');
+        $this
+            ->addMediaConversion('preview')
+            ->width(310)
+            ->height(310)
+            ->format('png')
+            ->nonQueued();
     }
 
-  public function children()
-  {
-    return $this->hasMany(Category::class, 'parent_id');
-  }
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('main')->singleFile();
+    }
 
-  public function parent()
-  {
-    return $this->belongsTo(Category::class, 'parent_id');
-  }
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function getNameUkAttribute()
+    {
+        return $this->getTranslation('name', 'uk');
+    }
+
+    public function getImage(): string
+    {
+       return $this->getFirstMediaUrl('main');
+    }
 }

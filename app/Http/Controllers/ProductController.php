@@ -21,8 +21,8 @@ class ProductController extends Controller
           ->where('price', '!=', 0);
       })
       ->whereHas('media')
-      ->whereHas('categories')
-      ->with(['media', 'categories'])
+      ->whereHas('detail.category')
+      ->with(['media'])
       ->paginate(6);
 
     $mainCategories = Category::query()->whereNull('parent_id')->get();

@@ -17,12 +17,16 @@ return new class extends Migration
             $table->string('external_code');
             $table->string('external_id')->nullable();
             $table->string('barcodes')->nullable();
-            $table->string('name')->nullable();
-            $table->text('description')->nullable();
             $table->string('article')->nullable();
+            $table->boolean('is_top_seller')->default(false);
+            $table->boolean('is_best_seller')->default(false);
+            $table->boolean('is_active')->default(true);
+            $table->json('name')->nullable();
+            $table->json('descriptions')->nullable();
 
-            $table->foreignId('brand_id')->nullable()->constrained('brands')->nullOnDelete();
-            $table->foreignId('purpose_id')->nullable()->constrained('purposes')->nullOnDelete();
+            $table->foreignId('category_id')->nullable()
+                ->constrained('categories')->nullOnDelete();
+
             $table->timestamps();
         });
     }

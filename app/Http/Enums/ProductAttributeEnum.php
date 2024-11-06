@@ -11,11 +11,15 @@ class ProductAttributeEnum
     const BRAND = '7e95b70a-9342-11ed-0a80-072100109a11';
     const SERIES = 'a8241b25-1f3b-11ee-0a80-062200399427';
     const APPLICATION = '2e9c4fd4-1f24-11ee-0a80-13d90035bbfd';
-    const ADVANTAGES = '2e9c510d-1f24-11ee-0a80-13d90035bbfe';
+    const BENEFITS = '2e9c510d-1f24-11ee-0a80-13d90035bbfe';
     const PURPOSE = '7e95b81a-9342-11ed-0a80-072100109a12';
     const MATERIAL = '7e95b9db-9342-11ed-0a80-072100109a14';
     const STRUCTURE = '7e95baee-9342-11ed-0a80-072100109a15';
     const MAIN_SHADE = 'a15a8448-3c12-11ee-0a80-004e000997a3';
+    const OPERATING_TEMPERATURE = '7e95c75f-9342-11ed-0a80-072100109a23';
+    const TYPE = '7e95b92e-9342-11ed-0a80-072100109a13';
+    const FORM_RELEASE = '7e95d9bc-9342-11ed-0a80-072100109a34';
+    const VOLUME = '7e95daf3-9342-11ed-0a80-072100109a35';
     const ROLL_M2 = '7e95bc68-9342-11ed-0a80-072100109a17';
     const WIDTH_M = '7e95bd25-9342-11ed-0a80-072100109a18';
     const THICKNESS = '7e95be86-9342-11ed-0a80-072100109a1a';

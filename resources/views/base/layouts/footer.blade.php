@@ -125,12 +125,6 @@
 
     </div>
 
-    <div class="test-class">
-{{--      {% for module in modules %}--}}
-{{--      {{ module }}--}}
-{{--      {% endfor %}--}}
-    </div>
-
     <div class="foot-contact foot-item">
       <div class="title">{{__('header_footer.contact_us')}}</div>
       <a href="tel:+38000000000" class="phone" ><span>+38</span>00000000</a>

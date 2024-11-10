@@ -121,7 +121,6 @@
     </div>
 
     @push('scripts')
-        <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
       <script>
         $(document).ready(function () {
           var homeProductsItem = new Swiper(".account-products-list .product-default .image", {

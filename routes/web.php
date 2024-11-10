@@ -3,6 +3,7 @@
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SyncProductImagesController;
+use App\Http\Controllers\VideosController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -14,17 +15,17 @@ Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
 Route::group(['prefix' => LaravelLocalization::setLocale(),
   'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
 
-  Route::get('/', [IndexController::class,'__invoke'])->name('index');
+  Route::get('/',IndexController::class)->name('index');
 
   Route::get('/shipping-and-payment', function () {
     return view('base.pages.delivery');
   })->name('delivery');
 
-  Route::get('/videoreviews', function () {
-    return view('base.pages.videoreviews');
-  })->name('videoreviews');
+    Route::get('/videoreviews', [VideosController::class, 'index'])->name('videoreviews');
 
-  Route::get('/news', function () {
+    Route::get('/videoreviews/{category}', [VideosController::class, 'show'])->name('videos.show');
+
+    Route::get('/news', function () {
     return view('base.pages.news');
   })->name('news');
 

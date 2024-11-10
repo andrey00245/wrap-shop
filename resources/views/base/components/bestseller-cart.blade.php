@@ -11,7 +11,7 @@
     <div class="home-products-list popup-list swiper">
       <div class="swiper-wrapper" aria-live="polite">
       @foreach($products->take(5) as $key => $product)
-          <div class="swiper-slide home-products-item cart-product-item product-default" data-ids="{{$product->categories->value('id')}}" id="homeBestsellerItem{{$key}}"
+          <div class="swiper-slide home-products-item cart-product-item product-default" data-ids="{{$product->category->id}}" id="homeBestsellerItem{{$key}}"
                role="group">
             <div class="product-default-texts-wrapper">
               <div class="top flex-justify">
@@ -53,20 +53,18 @@
               </a>
               <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
             <div class="product-default-texts-wrapper">
-
-              <div class="category">{{$product->categories->value('name')}}</div>
+              <div class="category">{{$product->category->name}}</div>
               <a href="{{route('products.show', ['product'=>$product->id])}}"
                  title="{{$product->name}}" class="name">{{$product->name}}</a>
               <div class="bottom flex-center">
-                <div class="price">{{number_format($product->prices->where('price_type_id', 2)->first()->price, 2, '.', '')}} ₴<span class="price-unit-xvr"></span></div>
+                <div class="price">{{number_format($product->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
                 <button class="button colord remarketing_cart_button" data-product_id="{{$product->id}}">
                   <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
               </div>
             </div>
 
+
             <div class="hover-additional-info">
-
-
               <div class="additional-info">
                 <p class="text-left additional-title">Призначення</p>
                 <p class="text-left additional-text">декоративна</p>
@@ -76,7 +74,6 @@
                 <p class="text-left additional-text">сатинова</p>
               </div>
             </div>
-
           </div>
         @endforeach
       </div>

@@ -3,7 +3,7 @@
     <div class="swiper-wrapper">
         @foreach($banners as $banner )
       <div class="swiper-slide home-banner-item">
-        <a href="#">
+        <a href="{{$banner->url}}">
           <img loading="lazy" src="{{$banner->getImage()}}" width="1312" height="450" alt="#" title="#">
         </a>
 {{--        <img loading="lazy" src="#" alt="#" title="#" width="1312" height="450">--}}

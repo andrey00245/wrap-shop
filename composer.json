@@ -16,6 +16,7 @@
         "laravel/socialite": "^5.15",
         "laravel/tinker": "^2.9",
         "mcamara/laravel-localization": "^2.0",
+        "mostafaznv/nova-video": "^6.3",
         "mrmonat/nova-translatable": "^1.0",
         "outl1ne/nova-multiselect-field": "^4.5",
         "spatie/enum": "^3.13",

@@ -210,6 +210,7 @@
 <link rel="stylesheet" href="{{asset('third-party/fancybox/jquery.fancybox.min.css')}}" media="screen">
 
 <script src="{{asset('js/jquery/jquery.min.js')}}"></script>
+<script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
 <script src="{{asset('third-party/fancybox/jquery.fancybox.min.js')}}"></script>
 <script src="{{mix('build/js/app.js')}}" type="text/javascript"></script>
 <script src="{{mix('build/js/mask.js')}}" type="text/javascript"></script>

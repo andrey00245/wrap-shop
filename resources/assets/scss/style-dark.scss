@@ -949,7 +949,7 @@ body::-webkit-scrollbar {
       height: 150px;
     }
 
-    &.show{
+    &.show {
       @media screen and (max-width: 767px) {
         height: 150px;
       }
@@ -1052,11 +1052,11 @@ body::-webkit-scrollbar {
 
     }
   }
+
   @media screen and (max-width: 767px) {
     min-height: 150px;
   }
 }
-
 
 
 /*.header*/
@@ -3030,10 +3030,10 @@ body::-webkit-scrollbar {
 }
 
 #cart-popup .table-striped .item {
-  padding: 15px;
+  padding: 5px;
   margin-bottom: 22px;
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0px 9px 31px rgba(255, 255, 255, 0.09);
+  background: #4C4F52B2;
+  border-radius: 4px;
   align-items: center;
   position: relative;
 }
@@ -3047,13 +3047,23 @@ body::-webkit-scrollbar {
   font-weight: 700;
   text-transform: uppercase;
   min-width: 110px;
+  padding: 15px 0;
 }
 
 #cart-popup .table-striped .item .name .cat, #cart-popup .table-striped .item .name .option {
   display: block;
-  font-weight: 100;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.66);
+  font-size: 14px;
+  color: #FFFFFF4D;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 0.11999999731779099px;
+  text-align: left;
+}
+
+#cart-popup .table-striped .item .name a {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 16px;
 }
 
 #cart-popup .table-striped .item .name .option {
@@ -3110,6 +3120,8 @@ body::-webkit-scrollbar {
 
 #cart-popup .table-striped .item .delete {
   margin-bottom: auto;
+  margin-top: 5px;
+  margin-right: 5px;
 }
 
 #cart-popup .table-striped .item .delete button {
@@ -3139,6 +3151,12 @@ body::-webkit-scrollbar {
 #cart-popup .table-bordered .total .value {
   font-size: 22px;
   text-transform: uppercase;
+}
+
+#cart-popup {
+  .cart-quantity-input-wrappper {
+
+  }
 }
 
 .cart-mini-button {

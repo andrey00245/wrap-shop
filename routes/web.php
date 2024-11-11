@@ -4,6 +4,7 @@ use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SyncProductImagesController;
 use App\Http\Controllers\VideosController;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -77,17 +78,29 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   });
 
   Route::get('/checkout', function () {
-    $products = Product::query()
-      ->whereHas('prices', function ($query) {
-        $query->where('price_type_id', 2)
-          ->where('price', '!=', 0);
-      })
-      ->whereHas('media')
-      ->whereHas('categories')
-      ->with(['media', 'categories'])
-      ->paginate(6);
 
-    return view('base.pages.checkout.index', compact('products'));
+    $products = Product::query()
+      ->whereHas('media')
+      ->whereHas('category')
+      ->with(['media'])
+      ->latest()
+      ->whereHas('prices', function ($query) {
+        $query->where('type_id', function ($subQuery) {
+          $subQuery->select('id')
+            ->from('price_types')
+            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+        })->where('price', '>', 0);
+      })
+      ->take(20)
+      ->get();
+
+    $latestCategory = Category::query()
+      ->whereHas('products', function ($query) use ($products) {
+        $query->whereIn('products.id', $products->pluck('id')->toArray());
+      })
+      ->get();
+
+    return view('base.pages.checkout.index', compact('latestCategory'));
   })->name('checkout');
 
 });

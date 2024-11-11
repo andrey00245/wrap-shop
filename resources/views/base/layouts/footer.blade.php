@@ -164,48 +164,10 @@
 
 <div class="map" id="map"></div>
 <div class="mobil-catalog-fixed wrap"><div class="mobil-catalog-open button"><i class="far fa-th-large"></i>Каталог товарів</div></div>
-{{--<link href="catalog/view/theme/default/stylesheet/product_statuses.css" type="text/css" rel="stylesheet" media="screen" />--}}
-{{--<link href="catalog/view/javascript/sociallogin/css/sociallogin.css" type="text/css" rel="stylesheet" media="screen" />--}}
-{{--<link href="catalog/view/javascript/sap_sms/css/sap_sms.css" type="text/css" rel="stylesheet" media="screen" />--}}
-{{--<link href="catalog/view/javascript/tel-input/css/intlTelInput.min.css" type="text/css" rel="stylesheet" media="screen" />--}}
-
-{{--<script src="catalog/view/theme/wrapshop/js/swiper-bundle.min.js?ver34567" defer></script>--}}
-{{--<script src="catalog/view/javascript/ocdevwizard/blog/main.js" type="text/javascript"defer></script>--}}
-{{--<script src="catalog/view/javascript/jquery/jquery.inputmask.bundle.min.js?ver34567"defer></script>--}}
-{{--<script src="catalog/view/javascript/simple.js" type="text/javascript"defer></script>--}}
-{{--<script src="catalog/view/javascript/simplepage.js" type="text/javascript"defer></script>--}}
-{{--<script src="catalog/view/javascript/simplecheckout.js?v=4.11.9" type="text/javascript"defer></script>--}}
-{{--<script src="catalog/view/theme/wrapshop/js/scripts.js" defer></script>--}}
-{{--<script src="catalog/view/javascript/search_suggestion.js" type="text/javascript"defer></script>--}}
-{{--<script src="catalog/view/javascript/search_suggestion_autocomplete.js" type="text/javascript"defer></script>--}}
-
-{{--<script src="catalog/view/javascript/tel-input/js/tel-input.js" type="text/javascript"defer></script>--}}
-{{--<script src="catalog/view/javascript/sociallogin/sociallogin.js" type="text/javascript"defer></script>--}}
-{{--<script src="catalog/view/javascript/sap_sms/sap_sms.js" type="text/javascript"defer></script>--}}
 @push('scripts')
 
 @endpush
 
-
-
-{{--<script src="{{mix('build/js/mask_list.js')}}" type="text/javascript"></script>--}}
-
-{{--<script type="module">--}}
-{{--  import { mask } from '{{mix('build/js/mask.js')}}';--}}
-
-{{--  console.log(mask('#phone'))--}}
-{{--</script>--}}
-{{--{# <script src="catalog/view/javascript/jquery/jquery.maskedinput.min.js" type="text/javascript"defer></script> #}--}}
-{{--{# <script src="catalog/view/javascript/tel-input/js/intlTelInput.js" type="text/javascript"defer></script> #}--}}
-
-{{--<link href="catalog/view/theme/wrapshop/stylesheet/ocdevwizard/form_builder/stylesheet-{{ theme }}.css" id="theme-link-form" type="text/css" rel="stylesheet" media="screen" />--}}
-{{--<link href="catalog/view/theme/wrapshop/stylesheet/simple-{{ theme }}.css" id="theme-link-simple" type="text/css" rel="stylesheet" media="screen" />--}}
-{{--{% for style in styles %}--}}
-{{--<link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" />--}}
-{{--{% endfor %}--}}
-{{--{% for script in scripts %}--}}
-{{--<script src="{{ script }}" type="text/javascript"defer></script>--}}
-{{--{% endfor %}--}}
 <link rel="stylesheet" href="{{asset('assets/css/form.css')}}" media="screen">
 <link rel="stylesheet" href="{{asset('third-party/fancybox/jquery.fancybox.min.css')}}" media="screen">
 

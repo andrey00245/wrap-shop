@@ -141,7 +141,7 @@
 
 .page-checkout {
   padding-top: 48px;
-  padding-bottom: 150px;
+  padding-bottom: 80px;
 }
 
 .simple-popup-body .form-horizontal .button,
@@ -228,18 +228,16 @@
 }
 
 #buttons .button {
-  font-weight: 700;
-  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgb(255 206 28 / 85%);
-  text-shadow: 2px 3px 18px rgb(255 206 28 / 85%);
-  border: 1px solid #FFCE1C;
-  border-radius: 3px;
+  text-shadow: 2px 3px 3 8px rgb(255 206 28 / 85%);
   height: 60px;
-  padding: 0 57px;
-  width: initial;
-  background: transparent;
-  display: inline-flex;
+  border: 1px solid #FFCE1C;
+  background-color: #FFCE1C1A;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  width: 100%;
 }
 
 #buttons .button i {

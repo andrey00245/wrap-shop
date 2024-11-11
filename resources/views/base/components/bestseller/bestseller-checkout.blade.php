@@ -1,6 +1,6 @@
-<section class="popup-products row" id="cartProductSlider">
+<section class="home-products row" id="checkoutProductSlider">
   <div class="home-products-top flex-justify">
-    <h2 class="popup-title"><span class="colord">рекомендуємо</span></h2>
+    <h2 class="home-title"><span class="colord">Нові</span> надходження</h2>
     <div class="line" data-background="{{asset('assets/img/head-top.png')}}" style="background-image: url('{{asset('assets/img/head-top.png')}}');"></div>
     <div class="home-slide-button flex-justify">
       <div class="swiper-button-next button" tabindex="0" role="button" aria-label="Next slide" aria-controls="swiper-wrapper-c52685b9106c91423" aria-disabled="false"></div>
@@ -8,7 +8,7 @@
     </div>
   </div>
 
-    <div class="home-products-list popup-list swiper">
+    <div class="home-products-list swiper">
       <div class="swiper-wrapper" aria-live="polite">
       @foreach($products->take(5) as $key => $product)
           <div class="swiper-slide home-products-item cart-product-item product-default" data-ids="{{$product->category->id}}" id="homeBestsellerItem{{$key}}"

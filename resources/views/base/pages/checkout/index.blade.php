@@ -204,6 +204,16 @@
                     <label for="coment">Хочете залишити коментар?</label>
                     <input type="text" name="coment" id="coment" placeholder="Коментар">
                   </div>
+
+                  <div class="input-group">
+                    @include('base.components.bestseller.bestseller-checkout')
+                  </div>
+
+                  <div class="input-group">
+                    <div id="buttons">
+                      <a class="button btn-primary button_oc btn"><i class="fas fa-chevron-right"></i><span>Підтвердити й оформити покупку</span></a>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -309,38 +319,9 @@
 
   </section>
 
-  <script>
-    let shippingMethod = document.querySelector('#simplecheckout_shipping')
-    let shippingMethodAddress = document.querySelector('#simplecheckout_shipping_address')
-    let novaPoshtaDesc = document.querySelector('#novaposhta_desc')
-
-    let inputsOpen = document.querySelectorAll('.simplecheckout-cart-total .inputs-open.button')
-
-    novaPoshtaDesc.remove()
-
-    shippingMethod.addEventListener('change', function (el) {
-      novaPoshtaDesc.remove()
-
-      if (this.querySelector('#pickup').checked) {
-        shippingMethodAddress.style.display = 'none';
-      } else {
-        shippingMethodAddress.style.display = '';
-      }
-      if (this.querySelector('#novaposhta').checked) {
-        this.querySelector('#novaposhta').parentNode.parentNode.insertAdjacentElement('afterend', novaPoshtaDesc);
-      }
-      if (this.querySelector('#novaposhta_doors').checked) {
-        this.querySelector('#novaposhta_doors').parentNode.parentNode.insertAdjacentElement('afterend', novaPoshtaDesc);
-      }
-    })
-
-    inputsOpen.forEach(function (el) {
-      el.addEventListener('click', function () {
-        el.parentElement.querySelector('.inputs.form-horizontal').classList.toggle('active')
-      })
-    })
-
-  </script>
+  @push('scripts')
+    <script src="{{mix('build/js/checkoutPage.js')}}"></script>
+  @endpush
 
 
 @endsection

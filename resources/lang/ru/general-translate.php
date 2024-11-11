@@ -2,6 +2,10 @@
 return [
   'leaders_of_sales' => '<span class="colord">Лидеры</span> продаж',
   'latest' => '<span class="colord">Новые</span> поступления',
+  '3m_colors' => '<span class="colord">3M color</span> пленки',
+  'yellotools' => '<span class="colord">Yellotools</span> инструменты',
+
+
   'sales_hit' => 'Хит продаж',
   'all' => 'Все',
   'view' => 'Смотреть',

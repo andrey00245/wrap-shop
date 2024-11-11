@@ -7,6 +7,7 @@ mix.js('resources/assets/js/delivery_tabs.js', 'public/build/js').version();
 mix.js('resources/assets/js/auth.js', 'public/build/js').version();
 mix.js('resources/assets/js/productShow.js', 'public/build/js').version();
 mix.js('resources/assets/js/productIndex.js', 'public/build/js').version();
+mix.js('resources/assets/js/checkoutPage.js', 'public/build/js').version();
 
 mix.css('resources/assets/scss/reset.css', 'public/build/css').version();
 mix.sass('resources/assets/scss/form.scss', 'public/build/css').version();

@@ -10,7 +10,7 @@
 
     <div class="home-products-list popup-list swiper">
       <div class="swiper-wrapper" aria-live="polite">
-      @foreach($products->take(5) as $key => $product)
+      @foreach($products as $key => $product)
           <div class="swiper-slide home-products-item cart-product-item product-default" data-ids="{{$product->category->id}}" id="homeBestsellerItem{{$key}}"
                role="group">
             <div class="product-default-texts-wrapper">

@@ -16,24 +16,11 @@ class VideosController extends Controller
      */
     public function index(): View
     {
-        $products = Product::query()
-            ->where('is_active', true)
-            ->where('is_top_seller', true)
-            ->whereHas('prices', function ($query) {
-                $query->where('type_id', function ($subQuery) {
-                    $subQuery->select('id')
-                        ->from('price_types')
-                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-                })->where('price', '>', 0);
-            })
-            ->get();
-
         $videos = Video::query()->where('is_active',true)->latest()->get();
         $categories = VideoCategory::all();
 
         return view('base.pages.videoreviews', compact(
                 'videos',
-                'products',
                 'categories',
             )
         );
@@ -46,18 +33,6 @@ class VideosController extends Controller
      */
     public function show(VideoCategory $category): View
     {
-        $products = Product::query()
-            ->where('is_active', true)
-            ->where('is_top_seller', true)
-            ->whereHas('prices', function ($query) {
-                $query->where('type_id', function ($subQuery) {
-                    $subQuery->select('id')
-                        ->from('price_types')
-                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-                })->where('price', '>', 0);
-            })
-            ->get();
-
         $videos = Video::query()
             ->where('category_id', $category->id)
             ->where('is_active',true)
@@ -68,7 +43,6 @@ class VideosController extends Controller
 
         return view('base.pages.videoreviews', compact(
                 'videos',
-                'products',
                 'categories'
             )
         );

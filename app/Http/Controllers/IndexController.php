@@ -50,10 +50,6 @@ class IndexController extends Controller
             })
             ->get();
 
-        $mainCategories = Category::query()
-            ->whereNull('parent_id')
-            ->get();
-
         $latestCategory = Category::query()
             ->whereHas('products', function ($query) use ($products) {
                 $query->whereIn('products.id', $products->pluck('id')->toArray());
@@ -69,7 +65,6 @@ class IndexController extends Controller
         return view('base.pages.main', compact(
                 'topSellerCategories',
                 'topSellersProducts',
-                'mainCategories',
                 'latestCategory',
                 'products',
                 'banners',

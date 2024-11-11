@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\View;
@@ -35,9 +36,16 @@ class AppServiceProvider extends ServiceProvider
                         ->from('price_types')
                         ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
                 })->where('price', '>', 0);
-            })
+            })->has('category')
             ->get();
 
-        View::share('products', $products);
+        $mainCategories = Category::query()
+            ->whereNull('parent_id')
+            ->get();
+
+        View::share([
+            'products' => $products,
+            'mainCategories' => $mainCategories,
+        ]);
     }
 }

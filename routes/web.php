@@ -72,35 +72,14 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
     })->name('wishlist');
   });
 
-  Route::group(['prefix' => '/products'], function(){
+  Route::group(['prefix' => '/products'], function() {
     Route::get('/', [ProductController::class,'index'])->name('products.index');
-    Route::get('/{product}', [ProductController::class,'show'])->name('products.show');
+    Route::get('/{product}/show', [ProductController::class,'show'])->name('products.show');
+    Route::get('/category/{category}', [ProductController::class,'category'])->name('products.category');
   });
 
   Route::get('/checkout', function () {
-
-    $products = Product::query()
-      ->whereHas('media')
-      ->whereHas('category')
-      ->with(['media'])
-      ->latest()
-      ->whereHas('prices', function ($query) {
-        $query->where('type_id', function ($subQuery) {
-          $subQuery->select('id')
-            ->from('price_types')
-            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-        })->where('price', '>', 0);
-      })
-      ->take(20)
-      ->get();
-
-    $latestCategory = Category::query()
-      ->whereHas('products', function ($query) use ($products) {
-        $query->whereIn('products.id', $products->pluck('id')->toArray());
-      })
-      ->get();
-
-    return view('base.pages.checkout.index', compact('latestCategory'));
+    return view('base.pages.checkout.index');
   })->name('checkout');
 
 });

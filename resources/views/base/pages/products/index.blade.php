@@ -1,6 +1,4 @@
 @extends('base.layouts.app')
-
-
 @section('content')
 
   @push('styles')
@@ -12,27 +10,20 @@
     <div class="category-top">
       <nav class="category-breadcrumbs">
         <ul class="flex-center">
-          <li><a href="https://wrap.shop/" title="Головна" class="button"><i class="far fa-chevron-left"></i>Головна</a>
+          <li><a href="{{route('index')}}" title="Головна" class="button"><i class="far fa-chevron-left"></i>Головна</a>
           </li>
         </ul>
       </nav>
-      <h1 class="title">Плівки</h1>
-
+      <h1 class="title">{{$category->name ?? ''}}</h1>
+        @if(isset($category))
       <nav class="category-child-nav">
         <ul>
-          <li><a href="https://wrap.shop/plivky/kolorovi-plivky/" title="Кольорові плівки" class="flex-center">Кольорові
-              плівки</a></li>
-          <li><a href="https://wrap.shop/plivky/zahysni-plivky/" title="Захисні плівки" class="flex-center">Захисні
-              плівки</a></li>
-          <li><a href="https://wrap.shop/plivky/plivka-dlya-avtomobilnyh-vikon/" title="Плівка для автомобільних вікон"
-                 class="flex-center">Плівка для автомобільних вікон</a></li>
-          <li><a href="https://wrap.shop/plivky/gotovi-dyzajny-ta-plivka-dlya-druku/"
-                 title="Готові дизайни та плівка для друку" class="flex-center">Готові дизайни та плівка для друку</a>
-          </li>
-          <li><a href="https://wrap.shop/plivky/lekala-dlya-salona/" title="Лекала для салона" class="flex-center">Лекала
-              для салона</a></li>
+            @foreach($category->children as $childrenCategory)
+                <li><a href="{{route('products.category', ['category' => $childrenCategory->id])}}" title="{{$childrenCategory->name}}" class="flex-center">{{$childrenCategory->name}}</a></li>
+            @endforeach
         </ul>
       </nav>
+        @endif
     </div>
     <div class="category-content wrap flex-justify">
       <div class="category-left">
@@ -2086,7 +2077,7 @@
               </div>
 
               <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
-                <i class="far fa-search-plus colord" data-src="{{$product->getMedia('images')->first()->getUrl()}}"
+                <i class="far fa-search-plus colord" data-src="{{$product->getImage()}}"
                    data-fancybox="gallery{{$product->id}}" data-caption="{{$product->name}}"></i>
                 <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->name}}"
                    class="swiper-wrapper">
@@ -2114,12 +2105,12 @@
               <div class="product-default-texts-wrapper list">
 
               <div class="center">
-                <div class="category">{{$product->categories->value('name')}}</div>
+                <div class="category">{{$product->category?->name}}</div>
                 <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->name}}"
                    class="name">{{$product->name}}</a>
               </div>
               <div class="bottom flex-center">
-                <div class="price">{{number_format($product->prices->where('price_type_id', 2)->first()->price, 2, '.', '')}} ₴<span
+                <div class="price">{{number_format($product->getPrice())}} ₴<span
                     class="price-unit-xvr"></span></div>
                 <button class="button colord remarketing_cart_button" data-product_id="{{$product->id}}"><i
                     class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>

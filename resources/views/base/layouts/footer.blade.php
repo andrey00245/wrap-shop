@@ -45,70 +45,16 @@
     </div>
     <nav class="foot-catalog foot-item">
       <ul class="footer-cat">
+          @foreach($mainCategories as $category)
         <li>
-          <a href="/plivky" title="Плівки для автомобіля">
-            <figure><img loading="lazy" src="http://localhost:8888/image/cachewebp/catalog/category/wrap-180x140.webp" srcset="http://localhost:8888/image/cachewebp/catalog/category/wrap-360x280.webp 2x" alt="Плівки для автомобіля" title="Плівки для автомобіля" width="180" height="140"></figure>
+            <a href="{{route('products.category', ['category' => $category->id])}}" title="{{$category->name}}">
+            <figure><img loading="lazy" src="{{$category->getImage()}}" srcset="{{$category->getImage()}}" alt="{{$category->name}}" title="{{$category->name}}" width="180" height="140"></figure>
             <div>
-              <div class="name">Плівки для автомобіля</div>
+              <div class="name">{{$category->name}}</div>
             </div>
           </a>
         </li>
-        <li>
-          <a href="/materialy-dlya-detejlingu-avto" title="Матеріали для детейлінгу">
-            <figure><img loading="lazy" src="http://localhost:8888/image/cachewebp/catalog/category/det-180x140.webp" srcset="http://localhost:8888/image/cachewebp/catalog/category/det-360x280.webp 2x" alt="Матеріали для детейлінгу" title="Матеріали для детейлінгу" width="180" height="140"></figure>
-            <div>
-              <div class="name">Матеріали для детейлінгу</div>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="/instrumenty-rozhidnyky" title="Інструменти / Розхідники">
-            <figure><img loading="lazy" src="http://localhost:8888/image/cachewebp/catalog/category/tools-180x140.webp" srcset="http://localhost:8888/image/cachewebp/catalog/category/tools-360x280.webp 2x" alt="Інструменти / Розхідники" title="Інструменти / Розхідники" width="180" height="140"></figure>
-            <div>
-              <div class="name">Інструменти / Розхідники</div>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="/materialy-dlya-shumoizolyaciyi-avto" title="Матеріали для шумоізоляції авто">
-            <figure><img loading="lazy" src="http://localhost:8888/image/cachewebp/catalog/category/sound-180x140.webp" srcset="http://localhost:8888/image/cachewebp/catalog/category/sound-360x280.webp 2x" alt="Матеріали для шумоізоляції авто" title="Матеріали для шумоізоляції авто" width="180" height="140"></figure>
-            <div>
-              <div class="name">Матеріали для шумоізоляції авто</div>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="/avtomobilni-kylymy-hand-made" title="Автомобільні килими Hand made">
-            <figure><img loading="lazy" src="http://localhost:8888/image/cachewebp/catalog/category/swc-180x140.webp" srcset="http://localhost:8888/image/cachewebp/catalog/category/swc-360x280.webp 2x" alt="Автомобільні килими Hand made" title="Автомобільні килими Hand made" width="180" height="140"></figure>
-            <div>
-              <div class="name">Автомобільні килими Hand made</div>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="/zahysne-sklo-dlya-multymedia-avto" title="Захисне скло для мультимедіа авто">
-            <figure><img loading="lazy" src="http://localhost:8888/image/cachewebp/catalog/category/glass-180x140.webp" srcset="http://localhost:8888/image/cachewebp/catalog/category/glass-360x280.webp 2x" alt="Захисне скло для мультимедіа авто" title="Захисне скло для мультимедіа авто" width="180" height="140"></figure>
-            <div>
-              <div class="name">Захисне скло для мультимедіа авто</div>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="/tuning" title="Тюнінг">
-            <figure><img loading="lazy" src="http://localhost:8888/image/cachewebp/catalog/category/tun-180x140.webp" srcset="http://localhost:8888/image/cachewebp/catalog/category/tun-360x280.webp 2x" alt="Тюнінг" title="Тюнінг" width="180" height="140"></figure>
-            <div>
-              <div class="name">Тюнінг</div>
-            </div>
-          </a>
-        </li>
-        <li>
-          <a href="/merch" title="Мерч">
-            <figure><img loading="lazy" src="http://localhost:8888/image/cachewebp/catalog/category/merch-180x140.webp" srcset="http://localhost:8888/image/cachewebp/catalog/category/merch-360x280.webp 2x" alt="Мерч" title="Мерч" width="180" height="140"></figure>
-            <div>
-              <div class="name">Мерч</div>
-            </div>
-          </a>
-        </li>
+          @endforeach
       </ul>
     </nav>
     <nav class="foot-menu foot-item">

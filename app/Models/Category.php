@@ -70,4 +70,9 @@ class Category extends Model implements HasMedia
     {
        return $this->getFirstMediaUrl('main');
     }
+
+    public function isParent(): bool
+    {
+       return is_null($this->parent_id);
+    }
 }

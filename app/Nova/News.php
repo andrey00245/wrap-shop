@@ -10,6 +10,7 @@ use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Trix;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Mostafaznv\NovaCkEditor\CkEditor;
 
 class News extends Resource
 {
@@ -54,7 +55,10 @@ class News extends Resource
             NovaTabTranslatable::make([
                 Text::make('Назва', 'title'),
                 Text::make('Час читання', 'read_time'),
-                Trix::make('Опис', 'description'),
+              CkEditor::make('Опис', 'description')
+                ->stacked()
+                ->fullWidth(),
+//                Trix::make('Опис', 'description'),
             ]),
             BelongsTo::make('Категорія','category',NewsCategory::class)
                 ->displayUsing(function ($parent) {

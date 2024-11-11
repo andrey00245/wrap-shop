@@ -30,6 +30,29 @@ return [
 
     'disks' => [
 
+        'image' => [
+          'driver'     => 'local',
+          'root'       => public_path('uploads/image'),
+          'url'        => env('APP_URL') . '/uploads/image',
+        ],
+
+      'video' => [
+        'driver'     => 'local',
+        'root'       => public_path('uploads/video'),
+        'url'        => env('APP_URL') . '/uploads/video',
+      ],
+      'audio' => [
+        'driver'     => 'local',
+        'root'       => public_path('uploads/audio'),
+        'url'        => env('APP_URL') . '/uploads/audio',
+      ],
+      'file' => [
+        'driver'     => 'local',
+        'root'       => public_path('uploads/file'),
+        'url'        => env('APP_URL') . '/uploads/file',
+      ],
+
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),

@@ -127,6 +127,7 @@ class ProductService
             ];
         }, $salePrices);
 
+
         foreach ($priceTypes as $priceData) {
             $priceType = PriceType::query()->updateOrCreate(
                 ['external_id' => $priceData['external_id']],

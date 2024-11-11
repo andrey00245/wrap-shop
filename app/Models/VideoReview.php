@@ -10,7 +10,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
     use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 
-class Video extends Model implements HasMedia
+class VideoReview extends Model implements HasMedia
 {
     use HasFactory,
         InteractsWithMedia,

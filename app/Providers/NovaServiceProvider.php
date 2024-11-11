@@ -15,6 +15,7 @@ use App\Nova\Product;
 use App\Nova\User;
 use App\Nova\Video;
 use App\Nova\VideoCategory;
+use App\Nova\VideoReview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
@@ -60,13 +61,11 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                 MenuSection::make('Блог', [
                     MenuItem::resource(NewsCategory::class),
                     MenuItem::resource(News::class),
-                    MenuItem::resource(VideoCategory::class),
-                    MenuItem::resource(Video::class),
                 ])->icon('desktop-computer')->collapsable(),
 
                 MenuSection::make('Відеогляд', [
                     MenuItem::resource(VideoCategory::class),
-                    MenuItem::resource(Video::class),
+                    MenuItem::resource(VideoReview::class),
                 ])->icon('desktop-computer')->collapsable(),
             ];
         });

@@ -12,7 +12,7 @@ use Kongulov\NovaTabTranslatable\TranslatableTabToRowTrait;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Text;
 
-class Video extends Resource
+class VideoReview extends Resource
 {
     use TranslatableTabToRowTrait;
 
@@ -21,7 +21,7 @@ class Video extends Resource
      *
      * @var class-string<\App\Models\Video>
      */
-    public static $model = \App\Models\Video::class;
+    public static $model = \App\Models\VideoReview::class;
 
     public static $title = 'title';
 

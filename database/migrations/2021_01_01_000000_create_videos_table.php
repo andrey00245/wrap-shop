@@ -11,8 +11,8 @@ class CreateVideosTable extends Migration
         Schema::create('videos', function(Blueprint $table) {
             $table->id();
             $table->string('name')->index();
-            $table->upload('file');
-            // $table->string('file')->index(); // in case that you don't want Larupload
+//            $table->upload('file');
+             $table->string('file')->index(); // in case that you don't want Larupload
             $table->timestamps();
         });
     }

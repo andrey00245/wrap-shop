@@ -5,9 +5,10 @@
     <link rel="stylesheet" href="{{mix('build/css/all-dark.css')}}">
     <link rel="stylesheet" href="{{mix('build/css/style-category-dark.css')}}">
   @endpush
-  <div class="products-background"></div>
   <section class="category-page row">
     <div class="category-top">
+      <img class="products-background" src="{{asset('assets/img/products/fon_wrap_webp.webp')}}" alt="">
+      <div class="products-background"></div>
       <nav class="category-breadcrumbs">
         <ul class="flex-center">
           <li><a href="{{route('index')}}" title="Головна" class="button"><i class="far fa-chevron-left"></i>Головна</a>

@@ -162,27 +162,7 @@
     }
   }
 
-  .quantity-input-group {
-    display: flex;
-    width: 92px;
-    height: 37px;
-    background: linear-gradient(to right, #484A4C 50%, rgba(255, 206, 28, 0.5) 100%);
-    border: 1px solid #828486;
-    margin-right: 10px;
 
-    .input-quantity {
-      text-align: center;
-      background-color: transparent;
-      font-size: 16px;
-      font-weight: 400;
-    }
-
-    .input-group-btn {
-      button {
-        padding: 10px;
-      }
-    }
-  }
 
   #product {
     .text_quantity_unit {

@@ -62,20 +62,16 @@
                   <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
               </div>
             </div>
-
             <div class="hover-additional-info">
-
-
               <div class="additional-info">
-                <p class="text-left title">Призначення</p>
-                <p class="text-left text">декоративна</p>
+                <p class="text-left additional-title">Призначення</p>
+                <p class="text-left additional-text">декоративна</p>
               </div>
               <div class="additional-info">
-                <p class="text-left title">Структура</p>
-                <p class="text-left text">сатинова</p>
+                <p class="text-left additional-title">Структура</p>
+                <p class="text-left additional-text">сатинова</p>
               </div>
             </div>
-
           </div>
         @endforeach
       </div>

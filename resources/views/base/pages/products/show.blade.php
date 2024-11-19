@@ -148,9 +148,9 @@
                 {{--                <span class="text_price_XVR label-name">{{__('product-show.price')}} </span>--}}
                 <div class="flex-center price-wrap">
                   <span class="item-price"
-                        data-discount='{"0": {"discountFrom": 0, "price": {{$product->prices->where('price_type_id', 2)->first()->price}}},"1": {"discountFrom": 10, "price": 5700},"2": {"discountFrom": 25, "price": 5300}}'
-                        data-value="{{number_format($product->prices->where('price_type_id', 2)->first()->price, 2, '.', '')}}"><span
-                      class="only-price">{{number_format($product->prices->where('price_type_id', 2)->first()->price, 2, '.', '')}}</span> ₴</span>
+                        data-discount='{"0": {"discountFrom": 0, "price": {{$product->getPrice()}}},"1": {"discountFrom": 10, "price": 5700},"2": {"discountFrom": 25, "price": 5300}}'
+                        data-value="{{number_format($product->getPrice(), 2, '.', '')}}"><span
+                      class="only-price">{{number_format($product->getPrice(), 2, '.', '')}}</span> ₴</span>
                   <span class="label-lenght">за 1 м.п.</span><span class="cur">$152</span>
                 </div>
               </div>
@@ -272,6 +272,25 @@
         </div>
       </div>
     </div>
+
+    <div class="product-page-example swiper">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide item" >
+          <img src="https://wrap.shop/image/catalog/demo/syncms/1s2cGKiWcbN9xCJRbjJfAsuznRA9fpfpe.webp" title="" alt="" loading="lazy" class="swiper-lazy" >
+          <div class="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+        </div>
+        <div class="swiper-slide item" >
+          <img src="https://wrap.shop/image/catalog/demo/syncms/1s2cGKiWcbN9xCJRbjJfAsuznRA9fpfpe.webp" title="" alt="" loading="lazy" class="swiper-lazy" >
+          <div class="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+        </div>
+      </div>
+      <div class="bottom flex-center">
+        <div class="swiper-button-prev button"></div>
+        <div class="desc">Подивіться, як виглядатиме ця плівка на автомобілі</div>
+        <div class="swiper-button-next button"></div>
+      </div>
+    </div>
+
     <div class="product-page-info flex-justify wrap">
       <div class="item">
         <div class="title">{{__('product-show.description')}}</div>

@@ -237,3 +237,12 @@ choseQuantity.each(function (){
 productSliderInitialization('homeLatest')
 imageSliderInProduct('home-products-item');
 
+
+var productPageExample = new Swiper(".product-page-example", {
+  loop: true,
+  navigation: {
+    nextEl: ".product-page-example .swiper-button-next",
+    prevEl: ".product-page-example .swiper-button-prev",
+  },
+  lazy: true,
+});

@@ -68,8 +68,6 @@
             </div>
 
             <div class="hover-additional-info">
-
-
               <div class="additional-info">
                 <p class="text-left additional-title">Призначення</p>
                 <p class="text-left additional-text">декоративна</p>

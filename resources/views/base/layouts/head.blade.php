@@ -2,8 +2,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>fsdfsdfsdfsdfsd</title>
-  <meta name="description" content="fdsfdsfdsfdsf">
+  <title>@yield('title', 'Default')</title>
+  <meta name="description" content="@yield('description', 'Default')">
 
   <link href="{{mix('build/css/style-dark.css')}}" rel="stylesheet" type="text/css">
   <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login.css')}}">

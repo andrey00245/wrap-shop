@@ -110,9 +110,6 @@
 
 <div class="map" id="map"></div>
 <div class="mobil-catalog-fixed wrap"><div class="mobil-catalog-open button"><i class="far fa-th-large"></i>Каталог товарів</div></div>
-@push('scripts')
-
-@endpush
 
 <link rel="stylesheet" href="{{asset('assets/css/form.css')}}" media="screen">
 <link rel="stylesheet" href="{{asset('third-party/fancybox/jquery.fancybox.min.css')}}" media="screen">
@@ -126,7 +123,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
 
 @stack('scripts')
-
 
 <script>
   function initMap() {
@@ -165,66 +161,6 @@
 </script>
 <script id="map-script" defer></script>
 <script>
-  let btn = document.getElementById("theme-button");
-  let btn1 = document.getElementById("theme-button1");
-  let link = document.getElementById("theme-link");
-  let link1 = document.getElementById("theme-link-category");
-  let link2 = document.getElementById("theme-link-product");
-  let link3 = document.getElementById("theme-link-information");
-  let link4 = document.getElementById("theme-link-blog");
-  let link5 = document.getElementById("theme-link-account");
-  let link6 = document.getElementById("theme-link-form");
-  let link7 = document.getElementById("theme-link-simple");
-  let link8 = document.getElementById("theme-link-fastorder");
-  let link9 = document.getElementById("theme-link-ocfilter");
-
-  $(document).ready(function($) {
-
-    $('.category-products-item .swiper-slide').css('display', 'flex');
-  });
-
-  let seoContentHeight = 104;
-  let seoContent = $('.seo-content');
-  seoContent.css("height", "auto");
-  let outerContentsHeight = seoContent.height();
-  seoContent.css("height", seoContentHeight+"px");
-
-  $(window).on('resize',function(){
-    seoContent.css("height", "auto");
-    outerContentsHeight = seoContent.height();
-    if( seoContent.hasClass('open')){
-      seoContent.css('height', outerContentsHeight+'px')
-    }
-    else {
-      seoContent.css('height', seoContentHeight+'px')
-    }
-  })
-
-  $('.seo-btn.show').click(function () {
-    $('.seo-btn.show').hide();
-    $('.seo-btn.collapse').show()
-    seoContent.toggleClass('open');
-    showCollapseSeoContent()
-  })
-
-  $('.seo-btn.collapse').click(function () {
-    $('.seo-btn.show').show();
-    $('.seo-btn.collapse').hide()
-    seoContent.toggleClass('open');
-    showCollapseSeoContent()
-  })
-
-  function showCollapseSeoContent(){
-    if( seoContent.hasClass('open')){
-      seoContent.css('height', outerContentsHeight+'px')
-    }
-    else {
-      seoContent.css('height', seoContentHeight+'px')
-    }
-  }
-
-  // mask("#tel-phone-loginpopup");
-  // mask("#input-telephone");
 
   $('input[type="tel"]').on('click', function() {
     $(this).prev('.notice-text').remove();

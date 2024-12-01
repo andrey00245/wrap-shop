@@ -935,12 +935,15 @@ margin-bottom: 5px;
   text-transform: uppercase;
   color: rgb(255 206 28 / 85%);
   text-shadow: 2px 3px 18px #FFCE1C;
-  font-family: 'DINPro', sans-serif;
+  font-family: 'InterVariable', sans-serif;
   border: 1px solid #FFCE1C;
   border-radius: 3px;
   display: inline-flex;
   padding: 15px 30px;
   background: transparent;
+  span {
+    font-size: 16px;
+  }
 }
 
 @media screen and (max-width: 1331px) {

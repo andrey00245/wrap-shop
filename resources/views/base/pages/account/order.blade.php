@@ -1,5 +1,7 @@
 @extends('base.pages.account.layout')
 
+@section('title', __('personal-account.order-history.meta_title'))
+
 @section('account.content')
   <h1>{{__('personal-account.order-history.title')}}</h1>
 

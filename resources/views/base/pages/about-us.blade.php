@@ -23,7 +23,7 @@
 
     <div class="page-pronas-description">{!! __('about-us.description') !!}</div>
 
-    <div class="page-pronas-list" style="height: 1393px;">
+    <div class="page-pronas-list">
       <a class="item image-item" href="{{asset('assets/img/about-us/1.jpg')}}" data-fancybox="pronas-gallery" title="{{__('about-us.title')}}">
         <img src="{{asset('assets/img/about-us/1.jpg')}}" data-src="{{asset('assets/img/about-us/1.jpg')}}" title="{{__('about-us.title')}}" alt="{{__('about-us.title')}}">
       </a>
@@ -73,27 +73,9 @@
   </div>
 
 @push('scripts')
-  <script src="https://wrap.shop/catalog/view/theme/wrapshop/js/blocksit.min.js"></script>
+  <script src="{{asset('third-party/blocksit.min.js')}}"></script>
 
   <script>
-    $(document).ready(function() {
-      // if ($(window).width() > 320) {
-      // 	$('.page-pronas-list').BlocksIt({
-      // 		numOfCol: 3,
-      // 		offsetX: 5,
-      // 		offsetY: 5,
-      // 		blockElement: '.page-pronas-list .item'
-      // 	});
-      // }
-      // if ($(window).width() > 1020) {
-      // 	$('.page-pronas-list').BlocksIt({
-      // 		numOfCol: 3,
-      // 		offsetX: 10,
-      // 		offsetY: 10,
-      // 		blockElement: '.page-pronas-list .item'
-      // 	});
-      // }
-    });
     function numRowChange() {
       if ($(window).width() > 320) {
         $('.page-pronas-list').BlocksIt({
@@ -112,7 +94,6 @@
         });
       }
     }
-
     $(window).on('load resize', numRowChange);
   </script>
 @endpush

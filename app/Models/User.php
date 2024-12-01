@@ -20,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
         'last_name',
         'verification_code',
         'verification_code_expires_at'
@@ -52,4 +53,9 @@ class User extends Authenticatable
     {
         return $this->phone;
     }
+
+  public function addresses()
+  {
+    return $this->hasMany(UserAddress::class);
+  }
 }

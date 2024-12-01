@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Account\ChangePasswordController;
+use App\Http\Controllers\Account\PersonalDataController;
+use App\Http\Controllers\Account\UserAddressController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SyncProductImagesController;
@@ -43,20 +46,23 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
       return view('base.pages.account.account');
     })->name('account');
 
-    Route::get('/personal-data', function () {
-      return view('base.pages.account.personal-data');
-    })->name('personal-data');
+    Route::group(['prefix' => '/personal-data'], function(){
+      Route::get('/', function () {return view('base.pages.account.personal-data');})->name('personal-data.edit');
+      Route::put('/update', [PersonalDataController::class, 'update'])->name('personal-data.update');
+    });
+
+    Route::group(['prefix' => '/change-password'], function(){
+      Route::get('/', function () {return view('base.pages.account.change-password');})->name('change-password.edit');
+      Route::patch('/update', [ChangePasswordController::class, 'update'])->name('change-password.update');
+    });
 
     Route::group(['prefix' => '/address'], function() {
-      Route::get('/', function () {
-        return view('base.pages.account.address.index');
-      })->name('address');
-      Route::get('/create', function () {
-        return view('base.pages.account.address.create');
-      })->name('account.address.create');
-      Route::get('/edit', function () {
-        return view('base.pages.account.address.edit');
-      })->name('account.address.edit');
+      Route::get('/', function () {return view('base.pages.account.address.index');})->name('address');
+      Route::get('/create', [UserAddressController::class, 'create'])->name('account.address.create');
+      Route::post('/store', [UserAddressController::class, 'store'])->name('account.address.store');
+      Route::get('/edit/{address}', [UserAddressController::class, 'edit'])->name('account.address.edit');
+      Route::put('/update/{address}', [UserAddressController::class, 'update'])->name('account.address.update');
+      Route::delete('/delete/{address}', [UserAddressController::class, 'delete'])->name('account.address.delete');
     });
 
     Route::get('/order', function () {

@@ -151,6 +151,47 @@ $(document).ready(function () {
     $(e).show().addClass('active');
 
   }
+
+
+
+  let seoContentHeight = 104;
+  let seoContent = $('.seo-content');
+  seoContent.css("height", "auto");
+  let outerContentsHeight = seoContent.height();
+  seoContent.css("height", seoContentHeight+"px");
+
+  $(window).on('resize',function(){
+    seoContent.css("height", "auto");
+    outerContentsHeight = seoContent.height();
+    if( seoContent.hasClass('open')){
+      seoContent.css('height', outerContentsHeight+'px')
+    }
+    else {
+      seoContent.css('height', seoContentHeight+'px')
+    }
+  })
+
+  $('.seo-btn.show').click(function () {
+    $('.seo-btn.show').hide();
+    $('.seo-btn.collapse').show()
+    seoContent.toggleClass('open');
+    showCollapseSeoContent()
+  })
+
+  $('.seo-btn.collapse').click(function () {
+    $('.seo-btn.show').show();
+    $('.seo-btn.collapse').hide()
+    seoContent.toggleClass('open');
+    showCollapseSeoContent()
+  })
+  function showCollapseSeoContent(){
+    if(seoContent.hasClass('open')){
+      seoContent.css('height', outerContentsHeight+'px')
+    }
+    else {
+      seoContent.css('height', seoContentHeight+'px')
+    }
+  }
 })
 
 

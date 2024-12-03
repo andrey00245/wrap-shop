@@ -78,6 +78,9 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
     })->name('wishlist');
   });
 
+  Route::get('/restore-password', function () {return view('base.pages.account.restore-password');})->name('restore-password');
+
+
   Route::group(['prefix' => '/products'], function() {
     Route::get('/', [ProductController::class,'index'])->name('products.index');
     Route::get('/{product}/show', [ProductController::class,'show'])->name('products.show');

@@ -11,13 +11,6 @@
   <link rel="stylesheet" href="{{asset('assets/css/font-awesome.css')}}" type="text/css" media="screen">
   <link rel="stylesheet" href="{{asset('assets/css/swiper-bundle.min.css')}}" media="screen">
 
-  <link rel="icon" type="image/png" sizes="32x32" href="{{asset('favicon-32x32.png')}}" type="image/x-icon">
-  <link rel="icon" href="{{asset('favicon-32x32.png')}}" type="image/x-icon">
-  <link rel="icon" href="{{asset('favicon-32x32.png')}}" type="image/x-icon">
-  <link rel="icon" href="{{asset('favicon-32x32.png')}}" type="image/x-icon">
-  <link rel="icon" href="{{asset('favicon-32x32.png')}}" type="image/x-icon">
-
-
   <link rel="icon" href="{{asset('assets/favicon/favicon.ico')}}" type="image/x-icon">
   <link rel="icon" sizes="16x16" href="{{asset('assets/favicon/favicon-16x16.png')}}">
   <link rel="icon" sizes="32x32" href="{{asset('assets/favicon/favicon-32x32.png')}}">

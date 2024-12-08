@@ -84,7 +84,7 @@
 
             @foreach($product->getMedia('images') as $key => $image)
               <a
-                data-fancybox="gallery"
+                data-fancybox="product-show-gallery"
                 data-caption="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
                 class="swiper-slide item flex-center swiper-slide-active"
                 href="{{$image->getUrl()}}"

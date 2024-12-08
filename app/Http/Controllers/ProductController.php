@@ -74,6 +74,14 @@ class ProductController extends Controller
       })
       ->get();
 
+
+    $viewProducts = session()->get('viewProducts', []);
+    if (!in_array($product->id, $viewProducts, true)) {
+      $viewProducts[] = $product->id;
+      session()?->put('viewProducts', $viewProducts);
+    }
+
+
     return view('base.pages.products.show', [
       'product' => $product,
       'products' => $products,

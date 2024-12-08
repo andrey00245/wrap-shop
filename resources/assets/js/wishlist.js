@@ -21,6 +21,7 @@ $(document).ready(function () {
       data: data,
       success: function (response) {
         $('.wishlist-total').text(response['count'])
+        $('.account-wishlist-count').text(response['count'])
         if(response['status'] === 'add'){
           currentButton.addClass('fas')
           currentButton.addClass('in-wishlist')

@@ -2079,7 +2079,7 @@
 
               <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
                 <i class="far fa-search-plus colord" data-src="{{$product->getImage()}}"
-                   data-fancybox="gallery{{$product->id}}" data-caption="{{$product->name}}"></i>
+                   data-fancybox="product-gallery{{$product->id}}" data-caption="{{$product->name}}"></i>
                 <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->name}}"
                    class="swiper-wrapper">
 
@@ -2089,7 +2089,7 @@
                       @if($key>0)
                         <div class="hide"
                              data-src="{{$image->getUrl()}}"
-                             data-fancybox="gallery{{$product->id}}"
+                             data-fancybox="product-gallery{{$product->id}}"
                              data-caption="{{$product->name}}"></div>
                       @endif
                       <img loading="lazy"

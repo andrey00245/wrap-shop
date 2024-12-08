@@ -45,7 +45,7 @@
                   @if($key>0)
                     <div class="hide"
                          data-src="{{$image->getUrl()}}"
-                         data-fancybox="gallery{{$product->id}}"
+                         data-fancybox="cart-bestseller-gallery{{$product->id}}"
                          data-caption="{{$product->name}}"></div>
                   @endif
                   <img loading="lazy"

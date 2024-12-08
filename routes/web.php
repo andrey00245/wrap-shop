@@ -3,6 +3,7 @@
 use App\Http\Controllers\Account\ChangePasswordController;
 use App\Http\Controllers\Account\PersonalDataController;
 use App\Http\Controllers\Account\UserAddressController;
+use App\Http\Controllers\Account\ViewedProductsController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SyncProductImagesController;
@@ -70,9 +71,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
       return view('base.pages.account.order');
     })->name('order');
 
-    Route::get('/viewed-products', function () {
-      return view('base.pages.account.viewed-products');
-    })->name('viewed-products');
+    Route::get('/viewed-products', [ViewedProductsController::class, 'index'])->name('viewed-products');
 
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
   });

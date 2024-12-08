@@ -20,15 +20,29 @@
               </div>
             </div>
             <div class="image swiper swiper-initialized swiper-horizontal swiper-pointer-events swiper-backface-hidden">
-              <div class="swiper-wrapper" id="swiper-wrapper-d89c5ec67e62e983" aria-live="polite">
+              <div class="swiper-wrapper">
+{{--                @foreach($wishlist->getMedia('images') as $key => $image)--}}
+
+{{--                  <a href="{{route('products.show', ['product' => $wishlist->id])}}"--}}
+{{--                     data-src="{{$image->getUrl()}}"--}}
+{{--                     class="swiper-slide item flex-center swiper-slide-next" data-fancybox="gallery{{$wishlist->id}}"--}}
+{{--                     data-caption="{{$wishlist->name}}">--}}
+{{--                    <img--}}
+{{--                      src="{{$image->getUrl('preview')}}"--}}
+{{--                      alt="{{$wishlist->name}}" title="{{$wishlist->name}}"--}}
+{{--                      class="swiper-lazy">--}}
+{{--                  </a>--}}
+{{--                @endforeach--}}
+
                 @foreach($wishlist->getMedia('images') as $key => $image)
-                  <a href="{{$image->getUrl()}}"
+                  <a href="{{route('products.show', ['product' => $wishlist->id])}}"
+                     data-src="{{$image->getUrl()}}"
                      class="swiper-slide item flex-center swiper-slide-next" data-fancybox="gallery{{$wishlist->id}}"
                      data-caption="{{$wishlist->name}}">
                     <img
                       src="{{$image->getUrl('preview')}}"
                       alt="{{$wishlist->name}}" title="{{$wishlist->name}}"
-                      class="swiper-lazy">
+                      class="swiper-lazy"/>
                   </a>
                 @endforeach
               </div>

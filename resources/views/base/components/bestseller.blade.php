@@ -34,7 +34,7 @@
             </div>
             <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
               <i class="far fa-search-plus colord" data-src="{{$product->getMedia('images')->first()->getUrl()}}"
-                 data-fancybox="gallery{{$product->id}}" data-caption="{{$product->name}}"></i>
+                 data-fancybox="bestseller-gallery{{$product->id}}" data-caption="{{$product->name}}"></i>
               <a href="{{route('products.show', ['product'=>$product->id])}}"
                  title="{{$product->name}}" class="swiper-wrapper"
                  id="swiper-wrapper-c1ba02d97e25995b" aria-live="polite">
@@ -43,7 +43,7 @@
                   @if($key>0)
                     <div class="hide"
                          data-src="{{$image->getUrl()}}"
-                         data-fancybox="gallery{{$product->id}}"
+                         data-fancybox="bestseller-gallery{{$product->id}}"
                          data-caption="{{$product->name}}"></div>
                   @endif
                   <img loading="lazy"

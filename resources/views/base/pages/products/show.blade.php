@@ -275,18 +275,16 @@
 
     <div class="product-page-example swiper">
       <div class="swiper-wrapper">
+          @foreach($product->getBannerImages() as $image)
         <div class="swiper-slide item" >
-          <img src="https://wrap.shop/image/catalog/demo/syncms/1s2cGKiWcbN9xCJRbjJfAsuznRA9fpfpe.webp" title="" alt="" loading="lazy" class="swiper-lazy" >
+          <img src="{{$image->getUrl()}}" title="" alt="" loading="lazy" class="swiper-lazy" >
           <div class="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
         </div>
-        <div class="swiper-slide item" >
-          <img src="https://wrap.shop/image/catalog/demo/syncms/1s2cGKiWcbN9xCJRbjJfAsuznRA9fpfpe.webp" title="" alt="" loading="lazy" class="swiper-lazy" >
-          <div class="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-        </div>
+          @endforeach
       </div>
       <div class="bottom flex-center">
         <div class="swiper-button-prev button"></div>
-        <div class="desc">Подивіться, як виглядатиме ця плівка на автомобілі</div>
+        <div class="desc">{{$product->banner_title}}</div>
         <div class="swiper-button-next button"></div>
       </div>
     </div>

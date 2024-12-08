@@ -38,11 +38,9 @@
         </div>
       </div>
 
-
       <div class="form-group">
         <div class="form">
           <div class="form-group group-telephone otpboxloginpopup" id="otpbox">
-
             <div class="fields-wrapper">
               <label for="name_email"
                      class="login-info-text text-center margintop20">{{__('popup.login_register.enter_phone')}}</label>
@@ -51,15 +49,17 @@
               <div class="password-group">
                 <label for="password"
                        class="login-info-text text-center margintop20">{{__('popup.login_register.password')}}</label>
-                <input id="password" type="password" name="phone_email"
+                <input id="login_password" type="password" name="password"
                        class="form-control form-field login-phone-email"
                        placeholder="{{__('popup.login_register.enter_password')}}">
               </div>
+                <div class="error-message-login" style="display:none; color:red"></div>
             </div>
-            <div class="input-group telephone-error-loginpopup">
+              <div class="input-group telephone-error-loginpopup">
               <span class="input-group-btn">
-					      <button class="send_otp_btn otp_btn-s btnverifyloginpopup button colord" id="button-verify-loginpopup"
-                        type="button">
+					      <button class="send_otp_btn otp_btn-s btnverifyloginpopup button colord"
+                                  id="button-verify-loginpopup"
+                                  type="button">
                   <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.sign_in')}}
                 </button>
 
@@ -69,7 +69,7 @@
                   <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.recover_password')}}
                 </button>
 				      </span>
-            </div>
+              </div>
           </div>
         </div>
       </div>
@@ -143,50 +143,39 @@
       </div>
 
 
-      <div class="form-group">
-        <div class="form">
-          <div class="form-group group-telephone otpboxloginpopup" id="otpbox">
+        <form id="registration-form" action="{{ route('register') }}" method="POST">
+            @csrf
+            <div class="form-group">
+                <div class="form">
+                    <div class="form-group group-telephone otpboxloginpopup" id="otpbox">
+                        <div class="fields-wrapper">
+                            <input type="text" id="register_name_email" name="phone_email" class="form-control form-field" placeholder="Email">
+                            <input id="register_password" type="password" name="password" class="form-control form-field" placeholder="Пароль">
 
-            <div class="fields-wrapper">
-              <label for="name_email"
-                     class="login-info-text text-center margintop20">{{__('popup.login_register.enter_phone')}}</label>
-              <input type="text" id="name_email" name="phone_email" class="form-control form-field login-phone-email"
-                     placeholder="{{__('popup.login_register.enter_phone_or_email_placeholder')}}">
-              <label for="password"
-                     class="login-info-text text-center margintop20">{{__('popup.login_register.password')}}</label>
-              <input id="password" type="password" name="phone_email"
-                     class="form-control form-field login-phone-email"
-                     placeholder="{{__('popup.login_register.enter_password')}}">
-
-              <div class="form-group group-firstname" id="regular-field-firstname">
-                <input autocomplete="on" type="text" id="input-name" name="name" value="" maxlength="40"
-                       class="form-control form-field required" required=""
-                       placeholder="{{__('popup.login_register.firstname')}}">
-              </div>
-              <div class="form-group group-lastname" id="regular-field-lastname">
-                <input autocomplete="on" type="text" id="input-last_name" name="last_name" value="" maxlength="40"
-                       class="form-control form-field required" required=""
-                       placeholder="{{__('popup.login_register.lastname')}}">
-              </div>
-              <div class="form-group group-telephone" id="regular-field-telephone">
-                <input autocomplete="on" type="tel" id="input-telephone" name="telephone" value="" maxlength="40"
-                       class="form-control form-field numeric required" required=""
-                       placeholder="{{__('popup.login_register.mobile')}}">
-              </div>
-
+                            <div class="form-group group-firstname">
+                                <input autocomplete="on" type="text" id="input-name" name="name" maxlength="40" class="form-control form-field" placeholder="{{__('popup.login_register.firstname')}}">
+                            </div>
+                            <div class="form-group group-lastname">
+                                <input autocomplete="on" type="text" id="input-last_name" name="last_name" maxlength="40" class="form-control form-field" placeholder="{{__('popup.login_register.lastname')}}">
+                            </div>
+                            <div class="form-group group-telephone">
+                                <input autocomplete="on" type="tel" id="input-telephone" name="telephone" maxlength="40" class="form-control form-field numeric"  placeholder="{{__('popup.login_register.mobile')}}">
+                            </div>
+                        </div>
+                        <div class="error-message-login" style="display:none; color:red; margin-bottom:15px"></div>
+                        <div class="input-group telephone-error-loginpopup">
+                            <span class="input-group-btn">
+            <button class="send_otp_btn otp_btn-s btnverifyloginpopup button colord" id="button-verify-loginpopup" type="submit">
+              <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.create_a_profile')}}
+            </button>
+          </span>
+                            <p class="register-description">{!! __('popup.login_register.register_conditions') !!}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="input-group telephone-error-loginpopup">
-              <span class="input-group-btn">
-					      <button class="send_otp_btn otp_btn-s btnverifyloginpopup button colord" id="button-verify-loginpopup"
-                        type="button">
-                  <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.create_a_profile')}}
-                </button>
-				      </span>
-              <p class="register-description">{!! __('popup.login_register.register_conditions') !!}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        </form>
+
     </div>
 
   </div>

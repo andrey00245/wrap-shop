@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 
@@ -23,6 +24,7 @@ class Product extends Model implements HasMedia
     public $translatable = [
         'name',
         'descriptions',
+        'banner_title'
     ];
 
     /**
@@ -45,7 +47,7 @@ class Product extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'details' => 'json',
+        'banner_title' => 'json',
     ];
 
     /**
@@ -104,6 +106,7 @@ class Product extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images');
+        $this->addMediaCollection('banner_images');
     }
 
     /**
@@ -147,5 +150,10 @@ class Product extends Model implements HasMedia
     public function getImage(): string
     {
         return $this->getFirstMediaUrl('images');
+    }
+
+    public function getBannerImages()
+    {
+        return $this->getMedia('banner_images');
     }
 }

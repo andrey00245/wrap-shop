@@ -303,13 +303,13 @@
             id="cart-total" class="cart-total flex-center">0</span></button>
           @guest
         <div id="wishlist-total" class="button heart login-show far fa-heart login-popup-open"><span
-            class="wishlist-total flex-center">0</span></div>
+            class="wishlist-total flex-center">{{count(session()->get('wishlist', []))}}</span></div>
         <div class="button userform-open login-show far fa-user login-popup-open"></div>
           @endguest
 
           @auth
         <a href="{{route('wishlist')}}" id="wishlist-total" title="Закладки (0)"
-           class="button heart far fa-heart"><span class="wishlist-total flex-center">0</span></a>
+           class="button heart far fa-heart"><span class="wishlist-total flex-center">{{auth()->user()->favoriteCount()}}</span></a>
         <a href="{{route('account')}}" title="Особистий кабінет" class="button user far fa-user-check"></a>
           @endauth
         <div class="head-top-open button"><i class="far fa-bars"></i></div>

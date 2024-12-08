@@ -71,6 +71,8 @@ return [
   'you-wishlist' => [
     'meta_title' => 'Your wishlist',
     'title' => 'Your wishlist',
+    'empty' => 'Your list is empty',
+    'changed' => 'List list successfully changed!'
   ],
 
   'reviewed-products' => [

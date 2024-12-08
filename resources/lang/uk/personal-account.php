@@ -71,6 +71,8 @@ return [
   'you-wishlist' => [
     'meta_title' => 'Ваш вішліст',
     'title' => 'Ваш вішліст',
+    'empty' => 'Ваш вішліст порожній',
+    'changed' => 'Список вішліста успішно змінено!'
   ],
 
   'reviewed-products' => [

@@ -4,6 +4,9 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -54,8 +57,21 @@ class User extends Authenticatable
         return $this->phone;
     }
 
-  public function addresses()
-  {
-    return $this->hasMany(UserAddress::class);
-  }
+    public function addresses()
+    {
+      return $this->hasMany(UserAddress::class);
+    }
+
+    /**
+     * Wishlists.
+     */
+    public function wishlists(): belongsToMany
+    {
+      return $this->belongsToMany(Product::class, 'wishlists');
+    }
+
+    public function favoriteCount()
+    {
+      return $this->wishlists()->count();
+    }
 }

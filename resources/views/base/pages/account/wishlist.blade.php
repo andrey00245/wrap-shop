@@ -4,66 +4,68 @@
 
 @section('account.content')
   <h1>{{__('personal-account.you-wishlist.title')}}</h1>
-  <div class="account-products-list flex-wrap">
-    <div class="item product-default" data-ids="102" id="homeSpecialItem1">
-      <div class="product-default-texts-wrapper">
-        <div class="top flex-justify">
-          <div class="sku">{{__('general-translate.product_card.code')}} 10528</div>
-          <div class="wishlist">
-            <a href="https://wrap.shop/index.php?route=account/wishlist&amp;remove=126"
-               title="{{__('general-translate.product_card.remove')}}"
-               class="fal fa-times"></a>
+  @if($wishlists->count() === 0)
+    <p>{{__('personal-account.you-wishlist.empty')}}</p>
+  @else
+    <div class="account-products-list flex-wrap">
+      @foreach($wishlists as $wishlist)
+        <div class="item product-default" data-ids="{{$wishlist->id}}" id="homeSpecialItem{{$wishlist->id}}">
+          <div class="product-default-texts-wrapper">
+            <div class="top flex-justify">
+              <div class="sku">{{__('general-translate.product_card.code')}} {{$wishlist->code}}</div>
+              <div class="wishlist">
+                <a href="{{route('wishlist.delete', ['product'=>$wishlist->id])}}"
+                   title="{{__('general-translate.product_card.remove')}}"
+                   class="fal fa-times"></a>
+              </div>
+            </div>
+            <div class="image swiper swiper-initialized swiper-horizontal swiper-pointer-events swiper-backface-hidden">
+              <div class="swiper-wrapper" id="swiper-wrapper-d89c5ec67e62e983" aria-live="polite">
+                @foreach($wishlist->getMedia('images') as $key => $image)
+                  <a href="{{$image->getUrl()}}"
+                     class="swiper-slide item flex-center swiper-slide-next" data-fancybox="gallery{{$wishlist->id}}"
+                     data-caption="{{$wishlist->name}}">
+                    <img
+                      src="{{$image->getUrl('preview')}}"
+                      alt="{{$wishlist->name}}" title="{{$wishlist->name}}"
+                      class="swiper-lazy">
+                  </a>
+                @endforeach
+              </div>
+              <div class="swiper-button-next button swiper-button-disabled swiper-button-lock" tabindex="-1" role="button"
+                   aria-label="Next slide" aria-controls="swiper-wrapper-d89c5ec67e62e983" aria-disabled="true"></div>
+              <div class="swiper-button-prev button swiper-button-disabled swiper-button-lock" tabindex="-1" role="button"
+                   aria-label="Previous slide" aria-controls="swiper-wrapper-d89c5ec67e62e983" aria-disabled="true"></div>
+              <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+            <div class="review">
+              <i class="fal fa-star"></i>
+              <i class="fal fa-star"></i>
+              <i class="fal fa-star"></i>
+              <i class="fal fa-star"></i>
+              <i class="fal fa-star"></i>
+              <div class="rating-result" style="width: 0%">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+            </div>
+            <div class="category">{{$wishlist->category?->name}}</div>
+            <a href="{{route('products.show', ['product' => $wishlist->id])}}"
+               title="{{$wishlist->name}}" class="name">{{$wishlist->name}}</a>
+            <div class="bottom flex-center">
+              <div class="price">{{number_format($wishlist->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
+              <button class="button colord remarketing_cart_button" data-product_id="{{$wishlist->id}}"><i
+                  class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
+              </button>
+            </div>
           </div>
         </div>
-        <div class="image swiper swiper-initialized swiper-horizontal swiper-pointer-events swiper-backface-hidden">
-          <div class="swiper-wrapper" id="swiper-wrapper-d89c5ec67e62e983" aria-live="polite">
-            <a href="https://wrap-shop.test/storage/33/conversions/da83fc382b22d0f0ad2b983435501c36-original.png"
-               class="swiper-slide item flex-center swiper-slide-active" data-fancybox="gallery999"
-               data-caption="Плівка глянцева 3M 2080-G12 Gloss Black" role="group">
-              <img alt="Плівка глянцева 3M 2080-G12 Gloss Black" title="Плівка глянцева 3M 2080-G12 Gloss Black"
-                   class="swiper-lazy swiper-lazy-loaded"
-                   src="https://wrap-shop.test/storage/33/conversions/da83fc382b22d0f0ad2b983435501c36-preview.png">
-            </a>
-            <a href="https://wrap-shop.test/storage/34/conversions/fb43d83819a9f62f54ea8f7f9bc7cc23-original.png"
-               class="swiper-slide item flex-center swiper-slide-next" data-fancybox="gallery999"
-               data-caption="Плівка глянцева 3M 2080-G12 Gloss Black" role="group" aria-label="2 / 2">
-              <img
-                src="https://wrap-shop.test/storage/34/conversions/fb43d83819a9f62f54ea8f7f9bc7cc23-preview.png"
-                alt="Плівка глянцева 3M 2080-G12 Gloss Black" title="Плівка глянцева 3M 2080-G12 Gloss Black"
-                class="swiper-lazy">
-            </a>
-          </div>
-          <div class="swiper-button-next button swiper-button-disabled swiper-button-lock" tabindex="-1" role="button"
-               aria-label="Next slide" aria-controls="swiper-wrapper-d89c5ec67e62e983" aria-disabled="true"></div>
-          <div class="swiper-button-prev button swiper-button-disabled swiper-button-lock" tabindex="-1" role="button"
-               aria-label="Previous slide" aria-controls="swiper-wrapper-d89c5ec67e62e983" aria-disabled="true"></div>
-          <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
-        <div class="review">
-          <i class="fal fa-star"></i>
-          <i class="fal fa-star"></i>
-          <i class="fal fa-star"></i>
-          <i class="fal fa-star"></i>
-          <i class="fal fa-star"></i>
-          <div class="rating-result" style="width: 0%">
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-            <i class="fas fa-star"></i>
-          </div>
-        </div>
-        <div class="category">Кольорові плівки</div>
-        <a href="https://wrap.shop/plivky/kolorovi-plivky/plivka-glyanceva-3m-2080-g12-gloss-black"
-           title="Плівка глянцева 3M 2080-G12 Gloss Black" class="name">Плівка глянцева 3M 2080-G12 Gloss Black</a>
-        <div class="bottom flex-center">
-          <div class="price">2562.00 ₴<span class="price-unit-xvr"></span></div>
-          <button class="button colord remarketing_cart_button" onclick="cart.add('126');" data-product_id="126"><i
-              class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
-          </button>
-        </div>
-      </div>
+      @endforeach
     </div>
-  </div>
+  @endif
+
 
   @push('scripts')
     <script>

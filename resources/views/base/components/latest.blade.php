@@ -20,7 +20,7 @@
                 </div>
                 <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
                 <div class="wishlist">
-                  <button type="button" class="button far fa-heart" title="{{__('general-translate.product_card.add_wishlist')}}"></button>
+                  <button type="button" class="button {{in_array($product->id, session()->get('wishlist', []), true) ? 'fas in-wishlist' : 'far'}} fa-heart" data-product-id="{{$product->id}}" title="{{__('general-translate.product_card.add_wishlist')}}"></button>
                 </div>
               </div>
             </div>
@@ -83,6 +83,5 @@
         </div>
       </div>
       <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
-
   </div>
 </section>

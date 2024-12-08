@@ -7,6 +7,7 @@ use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SyncProductImagesController;
 use App\Http\Controllers\VideosController;
+use App\Http\Controllers\WishlistController;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
@@ -15,10 +16,10 @@ use App\Http\Controllers\SyncProductController;
 
 Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']);
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
+Route::post('/add-product-to-wishlist', [WishlistController::class, 'update'])->name('add-product-to-wishlist');
 
 Route::group(['prefix' => LaravelLocalization::setLocale(),
   'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
-
   Route::get('/',IndexController::class)->name('index');
 
   Route::get('/shipping-and-payment', function () {
@@ -73,10 +74,11 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
       return view('base.pages.account.viewed-products');
     })->name('viewed-products');
 
-    Route::get('/wishlist', function () {
-      return view('base.pages.account.wishlist');
-    })->name('wishlist');
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
   });
+
+  Route::get('/wishlist/{product}/delete', [WishlistController::class, 'delete'])->name('wishlist.delete');
+
 
   Route::get('/restore-password', function () {return view('base.pages.account.restore-password');})->name('restore-password');
 
@@ -90,6 +92,5 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   Route::get('/checkout', function () {
     return view('base.pages.checkout.index');
   })->name('checkout');
-
 });
 

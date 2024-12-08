@@ -1,3 +1,6 @@
+import './wishlist'
+
+
 $(document).ready(function () {
   cartPopupSlider();
 

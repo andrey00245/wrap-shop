@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -55,12 +56,36 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Brand::class);
     }
 
+   /**
+   * @return bool
+   * @throws \Psr\Container\ContainerExceptionInterface
+   * @throws \Psr\Container\NotFoundExceptionInterface
+   */
+    public function isFavorite(): bool
+    {
+        if(Auth::check()){
+            return $this->wishlists()->where('user_id', Auth::id())->exists();
+        }
+        if(session()?->has('wishlist')){
+          return in_array($this->id, session()?->get('wishlist', []), true);
+        }
+        return false;
+    }
+
     /**
      * Category.
      */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Wishlists.
+     */
+    public function wishlists(): belongsToMany
+    {
+      return $this->belongsToMany(User::class, 'wishlists');
     }
 
     /**
@@ -90,7 +115,7 @@ class Product extends Model implements HasMedia
     }
 
     /**
-     * Prices.
+     * Attributes.
      */
     public function attributes(): BelongsToMany
     {

@@ -41,7 +41,7 @@
             id="cart-total" class="cart-total flex-center">0</span></button>
         @guest
           <div id="wishlist-total" class="button heart login-show far fa-heart login-popup-open"><span
-              class="wishlist-total flex-center">0</span></div>
+              class="wishlist-total flex-center">{{count(session()->get('wishlist', []))}}</span></div>
           <div class="button userform-open login-show far fa-user login-popup-open"></div>
         @endguest
 

@@ -28,7 +28,7 @@
             <li><a href="{{route('address')}}">{{__('personal-account.account.you_address')}}</a></li>
             <li><a href="{{route('order')}}">{{__('personal-account.account.order_story')}}</a></li>
             <li><a href="{{route('wishlist')}}">{{__('personal-account.account.wishlist')}} <span
-                  class="button account-wishlist-count">9</span></a></li>
+                  class="button account-wishlist-count">{{auth()->user()->favoriteCount()}}</span></a></li>
             <li><a href="{{route('viewed-products')}}">{{__('personal-account.account.viewed-products')}}</a></li>
             <li><a class="cart-open" href="#">{{__('personal-account.account.cart')}} <span
                   class="button account-cart-count">1</span></a></li>

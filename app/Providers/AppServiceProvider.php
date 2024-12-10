@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Nova\Support\DynamicSettings;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";
         });
 
+        $settings = new DynamicSettings();
+
         $products = Product::query()
             ->where('is_active', true)
             ->where('is_top_seller', true)
@@ -44,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
             ->get();
 
         View::share([
+            'settings' => $settings,
             'products' => $products,
             'mainCategories' => $mainCategories,
         ]);

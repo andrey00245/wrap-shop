@@ -16,6 +16,7 @@ use App\Nova\User;
 use App\Nova\Video;
 use App\Nova\VideoCategory;
 use App\Nova\VideoReview;
+use Bakerkretzmar\NovaSettingsTool\SettingsTool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
@@ -67,6 +68,10 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                     MenuItem::resource(VideoCategory::class),
                     MenuItem::resource(VideoReview::class),
                 ])->icon('desktop-computer')->collapsable(),
+
+                MenuSection::make(__(config('nova-settings-tool.sidebar-label', 'Settings')))
+                 ->path('/settings')
+                 ->icon('cog')
             ];
         });
 
@@ -126,6 +131,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     public function tools()
     {
         return [
+          new SettingsTool,
         ];
     }
 

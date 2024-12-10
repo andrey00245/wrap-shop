@@ -19,12 +19,12 @@
         @include('base.layouts.menu')
       </nav>
       <div class="head-social flex-center">
-        <a href="#" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
-        <a href="#" title="Instagram" target="_blank" class="fab fa-instagram"></a>
+        <a href="{{$settings->getTelegramUrl()}}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
+        <a href="{{$settings->getInstagramUrl()}}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
       </div>
       <div class="head-phone flex-center">
         <div class="title">{{__('header_footer.phone')}}</div>
-        <a href="tel:+380660003202"><span>+38</span> 066 000 32 02</a>
+        <a href="tel:{{$settings->getPhone()}}">{!! $settings->getPhoneView() !!}</a>
       </div>
       <div class="head-top-close button"><i class="fal fa-times"></i></div>
     </div>

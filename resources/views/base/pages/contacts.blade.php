@@ -24,18 +24,19 @@
           <img src="{{asset('assets/img/icons/phone.png')}}" alt="{{__('contacts.call')}}" title="{{__('contacts.call')}}">
           {{__('contacts.call')}}
         </div>
-        <a href="tel:+380660003202" class="phone"><span>+38</span> 066 000 32 02</a>
-        <a href="tel:+380660003202" class="phone"><span>+38</span> 066 000 32 02</a>
+
+        <a href="tel:{{$settings->getPhone()}}" class="phone">{!! $settings->getPhoneView() !!}</a>
+        <a href="tel:{{$settings->getAditionalPhone()}}" class="phone">{!! $settings->getAditionalPhoneView() !!}</a>
       </div>
       <div class="item">
         <div class="title flex-wrap">
           <img src="{{asset('assets/img/icons/email.png')}}" alt="{{__('contacts.write')}}" title="{{__('contacts.write')}}">
           {{__('contacts.write')}}
         </div>
-        <a href="mailto:info@wrap.shop" class="email" title="info@wrap.shop">info@wrap.shop</a>
+        <a href="mailto:{{$settings->getEmail()}}" class="email" title="{{$settings->getEmail()}}">{{$settings->getEmail()}}</a>
         <div class="social">
-          <a href="##" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
-          <a href="##" title="Instagram" target="_blank" class="fab fa-instagram"></a>
+          <a href="{{$settings->getTelegramUrl()}}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
+          <a href="{{$settings->getInstagramUrl()}}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
         </div>
       </div>
       <div class="item">
@@ -43,8 +44,8 @@
           <img src="{{asset('assets/img/icons/delivery-1.png')}}" alt="{{__('contacts.come_here')}}" title="{{__('contacts.come_here')}}">
           {{__('contacts.come_here')}}
         </div>
-        <div class="text">03039 Україна, Київ Вул. Ізюмська 5А</div>
-        <a href="https://maps.app.goo.gl/o9RyPetmqjb74eke9" target="_blank" title="{{__('contacts.make_a_route')}}" class="addlink">{{__('contacts.make_a_route')}}</a>
+        <div class="text">{{$settings->getAddress()}}</div>
+        <a href="{{$settings->getGoogleMapsUrl()}}" target="_blank" title="{{__('contacts.make_a_route')}}" class="addlink">{{__('contacts.make_a_route')}}</a>
       </div>
     </div>
   </section>

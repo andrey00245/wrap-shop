@@ -63,21 +63,17 @@
     </nav>
     <div class="foot-add foot-item">
       <div class="title">{{__('header_footer.our_office')}}</div>
-      <a href="#" target="_blank" title="32321321312">32321321312</a>
-
-      <a href="#" target="_blank" title="32321321312">32321321312</a>
-
-      <a href="#" target="_blank" title="32321321312">32321321312</a>
+      <a href="{{$settings->getGoogleMapsUrl()}}" target="_blank" title="{{$settings->getAddress()}}">{{$settings->getAddress()}}</a>
 
     </div>
 
     <div class="foot-contact foot-item">
       <div class="title">{{__('header_footer.contact_us')}}</div>
-      <a href="tel:+38000000000" class="phone" ><span>+38</span>00000000</a>
-      <a href="mailto:ааааааааааа" class="email" title="ааааааааааа" >ааааааааааа</a>
+      <a href="tel:{{$settings->getPhone()}}" class="phone"> {!! $settings->getPhoneView() !!}</a>
+      <a href="mailto:{{$settings->getEmail()}}" class="email" title="Email" >{{$settings->getEmail()}}</a>
       <div class="social">
-        <a href="#" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
-        <a href="#" title="Instagram" target="_blank" class="fab fa-instagram"></a>
+        <a href="{{$settings->getTelegramUrl()}}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
+        <a href="{{$settings->getInstagramUrl()}}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
       </div>
     </div>
     <div class="foot-copir">{{__('header_footer.all_rights_reserved', ['year'=> date('Y')])}}</div>

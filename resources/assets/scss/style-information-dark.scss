@@ -2,7 +2,7 @@
 .page-contact-list {
     display: flex;
     justify-content: center;
-    font-family: 'Gilroy';
+    font-family: 'InterVariable', sans-serif;
     font-weight: 300;
 }
 .page-contact-list .item {
@@ -17,7 +17,7 @@
 .page-contact-list .item .title {
     display: flex;
     align-items: center;
-    font-family: 'DIN Pro';
+    font-family: 'InterVariable', sans-serif;
     font-weight: 700;
     font-size: 20px;
     text-transform: uppercase;
@@ -74,7 +74,7 @@
     padding-bottom: 6px;
 }
 .page-contact-list .item .addlink {
-    font-family: 'DIN Pro';
+    font-family: 'InterVariable', sans-serif;
     font-weight: 500;
     font-size: 11px;
     text-transform: uppercase;
@@ -157,7 +157,7 @@
 .page-payment-tab .item {display: none;-webkit-transition: all 0.35s;-o-transition: all 0.35s;transition: all 0.35s;-moz-transition: all 0.35s;-ms-transition: all 0.35s;}
 .page-payment-tab .item.active {display: block;}
 .page-payment-tab .item .list li {
-    font-family: 'Gilroy';
+    font-family: 'InterVariable', sans-serif;
     line-height: 132%;
     color: rgba(255, 255, 255, 0.66);
     width: calc(33.333% - 60px);
@@ -172,7 +172,7 @@
 .page-payment-tab .item .list li .name {
     display: flex;
     align-items: center;
-    font-family: 'DIN Pro';
+    font-family: 'InterVariable', sans-serif;
     font-weight: 700;
     font-size: 20px;
     text-transform: uppercase;
@@ -278,7 +278,7 @@
     text-transform: uppercase;
 }
 .skinsslaider-top p {
-    font-family: 'Gilroy';
+    font-family: 'InterVariable', sans-serif;
     color: rgba(255, 255, 255, 0.66);
 }
 .skinsslaider-list {

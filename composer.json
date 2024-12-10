@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "bakerkretzmar/nova-settings-tool": "^2.0",
         "coderello/laravel-nova-lang": "^2.0",
         "ebess/advanced-nova-media-library": "^4.2",
         "fomvasss/laravel-notification-channel-turbo-sms": "^1.3",

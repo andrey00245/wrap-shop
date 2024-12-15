@@ -89,7 +89,7 @@ class ProductService
 
        if (property_exists($parseData, 'attributes')) {
            $attributes = $parseData?->attributes?->attrs;
-           $this->processCategories($attributes, $product);
+//           $this->processCategories($attributes, $product);
            $this->updateName($attributes, $product);
 //           $this->processExpenseCategory($attributes, $product);
            $this->processBrand($attributes, $product);

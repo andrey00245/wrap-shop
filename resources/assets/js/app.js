@@ -1,4 +1,5 @@
 import './wishlist'
+import './subscription'
 
 
 $(document).ready(function () {

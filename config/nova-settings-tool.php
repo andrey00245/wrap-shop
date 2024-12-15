@@ -105,6 +105,83 @@ return [
       'label' => 'Посилання на гугл карти',
       'panel' => 'Адреса',
     ],
+
+    [
+      'key' => 'video_banner_title_uk',
+      'label' => 'Відеобанер заголовок[UK]',
+      'panel' => 'Відеобанер',
+    ],
+    [
+      'key' => 'video_banner_title_ru',
+      'label' => 'Відеобанер заголовок[RU]',
+      'panel' => 'Відеобанер',
+    ],
+    [
+      'key' => 'video_banner_title_en',
+      'label' => 'Відеобанер заголовок[EN]',
+      'panel' => 'Відеобанер',
+    ],
+
+    [
+      'key' => 'video_banner_desc_uk',
+      'label' => 'Відеобанер опис[UK]',
+      'panel' => 'Відеобанер',
+      'type' => 'textarea'
+    ],
+    [
+      'key' => 'video_banner_desc_ru',
+      'label' => 'Відеобанер опис[RU]',
+      'panel' => 'Відеобанер',
+      'type' => 'textarea'
+
+    ],
+    [
+      'key' => 'video_banner_desc_en',
+      'label' => 'Відеобанер опис[EN]',
+      'panel' => 'Відеобанер',
+      'type' => 'textarea'
+
+    ],
+
+
+    [
+      'key' => 'slogan_title_uk',
+      'label' => 'Відеобанер заголовок[UK]',
+      'panel' => 'Слоган',
+    ],
+    [
+      'key' => 'slogan_title_ru',
+      'label' => 'Відеобанер заголовок[RU]',
+      'panel' => 'Слоган',
+    ],
+    [
+      'key' => 'slogan_title_en',
+      'label' => 'Відеобанер заголовок[EN]',
+      'panel' => 'Слоган',
+    ],
+
+    [
+      'key' => 'slogan_desc_uk',
+      'label' => 'Відеобанер опис[UK]',
+      'panel' => 'Слоган',
+      'type' => 'textarea'
+
+    ],
+    [
+      'key' => 'slogan_desc_ru',
+      'label' => 'Відеобанер опис[RU]',
+      'panel' => 'Слоган',
+      'type' => 'textarea'
+
+    ],
+    [
+      'key' => 'slogan_desc_en',
+      'label' => 'Відеобанер опис[EN]',
+      'panel' => 'Слоган',
+      'type' => 'textarea'
+
+    ],
+
   ],
 
 ];

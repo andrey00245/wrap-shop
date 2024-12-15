@@ -6,22 +6,31 @@ use App\Http\Controllers\Account\UserAddressController;
 use App\Http\Controllers\Account\ViewedProductsController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SubscribeController;
 use App\Http\Controllers\SyncProductImagesController;
 use App\Http\Controllers\VideosController;
 use App\Http\Controllers\WishlistController;
-use App\Models\Category;
+use App\Models\PrivacyPolicy;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\SyncProductController;
 
 Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']);
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
+
 Route::post('/add-product-to-wishlist', [WishlistController::class, 'update'])->name('add-product-to-wishlist');
 
 Route::group(['prefix' => LaravelLocalization::setLocale(),
   'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
   Route::get('/',IndexController::class)->name('index');
+
+  Route::get('/test', function(){
+    $product = Product::find(7);
+    $slug = Str::slug($product->name);
+    dd($slug);
+  });
 
   Route::get('/shipping-and-payment', function () {
     return view('base.pages.delivery');
@@ -85,11 +94,19 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   Route::group(['prefix' => '/products'], function() {
     Route::get('/', [ProductController::class,'index'])->name('products.index');
     Route::get('/{product}/show', [ProductController::class,'show'])->name('products.show');
-    Route::get('/category/{category}', [ProductController::class,'category'])->name('products.category');
+    Route::get('/{category}/{subcategory?}/{subsubcategory?}', [ProductController::class, 'category'])->name('products.category');
   });
+
+  Route::get('/privacy-policy', function (){
+    $privacy_policy = PrivacyPolicy::first();
+    return view('base.pages.privacy-policy', compact('privacy_policy'));
+  })->name('privacy-policy');
 
   Route::get('/checkout', function () {
     return view('base.pages.checkout.index');
   })->name('checkout');
+
+  Route::post('/subscribe', [SubscribeController::class, 'store'])->name('subscribe');
+
 });
 

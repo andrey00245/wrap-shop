@@ -1084,6 +1084,9 @@ body::-webkit-scrollbar {
 
 .page-default {
   padding-bottom: 70px;
+  .page-default-desc{
+    line-height: 24px;
+  }
 }
 
 .page-default-nav {
@@ -2748,6 +2751,7 @@ body::-webkit-scrollbar {
   display: flex;
   align-items: center;
   margin-bottom: 0;
+  justify-content: space-between;
 }
 
 .foot-form form {
@@ -2755,6 +2759,8 @@ body::-webkit-scrollbar {
   border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   justify-content: space-between;
+}
+.form-error-container{
   width: 500px;
 }
 
@@ -2769,7 +2775,7 @@ body::-webkit-scrollbar {
 }
 
 .foot-form form .form-control {
-  width: 160px;
+  width: 190px;
   height: 40px;
   padding: 0 10px 0 20px;
   font-size: 10px;
@@ -2818,10 +2824,8 @@ body::-webkit-scrollbar {
   display: none;
 }
 
-.foot-form form .error-text {
-  position: absolute;
-  bottom: -18px;
-  white-space: nowrap;
+.foot-form .form-error-container .error-text {
+  bottom: -5px;
   line-height: 14px;
   padding: 0 !important;
 }
@@ -2829,6 +2833,9 @@ body::-webkit-scrollbar {
 .foot-form-thanks {
   text-align: center;
   flex-direction: column;
+  &.hide{
+    display: none;
+  }
 }
 
 .foot-form-thanks i {
@@ -2843,7 +2850,7 @@ body::-webkit-scrollbar {
 
 
 @media screen and (max-width: 1331px) {
-  .foot-form form {
+  .form-error-container{
     width: 350px;
   }
   .foot-form .title {
@@ -2994,7 +3001,7 @@ body::-webkit-scrollbar {
   .foot-form .wrap {
     display: block;
   }
-  .foot-form form {
+  .form-error-container{
     width: auto;
   }
 
@@ -4458,5 +4465,57 @@ table .notify-quantity {
       letter-spacing: 1px;
       white-space: nowrap;
     }
+  }
+}
+
+.input-error {
+    border: 1px solid red !important;
+}
+
+.button-loading .spinner {
+  width: 25px;
+  height: 18px;
+  display: flex;
+  line-height: 15px;
+  justify-content: space-between;
+  align-items: center;
+
+  & > div {
+    width: 5px;
+    height: 5px;
+    background-color: #fff;
+    border-radius: 100%;
+    display: inline-block;
+    -webkit-animation: spinner-animation 1.4s infinite ease-in-out both;
+    animation: spinner-animation 1.4s infinite ease-in-out both;
+  }
+
+  .bounce1{
+    animation-delay: -.32s;
+  }
+  .bounce2{
+    animation-delay: -.16s;
+  }
+}
+
+@-webkit-keyframes spinner-animation {
+  0%,80%,100% {
+    -webkit-transform: scale(0)
+  }
+
+  40% {
+    -webkit-transform: scale(1.0)
+  }
+}
+
+@keyframes spinner-animation {
+  0%,80%,100% {
+    -webkit-transform: scale(0);
+    transform: scale(0)
+  }
+
+  40% {
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0)
   }
 }

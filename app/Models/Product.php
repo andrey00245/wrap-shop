@@ -177,11 +177,11 @@ class Product extends Model implements HasMedia
 
     public function getBenefits()
     {
-        return $this->attributes()->where('field_name', 'benefits')->first()->pivot->value;
+        return $this->attributes()->where('field_name', 'benefits')->first()?->pivot?->value;
     }
 
     public function getApplication()
     {
-        return $this->attributes()->where('field_name', 'application')->first()->pivot->value;
+        return $this->attributes()->where('field_name', 'application')->first()?->pivot?->value;
     }
 }

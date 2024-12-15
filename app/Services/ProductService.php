@@ -549,13 +549,6 @@ class ProductService
                     ]
                 ]);
             }
-            $product->attributes()->updateExistingPivot($productAttribute->id, [
-                'value' => [
-                    'uk' => $attribute->value ?? $attribute->value?->name,
-                    'ru' => $attribute->value ?? $attribute->value?->name,
-                    'en' => $attribute->value ?? $attribute->value?->name,
-                ]
-            ]);
         } else if (is_object($attribute->value)){
             $product->attributes()->attach($productAttribute->id, [
                 'value' => [

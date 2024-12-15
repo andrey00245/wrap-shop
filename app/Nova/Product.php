@@ -41,6 +41,7 @@ class Product extends Resource
         return [
             ID::make()->sortable(),
             new Panel('Основна інформація', $this->mainInformationFields()),
+            new Panel('Фото банер', $this->Banners()),
         ];
     }
 
@@ -75,6 +76,7 @@ class Product extends Resource
             Boolean::make('Активний','is_active'),
             HasMany::make('Типи Цін','prices',ProductPrices::class),
             BelongsToMany::make('Атрибуты', 'attributes', Attribute::class)
+                ->showCreateRelationButton(false)
                 ->fields(function () {
                     return [
                         NovaTabTranslatable::make([
@@ -83,6 +85,16 @@ class Product extends Resource
                         ])
                     ];
                 }),
+        ];
+    }
+
+    protected function Banners() {
+        return [
+            NovaTabTranslatable::make([
+                Text::make('Назва', 'banner_title'),
+            ])->hideFromIndex(),
+            Images::make('Фото', 'banner_images')
+                ->conversionOnIndexView('preview'),
         ];
     }
 

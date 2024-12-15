@@ -46,13 +46,16 @@ class AppServiceProvider extends ServiceProvider
             ->get();
 
         $mainCategories = Category::query()
-            ->whereNull('parent_id')
-            ->get();
+            ->whereNull('parent_id');
+
+        $productCategories = $mainCategories
+            ->with('children');
 
         View::share([
             'settings' => $settings,
             'products' => $products,
-            'mainCategories' => $mainCategories,
+            'mainCategories' => $mainCategories->get(),
+            'productCategories' => $productCategories->get(),
         ]);
     }
 }

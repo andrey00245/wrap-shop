@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Video;
 use App\Models\VideoCategory;
+use App\Models\VideoReview;
 use Illuminate\View\View;
 
 class VideosController extends Controller
@@ -16,7 +16,7 @@ class VideosController extends Controller
      */
     public function index(): View
     {
-        $videos = Video::query()->where('is_active',true)->latest()->get();
+        $videos = VideoReview::query()->where('is_active',true)->latest()->get();
         $categories = VideoCategory::all();
 
         return view('base.pages.videoreviews', compact(

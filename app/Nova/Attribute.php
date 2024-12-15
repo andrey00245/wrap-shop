@@ -2,6 +2,7 @@
 
 namespace App\Nova;
 
+use Illuminate\Http\Request;
 use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -35,6 +36,19 @@ class Attribute extends Resource
     public static $search = [
         'name',
     ];
+
+    /**
+     * Determine if the given user can create a resource.
+     *
+     * @param Request $request
+     *
+     * @return bool
+     */
+    public static function authorizedToCreate(Request $request)
+    {
+        return false;
+    }
+
 
     /**
      * Get the fields displayed by the resource.

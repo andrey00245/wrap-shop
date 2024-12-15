@@ -117,26 +117,26 @@ $(document).ready(function () {
     loginPopup()
     $("html").removeClass('no-overflow');
   })
+  //
+  // $("#button-verify-loginpopup").click(function (){
+  //   $(".password-group").show()
+  //   if($(".password-group").hasClass('active')){
+  //     return open_pop_up("#popup-registration");
+  //   }
+  //   $(".password-group").addClass('active')
+  // })
 
-  $("#button-verify-loginpopup").click(function (){
-    $(".password-group").show()
-    if($(".password-group").hasClass('active')){
-      return open_pop_up("#popup-registration");
-    }
-    $(".password-group").addClass('active')
-  })
+  // $(".login-show").click(function () {
+  //   $(".registration-show").removeClass('active');
+  //   $(".login-show").addClass('active');
+  //   return open_pop_up("#popup-login");
+  // });
 
-  $(".login-show").click(function () {
-    $(".registration-show").removeClass('active');
-    $(".login-show").addClass('active');
-    return open_pop_up("#popup-login");
-  });
-
-  $(".registration-show").click(function () {
-    $(".login-show").removeClass('active');
-    $(".registration-show").addClass('active')
-    return open_pop_up("#popup-registration");
-  });
+  // $(".registration-show").click(function () {
+  //   $(".login-show").removeClass('active');
+  //   $(".registration-show").addClass('active')
+  //   return open_pop_up("#popup-registration");
+  // });
 
   $(".forgot_password-show").click(function () {
     return open_pop_up("#popup-forgot_password");

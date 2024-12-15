@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,6 +32,22 @@ class AuthenticatedSessionController extends Controller
         return response()->json([
             'redirect_url' => route('account')
         ]);
+    }
+
+    /**
+     * Handle an incoming authentication request.
+     */
+    public function checkUser(Request $request)
+    {
+        $phoneEmail = $request->input('phone_email');
+
+        $user = User::where('email', $phoneEmail)->orWhere('phone', $phoneEmail)->first();
+
+        if ($user) {
+            return response()->json(['exists' => true]);
+        }
+
+        return response()->json(['exists' => false]);
     }
 
     /**

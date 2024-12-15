@@ -7,111 +7,118 @@ $(document).ready(function () {
 
     $('#input-telephone').inputmask('+380 99 999 99 99', { "placeholder": " " });
 
-    $('#form-registration').on('submit', function (event) {
+    $('#registration-form').on('submit', function(e) {
+        e.preventDefault();
 
-        event.preventDefault(); // Предотвращаем стандартную отправку формы
+        $('.input-error').removeClass('input-error');
+        $('.error-message').remove();
 
-        // Получаем данные формы
-        var formData = new FormData(this);
+        var isValid = true;
+        var formData = {
+            email: $('#register_name_email').val(),
+            password: $('#register_password').val(),
+            name: $('#input-name').val(),
+            last_name: $('#input-last_name').val(),
+            phone: $('#input-telephone').val(),
+        };
 
-        // Очистка старых ошибок
-        $('.form-group').removeClass('error');
-        $('.form-group .error-message').remove();
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                window.location.href = response.redirect_url;
+            },
+            error: function(xhr) {
+                if (xhr.status === 422) {
+                    var errors = xhr.responseJSON.errors;
 
-        // Флаг валидности формы
-        var valid = true;
-
-        // Простая валидация
-        $('.form-field.required').each(function () {
-            var $this = $(this);
-            var fieldName = $this.attr('name');
-            var fieldValue = $this.val().trim();
-
-            // Проверка на пустое поле
-            if (fieldValue === '') {
-                valid = false;
-                $this.closest('.form-group').addClass('error');
+                    var errorMessages = '<ul>';
+                    for (var field in errors) {
+                        errorMessages += '<li>' + errors[field].join('<br>') + '</li>';
+                    }
+                    errorMessages += '</ul>';
+                    $('.error-message-login').html(errorMessages).show();
+                }
             }
         });
+    });
 
-        // Проверка согласия с условиями
-        if (!$('#agree').is(':checked')) {
-            valid = false;
-            $('#slagreep').addClass('error');
-            $('#slagreep').append('<div class="error-message">Вы должны согласиться с условиями.</div>');
+
+    $('#button-verify-loginpopup').on('click', function() {
+        var phoneEmail = $('#name_email').val().trim();
+        var password = $('#login_password').val().trim();
+
+        $('.input-error').removeClass('input-error');
+
+        if (phoneEmail.length === 0) {
+            $('#name_email').addClass('input-error')
+            return;
         }
 
-
-        // Если форма валидна, отправляем данные
-        if (valid) {
+        if (phoneEmail && !password) {
             $.ajax({
-                url: $('#form-registration').attr('action'),
+                url: 'auth/check-user',
                 method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
+                data: {
+                    phone_email: phoneEmail,
+                },
+                success: function(response) {
+                    if (response.exists) {
+                        $(".password-group").show();
+                    } else {
+                        $(".password-group").hide();
+                        return open_pop_up("#popup-registration");
+                    }
+                },
+                error: function() {
+                    alert('Error occurred while checking user');
+                }
+            });
+        }
+
+        if (phoneEmail  && password) {
+            $.ajax({
+                url: '/auth/login',
+                method: 'POST',
+                data:  {
+                    phone_email: phoneEmail,
+                    password: password,
+                },
                 success: function (response) {
-                    // Перенаправляем на URL, полученный в ответе
                     window.location.href = response.redirect_url;
                 },
                 error: function (xhr) {
-                    // Обработка ошибок
-                    const errors = xhr.responseJSON.errors;
-                    for (var field in errors) {
-                        if (errors.hasOwnProperty(field)) {
-                            const errorMessages = errors[field];
-                            const $field = $('input[name="' + field + '"]');
-                            $field.closest('.form-group').addClass('error');
-                            $field.closest('.form-group').append('<div class="error-message">' + errorMessages.join('<br>') + '</div>');
-                        }
+                    var errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        var errorMessages = '';
+                        $.each(errors, function (key, message) {
+                            errorMessages += `<span style="color:red">${message}</span>`;
+                        });
+                        $('.error-message-login').html(errorMessages).show();
+                    } else {
+                        $('.error-message-login').html('Произошла ошибка при входе.').show();
                     }
                 }
             });
         }
     });
 
-    $('#form-login').on('submit', function (event) {
-        event.preventDefault(); // Предотвращаем стандартную отправку формы
-
-        // Получаем данные формы
-        var formData = $(this).serialize();
-        console.log('111')
-        // Очистка старых ошибок
-        $('.form-group').removeClass('error');
-        $('.form-group .error-message').remove();
-
-        // Флаг валидности формы
-        var valid = true;
-
-        // Если форма валидна, отправляем данные
-            $.ajax({
-                url: $('#form-login').attr('action'),
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    // Обработка успешного ответа
-                    window.location.href = response.redirect_url; // Перенаправление после успешного входа
-                },
-                error: function (xhr) {
-                    // Обработка ошибок от сервера
-                    var errors = xhr.responseJSON.errors;
-                    if (errors) {
-                        $.each(errors, function (key, message) {
-                            var $input = $(`[name=${key}]`);
-                            $input.closest('.form-group').addClass('error');
-                            $input.after(`<div class="error-message">${message}</div>`);
-                        });
-                    } else {
-                        alert('Произошла ошибка при входе.');
-                    }
-                }
-            });
-    });
-
     $('.g_id_signout').on('click', function(event) {
-        event.preventDefault(); // Предотвращаем стандартное действие ссылки
-
-        // Отправка скрытой формы
+        event.preventDefault();
         $('#logout-form').submit();
     });
+
+    function open_pop_up(e) {
+        $("#credential_picker_container").toggle();
+        $(".popup-window").hide()
+
+        $(".popup-window").removeClass('active');
+        $(".popup-overlay").addClass('active');
+        // $(".popup-overlay").fadeIn();
+        $("html").addClass('no-overflow');
+        // $(e).fadeIn().addClass('active');
+        $(e).show().addClass('active');
+
+    }
 });

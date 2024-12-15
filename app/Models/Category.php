@@ -77,4 +77,9 @@ class Category extends Model implements HasMedia
     {
        return is_null($this->parent_id);
     }
+
+    public function hasChildren(): bool
+    {
+        return $this->children()->exists();
+    }
 }

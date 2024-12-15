@@ -17,15 +17,14 @@ class SubscribeController extends Controller
       DB::beginTransaction();
       $subscribedUser = SubscribeUser::where('email', $request->get('email'))->first();
       if (!$subscribedUser) {
-        $subscribedUser = SubscribeUser::create([$request->all()]);
+        $subscribedUser = SubscribeUser::create($request->all());
         $subscribedUser->notify(new SendSubscribeNotification());
       }
       DB::commit();
     } catch (\Exception $ex) {
       DB::rollBack();
-      return response()->json(['success' => false, 'message' => __('subscribe.something_went_wrong')]);
+      return response()->json(['success' => false, 'message' => __('subscription.something_went_wrong')]);
     }
-
     return response()->json(['success' => true]);
   }
 }

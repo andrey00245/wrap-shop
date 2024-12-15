@@ -10,6 +10,7 @@ use App\Http\Controllers\SubscribeController;
 use App\Http\Controllers\SyncProductImagesController;
 use App\Http\Controllers\VideosController;
 use App\Http\Controllers\WishlistController;
+use App\Models\Category;
 use App\Models\PrivacyPolicy;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,29 @@ use App\Http\Controllers\SyncProductController;
 
 Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']);
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
+Route::get('/slug-generate', function(){
+  $products = Product::all();
+  $categories = Category::all();
+  foreach ($products as $product){
+    $product->slug = [
+      'en' => Str::slug($product->getTranslation('name', 'en')),
+      'uk' => Str::slug($product->getTranslation('name', 'uk')),
+      'ru' => Str::slug($product->getTranslation('name', 'ru'))
+    ];
+    $product->save();
+  }
+  foreach ($categories as $category){
+    $category->slug = [
+      'en' => Str::slug($category->getTranslation('name', 'en')),
+      'uk' => Str::slug($category->getTranslation('name', 'uk')),
+      'ru' => Str::slug($category->getTranslation('name', 'ru'))
+    ];
+    $category->save();
+  }
+
+  return 'okay';
+});
+
 
 Route::post('/add-product-to-wishlist', [WishlistController::class, 'update'])->name('add-product-to-wishlist');
 
@@ -26,11 +50,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
   Route::get('/',IndexController::class)->name('index');
 
-  Route::get('/test', function(){
-    $product = Product::find(7);
-    $slug = Str::slug($product->name);
-    dd($slug);
-  });
+
 
   Route::get('/shipping-and-payment', function () {
     return view('base.pages.delivery');

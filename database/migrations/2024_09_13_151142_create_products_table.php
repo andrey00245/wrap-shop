@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('is_best_seller')->default(false);
             $table->boolean('is_active')->default(true);
             $table->json('name')->nullable();
+            $table->json('slug')->nullable();
             $table->json('descriptions')->nullable();
 
             $table->foreignId('category_id')->nullable()

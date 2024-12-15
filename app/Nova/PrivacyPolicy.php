@@ -2,6 +2,7 @@
 
 namespace App\Nova;
 
+use Illuminate\Http\Request;
 use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
@@ -10,6 +11,8 @@ use Mostafaznv\NovaCkEditor\CkEditor;
 
 class PrivacyPolicy extends Resource
 {
+
+
   /**
    * The model the resource corresponds to.
    *
@@ -39,6 +42,20 @@ class PrivacyPolicy extends Resource
     return 'Політика конфіденційності';
   }
 
+  public static function authorizedToCreate(Request $request)
+  {
+    return false;
+  }
+
+  public function authorizedToDelete(Request $request)
+  {
+    return false;
+  }
+
+  public function authorizedToReplicate(Request $request)
+  {
+    return false;
+  }
   /**
    * Get the fields displayed by the resource.
    *

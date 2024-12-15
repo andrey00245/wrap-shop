@@ -15,7 +15,7 @@ class Category extends Model implements HasMedia
         InteractsWithMedia,
         HasTranslations;
 
-    protected $translatable = ['name'];
+    protected $translatable = ['name', 'slug'];
 
     /**
      * The attributes that are mass assignable.
@@ -24,11 +24,13 @@ class Category extends Model implements HasMedia
      */
     protected $fillable = [
         'name',
+        'slug',
         'parent_id',
     ];
 
     protected $casts = [
         'name' => 'json',
+        'slug' => 'json',
     ];
 
     public function registerMediaConversions(?Media $media = null): void

@@ -17,13 +17,13 @@ class ProductController extends Controller
   public function index(): View
   {
     $products = Product::query()
-          ->whereHas('prices', function ($query) {
-              $query->where('type_id', function ($subQuery) {
-                  $subQuery->select('id')
-                      ->from('price_types')
-                      ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-              })->where('price', '>', 0);
-          })
+      ->whereHas('prices', function ($query) {
+        $query->where('type_id', function ($subQuery) {
+          $subQuery->select('id')
+            ->from('price_types')
+            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+        })->where('price', '>', 0);
+      })
       ->whereHas('media')
       ->whereHas('category')
       ->with(['media'])
@@ -46,7 +46,7 @@ class ProductController extends Controller
   /**
    *  Handle the incoming request.
    *
-   *  @return View
+   * @return View
    */
   public function show(Product $product): View
   {
@@ -67,7 +67,7 @@ class ProductController extends Controller
       return $product->categories;
     })->unique('id');
 
-    $exampleWorks = Implementation::query()->where('is_active',true)->get();
+    $exampleWorks = Implementation::query()->where('is_active', true)->get();
     $latestCategory = Category::query()
       ->whereHas('products', function ($query) use ($products) {
         $query->whereIn('products.id', $products->pluck('id')->toArray());
@@ -91,27 +91,38 @@ class ProductController extends Controller
     ]);
   }
 
-    public function category(Category $category): View
-    {
-        $categories = $category->isParent() ? $category->children()->pluck('id') : [$category->id];
-
-        $products = Product::query()
-            ->whereHas('prices', function ($query) {
-                $query->where('type_id', function ($subQuery) {
-                    $subQuery->select('id')
-                        ->from('price_types')
-                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-                })->where('price', '>', 0);
-            })
-            ->whereHas('media')
-            ->whereIn('category_id', $categories)
-            ->with(['media'])
-            ->paginate(6);
-
-        return view('base.pages.products.index', [
-            'products' => $products,
-            'category' => $category,
-            'categories' => $category->children(),
-        ]);
+  public function category(Category $category, Category $subcategory = null, Category $subsubcategory = null): View
+  {
+    if ($subcategory) {
+      $categories = $subcategory->isParent() ? $subcategory->children()->pluck('id') : [$subcategory->id];
+      $childrenCategories = $subcategory->children;
+    } else if ($subsubcategory) {
+      $categories = $subsubcategory->isParent() ? $subsubcategory->children()->pluck('id') : [$subsubcategory->id];
+      $childrenCategories = $subsubcategory->children;
+    } else {
+      $categories = $category->isParent() ? $category->children()->pluck('id') : [$category->id];
+      $childrenCategories = $category->children;
     }
+
+    $products = Product::query()
+      ->whereHas('prices', function ($query) {
+        $query->where('type_id', function ($subQuery) {
+          $subQuery->select('id')
+            ->from('price_types')
+            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+        })->where('price', '>', 0);
+      })
+      ->whereHas('media')
+      ->whereIn('category_id', $categories)
+      ->with(['media'])
+      ->paginate(6);
+
+    return view('base.pages.products.index', [
+      'products' => $products,
+      'category' => $category,
+      'subcategory' => $subcategory,
+      'subsubcategory' => $subsubcategory,
+      'childrenCategories' => $childrenCategories,
+    ]);
+  }
 }

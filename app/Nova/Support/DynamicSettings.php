@@ -60,4 +60,25 @@ class DynamicSettings
     return $this->store->get('google_map_link') ?: '#';
   }
 
+  public function getVideoBannerTitle(): string
+  {
+    return $this->store->get('video_banner_title_'.LaravelLocalization::getCurrentLocale()) ?: '';
+  }
+
+  public function getVideoBannerDesc(): string
+  {
+    return $this->store->get('video_banner_desc_'.LaravelLocalization::getCurrentLocale()) ?: '';
+  }
+
+  public function getSloganTitle(): string
+  {
+    return $this->store->get('slogan_title_'.LaravelLocalization::getCurrentLocale()) ?: '';
+  }
+
+  public function getSloganDesc(): string
+  {
+    return $this->store->get('slogan_desc_'.LaravelLocalization::getCurrentLocale()) ?: '';
+  }
+
+
 }

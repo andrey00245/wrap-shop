@@ -11,6 +11,7 @@ use App\Nova\News;
 use App\Nova\NewsCategory;
 use App\Nova\Order;
 use App\Nova\PriceType;
+use App\Nova\PrivacyPolicy;
 use App\Nova\Product;
 use App\Nova\User;
 use App\Nova\Video;
@@ -68,6 +69,8 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                     MenuItem::resource(VideoCategory::class),
                     MenuItem::resource(VideoReview::class),
                 ])->icon('desktop-computer')->collapsable(),
+
+                MenuSection::resource(PrivacyPolicy::class)->icon('document'),
 
                 MenuSection::make(__(config('nova-settings-tool.sidebar-label', 'Settings')))
                  ->path('/settings')

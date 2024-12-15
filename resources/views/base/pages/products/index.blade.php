@@ -13,18 +13,48 @@
         <ul class="flex-center">
           <li><a href="{{route('index')}}" title="Головна" class="button"><i class="far fa-chevron-left"></i>Головна</a>
           </li>
+          @if(isset($category) && isset($subcategory))
+            <li><a href="{{route('products.category', ['category' => $category->id])}}" title="{{$category->name}}"
+                   class="button"><i class="far fa-chevron-left"></i>{{$category->name}}</a></li>
+          @endif
+          @if(isset($category) && isset($subcategory) && isset($subsubcategory))
+            <li><a
+                href="{{route('products.category', ['category' => $category->id, 'subcategory' => $subcategory->id])}}"
+                title="{{$subcategory->name}}" class="button"><i class="far fa-chevron-left"></i>{{$subcategory->name}}
+              </a></li>
+          @endif
         </ul>
       </nav>
-      <h1 class="title">{{$category->name ?? ''}}</h1>
-        @if(isset($category))
-      <nav class="category-child-nav">
-        <ul>
-            @foreach($category->children as $childrenCategory)
-                <li><a href="{{route('products.category', ['category' => $childrenCategory->id])}}" title="{{$childrenCategory->name}}" class="flex-center">{{$childrenCategory->name}}</a></li>
+      @if(isset($subsubcategory))
+        <h1 class="title">{{$subsubcategory->name ?? ''}}</h1>
+      @elseif(isset($subcategory))
+        <h1 class="title">{{$subcategory->name ?? ''}}</h1>
+      @else
+        <h1 class="title">{{$category->name ?? ''}}</h1>
+      @endif
+      @if(isset($category))
+        <nav class="category-child-nav">
+          <ul>
+            @foreach($childrenCategories as $childrenCategory)
+              @if($category && !$subcategory)
+                <li>
+                  <a href="{{route('products.category', ['category' => $category->id, 'subcategory'=>$childrenCategory->id])}}"
+                     title="{{$childrenCategory->name}}"
+                     class="flex-center">
+                    {{$childrenCategory->name}}
+                  </a>
+                </li>
+              @elseif($category && $subcategory && !$subsubcategory)
+                <li>
+                  <a href="{{route('products.category', ['category' => $category->id, 'subcategory' => $subcategory->id, 'subsubcategory'=>$childrenCategory->id])}}"
+                    title="{{$childrenCategory->name}}"
+                    class="flex-center">{{$childrenCategory->name}}</a>
+                </li>
+              @endif
             @endforeach
-        </ul>
-      </nav>
-        @endif
+          </ul>
+        </nav>
+      @endif
     </div>
     <div class="category-content wrap flex-justify">
       <div class="category-left">
@@ -2033,9 +2063,12 @@
           <div class="button-sort category-sort-open button"><i class="fal fa-sort-alt"></i>Сортування</div>
         </div>
         <div class="category-products flex-wrap">
-          <a href="https://wrap.shop/plivky/kolorovi-plivky/?ocf=F1S0V11" title="3m color" class="category-products-item product-default product-layout banner product-grid">
-            <img class="vertical" src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-vert.webp" alt="3m color" title="3m color" src="/image/catalog/category/webp/banners catalog/1-3m-vert.webp">
-            <img class="gorizont" src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-gor.webp" alt="3m color" title="3m color">
+          <a href="https://wrap.shop/plivky/kolorovi-plivky/?ocf=F1S0V11" title="3m color"
+             class="category-products-item product-default product-layout banner product-grid">
+            <img class="vertical" src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-vert.webp"
+                 alt="3m color" title="3m color" src="/image/catalog/category/webp/banners catalog/1-3m-vert.webp">
+            <img class="gorizont" src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-gor.webp"
+                 alt="3m color" title="3m color">
           </a>
           @foreach($products as $product)
             <div class="category-products-item product-default product-layout product-grid"
@@ -2048,33 +2081,33 @@
               </div>
               <div class="product-default-texts-wrapper">
 
-              <div class="top flex-justify">
-                <div class="sale statuses grid">
-                  <div class="category-status category-status-1 status-inline text rectangle "
-                       style=" color:#ffffff; background-color:#d04b4b;">
-                    {{__('general-translate.sales_hit')}}
+                <div class="top flex-justify">
+                  <div class="sale statuses grid">
+                    <div class="category-status category-status-1 status-inline text rectangle "
+                         style=" color:#ffffff; background-color:#d04b4b;">
+                      {{__('general-translate.sales_hit')}}
+                    </div>
+                  </div>
+                  <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
+                  <div class="review grid">
+                    <i class="fal fa-star"></i>
+                    <i class="fal fa-star"></i>
+                    <i class="fal fa-star"></i>
+                    <i class="fal fa-star"></i>
+                    <i class="fal fa-star"></i>
+                    <div class="rating-result" style="width: 100%">
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                      <i class="fas fa-star"></i>
+                    </div>
+                  </div>
+                  <div class="wishlist">
+                    <button type="button" class="button far fa-heart"
+                            title="{{__('general-translate.product_card.add_wishlist')}}"></button>
                   </div>
                 </div>
-                <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
-                <div class="review grid">
-                  <i class="fal fa-star"></i>
-                  <i class="fal fa-star"></i>
-                  <i class="fal fa-star"></i>
-                  <i class="fal fa-star"></i>
-                  <i class="fal fa-star"></i>
-                  <div class="rating-result" style="width: 100%">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                  </div>
-                </div>
-                <div class="wishlist">
-                  <button type="button" class="button far fa-heart"
-                          title="{{__('general-translate.product_card.add_wishlist')}}"></button>
-                </div>
-              </div>
               </div>
 
               <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
@@ -2100,27 +2133,27 @@
                     </div>
                   @endforeach
                 </a>
-{{--                <div class="swiper-button-next button" tabindex="0" role="button" aria-label="Next slide"></div>--}}
-{{--                <div class="swiper-button-prev button" tabindex="-1" role="button" aria-label="Previous slide"></div>--}}
+                {{--                <div class="swiper-button-next button" tabindex="0" role="button" aria-label="Next slide"></div>--}}
+                {{--                <div class="swiper-button-prev button" tabindex="-1" role="button" aria-label="Previous slide"></div>--}}
                 <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
               <div class="product-default-texts-wrapper list">
 
-              <div class="center">
-                <div class="category">{{$product->category?->name}}</div>
-                <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->name}}"
-                   class="name">{{$product->name}}</a>
+                <div class="center">
+                  <div class="category">{{$product->category?->name}}</div>
+                  <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->name}}"
+                     class="name">{{$product->name}}</a>
+                </div>
+                <div class="bottom flex-center">
+                  <div class="price">{{number_format($product->getPrice())}} ₴<span
+                      class="price-unit-xvr"></span></div>
+                  <button class="button colord remarketing_cart_button" data-product_id="{{$product->id}}"><i
+                      class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
+                </div>
               </div>
-              <div class="bottom flex-center">
-                <div class="price">{{number_format($product->getPrice())}} ₴<span
-                    class="price-unit-xvr"></span></div>
-                <button class="button colord remarketing_cart_button" data-product_id="{{$product->id}}"><i
-                    class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
-              </div>
-              </div>
-{{--              <div class="params">--}}
-{{--                <div class="item flex-column">Призначення <span class="label">декоративна</span></div>--}}
-{{--                <div class="item flex-column">Структура <span class="label">сатинова</span></div>--}}
-{{--              </div>--}}
+              {{--              <div class="params">--}}
+              {{--                <div class="item flex-column">Призначення <span class="label">декоративна</span></div>--}}
+              {{--                <div class="item flex-column">Структура <span class="label">сатинова</span></div>--}}
+              {{--              </div>--}}
             </div>
 
           @endforeach
@@ -2157,15 +2190,15 @@
 
   @push('scripts')
     <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
-{{--    <script>--}}
-{{--      let categoryProductsItem = new Swiper(".category-products-item .image", {--}}
-{{--        navigation: {--}}
-{{--          nextEl: ".category-products-item .image .swiper-button-next",--}}
-{{--          prevEl: ".category-products-item .image .swiper-button-prev",--}}
-{{--        },--}}
-{{--        lazy: true,--}}
-{{--      });--}}
-{{--    </script>--}}
+    {{--    <script>--}}
+    {{--      let categoryProductsItem = new Swiper(".category-products-item .image", {--}}
+    {{--        navigation: {--}}
+    {{--          nextEl: ".category-products-item .image .swiper-button-next",--}}
+    {{--          prevEl: ".category-products-item .image .swiper-button-prev",--}}
+    {{--        },--}}
+    {{--        lazy: true,--}}
+    {{--      });--}}
+    {{--    </script>--}}
     <script src="{{mix('build/js/productIndex.js')}}"></script>
   @endpush
 @endsection

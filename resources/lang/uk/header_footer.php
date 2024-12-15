@@ -15,7 +15,7 @@ return [
   'information' => 'Інформація',
   'our_office' => 'Наш офіс',
   'subscribe' => 'Оформіть підписку та будьте в темі!',
-  'subscribe_btn' => 'Отправить',
+  'subscribe_btn' => 'Відправити',
   'all_rights_reserved' => 'Всі права захищені. © :year',
 
   'home' => 'Головна'

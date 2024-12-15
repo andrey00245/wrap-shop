@@ -24,7 +24,8 @@ class Product extends Model implements HasMedia
     public $translatable = [
         'name',
         'descriptions',
-        'banner_title'
+        'banner_title',
+        'slug'
     ];
 
     /**
@@ -43,11 +44,15 @@ class Product extends Model implements HasMedia
         'details',
         'category_id',
         'name',
+        'slug',
         'descriptions',
     ];
 
     protected $casts = [
         'banner_title' => 'json',
+        'slug' => 'json',
+        'name' => 'json',
+        'description' => 'json',
     ];
 
     /**

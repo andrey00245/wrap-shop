@@ -28,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";
         });
 
+       /**
+       * @var DynamicSettings $settings
+       */
         $settings = new DynamicSettings();
 
         $products = Product::query()

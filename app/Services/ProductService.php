@@ -531,21 +531,47 @@ class ProductService
         $existingPivot = $product->attributes()->where('attribute_id', $productAttribute->id)->first();
 
         if ($existingPivot) {
+            if (is_object($attribute->value)){
+                $product->attributes()->updateExistingPivot($productAttribute->id, [
+                    'value' => [
+                        'uk' => $attribute->value?->name,
+                        'ru' => $attribute->value?->name,
+                        'en' => $attribute->value?->name,
+                    ]
+                ]);
+            }
+            else{
+                $product->attributes()->updateExistingPivot($productAttribute->id, [
+                    'value' => [
+                        'uk' => $attribute->value,
+                        'ru' => $attribute->value,
+                        'en' => $attribute->value,
+                    ]
+                ]);
+            }
             $product->attributes()->updateExistingPivot($productAttribute->id, [
-                'value' => json_encode([
+                'value' => [
                     'uk' => $attribute->value ?? $attribute->value?->name,
                     'ru' => $attribute->value ?? $attribute->value?->name,
                     'en' => $attribute->value ?? $attribute->value?->name,
-                ], JSON_THROW_ON_ERROR)
+                ]
             ]);
-        } else {
-            // Если связи нет, добавляем новую
+        } else if (is_object($attribute->value)){
             $product->attributes()->attach($productAttribute->id, [
-                'value' => json_encode([
-                    'uk' => $attribute->value ?? $attribute->value?->name,
-                    'ru' => $attribute->value ?? $attribute->value?->name,
-                    'en' => $attribute->value ?? $attribute->value?->name,
-                ], JSON_THROW_ON_ERROR)
+                'value' => [
+                    'uk' => $attribute->value?->name,
+                    'ru' => $attribute->value?->name,
+                    'en' => $attribute->value?->name,
+                ]
+            ]);
+        }
+        else{
+            $product->attributes()->attach($productAttribute->id, [
+                'value' => [
+                    'uk' => $attribute->value,
+                    'ru' => $attribute->value,
+                    'en' => $attribute->value,
+                ]
             ]);
         }
     }

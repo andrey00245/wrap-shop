@@ -26,7 +26,6 @@ class RegisteredUserController extends Controller
             'password' => ['required'],
         ]);
 
-
         $user = User::create([
             'name'      => $request->name,
             'last_name' => $request->last_name,

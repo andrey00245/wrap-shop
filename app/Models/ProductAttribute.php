@@ -18,6 +18,6 @@ class ProductAttribute extends Pivot
     protected $table = 'products_attributes';
 
     protected $casts = [
-        'value' => 'json',
+        'value' => 'array',
     ];
 }

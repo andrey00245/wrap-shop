@@ -161,4 +161,27 @@ class Product extends Model implements HasMedia
     {
         return $this->getMedia('banner_images');
     }
+
+    public function getProductAttributes()
+    {
+        return $this->attributes()
+            ->whereNotIn('field_name', [
+                'name',
+                'application',
+                'purpose',
+                'benefits',
+                'default_quantity'
+            ])
+            ->get();
+    }
+
+    public function getBenefits()
+    {
+        return $this->attributes()->where('field_name', 'benefits')->first()->pivot->value;
+    }
+
+    public function getApplication()
+    {
+        return $this->attributes()->where('field_name', 'application')->first()->pivot->value;
+    }
 }

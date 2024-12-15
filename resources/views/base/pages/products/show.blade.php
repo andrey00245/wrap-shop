@@ -52,20 +52,25 @@
         <div class="params-title-mobil">{{__('product-show.technical-specifications')}}</div>
         <div class="params">
           <div class="list flex-column">
-            <div class="item flex-justify">Призначення <span class="label">декоративна</span></div>
-            <div class="item flex-justify">Матеріал <span class="label">вініл</span></div>
-            <div class="item flex-justify">Структура <span class="label">глянцева</span></div>
-            <div class="item flex-justify">Основний відтінок <span class="label">коричневий</span></div>
-            <div class="item flex-justify">Рулон, м.п. <span class="label">25</span></div>
-            <div class="item flex-justify">Ширина, м <span class="label">1,52</span></div>
-            <div class="item flex-justify hide">Товщина <span class="label">80 мкр</span></div>
-            <div class="item flex-justify hide">Спосіб нанесення <span class="label">сухий</span></div>
-            <div class="item flex-justify hide">Температура поверхні <span class="label">від +10°C до +16°C</span></div>
-            <div class="item flex-justify hide">Температура експлуатації <span class="label">від -50°C до +110°C</span>
-            </div>
-            <div class="item flex-justify hide">Строк експлуатації <span class="label">до 5 років</span></div>
-            <div class="item flex-justify hide">Технологія виробництва <span class="label">литий вініл</span></div>
-            <div class="item flex-justify hide">Країна-виробник <span class="label">США</span></div>
+              @foreach($product->getProductAttributes() as $attribute)
+                  @php
+                      $value = $attribute->pivot->value;
+                  @endphp
+                      <div class="item flex-justify">{{ $attribute->name }} <span class="label">{{$value}}</span></div>
+                 @endforeach
+{{--            <div class="item flex-justify">Матеріал <span class="label">вініл</span></div>--}}
+{{--            <div class="item flex-justify">Структура <span class="label">глянцева</span></div>--}}
+{{--            <div class="item flex-justify">Основний відтінок <span class="label">коричневий</span></div>--}}
+{{--            <div class="item flex-justify">Рулон, м.п. <span class="label">25</span></div>--}}
+{{--            <div class="item flex-justify">Ширина, м <span class="label">1,52</span></div>--}}
+{{--            <div class="item flex-justify hide">Товщина <span class="label">80 мкр</span></div>--}}
+{{--            <div class="item flex-justify hide">Спосіб нанесення <span class="label">сухий</span></div>--}}
+{{--            <div class="item flex-justify hide">Температура поверхні <span class="label">від +10°C до +16°C</span></div>--}}
+{{--            <div class="item flex-justify hide">Температура експлуатації <span class="label">від -50°C до +110°C</span>--}}
+{{--            </div>--}}
+{{--            <div class="item flex-justify hide">Строк експлуатації <span class="label">до 5 років</span></div>--}}
+{{--            <div class="item flex-justify hide">Технологія виробництва <span class="label">литий вініл</span></div>--}}
+{{--            <div class="item flex-justify hide">Країна-виробник <span class="label">США</span></div>--}}
           </div>
           <div id="show-all" style="display: none" class="button">{{__('product-show.show-all')}}</div>
           <div id="show-less" style="display: none" class="button">{{__('product-show.show-less')}}</div>
@@ -291,30 +296,25 @@
 
     <div class="product-page-info flex-justify wrap">
       <div class="item">
+          @if($product->descriptions)
         <div class="title">{{__('product-show.description')}}</div>
-        <div class="text">Avery Gloss Metallic Brown – це вишуканість і глибина в одному відтінку. Насичений коричневий
-          колір з додаванням металічних вкраплень створює ефект розкоші і додає автомобілю аристократичності. Глянцеве
-          покриття акцентує глибину кольору, роблячи його ще більш виразним.
-        </div>
+        <div class="text">{{$product->descriptions}}</div>
+          @endif
       </div>
+        @if($product->getBenefits())
       <div class="item width-33">
         <div class="title">{{__('product-show.advantages')}}</div>
-        <div class="text">Елегантний коричневий відтінок: глибокий і насичений колір, що підкреслює індивідуальність
-          автомобіля.
-          Металічний ефект: вкраплення, що відображають світло, створюють динамічний і іскристий вигляд.
-          Глянцеве покриття: забезпечує додатковий блиск і розкішний вигляд кузова.
-          Захист і довговічність: плівка надійно захищає кузов від зовнішніх факторів, включаючи УФ-випромінювання, і
-          має відмінну зносостійкість.
-          Легкість установки: м'яка та еластична структура плівки спрощує процес наклеювання, дозволяючи ідеально
-          облягати деталі кузова.
+        <div class="text">{{$product->getBenefits()}}
         </div>
       </div>
+        @endif
+        @if($product->getApplication())
       <div class="item width-33">
         <div class="title">{{__('product-show.application')}}</div>
-        <div class="text">Цей відтінок особливо підійде для тих, хто прагне надати своєму автомобілю вишуканий і
-          аристократичний вигляд.
+        <div class="text">{{$product->getApplication()}}
         </div>
       </div>
+        @endif
     </div>
     <div class="product-page-claim wrap row">
       <div class="title">{{__('product-show.requirements')}}</div>

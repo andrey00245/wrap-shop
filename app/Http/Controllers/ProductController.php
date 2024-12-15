@@ -63,11 +63,7 @@ class ProductController extends Controller
       ->with(['media', 'category'])
       ->paginate(6);
 
-    $categories = $products->take(5)->flatMap(function ($product) {
-      return $product->categories;
-    })->unique('id');
-
-    $exampleWorks = Implementation::query()->where('is_active', true)->get();
+    $exampleWorks = Implementation::query()->where('is_active',true)->get();
     $latestCategory = Category::query()
       ->whereHas('products', function ($query) use ($products) {
         $query->whereIn('products.id', $products->pluck('id')->toArray());
@@ -81,11 +77,8 @@ class ProductController extends Controller
       session()?->put('viewProducts', $viewProducts);
     }
 
-
     return view('base.pages.products.show', [
       'product' => $product,
-      'products' => $products,
-      'categories' => $categories,
       'exampleWorks' => $exampleWorks,
       'latestCategory' => $latestCategory,
     ]);

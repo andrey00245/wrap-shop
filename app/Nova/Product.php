@@ -76,7 +76,6 @@ class Product extends Resource
             Boolean::make('Активний','is_active'),
             HasMany::make('Типи Цін','prices',ProductPrices::class),
             BelongsToMany::make('Атрибуты', 'attributes', Attribute::class)
-                ->showCreateRelationButton(false)
                 ->fields(function () {
                     return [
                         NovaTabTranslatable::make([

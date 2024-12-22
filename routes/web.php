@@ -51,7 +51,16 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
   Route::get('/',IndexController::class)->name('index');
 
+  Route::get('/privacy-policy', function (){
+    $privacy_policy = PrivacyPolicy::first();
+    return view('base.pages.privacy-policy', compact('privacy_policy'));
+  })->name('privacy-policy');
 
+  Route::get('/checkout', function () {
+    return view('base.pages.checkout.index');
+  })->name('checkout');
+
+  Route::post('/subscribe', [SubscribeController::class, 'store'])->name('subscribe');
 
   Route::get('/shipping-and-payment', function () {
     return view('base.pages.delivery');
@@ -123,16 +132,8 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   });
   Route::get('/{category}/{subcategory?}/{subsubcategory?}', [ProductController::class, 'category'])->name('products.category');
 
-  Route::get('/privacy-policy', function (){
-    $privacy_policy = PrivacyPolicy::first();
-    return view('base.pages.privacy-policy', compact('privacy_policy'));
-  })->name('privacy-policy');
 
-  Route::get('/checkout', function () {
-    return view('base.pages.checkout.index');
-  })->name('checkout');
 
-  Route::post('/subscribe', [SubscribeController::class, 'store'])->name('subscribe');
 
 });
 

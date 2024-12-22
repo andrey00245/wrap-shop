@@ -55,6 +55,11 @@ class Product extends Model implements HasMedia
         'description' => 'json',
     ];
 
+  public function getSlugEnAttribute()
+  {
+    return $this->getTranslation('slug', 'en');
+  }
+
     /**
      * Brand.
      */

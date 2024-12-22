@@ -47,7 +47,7 @@
       <ul class="footer-cat">
         @foreach($mainCategories as $category)
           <li>
-            <a href="{{route('products.category', ['category' => $category->id])}}" title="{{$category->name}}">
+            <a href="{{route('products.category', ['category' => $category->slugEn])}}" title="{{$category->name}}">
               <figure><img loading="lazy" src="{{$category->getImage()}}" srcset="{{$category->getImage()}}"
                            alt="{{$category->name}}" title="{{$category->name}}" width="180" height="140"></figure>
               <div>

@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
+use App\Models\News;
+use App\Models\NewsCategory;
 use App\Models\UserAddress;
 use App\Policies\UserAddressPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -25,7 +28,23 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
-      Gate::policy(UserAddress::class, UserAddressPolicy::class);
+        Gate::policy(UserAddress::class, UserAddressPolicy::class);
+
+        Route::bind('category', function ($slug) {
+          return Category::whereJsonContains('slug->en', $slug)->firstOrFail(); // Ищем по slug
+        });
+        Route::bind('subcategory', function ($slug) {
+          return Category::whereJsonContains('slug->en', $slug)->firstOrFail(); // Ищем по slug
+        });
+        Route::bind('subsubcategory', function ($slug) {
+          return Category::whereJsonContains('slug->en', $slug)->firstOrFail(); // Ищем по slug
+        });
+        Route::bind('news_category', function ($slug) {
+          return NewsCategory::whereJsonContains('slug->en', $slug)->firstOrFail(); // Ищем по slug
+        });
+        Route::bind('news', function ($slug) {
+          return News::whereJsonContains('slug->en', $slug)->firstOrFail(); // Ищем по slug
+        });
     }
 
     /**

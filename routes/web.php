@@ -5,6 +5,7 @@ use App\Http\Controllers\Account\PersonalDataController;
 use App\Http\Controllers\Account\UserAddressController;
 use App\Http\Controllers\Account\ViewedProductsController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SubscribeController;
 use App\Http\Controllers\SyncProductImagesController;
@@ -60,9 +61,14 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
 
     Route::get('/videoreviews/{category}', [VideosController::class, 'show'])->name('videos.show');
 
-    Route::get('/news', function () {
-    return view('base.pages.news');
-  })->name('news');
+
+    Route::group(['prefix' => '/news'], function(){
+
+      Route::get('/', [NewsController::class, 'index'])->name('news.index');
+      Route::get('/{news_category:slug}', [NewsController::class, 'category'])->name('news.category');
+      Route::get('/{news_category:slug}/{news:slug}', [NewsController::class, 'show'])->name('news.show');
+    });
+
 
   Route::get('/about-us', function () {
     return view('base.pages.about-us');
@@ -114,8 +120,8 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   Route::group(['prefix' => '/products'], function() {
     Route::get('/', [ProductController::class,'index'])->name('products.index');
     Route::get('/{product}/show', [ProductController::class,'show'])->name('products.show');
-    Route::get('/{category}/{subcategory?}/{subsubcategory?}', [ProductController::class, 'category'])->name('products.category');
   });
+  Route::get('/{category}/{subcategory?}/{subsubcategory?}', [ProductController::class, 'category'])->name('products.category');
 
   Route::get('/privacy-policy', function (){
     $privacy_policy = PrivacyPolicy::first();

@@ -93,13 +93,14 @@ class ProductController extends Controller
 
   public function category(Category $category, Category $subcategory = null, Category $subsubcategory = null): View
   {
-    if ($subcategory) {
-      $categories = $subcategory->isParent() ? $subcategory->children()->pluck('id') : [$subcategory->id];
-      $childrenCategories = $subcategory->children;
-    } else if ($subsubcategory) {
+    if ($subsubcategory) {
       $categories = $subsubcategory->isParent() ? $subsubcategory->children()->pluck('id') : [$subsubcategory->id];
       $childrenCategories = $subsubcategory->children;
-    } else {
+    }
+     else if ($subcategory) {
+       $categories = $subcategory->isParent() ? $subcategory->children()->pluck('id') : [$subcategory->id];
+       $childrenCategories = $subcategory->children;
+     } else {
       $categories = $category->isParent() ? $category->children()->pluck('id') : [$category->id];
       $childrenCategories = $category->children;
     }

@@ -48,6 +48,11 @@ class Category extends Model implements HasMedia
         $this->addMediaCollection('main')->singleFile();
     }
 
+    public function getSlugEnAttribute()
+    {
+      return $this->getTranslation('slug', 'en');
+    }
+
     public function products()
     {
         return $this->hasMany(Product::class);

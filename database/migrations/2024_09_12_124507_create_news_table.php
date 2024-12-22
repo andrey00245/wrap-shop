@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->json('read_time')->nullable();
             $table->json('title')->nullable();
+            $table->json('slug')->nullable();
             $table->json('description')->nullable();
             $table->boolean('is_active')->default(0);
 

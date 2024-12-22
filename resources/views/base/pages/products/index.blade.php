@@ -11,15 +11,15 @@
       <div class="products-background"></div>
       <nav class="category-breadcrumbs">
         <ul class="flex-center">
-          <li><a href="{{route('index')}}" title="Головна" class="button"><i class="far fa-chevron-left"></i>Головна</a>
+          <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}" class="button"><i class="far fa-chevron-left"></i>{{__('header_footer.home')}}</a>
           </li>
           @if(isset($category) && isset($subcategory))
-            <li><a href="{{route('products.category', ['category' => $category->id])}}" title="{{$category->name}}"
+            <li><a href="{{route('products.category', ['category' => $category->slugEn])}}" title="{{$category->name}}"
                    class="button"><i class="far fa-chevron-left"></i>{{$category->name}}</a></li>
           @endif
           @if(isset($category) && isset($subcategory) && isset($subsubcategory))
             <li><a
-                href="{{route('products.category', ['category' => $category->id, 'subcategory' => $subcategory->id])}}"
+                href="{{route('products.category', ['category' => $category->slugEn, 'subcategory' => $subcategory->slugEn])}}"
                 title="{{$subcategory->name}}" class="button"><i class="far fa-chevron-left"></i>{{$subcategory->name}}
               </a></li>
           @endif
@@ -38,7 +38,7 @@
             @foreach($childrenCategories as $childrenCategory)
               @if($category && !$subcategory)
                 <li>
-                  <a href="{{route('products.category', ['category' => $category->id, 'subcategory'=>$childrenCategory->id])}}"
+                  <a href="{{route('products.category', ['category' => $category->slugEn, 'subcategory'=>$childrenCategory->slugEn])}}"
                      title="{{$childrenCategory->name}}"
                      class="flex-center">
                     {{$childrenCategory->name}}
@@ -46,7 +46,7 @@
                 </li>
               @elseif($category && $subcategory && !$subsubcategory)
                 <li>
-                  <a href="{{route('products.category', ['category' => $category->id, 'subcategory' => $subcategory->id, 'subsubcategory'=>$childrenCategory->id])}}"
+                  <a href="{{route('products.category', ['category' => $category->slugEn, 'subcategory' => $subcategory->slugEn, 'subsubcategory'=>$childrenCategory->slugEn])}}"
                     title="{{$childrenCategory->name}}"
                     class="flex-center">{{$childrenCategory->name}}</a>
                 </li>

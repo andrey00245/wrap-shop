@@ -2,7 +2,7 @@
   <div class="swiper">
     <div class="swiper-wrapper">
       @foreach($mainCategories as $mainCategory)
-        <a href="{{ route('products.category', ['category' => $mainCategory->id]) }}" class="swiper-slide home-category-item flex-justify" title="" >
+        <a href="{{ route('products.category', ['category' => $mainCategory->slugEn]) }}" class="swiper-slide home-category-item flex-justify" title="" >
           <figure class="img flex-center"><img loading="lazy" src="{{$mainCategory->getImage()}}" srcset="" alt="" title=""></figure>
           <div class="right">
             <div class="name">{{$mainCategory->name}}</div>

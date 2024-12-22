@@ -5,6 +5,7 @@ namespace App\Nova;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
@@ -66,6 +67,8 @@ class News extends Resource
                 }),
             Images::make('Фото','main')
                 ->conversionOnIndexView('preview'),
+            Boolean::make('Активна','is_active'),
+
         ];
     }
 

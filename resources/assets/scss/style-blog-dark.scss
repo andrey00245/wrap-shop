@@ -11,6 +11,7 @@
 .page-video-list .item img {
     width: 100%;
     height: 100%;
+    object-fit: cover;
 }
 .page-video-list .item .caption {
     position: absolute;

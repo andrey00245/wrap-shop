@@ -77,12 +77,14 @@
         </div>
       </div>
       <div class="product-page-center">
+          @if($product->is_top_seller)
         <div class="sale statuses">
           <div class="product-status product-status-1 status-inline text rectangle"
                style="color:#ffffff; background-color:#d04b4b; z-index: 2">
             {{__('general-translate.sales_hit')}}
           </div>
         </div>
+          @endif
         <div
           class="product-slider swiper">
           <div class="swiper-wrapper">

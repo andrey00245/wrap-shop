@@ -59,10 +59,10 @@
     <div class="category-content wrap flex-justify">
       <div class="category-left">
         <div class="search-left">
-          <div class="title">Пошук у каталозі</div>
+          <div class="title">{{__('product-index.find-in-catalog')}}</div>
           <div id="search" class="flex-justify">
-            <input type="text" name="search1" value="" placeholder="Я шукаю:" class="form-control input-lg">
-            <button type="button" class="button colord btn btn-default btn-lg"><i class="fal fa-search"></i>Шукати
+            <input type="text" name="search1" value="" placeholder="{{__('product-index.i_am_looking_for')}}:" class="form-control input-lg">
+            <button type="button" class="button colord btn btn-default btn-lg"><i class="fal fa-search"></i>{{__('product-index.search')}}
             </button>
           </div>
         </div>
@@ -72,9 +72,7 @@
 
           <div class="ocf-content">
             <div class="ocf-header">
-              Фільтри
-
-
+              {{__('product-index.filter')}}
               <button type="button" data-ocf="mobile" class="ocf-close-mobile" aria-label="Close filter"><i
                   class="fal fa-times"></i></button>
             </div>
@@ -87,88 +85,57 @@
                   <div class="ocf-filter-body">
                     <div class="ocf-filter-header" data-ocf="expand">
                       <span class="ocf-active-label"></span>
-
-                      <span class="ocf-filter-name">Ціна</span>
-
+                      <span class="ocf-filter-name">{{__('product-index.price')}}</span>
                       <span class="ocf-filter-header-append">
-
-        <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle" data-ocf-discard="2.0"></span>
-
-        <span class="ocf-plus-minus"></span>
-      </span>
-                    </div><!-- /.ocf-filter-header -->
+                        <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle" data-ocf-discard="2.0"></span>
+                        <span class="ocf-plus-minus"></span>
+                      </span>
+                    </div>
                     <div class="ocf-filter-collapse ocf-collapse ocf-in">
-
-
                       <div class="ocf-input-group ocf-slider-input-group">
-                        <input type="number" name="ocf[2-0-1][min]" min="336" max="5586" value="336"
-                               class="ocf-form-control ocf-grouping ocf-min" id="ocf-input-min-2-0-1"
-                               data-filter-key="2.0" autocomplete="off" aria-label="Ціна">
-                        <input type="number" name="ocf[2-0-1][max]" min="336" max="5586" value="5586"
-                               class="ocf-form-control ocf-grouping ocf-max" id="ocf-input-max-2-0-1"
-                               data-filter-key="2.0" autocomplete="off" aria-label="Ціна">
+                        <input type="number" name="min_price" min="{{$minPrice}}" max="{{$maxPrice}}" value="{{$minPrice}}"
+                               class="ocf-form-control ocf-grouping ocf-min"
+                               autocomplete="off" aria-label="{{__('product-index.price')}}">
+                        <input type="number" name="max_price" min="{{$minPrice}}" max="{{$maxPrice}}" value="{{$maxPrice}}"
+                               class="ocf-form-control ocf-grouping ocf-max"
+                               autocomplete="off" aria-label="{{__('product-index.price')}}">
                       </div>
 
                       <div class="ocf-value-list">
                         <div class="ocf-value-list-body">
-
-                          <button type="button" id="ocf-v-2-0-330-1700-1" class="ocf-value ocf-radio"
-                                  data-filter-key="2.0" data-value-id="330-1700">
-                            <span class="ocf-value-input ocf-value-input-radio"></span>
-
-                            <span class="ocf-value-name">330 - 1700 ₴</span>
-                          </button>
-                          <button type="button" id="ocf-v-2-0-1700-3000-1" class="ocf-value ocf-radio"
-                                  data-filter-key="2.0" data-value-id="1700-3000">
-                            <span class="ocf-value-input ocf-value-input-radio"></span>
-
-                            <span class="ocf-value-name">1700 - 3000 ₴</span>
-                          </button>
-                          <button type="button" id="ocf-v-2-0-3000-4300-1" class="ocf-value ocf-radio"
-                                  data-filter-key="2.0" data-value-id="3000-4300">
-                            <span class="ocf-value-input ocf-value-input-radio"></span>
-
-                            <span class="ocf-value-name">3000 - 4300 ₴</span>
-                          </button>
-                          <button type="button" id="ocf-v-2-0-4300-5600-1" class="ocf-value ocf-radio"
-                                  data-filter-key="2.0" data-value-id="4300-5600">
-                            <span class="ocf-value-input ocf-value-input-radio"></span>
-
-                            <span class="ocf-value-name">4300 - 5600 ₴</span>
-                          </button>
+                          @for($i = 0; $i<4;$i++)
+                            <button type="button" class="ocf-value ocf-radio"
+                                    data-value-min="{{$minPrice + $step*$i}}"
+                                    data-value-max="{{$minPrice + $step*($i+1)}}">
+                              <span class="ocf-value-input ocf-value-input-radio"></span>
+                              <span class="ocf-value-name">{{$minPrice + $step*$i}} - {{$minPrice + $step*($i+1)}} ₴</span>
+                            </button>
+                          @endfor
                         </div>
-
-
                       </div>
                     </div>
                   </div>
                 </div>
                   @foreach($attributes as $attribute)
                       @if($attribute->field_name === 'main_shade')
-                          <div class="ocf-filter ocf-open ocf-dropdown" id="ocf-filter-40-2-1">
+                          <div class="ocf-filter ocf-open ocf-dropdown">
                               <div class="ocf-filter-body">
                                   <div class="ocf-filter-header" data-ocf="expand">
                                       <span class="ocf-active-label"></span>
-
                                       <span class="ocf-filter-name">{{$attribute->name}}</span>
-
                                       <span class="ocf-filter-header-append">
-
-        <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle" data-ocf-discard="40.2"></span>
-
-        <span class="ocf-plus-minus"></span>
-      </span>
+                                        <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle"
+                                              data-ocf-discard="40.2"></span>
+                                        <span class="ocf-plus-minus"></span>
+                                      </span>
                                   </div><!-- /.ocf-filter-header -->
                                   <div class="ocf-filter-collapse ocf-collapse ocf-in">
-
-
                                       <div class="ocf-value-list">
                                           <div class="ocf-scroll-y">
                                               <div class="ocf-value-list-body">
                                                   @foreach($attribute->getPivotValue() as $value)
-                                                  <button type="button" id="ocf-v-40-2-1225646050-1"
-                                                          class="ocf-value ocf-checkbox"
-                                                          data-filter-key="40.2" data-value-id="1225646050">
+                                                  <button type="button"
+                                                          class="ocf-value ocf-checkbox filterProducts" data-filter="{{$value}}" data-filter-type="{{$attribute->field_name}}">
                                                       <span class="ocf-value-color"
                                                             style="background-color: {{__('colors.' . $value)}};"></span>
 
@@ -210,8 +177,8 @@
                                       <div class="ocf-value-list">
                                           <div class="ocf-value-list-body">
                                               @foreach($attribute->getPivotValue() as $value)
-                                                  <button type="button" id="ocf-v-86-2-4291261012-1" class="ocf-value ocf-checkbox"
-                                                          data-filter-key="86.2" data-value-id="4291261012">
+                                                  <button type="button" class="ocf-value ocf-checkbox filterProducts"
+                                                          data-filter="{{$value}}" data-filter-type="{{$attribute->field_name}}">
                                                       <span class="ocf-value-input ocf-value-input-checkbox"></span>
                                                       <span class="ocf-value-name">{{$value}}</span>
                                                       <span class="ocf-value-append">
@@ -268,16 +235,51 @@
             <div class="label">Сортувати за:</div>
             <div class="category-sort-close button"><i class="fal fa-times"></i></div>
             <div class="list">
-              <a href="https://wrap.shop/plivky/?sort=p.sort_order&amp;order=ASC" class="button active"
+              <a href="{{route('products.category', [
+                  'category' => $category->slugEn,
+                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
+                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
+                  ])}}"
+                 class="button {{!request()->get('sort_by') && !request()->get('sort_direction') ? 'active' : null}}"
                  title="Замовчуванням">Замовчуванням</a>
-              <a href="https://wrap.shop/plivky/?sort=pd.name&amp;order=ASC" class="button"
+              <a href="{{route('products.category', [
+                  'category' => $category->slugEn,
+                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
+                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
+                  'sort_by' => 'name',
+                  'sort_direction' => 'asc',
+                  ])}}" class="button {{request()->get('sort_by') === 'name' && request()->get('sort_direction') === 'asc' ? 'active' : null}}"
                  title="Алфавітом">Алфавітом</a>
-              <a href="https://wrap.shop/plivky/?sort=p.price&amp;order=ASC" class="button" title="Зростанням ціни">Зростанням
+              <a href="{{route('products.category', [
+                  'category' => $category->slugEn,
+                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
+                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
+                  'sort_by' => 'price',
+                  'sort_direction' => 'asc',
+                  ])}}" class="button {{request()->get('sort_by') === 'price' && request()->get('sort_direction') === 'asc' ? 'active' : null}}" title="Зростанням ціни">Зростанням
                 ціни</a>
-              <a href="https://wrap.shop/plivky/?sort=p.price&amp;order=DESC" class="button" title="Спаданням ціни">Спаданням
+              <a href="{{route('products.category', [
+                  'category' => $category->slugEn,
+                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
+                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
+                  'sort_by' => 'price',
+                  'sort_direction' => 'desc',
+                  ])}}" class="button {{request()->get('sort_by') === 'price' && request()->get('sort_direction') === 'desc' ? 'active' : null}}" title="Спаданням ціни">Спаданням
                 ціни</a>
-              <a href="https://wrap.shop/plivky/?sort=rating&amp;order=ASC" class="button" title="Найпопулярнішими">Найпопулярнішими</a>
-              <a href="https://wrap.shop/plivky/?sort=p.date_available&amp;order=ASC" class="button"
+              <a href="{{route('products.category', [
+                  'category' => $category->slugEn,
+                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
+                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
+                  'sort_by' => 'is_top_seller',
+                  'sort_direction' => 'desc',
+                  ])}}" class="button {{request()->get('sort_by') === 'is_top_seller' && request()->get('sort_direction') === 'desc' ? 'active' : null}}" title="Найпопулярнішими">Найпопулярнішими</a>
+              <a href="{{route('products.category', [
+                  'category' => $category->slugEn,
+                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
+                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
+                  'sort_by' => 'created_at',
+                  'sort_direction' => 'desc',
+                  ])}}" class="button {{request()->get('sort_by') === 'created_at' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
                  title="Датою додавання">Датою додавання</a>
             </div>
           </div>
@@ -296,7 +298,7 @@
           <a href="https://wrap.shop/plivky/kolorovi-plivky/?ocf=F1S0V11" title="3m color"
              class="category-products-item product-default product-layout banner product-grid">
             <img class="vertical" src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-vert.webp"
-                 alt="3m color" title="3m color" src="/image/catalog/category/webp/banners catalog/1-3m-vert.webp">
+                 alt="3m color" title="3m color">
             <img class="gorizont" src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-gor.webp"
                  alt="3m color" title="3m color">
           </a>
@@ -399,25 +401,24 @@
             @if ($products->hasPages())
               <ul class="flex-center pagination">
                 @if ($products->currentPage() > 3)
-                  <li><a href="{{ $products->url(1) }}">1</a></li>
+                  <li><a href="{{ $products->appends((request()->except('page')))->url(1) }}">1</a></li>
                   <li class="disabled"><span>&hellip;</span></li>
                 @endif
                 @for ($i = max($products->currentPage() - 2, 1); $i <= min($products->currentPage() + 2, $products->lastPage()); $i++)
                   @if ($i == $products->currentPage())
                     <li class="active"><span>{{$i}}</span></li>
                   @else
-                    <li><a href="{{ $products->url($i) }}">{{ $i }}</a></li>
+                    <li><a href="{{ $products->appends((request()->except('page')))->url($i) }}">{{ $i }}</a></li>
                   @endif
                 @endfor
                 @if ($products->currentPage() < $products->lastPage() - 2)
                   <li class="disabled"><span>&hellip;</span></li>
-                  <li><a href="{{ $products->url($products->lastPage()) }}">{{ $products->lastPage() }}</a></li>
+                  <li><a href="{{ $products->appends((request()->except('page')))->url($products->lastPage()) }}">{{ $products->lastPage() }}</a></li>
                 @endif
               </ul>
             @endif
           </div>
         </div>
-
       </div>
     </div>
   </section>
@@ -433,6 +434,10 @@
     {{--        lazy: true,--}}
     {{--      });--}}
     {{--    </script>--}}
+
+    <script>
+      const lang = '{{app()->getLocale()}}';
+    </script>
     <script src="{{mix('build/js/productIndex.js')}}"></script>
   @endpush
 @endsection

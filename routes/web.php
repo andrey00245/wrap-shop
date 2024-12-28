@@ -51,6 +51,8 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
   Route::get('/',IndexController::class)->name('index');
 
+  Route::get('/get-count', [ProductController::class, 'getCount'])->name('get-count');
+
   Route::get('/privacy-policy', function (){
     $privacy_policy = PrivacyPolicy::first();
     return view('base.pages.privacy-policy', compact('privacy_policy'));

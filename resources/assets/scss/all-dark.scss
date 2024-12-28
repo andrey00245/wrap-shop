@@ -638,7 +638,7 @@ a.ocf-btn.ocf-disabled {
   line-height: 16px;
   text-align: center;
   letter-spacing: 0;
-  color: rgb(255 255 255 / 35%);
+  color: rgb(255 255 255);
   position: relative;
   @media screen and (max-width: 768px) {
     font-size: 13px;
@@ -672,7 +672,7 @@ font-size: 14px;
 }
 
 .ocf-value.ocf-disabled, .ocf-value[disabled], .ocf-value:disabled {
-  color: #fff;
+  color: rgba(255, 255, 255, 0.35);
   cursor: not-allowed;
   border-color: rgb(255 255 255 / 35%)
 }
@@ -748,7 +748,7 @@ font-size: 14px;
   word-break: break-word;
   text-align: left;
   font-size: inherit;
-  color: white
+  //color: white
 }
 
 .ocf-auto-column .ocf-value-name {

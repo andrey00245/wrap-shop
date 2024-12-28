@@ -31,6 +31,20 @@ class Attribute extends Model
         'name' => 'json',
     ];
 
+
+  public function productsVisible($categoryId): BelongsToMany
+  {
+    return $this->belongsToMany(Product::class, 'products_attributes', 'attribute_id', 'product_id')
+      ->where('category_id', $categoryId)
+      ->whereHas('media')
+      ->whereHas('prices', function ($query) {
+        $query->where('type_id', DB::table('price_types')
+          ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
+          ->value('id'))
+          ->where('price', '>', 0);
+      })->withPivot('value');
+  }
+
     /**
      * Attributes.
      */

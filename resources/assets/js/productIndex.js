@@ -93,7 +93,84 @@ $(document).ready(function () {
     element.querySelector('.ocf-filter-header').onclick = () => filertsDropdownAction(element)
   })
   openCloseFilterMenu()
+  filterProducts()
 })
+
+function filterProducts() {
+  let url = '/get-count'
+  if (lang !== 'uk') {
+    url = '/' + lang + url;
+  }
+
+  const filterProducts = $('.filterProducts')
+  let filters = {};
+
+  filterProducts.each(function () {
+    let filterType = $(this).data('filter-type')
+    let filterValue = $(this).data('filter')
+
+    if (!filters[filterType]) {
+      filters[filterType] = {};
+    }
+
+    filters[filterType][filterValue] = {};
+    filters[filterType][filterValue]['active'] = false;
+  })
+
+  filterProducts.on('click', function () {
+    let filterType = $(this).data('filter-type')
+    let filterValue = $(this).data('filter')
+    filters[filterType][filterValue]['active'] = !filters[filterType][filterValue]['active'];
+    if (filters[filterType][filterValue]['active']) {
+      $(this).addClass('ocf-selected')
+    } else {
+      $(this).removeClass('ocf-selected')
+    }
+
+    $.ajax({
+      url: url,          // URL to send the request to
+      type: 'GET',              // Type of request: 'GET', 'POST', 'PUT', etc.
+      dataType: 'json',         // Expected data format from the server
+      data: {                   // Data to send with the request (for POST, PUT, etc.)
+        filters: filters
+      },
+      success: function (response) {
+        let filterTypeActive = [];
+
+        filterProducts.each(function () {
+          if (response[0][$(this).data('filter-type')][$(this).data('filter')]['active'] === "true") {
+            filterTypeActive.push($(this).data('filter-type'));
+          }
+        })
+
+        filterProducts.each(function () {
+          if(filterTypeActive.includes($(this).data('filter-type'))){
+            $(this).find('.ocf-value-count').text('+' + response[0][$(this).data('filter-type')][$(this).data('filter')]['count'])
+          }
+          else {
+            $(this).find('.ocf-value-count').text(response[0][$(this).data('filter-type')][$(this).data('filter')]['count'])
+          }
+          // if(response[0][$(this).data('filter-type')][$(this).data('filter')]['count'] === 0){
+          //   $(this).find('.ocf-value-count').text(response[0][$(this).data('filter-type')][$(this).data('filter')]['count'])
+          //   $(this).addClass('ocf-disabled');
+          //   $(this).prop('disabled', true);
+          // }
+        })
+
+
+        // Handle a successful response
+      },
+      error: function (xhr, status, error) {
+        // Handle errors
+        console.log('Error:', error);
+      },
+      complete: function (xhr, status) {
+        // Handle actions to be done after request completion
+        console.log('Request completed');
+      }
+    });
+  })
+}
 
 
 

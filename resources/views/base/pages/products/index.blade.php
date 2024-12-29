@@ -26,11 +26,11 @@
         </ul>
       </nav>
       @if(isset($subsubcategory))
-        <h1 class="title">{{$subsubcategory->name ?? ''}}</h1>
+        <h1 class="title" id="categoryId" data-category-id="{{$subsubcategory->id}}">{{$subsubcategory->name ?? ''}}</h1>
       @elseif(isset($subcategory))
-        <h1 class="title">{{$subcategory->name ?? ''}}</h1>
+        <h1 class="title" id="categoryId" data-category-id="{{$subcategory->id}}">{{$subcategory->name ?? ''}}</h1>
       @else
-        <h1 class="title">{{$category->name ?? ''}}</h1>
+        <h1 class="title" id="categoryId" data-category-id="{{$category->id}}">{{$category->name ?? ''}}</h1>
       @endif
       @if(isset($category))
         <nav class="category-child-nav">

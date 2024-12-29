@@ -120,6 +120,7 @@ function filterProducts() {
   filterProducts.on('click', function () {
     let filterType = $(this).data('filter-type')
     let filterValue = $(this).data('filter')
+    let categoryId = $('#categoryId').data('category-id');
     filters[filterType][filterValue]['active'] = !filters[filterType][filterValue]['active'];
     if (filters[filterType][filterValue]['active']) {
       $(this).addClass('ocf-selected')
@@ -132,7 +133,8 @@ function filterProducts() {
       type: 'GET',              // Type of request: 'GET', 'POST', 'PUT', etc.
       dataType: 'json',         // Expected data format from the server
       data: {                   // Data to send with the request (for POST, PUT, etc.)
-        filters: filters
+        filters: filters,
+        category_id: categoryId
       },
       success: function (response) {
         let filterTypeActive = [];

@@ -169,7 +169,10 @@
                   10 м.п. і більше: <span class="colord">5700 ₴</span> <span class="cur">| 142.5 $</span>
                 </div>
                 <div class="item-btn">
-                  <span data-quantity="10" class="select-quantity">{{__('product-show.choose')}}</span>
+                  <span data-quantity="10"
+                        data-chosen="{{__('product-show.chosen')}}"
+                        data-choose="{{__('product-show.choose')}}"
+                        class="select-quantity">{{__('product-show.choose')}}</span>
                 </div>
               </li>
 
@@ -178,7 +181,10 @@
                   25 м.п. і більше: <span class="colord">5300 ₴</span> <span class="cur">| 132.5 $</span>
                 </div>
                 <div class="item-btn">
-                  <span data-quantity="25" class="select-quantity">{{__('product-show.choose')}}</span>
+                  <span data-quantity="25"
+                        data-chosen="{{__('product-show.chosen')}}"
+                        data-choose="{{__('product-show.choose')}}"
+                        class="select-quantity">{{__('product-show.choose')}}</span>
                 </div>
               </li>
             </ul>

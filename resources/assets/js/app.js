@@ -4,6 +4,7 @@ import './subscription'
 
 $(document).ready(function () {
   cartPopupSlider();
+  showHideSubCategories();
 
   let scroll = $(window).scrollTop();
   slideHeader(scroll);
@@ -236,4 +237,31 @@ function cartPopupSlider(){
       cartSlider.update();
     }
   });
+}
+
+function showHideSubCategories(){
+  let openSubMenu = $('.openSubMenu')
+  let mainMenu = $('.head-catalog-container.mainMenu')
+  let subMenu = $('.head-catalog-container.subMenu')
+  let backToMainCategory = $('.head-catalog-container .back_to_main_category')
+
+  backToMainCategory.on('click', function (){
+    let currentCutegoryId = $(this).data('category-id')
+    subMenu.each(function (){
+      if($(this).data('modal-category') === currentCutegoryId){
+        $(this).removeClass('show')
+      }
+    })
+    mainMenu.addClass('show')
+  })
+
+  openSubMenu.on('click', function (){
+    let currentCutegoryId = $(this).data('category-id')
+    mainMenu.removeClass('show')
+    subMenu.each(function (){
+      if($(this).data('modal-category') === currentCutegoryId){
+        $(this).addClass('show')
+      }
+    })
+  })
 }

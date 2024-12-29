@@ -129,6 +129,7 @@ function plusMinus(input, action) {
     recalcTotalPrice(currentVal)
     input.val(decimalPoint(currentVal))
   }
+  onOffSelectedQuantity()
 }
 
 function decimalPoint(val) {
@@ -183,6 +184,26 @@ function restyleThreeLastChart(selector) {
   }
 }
 
+function onOffSelectedQuantity(){
+  choseQuantity.each(function (index){
+    $(this).removeClass('is-active')
+    $(this).text($(this).data('choose'))
+
+    if (choseQuantity[index + 1] !== undefined) {
+      if (parseFloat(choseQuantity[index].getAttribute('data-quantity')) <= parseFloat(quantityInput.val())
+        && parseFloat(choseQuantity[index + 1].getAttribute('data-quantity')) > parseFloat(quantityInput.val())) {
+        $(this).addClass('is-active')
+        $(this).text($(this).data('chosen'))
+      }
+    } else {
+      if (parseFloat(choseQuantity[index].getAttribute('data-quantity')) <= parseFloat(quantityInput.val())) {
+        $(this).addClass('is-active')
+        $(this).text($(this).data('chosen'))
+      }
+    }
+  })
+}
+
 //show hide params and buttons
 function initializationAllLessButtons() {
   if (hiddenParams.length !== 0) {
@@ -224,18 +245,15 @@ choseMax.on('click', function () {
   quantityInput.trigger('change');
 })
 
-choseQuantity.each(function (){
-  $(this).removeClass('disabled')
 
-  $(this).on('click', function () {
-    $(this).addClass('disabled')
-    quantityInput.val($(this).data('quantity'))
-    quantityInput.trigger('change');
-  })
+choseQuantity.on('click', function () {
+  quantityInput.val($(this).data('quantity'))
+  quantityInput.trigger('change');
 })
 
-productSliderInitialization('homeLatest')
+productSliderInitialization('homeLatest');
 imageSliderInProduct('home-products-item');
+
 
 
 var productPageExample = new Swiper(".product-page-example", {

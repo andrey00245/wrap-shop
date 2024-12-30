@@ -135,7 +135,7 @@ class ProductController extends Controller
           ->whereIn('category_id', $categories)
           ->whereHas('media')
           ->select('products.*', \DB::raw('MAX(product_prices.price) as price'))
-          ->groupBy('products.id', 'product.code')
+          ->groupBy('products.id', 'products.code')
           ->orderBy($sortBy, $sortDirection)
           ->paginate(6);
 

@@ -138,6 +138,7 @@ class ProductController extends Controller
           ->groupBy('products.id',
             'products.code',
             'products.external_code',
+            'products.external_id',
             'products.banner_title')
           ->orderBy($sortBy, $sortDirection)
           ->paginate(6);

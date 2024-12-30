@@ -98,6 +98,10 @@
   </script>
 @endpush
 
+@push('fixed-catalog')
+  @include('base.components.categories-catalog')
+@endpush
+
 @endsection
 
 

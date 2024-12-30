@@ -105,3 +105,6 @@
     </form>
   </div>
 @endsection
+@push('fixed-catalog')
+  @include('base.components.categories-catalog')
+@endpush

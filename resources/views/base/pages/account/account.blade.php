@@ -11,3 +11,6 @@
     <a class="item button cart-open" href="#"><i class="fal fa-shopping-cart"></i>{{__('personal-account.account.cart')}} <span class="button account-cart-count">1</span></a>
   </div>
 @endsection
+@push('fixed-catalog')
+  @include('base.components.categories-catalog')
+@endpush

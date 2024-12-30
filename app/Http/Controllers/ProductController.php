@@ -148,6 +148,8 @@ class ProductController extends Controller
             'products.name',
             'products.descriptions',
             'products.category_id',
+            'products.created_at',
+            'products.updated_at',
             'products.banner_title')
           ->orderBy($sortBy, $sortDirection)
           ->paginate(6);

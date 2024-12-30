@@ -139,6 +139,15 @@ class ProductController extends Controller
             'products.code',
             'products.external_code',
             'products.external_id',
+            'products.barcodes',
+            'products.slug',
+            'products.article',
+            'products.is_top_seller',
+            'products.is_best_seller',
+            'products.is_active',
+            'products.name',
+            'products.description',
+            'products.category_id',
             'products.banner_title')
           ->orderBy($sortBy, $sortDirection)
           ->paginate(6);

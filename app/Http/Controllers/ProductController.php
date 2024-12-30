@@ -146,7 +146,7 @@ class ProductController extends Controller
             'products.is_best_seller',
             'products.is_active',
             'products.name',
-            'products.description',
+            'products.descriptions',
             'products.category_id',
             'products.banner_title')
           ->orderBy($sortBy, $sortDirection)

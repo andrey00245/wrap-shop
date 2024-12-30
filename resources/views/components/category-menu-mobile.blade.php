@@ -1,6 +1,6 @@
 @props(['category'])
 @if($category->hasChildren())
-  <li class="item parrent flex-all">
+  <li class="item parent flex-all">
     <a href="{{ route('products.category', ['category' => $category->slugEn]) }}"
        title="{{ $category->name }}">
       <figure>

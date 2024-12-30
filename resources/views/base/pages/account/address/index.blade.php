@@ -41,3 +41,6 @@
                                class="btn btn-primary">{{__('personal-account.you-addresses.new-address')}}</a></div>
   </div>
 @endsection
+@push('fixed-catalog')
+  @include('base.components.categories-catalog')
+@endpush

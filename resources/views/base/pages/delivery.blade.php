@@ -57,9 +57,11 @@
   @push('scripts')
       <script src="{{mix('build/js/delivery_tabs.js')}}"></script>
   @endpush
-
 @endsection
 
+@push('fixed-catalog')
+  @include('base.components.categories-catalog')
+@endpush
 
 
 

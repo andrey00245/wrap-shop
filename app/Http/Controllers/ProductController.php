@@ -137,6 +137,7 @@ class ProductController extends Controller
           ->select('products.*', \DB::raw('MAX(product_prices.price) as price'))
           ->groupBy('products.id',
             'products.code',
+            'products.external_code',
             'products.banner_title')
           ->orderBy($sortBy, $sortDirection)
           ->paginate(6);

@@ -11,7 +11,8 @@
       <div class="products-background"></div>
       <nav class="category-breadcrumbs">
         <ul class="flex-center">
-          <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}" class="button"><i class="far fa-chevron-left"></i>{{__('header_footer.home')}}</a>
+          <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}" class="button"><i
+                class="far fa-chevron-left"></i>{{__('header_footer.home')}}</a>
           </li>
           @if(isset($category) && isset($subcategory))
             <li><a href="{{route('products.category', ['category' => $category->slugEn])}}" title="{{$category->name}}"
@@ -26,7 +27,8 @@
         </ul>
       </nav>
       @if(isset($subsubcategory))
-        <h1 class="title" id="categoryId" data-category-id="{{$subsubcategory->id}}">{{$subsubcategory->name ?? ''}}</h1>
+        <h1 class="title" id="categoryId"
+            data-category-id="{{$subsubcategory->id}}">{{$subsubcategory->name ?? ''}}</h1>
       @elseif(isset($subcategory))
         <h1 class="title" id="categoryId" data-category-id="{{$subcategory->id}}">{{$subcategory->name ?? ''}}</h1>
       @else
@@ -38,15 +40,17 @@
             @foreach($childrenCategories as $childrenCategory)
               @if($category && !$subcategory)
                 <li>
-                  <a href="{{route('products.category', ['category' => $category->slugEn, 'subcategory'=>$childrenCategory->slugEn])}}"
-                     title="{{$childrenCategory->name}}"
-                     class="flex-center">
+                  <a
+                    href="{{route('products.category', ['category' => $category->slugEn, 'subcategory'=>$childrenCategory->slugEn])}}"
+                    title="{{$childrenCategory->name}}"
+                    class="flex-center">
                     {{$childrenCategory->name}}
                   </a>
                 </li>
               @elseif($category && $subcategory && !$subsubcategory)
                 <li>
-                  <a href="{{route('products.category', ['category' => $category->slugEn, 'subcategory' => $subcategory->slugEn, 'subsubcategory'=>$childrenCategory->slugEn])}}"
+                  <a
+                    href="{{route('products.category', ['category' => $category->slugEn, 'subcategory' => $subcategory->slugEn, 'subsubcategory'=>$childrenCategory->slugEn])}}"
                     title="{{$childrenCategory->name}}"
                     class="flex-center">{{$childrenCategory->name}}</a>
                 </li>
@@ -61,8 +65,10 @@
         <div class="search-left">
           <div class="title">{{__('product-index.find-in-catalog')}}</div>
           <div id="search" class="flex-justify">
-            <input type="text" name="search1" value="" placeholder="{{__('product-index.i_am_looking_for')}}:" class="form-control input-lg">
-            <button type="button" class="button colord btn btn-default btn-lg"><i class="fal fa-search"></i>{{__('product-index.search')}}
+            <input type="text" name="search1" value="" placeholder="{{__('product-index.i_am_looking_for')}}:"
+                   class="form-control input-lg">
+            <button type="button" class="button colord btn btn-default btn-lg"><i
+                class="fal fa-search"></i>{{__('product-index.search')}}
             </button>
           </div>
         </div>
@@ -79,7 +85,45 @@
 
             <div class="ocf-body">
               <div class="ocf-filter-list ocf-clearfix">
+                <div class="ocf-selected-card">
+                  <div class="ocf-selected-filter">
 
+                    @php
+                      $queryParams = request()->query();
+                      if(array_key_exists('page', $queryParams)) {
+                        unset($queryParams['page']);
+                      }
+
+                      foreach($queryParams as $key => $params){
+                        foreach($params as $param){
+
+                          $tempParams = $queryParams;
+                          if (isset($tempParams[$key])) {
+                            $tempParams[$key] = array_filter($tempParams[$key], function($value) use ($param) {
+                              return $value !== $param;
+                            });
+                            if (empty($tempParams[$key])) {
+                              unset($tempParams[$key]);
+                            }
+                          }
+
+                          if(empty($tempParams)){
+
+                            $newUrl = URL::current();
+                          }
+                          else{
+                            $newUrl = URL::current() . '?' . http_build_query($tempParams);
+                          }
+
+                          echo '<button type="button" onclick="location = \''.$newUrl.'\'" class="ocf-selected-discard" title="3M">
+                                  <span class="ocf-selected-value-name">'. $param .'</span>
+                                    <i class="ocf-icon ocf-times"></i>
+                                </button>';
+                        }
+                      }
+                    @endphp
+                  </div>
+                </div>
 
                 <div class="ocf-filter ocf-dropdown ocf-open" id="ocf-filter-2-0-1">
                   <div class="ocf-filter-body">
@@ -87,16 +131,19 @@
                       <span class="ocf-active-label"></span>
                       <span class="ocf-filter-name">{{__('product-index.price')}}</span>
                       <span class="ocf-filter-header-append">
-                        <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle" data-ocf-discard="2.0"></span>
+                        <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle"
+                              data-ocf-discard="2.0"></span>
                         <span class="ocf-plus-minus"></span>
                       </span>
                     </div>
                     <div class="ocf-filter-collapse ocf-collapse ocf-in">
                       <div class="ocf-input-group ocf-slider-input-group">
-                        <input type="number" name="min_price" min="{{$minPrice}}" max="{{$maxPrice}}" value="{{$minPrice}}"
+                        <input type="number" name="min_price" min="{{$minPrice}}" max="{{$maxPrice}}"
+                               value="{{$minPrice}}"
                                class="ocf-form-control ocf-grouping ocf-min"
                                autocomplete="off" aria-label="{{__('product-index.price')}}">
-                        <input type="number" name="max_price" min="{{$minPrice}}" max="{{$maxPrice}}" value="{{$maxPrice}}"
+                        <input type="number" name="max_price" min="{{$minPrice}}" max="{{$maxPrice}}"
+                               value="{{$maxPrice}}"
                                class="ocf-form-control ocf-grouping ocf-max"
                                autocomplete="off" aria-label="{{__('product-index.price')}}">
                       </div>
@@ -108,7 +155,8 @@
                                     data-value-min="{{$minPrice + $step*$i}}"
                                     data-value-max="{{$minPrice + $step*($i+1)}}">
                               <span class="ocf-value-input ocf-value-input-radio"></span>
-                              <span class="ocf-value-name">{{$minPrice + $step*$i}} - {{$minPrice + $step*($i+1)}} ₴</span>
+                              <span
+                                class="ocf-value-name">{{$minPrice + $step*$i}} - {{$minPrice + $step*($i+1)}} ₴</span>
                             </button>
                           @endfor
                         </div>
@@ -116,84 +164,83 @@
                     </div>
                   </div>
                 </div>
-                  @foreach($attributes as $attribute)
-                      @if($attribute->field_name === 'main_shade')
-                          <div class="ocf-filter ocf-open ocf-dropdown">
-                              <div class="ocf-filter-body">
-                                  <div class="ocf-filter-header" data-ocf="expand">
-                                      <span class="ocf-active-label"></span>
-                                      <span class="ocf-filter-name">{{$attribute->name}}</span>
-                                      <span class="ocf-filter-header-append">
+                @foreach($attributes as $attribute)
+                  @if($attribute->field_name === 'main_shade')
+                    <div class="ocf-filter ocf-open ocf-dropdown">
+                      <div class="ocf-filter-body">
+                        <div class="ocf-filter-header" data-ocf="expand">
+                          <span class="ocf-active-label"></span>
+                          <span class="ocf-filter-name">{{$attribute->name}}</span>
+                          <span class="ocf-filter-header-append">
                                         <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle"
                                               data-ocf-discard="40.2"></span>
                                         <span class="ocf-plus-minus"></span>
                                       </span>
-                                  </div><!-- /.ocf-filter-header -->
-                                  <div class="ocf-filter-collapse ocf-collapse ocf-in">
-                                      <div class="ocf-value-list">
-                                          <div class="ocf-scroll-y">
-                                              <div class="ocf-value-list-body">
-                                                  @foreach($attribute->getPivotValue() as $value)
-                                                  <button type="button"
-                                                          class="ocf-value ocf-checkbox filterProducts" data-filter="{{$value}}" data-filter-type="{{$attribute->field_name}}">
-                                                      <span class="ocf-value-color"
+                        </div><!-- /.ocf-filter-header -->
+                        <div class="ocf-filter-collapse ocf-collapse ocf-in">
+                          <div class="ocf-value-list">
+                            <div class="ocf-scroll-y">
+                              <div class="ocf-value-list-body">
+                                @foreach($attribute->getPivotValue() as $value)
+                                  <button type="button" class="ocf-value ocf-checkbox filterProducts {{array_key_exists($attribute->field_name, request()->query()) ? (in_array($value, request()->query()[$attribute->field_name]) ? 'ocf-selected' : '') : ''}}"
+                                          data-filter="{{$value}}"
+                                          data-filter-type="{{$attribute->field_name}}">
+
+                                    <span class="ocf-value-color"
                                                             style="background-color: {{__('colors.' . $value)}};"></span>
 
-                                                      <span class="ocf-value-name">{{$value}}</span>
-                                                      <span class="ocf-value-append">
-    <span class="ocf-value-count">{{$attribute->getDefaultProductsCount($attribute->id, $value)}}</span>
-  </span>
-                                                  </button>
-                                                  @endforeach
-                                              </div>
-
-                                          </div>
-
-                                      </div>
-                                  </div>
+                                    <span class="ocf-value-name">{{$value}}</span>
+                                    <span class="ocf-value-append">
+                                      <span class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$attribute->getDefaultProductsCount($attribute->id, $value)}}</span>
+                                    </span>
+                                  </button>
+                                @endforeach
                               </div>
+
+                            </div>
+
                           </div>
-                      @endif
-                  @endforeach
+                        </div>
+                      </div>
+                    </div>
+                  @endif
+                @endforeach
                 @foreach($attributes as $attribute)
-                      @if($attribute->field_name !== 'main_shade')
-                          <div class="ocf-filter ocf-dropdown" id="ocf-filter-86-2-1">
-                              <div class="ocf-filter-body">
-                                  <div class="ocf-filter-header" data-ocf="expand">
-                                      <span class="ocf-active-label"></span>
+                  @if($attribute->field_name !== 'main_shade')
+                    <div class="ocf-filter ocf-dropdown" id="ocf-filter-86-2-1">
+                      <div class="ocf-filter-body">
+                        <div class="ocf-filter-header" data-ocf="expand">
+                          <span class="ocf-active-label"></span>
 
-                                      <span class="ocf-filter-name">{{$attribute->name}}</span>
+                          <span class="ocf-filter-name">{{$attribute->name}}</span>
 
-                                      <span class="ocf-filter-header-append">
-
-        <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle" data-ocf-discard="86.2"></span>
-
-        <span class="ocf-plus-minus"></span>
-      </span>
-                                  </div><!-- /.ocf-filter-header -->
-                                  <div class="ocf-filter-collapse ocf-collapse">
+                          <span class="ocf-filter-header-append">
+                            <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle" data-ocf-discard="86.2"></span>
+                            <span class="ocf-plus-minus"></span></span>
+                        </div><!-- /.ocf-filter-header -->
+                        <div class="ocf-filter-collapse ocf-collapse">
 
 
-                                      <div class="ocf-value-list">
-                                          <div class="ocf-value-list-body">
-                                              @foreach($attribute->getPivotValue() as $value)
-                                                  <button type="button" class="ocf-value ocf-checkbox filterProducts"
-                                                          data-filter="{{$value}}" data-filter-type="{{$attribute->field_name}}">
-                                                      <span class="ocf-value-input ocf-value-input-checkbox"></span>
-                                                      <span class="ocf-value-name">{{$value}}</span>
-                                                      <span class="ocf-value-append">
-            <span class="ocf-value-count">{{$attribute->getDefaultProductsCount($attribute->id, $value)}}</span>
-        </span>
-                                                  </button>
-                                              @endforeach
-                                          </div>
+                          <div class="ocf-value-list">
+                            <div class="ocf-value-list-body">
+                              @foreach($attribute->getPivotValue() as $value)
+                                <button type="button" class="ocf-value ocf-checkbox filterProducts {{array_key_exists($attribute->field_name, request()->query()) ? (in_array($value, request()->query()[$attribute->field_name]) ? 'ocf-selected' : '') : ''}}"
+                                        data-filter="{{$value}}" data-filter-type="{{$attribute->field_name}}">
+                                  <span class="ocf-value-input ocf-value-input-checkbox"></span>
+                                  <span class="ocf-value-name">{{$value}}</span>
+                                  <span class="ocf-value-append">
+                                      <span class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$attribute->getDefaultProductsCount($attribute->id, $value)}}</span>
+                                  </span>
+                                </button>
+                              @endforeach
+                            </div>
 
 
-                                      </div>
-                                  </div>
-                              </div>
                           </div>
-                      @endif
+                        </div>
+                      </div>
+                    </div>
+                  @endif
                 @endforeach
               </div>
             </div>
@@ -225,6 +272,15 @@
               Виберіть фільтри
             </button>
           </div>
+
+          <div id="ocfFilter" class="ocf-popover ocf-fade ocf-right ocf-in" style="top: 0; left: 0; display: none;">
+            <div class="ocf-arrow"></div>
+            <div class="ocf-popover-content">
+              <button class="ocf-btn ocf-search-btn-popover">
+                Показати <b class="ocf-btn-label">0</b> товарів
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -248,7 +304,8 @@
                   'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
                   'sort_by' => 'name',
                   'sort_direction' => 'asc',
-                  ])}}" class="button {{request()->get('sort_by') === 'name' && request()->get('sort_direction') === 'asc' ? 'active' : null}}"
+                  ])}}"
+                 class="button {{request()->get('sort_by') === 'name' && request()->get('sort_direction') === 'asc' ? 'active' : null}}"
                  title="Алфавітом">Алфавітом</a>
               <a href="{{route('products.category', [
                   'category' => $category->slugEn,
@@ -256,7 +313,9 @@
                   'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
                   'sort_by' => 'price',
                   'sort_direction' => 'asc',
-                  ])}}" class="button {{request()->get('sort_by') === 'price' && request()->get('sort_direction') === 'asc' ? 'active' : null}}" title="Зростанням ціни">Зростанням
+                  ])}}"
+                 class="button {{request()->get('sort_by') === 'price' && request()->get('sort_direction') === 'asc' ? 'active' : null}}"
+                 title="Зростанням ціни">Зростанням
                 ціни</a>
               <a href="{{route('products.category', [
                   'category' => $category->slugEn,
@@ -264,7 +323,9 @@
                   'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
                   'sort_by' => 'price',
                   'sort_direction' => 'desc',
-                  ])}}" class="button {{request()->get('sort_by') === 'price' && request()->get('sort_direction') === 'desc' ? 'active' : null}}" title="Спаданням ціни">Спаданням
+                  ])}}"
+                 class="button {{request()->get('sort_by') === 'price' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
+                 title="Спаданням ціни">Спаданням
                 ціни</a>
               <a href="{{route('products.category', [
                   'category' => $category->slugEn,
@@ -272,14 +333,17 @@
                   'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
                   'sort_by' => 'is_top_seller',
                   'sort_direction' => 'desc',
-                  ])}}" class="button {{request()->get('sort_by') === 'is_top_seller' && request()->get('sort_direction') === 'desc' ? 'active' : null}}" title="Найпопулярнішими">Найпопулярнішими</a>
+                  ])}}"
+                 class="button {{request()->get('sort_by') === 'is_top_seller' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
+                 title="Найпопулярнішими">Найпопулярнішими</a>
               <a href="{{route('products.category', [
                   'category' => $category->slugEn,
                   'subcategory' => $subcategory ? $subcategory->slugEn : null,
                   'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
                   'sort_by' => 'created_at',
                   'sort_direction' => 'desc',
-                  ])}}" class="button {{request()->get('sort_by') === 'created_at' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
+                  ])}}"
+                 class="button {{request()->get('sort_by') === 'created_at' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
                  title="Датою додавання">Датою додавання</a>
             </div>
           </div>
@@ -305,25 +369,25 @@
           @foreach($products as $product)
             <div class="category-products-item product-default product-layout product-grid"
                  id="categoryProductsItem{{$product->id}}">
-                @if($product->is_top_seller)
-              <div class="sale statuses list">
-                <div class="category-status category-status-1 status-inline text rectangle "
-                     style=" color:#ffffff; background-color:#d04b4b;">
-                  {{__('general-translate.sales_hit')}}
+              @if($product->is_top_seller)
+                <div class="sale statuses list">
+                  <div class="category-status category-status-1 status-inline text rectangle "
+                       style=" color:#ffffff; background-color:#d04b4b;">
+                    {{__('general-translate.sales_hit')}}
+                  </div>
                 </div>
-              </div>
-                @endif
+              @endif
               <div class="product-default-texts-wrapper">
 
                 <div class="top flex-justify">
-                    @if($product->is_top_seller)
-                  <div class="sale statuses grid">
-                    <div class="category-status category-status-1 status-inline text rectangle "
-                         style=" color:#ffffff; background-color:#d04b4b;">
-                      {{__('general-translate.sales_hit')}}
+                  @if($product->is_top_seller)
+                    <div class="sale statuses grid">
+                      <div class="category-status category-status-1 status-inline text rectangle "
+                           style=" color:#ffffff; background-color:#d04b4b;">
+                        {{__('general-translate.sales_hit')}}
+                      </div>
                     </div>
-                  </div>
-                    @endif
+                  @endif
                   <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
                   <div class="review grid">
                     <i class="fal fa-star"></i>
@@ -413,7 +477,9 @@
                 @endfor
                 @if ($products->currentPage() < $products->lastPage() - 2)
                   <li class="disabled"><span>&hellip;</span></li>
-                  <li><a href="{{ $products->appends((request()->except('page')))->url($products->lastPage()) }}">{{ $products->lastPage() }}</a></li>
+                  <li><a
+                      href="{{ $products->appends((request()->except('page')))->url($products->lastPage()) }}">{{ $products->lastPage() }}</a>
+                  </li>
                 @endif
               </ul>
             @endif

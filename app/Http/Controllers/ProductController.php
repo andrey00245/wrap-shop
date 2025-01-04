@@ -8,9 +8,12 @@ use App\Models\Implementation;
 use App\Models\Product;
 use App\Models\ProductAttribute;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use function Doctrine\DBAL\Query\andWhere;
+use function PHPUnit\Framework\isEmpty;
 
 class ProductController extends Controller
 {
@@ -103,6 +106,17 @@ class ProductController extends Controller
 
   public function category(Category $category, Category $subcategory = null, Category $subsubcategory = null): View
   {
+    $selectedFilterValues = request()->all();
+    unset($selectedFilterValues['page']);
+//
+//    foreach (request()->all() as $key => $filterType) {
+//      foreach ($filterType as $filterValue) {
+//        $selectedFilterValues[$key][] = $filterValue;
+//      }
+//    }
+//
+//    dd($selectedFilterValues);
+
     if ($subsubcategory) {
       $categories = $subsubcategory->isParent() ? $subsubcategory->children()->pluck('id') : [$subsubcategory->id];
       $childrenCategories = $subsubcategory->children;
@@ -139,20 +153,101 @@ class ProductController extends Controller
       ->whereHas('media')
       ->select('products.*', \DB::raw('MAX(product_prices.price) as price'))
       ->groupBy('products.id')
-      ->orderBy($sortBy, $sortDirection);
+      ->orderBy($sortBy, $sortDirection)
+      ->with(['products_attributes' => function ($query) {
+        $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
+      }]);
+//    $products->paginate(1);
+
+//      dump($products->paginate(1));
+
+
+
+
+//    $products = Product::query()
+//      ->whereIn('category_id', $categories)
+//      ->whereHas('attributes')
+//      ->whereHas('media')
+//      ->whereHas('prices', function ($query) {
+//        $query->where('type_id', DB::table('price_types')
+//          ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
+//          ->value('id'))
+//          ->where('price', '>', 0);
+//      })
+//      ->with(['products_attributes' => function ($query) {
+//        $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
+//      }])
+//      ->get();
+
+
+
+
 
     $productsAllCollection = $products->get();
-    $products = $products->paginate(4);
+
+
+    $productsAllCollection = $productsAllCollection->filter(function ($product) use ($selectedFilterValues) {
+      foreach ($selectedFilterValues as $key => $filterValues) {
+//        dump($selectedFilterValues);
+
+        $matchingValues = [];
+        foreach ($product->products_attributes as $products_attribute) {
+//          dump('here - 2');
+
+          if ($products_attribute->field_name === $key) {
+            $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
+//            dump( $products_attribute->value);
+
+          }
+        }
+        if (empty($matchingValues)) {
+//          dump(dump('here - 4'));
+          return false;
+        }
+      }
+      return $product;
+    });
+
+
+
+//
+//
+//    foreach ($productsAllCollection as $product){
+//      dump($product);
+//    }
+//    dd($productsAllCollection);
+
+
+//    $page = Paginator::resolveCurrentPage('page');
+    $perPage = 1;
+//    $total = $productsAllCollection->count()/$perPage;
+
+    $attributes = collect();
+
+    foreach ($productsAllCollection as $product) {
+      $attributes[] = $product->getProductAttributes();
+    }
+
+//    dump($attributes);
+
+//    dump(request()->get('page'));
+
+//    dump($productsAllCollection);
+
+    $products = new LengthAwarePaginator($productsAllCollection->forPage(request()->get('page'), $perPage), $productsAllCollection->count(), $perPage, request()->get('page'), ['path'=>url()->current(),'pageName'=>'page']);
+
+//    dd($products);
+
+//    $products = $productsAllCollection->paginate(4);
 
     $maxPrice = $productsAllCollection->max('price');
     $minPrice = $productsAllCollection->min('price');
     $step = ceil(($maxPrice - $minPrice) / 4);
 
-    $attributes = collect();
+//dd($products);
+//    dd($attributes->flatten()->unique('field_name'));
 
-    foreach ($products as $product) {
-      $attributes[] = $product->getProductAttributes();
-    }
+
 
     return view('base.pages.products.index', [
       'products' => $products,
@@ -172,44 +267,28 @@ class ProductController extends Controller
    */
   public function getCount(Request $request)
   {
-    $filterTypes = [];
-    $filterValues = [];
+    $selectedFilterValues = [];
+    $categories = [];
+
+    $category = Category::query()->where('id', $request->get('category_id'))->first();
+    if ($category->hasChildren()) {
+      $categories = $category->children()->pluck('id');
+    } else {
+      $categories[] = $category->id;
+    }
 
     foreach ($request->get('filters') as $key => $filterType) {
-      $filterTypes[] = $key;
       foreach ($filterType as $key_i => $filterValue) {
-//        dump($filterValue);
         if (in_array('true', $filterValue, true)) {
-          $filterValues[$key][] = $key_i;
+          $selectedFilterValues[$key][] = $key_i;
         }
       }
     }
 
-
-
-    dump($request->get('filters'));
-    dump($filterTypes);
-    dd($filterValues);
-
-//
-//    dump($filterValues);
-//
-//
-//    dd($filterTypes);
-
-    $responseArray = $request->get('filters');
-
-//    dd($responseArray);
-
-    $attributes = Attribute::query()
-      ->whereIn('field_name', $filterTypes)
-      ->get();
-
-
-//dump($filterValues);
+    $responseArray['attributes_count'] = $request->get('filters');
 
     $products = Product::query()
-      ->whereIn('category_id', [2])
+      ->whereIn('category_id', $categories)
       ->whereHas('attributes')
       ->whereHas('media')
       ->whereHas('prices', function ($query) {
@@ -217,205 +296,112 @@ class ProductController extends Controller
           ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
           ->value('id'))
           ->where('price', '>', 0);
-      })->with(['products_attributes' => function ($query) use ($filterValues) {
-        $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id')
-          ->where(function ($query) use ($filterValues) {
-            foreach ($filterValues as $field_name => $filterValuesArray) {
-              if (array_key_exists($field_name, $filterValues)) {
-                $query->orWhereIn('attributes.field_name', [$field_name])
-                  ->whereIn('products_attributes.value->'.App::getLocale(), $filterValuesArray);
-              }
-            }
-          });
+      })
+      ->with(['products_attributes' => function ($query) {
+        $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
       }])
       ->get();
 
 
-    $products = $products->filter(function ($product) use ($filterValues) {
-      if ($product->products_attributes->count() === count($filterValues)) {
-        return $product;
+    $selectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
+      foreach ($selectedFilterValues as $key => $filterValues) {
+        $matchingValues = [];
+        foreach ($product->products_attributes as $products_attribute) {
+          if ($products_attribute->field_name === $key) {
+            $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
+          }
+        }
+        if (empty($matchingValues)) {
+          return false;
+        }
+      }
+      return $product;
+    });
+
+    $responseArray['total_count'] = $selectedProducts->count();
+
+    $nonSelectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
+      foreach ($selectedFilterValues as $key => $filterValues) {
+        $matchingValues = [];
+        foreach ($product->products_attributes as $products_attribute) {
+          if ($products_attribute->field_name === $key) {
+            $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
+          }
+        }
+        if (empty($matchingValues)) {
+          return $product;
+        }
       }
       return false;
     });
-//    dd($products);
 
-
-//    dd($products);
-
-    $testAttribute = ProductAttribute::query()->whereNotIn('attribute_id', [1,3,4,5,14])->pluck('value')->unique();
-
-//dd($products->pluck('id'));
-
-    $testArr = Attribute::query()->whereIn('field_name',[
-      'brand',
-      'material',
-      'structure',
-      'operating_temperature',
-      'width',
-      'application_method',
-      'surface_temperature',
-      'main_shade',
-      'country_manufacture',
-      'type',
-      'form_release',
-      'volume'
-    ])->select(['field_name', 'id'])->get()->toArray();
-
-    $result = [];
-//    dd();
-
-//    dd($testArr);
-
-    foreach ($testArr as $item) {
-      // Если ключ field_name уже существует в результирующем массиве
-      if (isset($result[$item['field_name']])) {
-        // Добавляем новый элемент в соответствующий массив
-        $result[$item['field_name']][] = $item;
-      } else {
-        // Если нет, создаем новый ключ с массивом
-        $result[$item['field_name']] = $item;
+    foreach ($responseArray['attributes_count'] as $key_i => $item) {
+      foreach ($item as $key_j => $attribute) {
+        if (!array_key_exists('count', $responseArray['attributes_count'][$key_i][$key_j])) {
+          $responseArray['attributes_count'][$key_i][$key_j]['count'] = 0;
+        }
       }
     }
 
-//    dump($result);
-//    dump($testArr);
-//    dd(array_intersect_key($result, $filterValues));
+    foreach ($selectedProducts as $product) {
+      foreach ($product->products_attributes as $products_attribute) {
+        if (array_key_exists($products_attribute->field_name, $responseArray['attributes_count'])) {
+          if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]["count"])) {
+            ++$responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'];
+          }
+        }
+      }
+    }
 
-    $testAttribute = $testAttribute->map(function ($attribute) use ($products, $result, $filterValues) {
-//      dd($attribute);
-      foreach ($result as $key => $value) {
-        if (array_key_exists($key, $filterValues)) {
-          $productIds = $products->pluck('id')->toArray();
-          break;
-        } else {
-          $productIds = ProductAttribute::query()
-//            dd(array_key_exists($key, $filterValues), $key, $value, $filterValues)
-//            ->where('attribute_id', $value['id'])
-            ->whereIn('product_id',$products->pluck('id'))
-            ->whereJsonContains('value->'.App::getLocale(), $attribute)
-            ->pluck('product_id')->toArray();
-            break;
+    foreach ($nonSelectedProducts as $product) {
+      $testArr = [];
+      $valArr = [];
+      foreach ($selectedFilterValues as $keyI => $selectedFilterValue) {
+        $testArr[] = $keyI;
+        foreach ($selectedFilterValue as $filterValue) {
+          $valArr[] = $filterValue;
         }
       }
 
-      return [
-        'name'=>$attribute,
-        'count' => Product::query()
-          ->whereIn('id', $productIds)
-          ->whereHas('media')
-          ->whereIn('category_id', [2])->count()
-        ];
-    });
+      $tempAddCount = 0;
+      $tempField = '';
 
+      foreach ($product->products_attributes as $products_attribute) {
+        if (in_array($products_attribute->field_name, $testArr, true)) {
+          if (in_array($products_attribute->value, $valArr, true)) {
+            $tempAddCount++;
+          } else {
+            $tempField = $products_attribute->field_name;
+          }
+        }
+      }
 
-//    dd($testAttribute);
-
-//    $productsCount = Product::query()
-//      ->whereIn('id', $productIds)
-//      ->whereHas('media')
-//      ->whereIn('category_id', $category->isParent() ? $category->children()->pluck('id') : [$category->id])
-//      ->whereHas('prices', function ($query) {
-//        $query->where('type_id', function ($subQuery) {
-//          $subQuery->select('id')
-//            ->from('price_types')
-//            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-//        })->where('price', '>', 0);
-//      })->count();
-
-
-
-
-
-
-
-
-//    $products = Product::query()
-//      ->whereIn('category_id', [2])
-//      ->whereHas('attributes'
-//        function ($query) use ($filterValues){
-//        $tempVar = [];
-//        foreach ($filterValues as $key => $filterValue){
-//          $tempVar[] = $key;
-//        }
-//        return $query->whereIn('field_name', $tempVar);
-//      )
-//      ->whereHas('media')
-//      ->with('products_attributes', function ($query) use ($filterValues) {
-//        $tempArr = [];
-
-//        dd($filterValues);
-
-
-//        dd($tempArr);
-//        return $query->where('value->' . App::getLocale(), function ($queryQuery) use ($filterValues){
-//
-//
-//          foreach ($filterValues as $key => $filterValue){
-//            foreach ($filterValue as $filter){
-//              $tempArr[] = $filter;
-//            }
-//          }
-//        });
-//      })
-//      ->get();
-
-//    dd($products);
-
-//
-//    $users = User::where('column1', '=', value1)
-//      ->where(function($query) use ($variable1,$variable2){
-//        $query->where('column2','=',$variable1)
-//          ->orWhere('column3','=',$variable2);
-//      })
-
-
-
-
-
-//    dd($products);
-
-
-//    foreach ($attributes as $attribute) {
-//      dump($attribute);
-
-//      $products = $attribute->productsVisible(2);
-
-//      dump($products->get());
-//      dump($products->wherePivot('value->uk', '3M')->get());
-//      foreach ($products as $product) {
-//        dump($product->pivot->value);
-
-//      }
-//    }
-//    dd(1);
-
-//    dd($testAttribute);
-
-
-    foreach ($responseArray as $key_i => $attributes){
-      foreach ($attributes as $key_j => $attribute){
-        $responseArray[$key_i][$key_j]['count'] = $testAttribute->where('name', $key_j)->first()['count'];
-//        dump($testAttribute->where('name', $key_j)->first()['count']);
-
+      if ($tempAddCount === count($testArr) - 1) {
+        foreach ($product->products_attributes as $products_attribute) {
+          if ($products_attribute->field_name === $tempField) {
+            if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]["count"])) {
+              ++$responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'];
+            }
+          }
+        }
       }
     }
 
+    $referer = $request->header('referer');
 
-//    foreach ($attributes as $attribute) {
-//      foreach ($attribute->productsVisible(2)->get() as $product) {
-//        $key = json_decode($product->pivot->value, true, 512, JSON_THROW_ON_ERROR)[App::getLocale()];
-//        if (!array_key_exists('count', $responseArray[$attribute->field_name][$key])) {
-//          $responseArray[$attribute->field_name][$key]['count'] = 0;
-//        }
-//        if (isset($responseArray[$attribute->field_name][$key]["count"])) {
-//          ++$responseArray[$attribute->field_name][$key]['count'];
-//        }
-//      }
-//    }
+    if ($referer) {
+      $parsedUrl = parse_url($referer);
+      $newUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'];
+    }
 
-//    dd($responseArray);
+    if(empty($selectedFilterValues)){
+      $responseArray['new_url'] = $newUrl;
+    }
+    else{
+      $responseArray['new_url'] = $newUrl . '?' . http_build_query($selectedFilterValues);
+    }
 
-    return response()->json([$responseArray]);
+    return response()->json($responseArray);
   }
 
 }

@@ -188,6 +188,10 @@ class Product extends Model implements HasMedia
             ->get();
     }
 
+    public function getCountProducts(){
+
+    }
+
     public function getBenefits()
     {
         return $this->attributes()->where('field_name', 'benefits')->first()?->pivot?->value;

@@ -638,7 +638,7 @@ a.ocf-btn.ocf-disabled {
   line-height: 16px;
   text-align: center;
   letter-spacing: 0;
-  color: rgb(255 255 255 / 35%);
+  color: rgb(255 255 255);
   position: relative;
   @media screen and (max-width: 768px) {
     font-size: 13px;
@@ -671,10 +671,18 @@ font-size: 14px;
   margin-bottom: 0
 }
 
-.ocf-value.ocf-disabled, .ocf-value[disabled], .ocf-value:disabled {
-  color: #fff;
-  cursor: not-allowed;
-  border-color: rgb(255 255 255 / 35%)
+.ocf-value.ocf-disabled, .ocf-value[disabled], .ocf-value:disabled, .ocf-value:disabled:not(.ocf-selected) {
+
+}
+
+.ocf-value{
+  &:not(.ocf-selected){
+    &.ocf-disabled, &[disabled], &:disabled  {
+      color: rgba(255, 255, 255, 0.35);
+      cursor: not-allowed;
+      border-color: rgb(255 255 255 / 35%)
+    }
+  }
 }
 
 .ocf-selected, .ocf-selected:active, .ocf-selected:focus, .ocf-selected:visited, .ocf-selected:hover {
@@ -687,7 +695,7 @@ font-size: 14px;
   width: 22px;
   height: 22px;
   flex: 0 0 22px;
-  margin-right: 10px;
+  margin-right: 6px;
   overflow: hidden;
   border: 1px solid transparent;
   border-radius: 50%;
@@ -748,7 +756,7 @@ font-size: 14px;
   word-break: break-word;
   text-align: left;
   font-size: inherit;
-  color: white
+  //color: white
 }
 
 .ocf-auto-column .ocf-value-name {
@@ -1440,7 +1448,8 @@ font-size: 14px;
   text-align: center;
   letter-spacing: .18em;
   text-transform: uppercase;
-  color: #fff
+  color: #fff;
+  margin-bottom: 8px;
 }
 
 .ocf-theme-light .ocf-selected-discard:hover {

@@ -27,7 +27,8 @@
               </div>
               <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
               <div class="wishlist">
-                <button type="button" class="button far fa-heart"
+                <button type="button" class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"
+                        data-product-id="{{$product->id}}"
                         title="{{__('general-translate.product_card.add_wishlist')}}"></button>
               </div>
             </div>

@@ -32,6 +32,7 @@ return [
   'expiration-date-val' => ':month month',
   'quantity-in-stock' => 'Sorry, quantity in stock :max',
   'choose' => 'Choose',
+  'chosen' => 'Chosen',
   'max-quantity' => 'Max: :max',
   'select-max' => 'Choose maximum',
   'discont-text' => 'Order more <span class="count-for-discont">0</span> and save <span class="saving-val">0</span> ₴',

@@ -110,9 +110,7 @@
 
 
 <div class="map" id="map"></div>
-<div class="mobil-catalog-fixed wrap">
-  <div class="mobil-catalog-open button"><i class="far fa-th-large"></i>Каталог товарів</div>
-</div>
+@stack('fixed-catalog')
 
 <link rel="stylesheet" href="{{asset('assets/css/form.css')}}" media="screen">
 <link rel="stylesheet" href="{{asset('third-party/fancybox/jquery.fancybox.min.css')}}" media="screen">

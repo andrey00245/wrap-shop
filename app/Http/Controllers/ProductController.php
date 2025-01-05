@@ -148,7 +148,22 @@ class ProductController extends Controller
       ->whereIn('category_id', $categories)
       ->whereHas('media')
       ->select('products.*', \DB::raw('MAX(product_prices.price) as price'))
-      ->groupBy('products.id')
+      ->groupBy('products.id',
+        'products.code',
+        'products.external_code',
+        'products.external_id',
+        'products.barcodes',
+        'products.slug',
+        'products.article',
+        'products.is_top_seller',
+        'products.is_best_seller',
+        'products.is_active',
+        'products.name',
+        'products.descriptions',
+        'products.category_id',
+        'products.created_at',
+        'products.updated_at',
+        'products.banner_title')
       ->orderBy($sortBy, $sortDirection)
       ->with(['products_attributes' => function ($query) {
         $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');

@@ -22,7 +22,7 @@
         <div class="code-wishlist-wrapper">
           <div class="sku deskopt">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
           <div class="wishlist desktop">
-            <button type="button" title="В закладки" class="button far fa-heart"></button>
+            <button type="button" title="В закладки" class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart " data-product-id="{{$product->id}}"></button>
           </div>
         </div>
 

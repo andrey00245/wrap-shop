@@ -107,15 +107,11 @@ class ProductController extends Controller
   public function category(Category $category, Category $subcategory = null, Category $subsubcategory = null): View
   {
     $selectedFilterValues = request()->all();
-    unset($selectedFilterValues['page']);
-//
-//    foreach (request()->all() as $key => $filterType) {
-//      foreach ($filterType as $filterValue) {
-//        $selectedFilterValues[$key][] = $filterValue;
-//      }
-//    }
-//
-//    dd($selectedFilterValues);
+    unset($selectedFilterValues['page'],
+      $selectedFilterValues['sort_by'],
+      $selectedFilterValues['sort_direction'],
+      $selectedFilterValues['min_price'],
+      $selectedFilterValues['max_price']);
 
     if ($subsubcategory) {
       $categories = $subsubcategory->isParent() ? $subsubcategory->children()->pluck('id') : [$subsubcategory->id];
@@ -157,97 +153,56 @@ class ProductController extends Controller
       ->with(['products_attributes' => function ($query) {
         $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
       }]);
-//    $products->paginate(1);
 
-//      dump($products->paginate(1));
+    $temp = $products->get();
 
+    $maxPrice = $temp->max('price');
+    $minPrice = $temp->min('price');
+    $step = ceil(($maxPrice - $minPrice) / 4);
 
-
-
-//    $products = Product::query()
-//      ->whereIn('category_id', $categories)
-//      ->whereHas('attributes')
-//      ->whereHas('media')
-//      ->whereHas('prices', function ($query) {
-//        $query->where('type_id', DB::table('price_types')
-//          ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
-//          ->value('id'))
-//          ->where('price', '>', 0);
-//      })
-//      ->with(['products_attributes' => function ($query) {
-//        $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
-//      }])
-//      ->get();
-
-
-
-
-
-    $productsAllCollection = $products->get();
-
+    if(request()->get('min_price') && request()->get('max_price')){
+      $productsAllCollection = $products
+        ->where('product_prices.price', '>=', request()->get('min_price'))
+        ->where('product_prices.price', '<=', request()->get('max_price'))
+        ->get();
+    }
+    else {
+      $productsAllCollection = $temp;
+    }
 
     $productsAllCollection = $productsAllCollection->filter(function ($product) use ($selectedFilterValues) {
       foreach ($selectedFilterValues as $key => $filterValues) {
-//        dump($selectedFilterValues);
-
         $matchingValues = [];
         foreach ($product->products_attributes as $products_attribute) {
-//          dump('here - 2');
-
           if ($products_attribute->field_name === $key) {
             $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
-//            dump( $products_attribute->value);
-
           }
         }
         if (empty($matchingValues)) {
-//          dump(dump('here - 4'));
           return false;
         }
       }
       return $product;
     });
 
-
-
-//
-//
-//    foreach ($productsAllCollection as $product){
-//      dump($product);
-//    }
-//    dd($productsAllCollection);
-
-
-//    $page = Paginator::resolveCurrentPage('page');
-    $perPage = 1;
-//    $total = $productsAllCollection->count()/$perPage;
-
+    $perPage = 18;
     $attributes = collect();
 
     foreach ($productsAllCollection as $product) {
       $attributes[] = $product->getProductAttributes();
     }
 
-//    dump($attributes);
+    $products = new LengthAwarePaginator($productsAllCollection->forPage(request()->get('page'), $perPage), $productsAllCollection->count(), $perPage, request()->get('page'), ['path' => url()->current(), 'pageName' => 'page']);
 
-//    dump(request()->get('page'));
+    $attributesArray = [];
 
-//    dump($productsAllCollection);
+    foreach ($attributes->flatten()->unique('field_name') as $attribure){
+      foreach ($attribure->getPivotValue() as $value){
+        $attributesArray[$attribure->field_name][$value]['count'] = 0;
+      }
+    }
 
-    $products = new LengthAwarePaginator($productsAllCollection->forPage(request()->get('page'), $perPage), $productsAllCollection->count(), $perPage, request()->get('page'), ['path'=>url()->current(),'pageName'=>'page']);
-
-//    dd($products);
-
-//    $products = $productsAllCollection->paginate(4);
-
-    $maxPrice = $productsAllCollection->max('price');
-    $minPrice = $productsAllCollection->min('price');
-    $step = ceil(($maxPrice - $minPrice) / 4);
-
-//dd($products);
-//    dd($attributes->flatten()->unique('field_name'));
-
-
+    $responseArray = Product::getCountProducts($categories, request(), $selectedFilterValues, $attributesArray);
 
     return view('base.pages.products.index', [
       'products' => $products,
@@ -259,6 +214,7 @@ class ProductController extends Controller
       'maxPrice' => $maxPrice,
       'step' => $step,
       'attributes' => $attributes->flatten()->unique('field_name') ?? collect(),
+      'responseArray' => $responseArray,
     ]);
   }
 
@@ -285,123 +241,7 @@ class ProductController extends Controller
       }
     }
 
-    $responseArray['attributes_count'] = $request->get('filters');
-
-    $products = Product::query()
-      ->whereIn('category_id', $categories)
-      ->whereHas('attributes')
-      ->whereHas('media')
-      ->whereHas('prices', function ($query) {
-        $query->where('type_id', DB::table('price_types')
-          ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
-          ->value('id'))
-          ->where('price', '>', 0);
-      })
-      ->with(['products_attributes' => function ($query) {
-        $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
-      }])
-      ->get();
-
-
-    $selectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
-      foreach ($selectedFilterValues as $key => $filterValues) {
-        $matchingValues = [];
-        foreach ($product->products_attributes as $products_attribute) {
-          if ($products_attribute->field_name === $key) {
-            $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
-          }
-        }
-        if (empty($matchingValues)) {
-          return false;
-        }
-      }
-      return $product;
-    });
-
-    $responseArray['total_count'] = $selectedProducts->count();
-
-    $nonSelectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
-      foreach ($selectedFilterValues as $key => $filterValues) {
-        $matchingValues = [];
-        foreach ($product->products_attributes as $products_attribute) {
-          if ($products_attribute->field_name === $key) {
-            $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
-          }
-        }
-        if (empty($matchingValues)) {
-          return $product;
-        }
-      }
-      return false;
-    });
-
-    foreach ($responseArray['attributes_count'] as $key_i => $item) {
-      foreach ($item as $key_j => $attribute) {
-        if (!array_key_exists('count', $responseArray['attributes_count'][$key_i][$key_j])) {
-          $responseArray['attributes_count'][$key_i][$key_j]['count'] = 0;
-        }
-      }
-    }
-
-    foreach ($selectedProducts as $product) {
-      foreach ($product->products_attributes as $products_attribute) {
-        if (array_key_exists($products_attribute->field_name, $responseArray['attributes_count'])) {
-          if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]["count"])) {
-            ++$responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'];
-          }
-        }
-      }
-    }
-
-    foreach ($nonSelectedProducts as $product) {
-      $testArr = [];
-      $valArr = [];
-      foreach ($selectedFilterValues as $keyI => $selectedFilterValue) {
-        $testArr[] = $keyI;
-        foreach ($selectedFilterValue as $filterValue) {
-          $valArr[] = $filterValue;
-        }
-      }
-
-      $tempAddCount = 0;
-      $tempField = '';
-
-      foreach ($product->products_attributes as $products_attribute) {
-        if (in_array($products_attribute->field_name, $testArr, true)) {
-          if (in_array($products_attribute->value, $valArr, true)) {
-            $tempAddCount++;
-          } else {
-            $tempField = $products_attribute->field_name;
-          }
-        }
-      }
-
-      if ($tempAddCount === count($testArr) - 1) {
-        foreach ($product->products_attributes as $products_attribute) {
-          if ($products_attribute->field_name === $tempField) {
-            if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]["count"])) {
-              ++$responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'];
-            }
-          }
-        }
-      }
-    }
-
-    $referer = $request->header('referer');
-
-    if ($referer) {
-      $parsedUrl = parse_url($referer);
-      $newUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'];
-    }
-
-    if(empty($selectedFilterValues)){
-      $responseArray['new_url'] = $newUrl;
-    }
-    else{
-      $responseArray['new_url'] = $newUrl . '?' . http_build_query($selectedFilterValues);
-    }
-
-    return response()->json($responseArray);
+    return response()->json(Product::getCountProducts($categories, $request, $selectedFilterValues));
   }
 
 }

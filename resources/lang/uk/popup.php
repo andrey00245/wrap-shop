@@ -48,4 +48,22 @@ return [
     'im_looking_for' => 'Я шукаю:',
     'search' => 'Шукати',
   ],
+  'consult_popup' => [
+      'title' => 'Замовити консультацію',
+      'name' => 'Ваше імʼя <strong style="color:red">*</strong>',
+      'enter_name_placeholder' => 'Введіть ваше ім\'я',
+      'phone' => 'Ваш телефон <strong style="color:red">*</strong>',
+      'enter_phone_placeholder' => 'Введіть ваш телефон',
+      'email' => 'Ваш Email',
+      'enter_email_placeholder' => 'Введіть ваш Email',
+      'comment' => 'Ваш коментар',
+      'enter_comment_placeholder' => 'Введіть ваш коментар',
+      'submit_button' => 'Відправити',
+      'thanks_message' => 'Дякуємо за відправлену заявку! <br>Ми з вами з\'яжемося як найшвидше!'
+  ],
+  'fast_order' => [
+      'title' => 'Швидка покупка',
+      'submit' => 'Оформити Замовлення',
+      'thanks_message' => 'Дякуємо за оформлення замовлення! <br> Наші менеджери зв\'яжуться з вами як найшвидше.',
+  ],
 ];

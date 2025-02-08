@@ -49,7 +49,8 @@ const textDiscount = $('.text-discount')
 const countForDiscont = $('.text-discount .count-for-discont')
 const savingVal = $('.text-discount .saving-val')
 
-recalcTotalPrice(quantityInput.val())
+recalcTotalPrice(quantityInput.val(), '#price-block-1')
+recalcTotalPrice(quantityInput.val(), '#price-block-2')
 initializationAllLessButtons()
 
 
@@ -93,7 +94,8 @@ function plusMinus(input, action) {
       newVal = 0
     }
 
-    recalcTotalPrice(newVal)
+    recalcTotalPrice(newVal, '#price-block-1')
+    recalcTotalPrice(newVal, '#price-block-2')
     input.val(decimalPoint(newVal))
   }
 
@@ -107,7 +109,8 @@ function plusMinus(input, action) {
       newVal = 0
     }
 
-    recalcTotalPrice(newVal)
+      recalcTotalPrice(newVal, '#price-block-1')
+      recalcTotalPrice(newVal, '#price-block-2')
     input.val(decimalPoint(newVal))
   }
 
@@ -126,7 +129,8 @@ function plusMinus(input, action) {
     }
     currentVal = integerNumber(currentVal, step)
 
-    recalcTotalPrice(currentVal)
+      recalcTotalPrice(newVal, '#price-block-1')
+      recalcTotalPrice(newVal, '#price-block-2')
     input.val(decimalPoint(currentVal))
   }
   onOffSelectedQuantity()
@@ -145,32 +149,34 @@ function integerNumber(currentVal, step) {
   return currentVal
 }
 
-function recalcTotalPrice(newVal) {
-  for (const key in discounts) {
-    if (discounts.hasOwnProperty(key)) {
-      const item = discounts[key];
-      if (key != 0) {
-        const prevItem = discounts[key - 1];
-        if (newVal < item.discountFrom && newVal >= prevItem.discountFrom) {
-          countForDiscont.text((item.discountFrom - newVal).toFixed(1))
-          savingVal.text(item.discountFrom*prevItem.price - item.discountFrom*item.price)
-        }
-        if(newVal >= item.discountFrom){
-          textDiscount.hide()
-        }
-        else{
-          textDiscount.show()
+function recalcTotalPrice(newVal, priceBlockId) {
+    const price = $(priceBlockId + ' .item-price .only-price');
+    const totalPrice = $(priceBlockId + ' .autocalc-product-price .total-price');
 
+    for (const key in discounts) {
+        if (discounts.hasOwnProperty(key)) {
+            const item = discounts[key];
+            if (key != 0) {
+                const prevItem = discounts[key - 1];
+                if (newVal < item.discountFrom && newVal >= prevItem.discountFrom) {
+                    countForDiscont.text((item.discountFrom - newVal).toFixed(1));
+                    savingVal.text(item.discountFrom*prevItem.price - item.discountFrom*item.price);
+                }
+                if (newVal >= item.discountFrom) {
+                    textDiscount.hide();
+                } else {
+                    textDiscount.show();
+                }
+            }
+
+            if (newVal >= item.discountFrom) {
+                price.text(item.price.toFixed(2));
+                totalPrice.text((item.price * newVal).toFixed(2));
+                restyleThreeLastChart(priceBlockId + ' .price-wrap .only-price');
+                restyleThreeLastChart(priceBlockId + ' .autocalc-product-price .total-price');
+            }
         }
-      }
-      if (newVal >= item.discountFrom) {
-        price.text(item.price.toFixed(2))
-        totalPrice.text((item.price * newVal).toFixed(2))
-        restyleThreeLastChart('.price-wrap .only-price')
-        restyleThreeLastChart('.autocalc-product-price .total-price')
-      }
     }
-  }
 }
 
 restyleThreeLastChart('.price-wrap .only-price')

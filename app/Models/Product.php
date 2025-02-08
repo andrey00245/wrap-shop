@@ -18,6 +18,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
+use function Carbon\int;
 
 class Product extends Model implements HasMedia
 {
@@ -187,7 +188,13 @@ class Product extends Model implements HasMedia
                 'application',
                 'purpose',
                 'benefits',
-                'default_quantity'
+                'default_quantity',
+                'master_qualification',
+                'store_terms',
+                'warranty',
+                'quantity_step',
+                'min_order_quantity',
+                'room_temperature'
             ])
             ->get();
     }
@@ -383,5 +390,61 @@ class Product extends Model implements HasMedia
     public function getApplication()
     {
         return $this->attributes()->where('field_name', 'application')->first()?->pivot?->value;
+    }
+
+    public function getDefaultQuantity()
+    {
+        return $this->attributes()->where('field_name', 'default_quantity')->first()?->pivot?->value;
+    }
+
+    public function getWarranty()
+    {
+        return $this->attributes()->where('field_name', 'warranty')->first()?->pivot?->value;
+    }
+
+    public function getStoreTerms()
+    {
+        return $this->attributes()->where('field_name', 'store_terms')->first()?->pivot?->value;
+    }
+
+    public function getRoomTemperature()
+    {
+        return $this->attributes()->where('field_name', 'room_temperature')->first()?->pivot?->value;
+    }
+
+    public function getMasterQualification()
+    {
+        return $this->attributes()->where('field_name', 'master_qualification')->first()?->pivot?->value;
+    }
+
+    public function getPriceByDollars()
+    {
+       return round($this->getPrice() / 42,0);
+    }
+
+    public function getMinOrderCount()
+    {
+        return $this->attributes()->where('field_name', 'min_order_quantity')->first()?->pivot?->value;
+    }
+
+    public function getOrderStep()
+    {
+        return $this->attributes()->where('field_name', 'quantity_step')->first()?->pivot?->value;
+    }
+
+    public function getRollSize()
+    {
+        return $this->attributes()->where('field_name', 'roll_size')->first()?->pivot?->value;
+    }
+
+    public function getPriceByCount($count)
+    {
+        $productPrice = $this->getPrice();
+
+        if ($this->getRollSize()) {
+            return $productPrice * $count;
+        }
+
+        return $productPrice * $count;
     }
 }

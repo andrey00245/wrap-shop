@@ -4,8 +4,12 @@ use App\Http\Controllers\Account\ChangePasswordController;
 use App\Http\Controllers\Account\PersonalDataController;
 use App\Http\Controllers\Account\UserAddressController;
 use App\Http\Controllers\Account\ViewedProductsController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\FastOrderController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SubscribeController;
 use App\Http\Controllers\SyncProductImagesController;
@@ -46,6 +50,15 @@ Route::get('/slug-generate', function(){
 
 
 Route::post('/add-product-to-wishlist', [WishlistController::class, 'update'])->name('add-product-to-wishlist');
+Route::post('/cart/add', [CartController::class, 'add']);
+Route::post('/cart/remove/{productId}', [CartController::class, 'remove']);
+Route::post('/cart/update/', [CartController::class, 'update']);
+Route::get('/cart', [CartController::class, 'index']);
+Route::post('/consultation', [ConsultationController::class, 'store']);
+Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+
+
+Route::post('/fast-order', [FastOrderController::class, 'store'])->name('fast-order.store');
 
 Route::group(['prefix' => LaravelLocalization::setLocale(),
   'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
@@ -61,6 +74,10 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   Route::get('/checkout', function () {
     return view('base.pages.checkout.index');
   })->name('checkout');
+
+    Route::get('/checkout/success', function () {
+        return view('base.pages.checkout.success');
+    })->name('checkout.success');
 
   Route::post('/subscribe', [SubscribeController::class, 'store'])->name('subscribe');
 
@@ -89,7 +106,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
     return view('base.pages.contacts');
   })->name('contacts');
 
-  Route::group(['prefix' => '/account'], function(){
+  Route::group(['prefix' => '/account', 'middleware' => ['redirect_if_not_authenticated']], function(){
     Route::get('/', function () {
       return view('base.pages.account.account');
     })->name('account');
@@ -120,7 +137,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
     Route::get('/viewed-products', [ViewedProductsController::class, 'index'])->name('viewed-products');
 
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
-  });
+  })->middleware('redirect_if_not_authenticated');
 
   Route::get('/wishlist/{product}/delete', [WishlistController::class, 'delete'])->name('wishlist.delete');
 
@@ -133,9 +150,5 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
     Route::get('/{product}/show', [ProductController::class,'show'])->name('products.show');
   });
   Route::get('/{category}/{subcategory?}/{subsubcategory?}', [ProductController::class, 'category'])->name('products.category');
-
-
-
-
 });
 

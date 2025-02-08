@@ -819,3 +819,19 @@ trix-toolbar .trix-button-row .trix-button-group .trix-button.trix-active {
 .ap-footer-osm svg {
   display: inherit;
 }
+
+.custom-status-select {
+    background-color: #f0f0f0;
+}
+
+.custom-status-select option[value="new"] {
+    background-color: #28a745; /* Зеленый для нового */
+}
+
+.custom-status-select option[value="in_process"] {
+    background-color: #ffc107; /* Желтый для в процессе */
+}
+
+.custom-status-select option[value="completed"] {
+    background-color: #007bff; /* Синий для завершенного */
+}

@@ -47,4 +47,22 @@ return [
     'im_looking_for' => 'I\'m looking for:',
     'search' => 'Search',
   ],
+  'consult_popup' => [
+      'title' => 'Order a consultation',
+      'name' => 'Your name <strong style="color:red;">*</strong>',
+      'enter_name_placeholder' => 'Enter your name',
+      'phone' => 'Your phone <strong style="color:red">*</strong>',
+      'enter_phone_placeholder' => 'Enter your phone number',
+      'email' => 'Your Email',
+      'enter_email_placeholder' => 'Enter your Email',
+      'comment' => 'Your comment',
+      'enter_comment_placeholder' => 'Enter your comment',
+      'submit_button' => 'Submit',
+      'thanks_message' => 'Thank you for your request! <br>We will contact you as soon as possible!'
+  ],
+  'fast_order' => [
+      'title' => 'Fast Purchase',
+      'submit' => 'Place Order',
+      'thanks_message' => 'Thank you for placing the order! <br> Our managers will contact you as soon as possible.',
+  ],
 ];

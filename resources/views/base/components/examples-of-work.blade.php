@@ -1,3 +1,4 @@
+@if($exampleWorks->count() > 0)
 <section class="examples-of-work">
   <div class="wrap">
     <div class="home-products-top flex-justify">
@@ -36,3 +37,4 @@
     </div>
   </div>
 </section>
+@endif

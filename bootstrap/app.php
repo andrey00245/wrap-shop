@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\RedirectIfNotAuthenticated;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,6 +15,14 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \App\Http\Middleware\CartMiddleware::class,
+        ]);
+        $middleware->web(prepend: [
+            \Illuminate\Session\Middleware\StartSession::class,
+            \App\Http\Middleware\CartMiddleware::class,
+//            \App\Http\Middleware\RedirectIfNotAuthenticated::class,
         ]);
 
         $middleware->alias([
@@ -27,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
         'localeSessionRedirect'   => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
         'localeCookieRedirect'    => \Mcamara\LaravelLocalization\Middleware\LocaleCookieRedirect::class,
         'localeViewPath'          => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
+        'redirect_if_not_authenticated' => RedirectIfNotAuthenticated::class,
       ]);
 
     })

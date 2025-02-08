@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use MoySklad\Components\Specs\QuerySpecs\QuerySpecs;
 use MoySklad\Entities\Products\Product as ApiProduct;
 use MoySklad\MoySklad;
@@ -93,7 +94,20 @@ class ProductService
            $this->updateName($attributes, $product);
 //           $this->processExpenseCategory($attributes, $product);
            $this->processBrand($attributes, $product);
+           $this->processRollSize($attributes, $product);
+           $this->processThickness($attributes, $product);
+           $this->processMaterialStretchingPercent($attributes, $product);
+           $this->processProtectionLiner($attributes, $product);
+           $this->processMasterQualification($attributes, $product);
+           $this->processAdhesion($attributes, $product);
+           $this->processStoreTerms($attributes, $product);
+           $this->processServiceLife($attributes, $product);
+           $this->processWarranty($attributes, $product);
+           $this->processProductTechnology($attributes, $product);
+           $this->processQuantityStep($attributes, $product);
+           $this->processMinOrderQuantity($attributes, $product);
            $this->processApplication($attributes, $product);
+           $this->processRoomTemperature($attributes, $product);
            $this->processPropose($attributes, $product);
            $this->updateBenefits($attributes, $product);
            $this->updateMaterial($attributes, $product);
@@ -244,6 +258,163 @@ class ProductService
      * @param $attributes
      * @param $product
      */
+    protected function processRollSize($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::ROLL_SIZE) {
+                $this->saveProductAttribute($attribute, $product, 'roll_size');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processThickness($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::THICKNESS) {
+                $this->saveProductAttribute($attribute, $product, 'thickness');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processMaterialStretchingPercent($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::MATERIAL_STRETCHING_PERCENT) {
+                $this->saveProductAttribute($attribute, $product, 'material_stretching_percent');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processProtectionLiner($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::PROTECTIVE_LINER) {
+                $this->saveProductAttribute($attribute, $product, 'protection_liner');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processMasterQualification($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::MASTER_QUALIFICATION) {
+                $this->saveProductAttribute($attribute, $product, 'master_qualification');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processAdhesion($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::ADHESION) {
+                $this->saveProductAttribute($attribute, $product, 'adhesion');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processServiceLife($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::SERVICE_LIFE) {
+                $this->saveProductAttribute($attribute, $product, 'service_life');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processWarranty($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::WARRANTY) {
+                $this->saveProductAttribute($attribute, $product, 'warranty');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processProductTechnology($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::PRODUCTION_TECHNOLOGY) {
+                $this->saveProductAttribute($attribute, $product, 'product_technology');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processQuantityStep($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::QUANTITY_STEP) {
+                $this->saveProductAttribute($attribute, $product, 'quantity_step');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processMinOrderQuantity($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::MINIMUM_ORDER_QUANTITY) {
+                $this->saveProductAttribute($attribute, $product, 'min_order_quantity');
+            }
+        }
+    }
+
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processStoreTerms($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::STORAGE_TERM) {
+                $this->saveProductAttribute($attribute, $product, 'store_terms');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
     protected function processPropose($attributes, $product): void
     {
         foreach ($attributes as $attribute) {
@@ -360,7 +531,7 @@ class ProductService
      * @param $attributes
      * @param $product
      */
-    protected function updateRoomTemperature($attributes, $product): void
+    protected function processRoomTemperature($attributes, $product): void
     {
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::ROOM_TEMPERATURE) {

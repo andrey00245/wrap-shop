@@ -12,16 +12,14 @@
     <link rel="stylesheet" href="{{mix('build/css/simple-dark.css')}}">
 
   @endpush
-
-
-
-
   {{--  </div>--}}
 
   <section id="content" class="page-checkout wrap row">
     <div class="simple-content">
       <div id="simplecheckout_form_0">
-        <div class="simplecheckout">
+          <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm">
+              @csrf
+        <for class="simplecheckout">
           <div class="simplecheckout-step" style="display: flex;">
             <div class="simplecheckout-left-column flex-justify">
               <div class="fast-order">
@@ -90,21 +88,33 @@
                     <p class="title"><span>01</span> Контактні данні</p>
                     <div class="input-group">
                       <label for="phone">Номер телефону</label>
-                      <input type="text" name="phone" id="phone">
+                        <input type="text" name="phone" id="phone" placeholder="Телефон" value="{{ old('phone') }}" required>
+                        @error('phone')
+                        <div class="error">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="input-group">
                       <label for="first-name">Ім'я</label>
-                      <input type="text" name="first-name" id="first-name" placeholder="Ім'я">
+                        <input type="text" name="first-name" placeholder="Ім'я" id="first-name" value="{{ old('first-name') }}" required>
+                        @error('first-name')
+                        <div class="error">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="input-group">
                       <label for="last-name">Прізвище</label>
-                      <input type="text" name="last-name" id="last-name" placeholder="Прізвище">
+                        <input type="text" name="last-name" id="last-name" placeholder="Прізвище" value="{{ old('last-name') }}" required>
+                        @error('last-name')
+                        <div class="error">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="input-group">
                       <label for="email">Email</label>
-                      <input type="email" name="email" id="email" placeholder="Email">
+                        <input type="email" name="email" id="email" placeholder="Email" value="{{ old('email') }}" required>
+                        @error('email')
+                        <div class="error">{{ $message }}</div>
+                        @enderror
                     </div>
                   </div>
 
@@ -145,23 +155,22 @@
                     </div>
                   </div>
 
-
                   <div class="input-fields-wrapper" style="display: none" id="simplecheckout_shipping_address">
                     <p class="title">Адреса доставки</p>
 
                     <div class="simplecheckout-block-content">
                       <fieldset>
                         <div class="input-group">
-                          <label for="phone">Населений пункт</label>
-                          <input type="text" name="phone" id="phone">
+                          <label for="city">Населений пункт</label>
+                          <input type="text" name="city" id="city">
                           <div style="display:none;" data-for="shipping_address_address_1" data-for-type="text"
                                data-rule="notEmpty" class="simplecheckout-error-text simplecheckout-rule"
                                data-not-empty="1" data-required="true">Це поле обов'язкове!
                           </div>
                         </div>
                         <div class="input-group">
-                          <label for="phone">Відділення / Адреса</label>
-                          <input type="text" name="phone" id="phone">
+                          <label for="shipping_address">Відділення / Адреса</label>
+                          <input type="text" name="shipping_address" id="shipping_address">
                           <div style="display:none;" data-for="shipping_address_address_1" data-for-type="text"
                                data-rule="notEmpty" class="simplecheckout-error-text simplecheckout-rule"
                                data-not-empty="1" data-required="true">Це поле обов'язкове!
@@ -201,18 +210,23 @@
                     </div>
                   </div>
                   <div class="input-group">
-                    <label for="coment">Хочете залишити коментар?</label>
-                    <input type="text" name="coment" id="coment" placeholder="Коментар">
+                    <label for="comment">Хочете залишити коментар?</label>
+                      <input name="comment" id="comment" placeholder="Коментар">{{ old('comment') }}
+                      @error('comment')
+                      <div class="error">{{ $message }}</div>
+                      @enderror
                   </div>
 
-                  <div class="input-group">
-                    @include('base.components.bestseller.bestseller-checkout')
-                  </div>
+{{--                  <div class="input-group">--}}
+{{--                    @include('base.components.bestseller.bestseller-checkout')--}}
+{{--                  </div>--}}
 
                   <div class="input-group">
-                    <div id="buttons">
-                      <a class="button btn-primary button_oc btn"><i class="fas fa-chevron-right"></i><span>Підтвердити й оформити покупку</span></a>
-                    </div>
+                      <div id="buttons">
+                          <a href="javascript:void(0);" class="button btn-primary button_oc btn" id="submitBtn">
+                              <i class="fas fa-chevron-right"></i><span>Підтвердити й оформити покупку</span>
+                          </a>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -220,8 +234,8 @@
             </div>
             <div class="simplecheckout-right-column">
               <div class="simplecheckout-block" id="simplecheckout_cart">
-                <div class="checkout-heading panel-heading">Ваше замовлення <span
-                    class="checkout-edit">Редагувати</span>
+                <div class="checkout-heading panel-heading ">Ваше замовлення <span
+                    class="checkout-edit cart-open">Редагувати</span>
                 </div>
                 <div class="table-responsive">
                   <table class="simplecheckout-cart">
@@ -238,19 +252,19 @@
                     </thead>
                     <tbody>
 
+                    @foreach($cartItems as $item)
                     <tr class="item flex-justify">
                       <td class="image">
-                        <a
-                          href="https://wrap.shop/plivky/zahysni-plivky/antygravijna-satynova-plivka-kybertane-ppf-deep-satin"><img
-                            src="https://wrap.shop/image/cachewebp/catalog/demo/syncms/e359162a-0538-11ea-0a80-01b70006656a_0-70x70.webp"
-                            alt="Плівка антигравійна сатинова Kybertane PPF Deep Satin 1,53 м"
-                            title="Плівка антигравійна сатинова Kybertane PPF Deep Satin 1,53 м"></a>
+                          <a
+                              href="{{route('products.show', ['product' => $item['product']->id])}}"><img
+                                  loading="lazy"
+                                  src="{{$item['product']->getMedia('images')[0]->getUrl('preview')}}"
+                                  alt="{{$item['product']->name}}"
+                                  title="{{$item['product']->name}}" class="img-thumbnail"></a>
                       </td>
                       <td class="name">
-                        <span class="cat">Захисні плівки</span>
-                        <a
-                          href="https://wrap.shop/plivky/zahysni-plivky/antygravijna-satynova-plivka-kybertane-ppf-deep-satin">Плівка
-                          антигравійна сатинова Kybertane PPF Deep Satin 1,53 м</a>
+                          <span class="cat">{{$item['product']->category->name}}</span><a
+                              href="{{route('products.show', ['product'=>$item['product']->id])}}">{{$item['product']->name}}</a>
                         <div class="options">
                         </div>
                       </td>
@@ -265,12 +279,13 @@
                         </div>
                       </td>
                       <td class="price">
-                        <div>3360.00 ₴<span class="price-unit-xvr"></span></div>
+                          {{$item['product']->getPrice()}} ₴<span class="price-unit-xvr"></span>
                       </td>
                       <td class="total">
-                        3360.00 ₴<span class="count">х 1 м.п.</span>
+                          {{$item['product']->getPrice()}} ₴<span class="count">х {{$item['product']->getRollSize() ? 'за 1 м.п.' : 'за 1  шт'}}</span>
                       </td>
                     </tr>
+                    @endforeach
                     </tbody>
                   </table>
                 </div>
@@ -298,11 +313,11 @@
                   <div class="right">
                     <div class="simplecheckout-cart-total" id="total_sub_total">
                       <span class="simplecheckout-cart-total-label">Сума</span>
-                      <span class="simplecheckout-cart-total-value">4972<span class="coins">.80</span> ₴</span>
+                      <span class="simplecheckout-cart-total-value">{{$sum}}</span> ₴</span>
                     </div>
                     <div class="simplecheckout-cart-total" id="total_total">
                       <span class="simplecheckout-cart-total-label">Разом</span>
-                      <span class="simplecheckout-cart-total-value">4972<span class="coins">.80</span> ₴</span>
+                      <span class="simplecheckout-cart-total-value">{{$sum}}</span> ₴</span>
                     </div>
                   </div>
                 </div>
@@ -311,11 +326,11 @@
               </div>
             </div>
           </div>
+        </for>
+          </form>
         </div>
-
       </div>
     </div>
-
 
   </section>
 
@@ -323,6 +338,11 @@
     <script src="{{mix('build/js/checkoutPage.js')}}"></script>
   @endpush
 
+  <script>
+      document.getElementById('submitBtn').addEventListener('click', function() {
+          document.getElementById('checkoutForm').submit();
+      });
+  </script>
 
 @endsection
 

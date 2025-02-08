@@ -9,6 +9,7 @@ return [
   'password.required' => 'The password must be from 8 to 20 characters!',
   'password.confirmed' => 'Password confirmation does not match.',
   'field.required' => 'This field is required!',
+  'first-name.required' => 'This First Name is required!',
 
   /*
     |--------------------------------------------------------------------------

@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Nova\Attribute;
 use App\Nova\Banner;
 use App\Nova\Category;
+use App\Nova\Consultation;
+use App\Nova\FastOrder;
 use App\Nova\Feedback;
 use App\Nova\Implementation;
 use App\Nova\News;
@@ -53,6 +55,13 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                     MenuItem::resource(PriceType::class),
                     MenuItem::resource(Order::class),
                     MenuItem::resource(Implementation::class),
+
+                ])->icon('collection')->collapsable(),
+
+                MenuSection::make('Замовлення-Консультації', [
+                    MenuItem::resource(Order::class),
+                    MenuItem::resource(Consultation::class),
+                    MenuItem::resource(FastOrder::class),
 
                 ])->icon('collection')->collapsable(),
 

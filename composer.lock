@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8c4c6fbdf9a03449b27c0de25f913077",
+    "content-hash": "ccdeb4fdda18b92bfba9d0ccc8d6290b",
     "packages": [
         {
             "name": "bakerkretzmar/nova-settings-tool",
@@ -9163,6 +9163,53 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.11.0"
             },
             "time": "2022-06-03T18:03:27+00:00"
+        },
+        {
+            "name": "wesselperik/nova-status-field",
+            "version": "2.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wesselperik/nova-status-field.git",
+                "reference": "1b59ca03b658a2ed73b086df7d41394326fe80ef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wesselperik/nova-status-field/zipball/1b59ca03b658a2ed73b086df7d41394326fe80ef",
+                "reference": "1b59ca03b658a2ed73b086df7d41394326fe80ef",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/nova": "^4.0",
+                "php": "^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "WesselPerik\\StatusField\\FieldServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "WesselPerik\\StatusField\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A Laravel Nova field for displaying statuses.",
+            "keywords": [
+                "laravel",
+                "nova",
+                "status"
+            ],
+            "support": {
+                "issues": "https://github.com/wesselperik/nova-status-field/issues",
+                "source": "https://github.com/wesselperik/nova-status-field/tree/2.1.2"
+            },
+            "time": "2022-09-14T19:06:22+00:00"
         }
     ],
     "packages-dev": [

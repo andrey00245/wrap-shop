@@ -46,6 +46,7 @@ $(document).ready(function () {
     $('#simple-popup').removeClass('active');
     $('#search-popup').removeClass('active');
     $('#login-popup').removeClass('active');
+    $('#fast-order-popup').removeClass('active');
     $('.head-top').removeClass('active');
     if($('#cart-popup').hasClass('active')){
       $("html").addClass('no-overflow');
@@ -71,14 +72,33 @@ $(document).ready(function () {
     $('.head-top').removeClass('active');
   }
 
+    function consultPopup(){
+        $('#consult-popup').toggleClass('active');
+        $('#search-popup').removeClass('active');
+        $('#simple-popup').removeClass('active');
+        $('#cart-popup').removeClass('active');
+        $('#fast-order-popup').removeClass('active');
+        $('.head-top').removeClass('active');
+    }
+
+    function fastOrderPopup(){
+        $('#fast-order-popup').toggleClass('active');
+        $('#consult-popup').removeClass('active');
+        $('#search-popup').removeClass('active');
+        $('#simple-popup').removeClass('active');
+        $('#cart-popup').removeClass('active');
+        $('.head-top').removeClass('active');
+    }
+
   function menuPopup(){
     $('.head-top').toggleClass('active');
     $('#login-popup').removeClass('active');
     $('#search-popup').removeClass('active');
     $('#simple-popup').removeClass('active');
     $('#cart-popup').removeClass('active');
+      $('#fast-order-popup').removeClass('active');
 
-    if($('.head-top').hasClass('active')){
+      if($('.head-top').hasClass('active')){
       $("html").addClass('no-overflow');
     }
     else{
@@ -114,10 +134,28 @@ $(document).ready(function () {
     }
   })
 
-  $(".login-popup-close").on("click", function () {
-    loginPopup()
-    $("html").removeClass('no-overflow');
-  })
+    $(".login-popup-close").on("click", function () {
+        loginPopup()
+        $("html").removeClass('no-overflow');
+    })
+
+    $(".consult-popup-open").on("click", function () {
+        if (!$('#consult-popup').hasClass('active')){
+            consultPopup()
+        }
+    })
+
+  $(".consult-popup-close").on("click", function () {
+      consultPopup()
+  });
+
+    $(".fast-order-popup-open").on("click", function () {
+        fastOrderPopup()
+    })
+
+    $(".fast-order-popup-close").on("click", function () {
+        fastOrderPopup()
+    })
   //
   // $("#button-verify-loginpopup").click(function (){
   //   $(".password-group").show()
@@ -237,6 +275,95 @@ function cartPopupSlider(){
       cartSlider.update();
     }
   });
+
+    $(document).ready(function() {
+        $('#button-submit-consultation').on('click', function() {
+            var name = $('#name').val().trim();
+            var phone = $('#phone').val().trim();
+            var email = $('#email').val().trim();
+            var comment = $('#comment').val().trim();
+            var productId = $('#consult-popup-product-id').val();
+
+            var formData = {
+                'name': name,
+                'phone': phone,
+                'email': email,
+                'comment': comment,
+                'product_id': productId
+            };
+
+            $.ajax({
+                url: '/consultation',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#popup-consultation').hide();
+                        $('.popup-consult-thanks').show();
+                    } else {
+                        $('.error-message-consultation').text(response.message).show();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('.error-message-consultation').empty().show();
+
+                    if (xhr.status === 422) {
+                        var errors = xhr.responseJSON.errors;
+                        for (var field in errors) {
+                            var errorMessage = errors[field].join('<br>');
+                            var errorElement = '<div class="error-item"><span>' + errorMessage + '</span></div>';
+                            $('.error-message-consultation').append(errorElement);
+                        }
+                    } else {
+                        $('.error-message-consultation').text('Произошла ошибка. Попробуйте снова.').show();
+                    }
+                }
+            });
+        });
+
+        $('#button-submit-fast-order').on('click', function(e) {
+            e.preventDefault();
+
+            let formData = {
+                product_id: $('#fast-order-product-id').val(),
+                quantity: $('#input-quantity').val(),
+                name: $('#fast_order_name').val(),
+                phone: $('#fast_order_phone').val(),
+                email: $('#fast_order_email').val(),
+                comment: $('#fast_order_comment').val(),
+                total_price: $('#total-price').text(),
+            };
+
+            console.log(formData);
+
+            $.ajax({
+                url: '/fast-order',
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#order-popup').hide();
+                        $('#fast-order-form').hide();
+                        $('.consult-title').hide();
+                        $('.fast-order-success').show();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('.error-message-fast-order').empty().show();
+
+                    if (xhr.status === 422) {
+                        var errors = xhr.responseJSON.errors;
+                        for (var field in errors) {
+                            var errorMessage = errors[field].join('<br>');
+                            var errorElement = '<div class="error-item"><span>' + errorMessage + '</span></div>';
+                            $('.error-message-fast-order').append(errorElement);
+                        }
+                    }
+                }
+            });
+        });
+    });
 }
 
 function showHideSubCategories(){

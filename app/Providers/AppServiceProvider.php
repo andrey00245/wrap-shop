@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
 use App\Nova\Support\DynamicSettings;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 

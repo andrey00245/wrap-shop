@@ -114,8 +114,8 @@
                   class="swiper-slide item swiper-slide-visible swiper-slide-active swiper-slide-thumb-active"
                   role="group">
                   <img data-src="{{$image->getUrl('preview')}}"
-                       title="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
-                       alt="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
+                       title="{{$product->name}}"
+                       alt="{{$product->name}}"
                        src="{{$image->getUrl('preview')}}">
                 </div>
               @endforeach
@@ -158,12 +158,12 @@
                         data-discount='{"0": {"discountFrom": 0, "price": {{$product->getPrice()}}},"1": {"discountFrom": 10, "price": 5700},"2": {"discountFrom": 25, "price": 5300}}'
                         data-value="{{number_format($product->getPrice(), 2, '.', '')}}"><span
                       class="only-price">{{number_format($product->getPrice(), 2, '.', '')}}</span> ₴</span>
-                  <span class="label-lenght">за 1 м.п.</span><span class="cur">$152</span>
+                  <span class="label-lenght"> {{$product->getRollSize() ? 'за 1 м.п.' : 'за 1  шт'}}</span><span class="cur">$ {{$product->getPriceByDollars()}}</span>
                 </div>
               </div>
             </div>
-
-            <ul class="product-discounts">
+              @if($product->getRollSize())
+              <ul class="product-discounts">
               <li>
                 <div class="item-text">
                   10 м.п. і більше: <span class="colord">5700 ₴</span> <span class="cur">| 142.5 $</span>
@@ -188,6 +188,7 @@
                 </div>
               </li>
             </ul>
+              @endif
           </div>
         </div>
         <div id="product" class="bottom">
@@ -197,13 +198,12 @@
                 <label class="text_quantity_unit label-name" for="input-quantity-{{$product->id}}">
                   {{__('product-show.quantity')}}
                 </label>
-
                 <div class="quantity-input-wrappper">
                   <div class="input-group quantity-input-group">
                   <span class="input-group-btn">
                     <button type="button" class="btn btn-primary" id="minus-btn">-</button>
                   </span>
-                    <input type="text" name="quantity" data-min="0.1" data-max="{{$count}}" data-step="0.1" value="0.1"
+                    <input type="text" name="quantity" data-min="{{$product->getMinOrderCount()}}" data-max="{{$count}}" data-step="{{$product->getOrderStep()}}" value="{{$product->getDefaultQuantity()}}"
                            id="input-quantity-{{$product->id}}" class="input-quantity">
                     <span class="input-group-btn">
                     <button type="button" class="btn btn-primary colord" id="plus-btn">+</button>
@@ -218,20 +218,35 @@
               </div>
             </div>
 
-            <div class="price flex-wrap">
-              <div class="default">
-                <div class="top-wrapper">
-                  <span class="text-total-summ">{{__('product-show.total')}} </span>
-                  <span class="text-discount">
-                    {!! __('product-show.discont-text')  !!}
-                  </span>
-                </div>
-                <span class="autocalc-product-price"><span class="total-price">0.00</span> ₴</span>
-              </div>
-            </div>
+{{--            <div class="price flex-wrap">--}}
+{{--              <div class="default">--}}
+{{--                <div class="top-wrapper">--}}
+{{--                  <span class="text-total-summ">{{__('product-show.total')}} </span>--}}
+{{--                  <span class="text-discount">--}}
+{{--                    {!! __('product-show.discont-text')  !!}--}}
+{{--                  </span>--}}
+{{--                    TODO --}}
+{{--                </div>--}}
+{{--                <span class="autocalc-product-price"><span class="total-price">0.00</span> ₴</span>--}}
+{{--              </div>--}}
+{{--            </div>--}}
 
-            <div class="alert alert-info alert-info-xvr">
-              {!! __('product-show.total-description', ['min' => 0.1, 'step' => 0.1]) !!}
+              <div class="price flex-wrap" id="price-block-1">
+                  <div class="default">
+                      <div class="top-wrapper">
+                          <span class="text-total-summ">{{__('product-show.total')}}</span>
+                          <span class="text-discount">
+{{--                                              {!! __('product-show.discont-text')  !!}--}}
+                          {{--                  </span>--}}
+                          {{--                    TODO --}}
+                      </div>
+                      <span class="autocalc-product-price"><span class="total-price">0.00</span> ₴</span>
+                  </div>
+              </div>
+
+
+              <div class="alert alert-info alert-info-xvr">
+              {!! __('product-show.total-description', ['min' => $product->getMinOrderCount(), 'step' => $product->getOrderStep()]) !!}
             </div>
 
             @if($count == 0)
@@ -241,16 +256,17 @@
                     class="fas fa-chevron-right"></i>{!! __('product-show.stock-in-alert') !!}</button>
               </div>
             @elseif($count>0)
-              <button type="button" id="button-cart" class="cart button colord"><i
-                  class="fas fa-chevron-right"></i>{{__('product-show.add-to-cart')}}</button>
-              <button class="speed button btn-quick-order btn-lg btn-block" type="button"
+                  <button type="button" id="button-cart" class="cart button colord" data-product-id="{{$product->id}}">
+                      <i class="fas fa-chevron-right"></i>{{__('product-show.add-to-cart')}}
+                  </button>
+              <button class="speed button btn-quick-order btn-lg fast-order-popup-open" type="button"
                       title="{{__('product-show.fast-buy')}}">
                 <span>{{__('product-show.fast-buy')}}</span>
               </button>
             @endif
 
           </div>
-          <div class="consult-open button">
+          <div class="consult-open consult-popup-open button">
             {{__('product-show.want-to-learn-more')}}
             <span>{{__('product-show.order-a-consultation')}}</span>
           </div>
@@ -270,12 +286,14 @@
           <p><img alt="{{__('product-show.payment')}}" src="{{asset('assets/img/pay.svg')}}"
                   style="width: 350px; float: left;" class="note-float-left"><br></p>
         </div>
+          @if($product->getWarranty())
         <div class="item garant">
           <span class="icon"><img width="68" height="79" src="{{asset('assets/img/icons/protection.svg')}}"
                                   alt="{{__('product-show.guarantee')}}"></span>
           <span class="title">{{__('product-show.guarantee')}}</span>
-          <p>{{__('product-show.guarantee-description', ['month' => 12])}}</p>
+          <p>{{$product->getWarranty() ?? '-' }}</p>
         </div>
+          @endif
       </div>
 
       <div class="code-wishlist-wrapper mobil">
@@ -324,35 +342,44 @@
       </div>
         @endif
     </div>
+      @if($product->getMasterQualification() || $product->getRoomTemperature() || $product->getStoreTerms())
     <div class="product-page-claim wrap row">
       <div class="title">{{__('product-show.requirements')}}</div>
       <div class="desc">{{__('product-show.requirements_desc')}}</div>
       <div class="list flex-justify">
+          @if($product->getMasterQualification())
         <div class="item">
-          <div class="image"><img data-src="{{asset('assets/img/icons/Qualification-2.svg')}}"
+          <div class="image"><img data-src="{{asset('assets/img/icons/Qualification-'.$product->getMasterQualification().'.svg')}}"
                                   alt="Кваліфікація майстра - Вимоги" title="Кваліфікація майстра - Вимоги"></div>
-          <div class="value">2<sup>/5</sup></div>
+          <div class="value">{{$product->getMasterQualification()}}<sup>/5</sup></div>
           <div class="name">{{__('product-show.masters-qualification')}}</div>
         </div>
+          @endif
+              @if($product->getRoomTemperature())
         <div class="item">
           <div class="image"><img data-src="{{asset('assets/img/icons/Temperature.png')}}"
                                   alt="Температура приміщення - Вимоги" title="Температура приміщення - Вимоги"></div>
-          <div class="value">{{__('product-show.room-temperature-val', ['temperature' => 16])}}</div>
+          <div class="value">{{__('product-show.room-temperature-val', ['temperature' => $product->getRoomTemperature()])}}</div>
           <div class="name">{{__('product-show.room-temperature')}}</div>
         </div>
+              @endif
+              @if($product->getStoreTerms())
         <div class="item">
           <div class="image"><img data-src="{{asset('assets/img/icons/Term.png')}}" alt="Термін зберігання - Вимоги"
                                   title="Термін зберігання - Вимоги"></div>
-          <div class="value">{{__('product-show.expiration-date-val', ['month' => 24])}}</div>
+          <div class="value">{{$product->getStoreTerms()}}</div>
           <div class="name">{{__('product-show.expiration-date')}}</div>
         </div>
+              @endif
       </div>
     </div>
+      @endif
   </section>
 
   @include('base.components.examples-of-work')
   @include('base.components.latest')
-
+  @include('base.components.consult-popup')
+  @include('base.components.fast-order-popup')
 
   @push('scripts')
     <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>

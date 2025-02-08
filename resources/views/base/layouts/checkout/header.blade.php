@@ -13,11 +13,11 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
       </div>
-
-      <div class="head-continue">
-        <a href="{{route('index')}}" title="продовжити покупки" class="button">продовжити покупки
-        </a>
-      </div>
+        @if(Route::currentRouteName() !== 'checkout.success')
+            <div class="head-continue">
+                <a href="{{ route('index') }}" title="продовжити покупки" class="button">продовжити покупки</a>
+            </div>
+        @endif
       <div class="head-catalog-bg"></div>
       <div class="head-logo">
         <a href="{{route('index')}}" title="Wrap.Shop">
@@ -38,7 +38,7 @@
       <div class="head-buttons">
         <div class="search-popup-open button search far fa-search"></div>
         <button class="button cart-open far fa-shopping-cart dropdown-toggle"><span
-            id="cart-total" class="cart-total flex-center">0</span></button>
+            id="cart-total" class="cart-total flex-center">{{$cartItemsCount}}</span></button>
         @guest
           <div id="wishlist-total" class="button heart login-show far fa-heart login-popup-open"><span
               class="wishlist-total flex-center">{{count(session()->get('wishlist', []))}}</span></div>

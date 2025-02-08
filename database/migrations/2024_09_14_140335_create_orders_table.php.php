@@ -14,6 +14,17 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->string('phone');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('email');
+            $table->string('shipping_method');
+            $table->string('payment_method');
+            $table->text('comment')->nullable();
+            $table->string('shipping_address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('status')->default('new');
+            $table->timestamps();
         });
     }
 

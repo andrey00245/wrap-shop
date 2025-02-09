@@ -84,8 +84,6 @@ class OrderController extends Controller
             ]);
         }
 
-
-
         return redirect()->route('checkout.success');
     }
 }

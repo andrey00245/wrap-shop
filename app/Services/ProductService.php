@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\ProcessProductImages;
 use App\Models\Attribute;
 use App\Models\ExpenseCategory;
 use App\Models\Product;
@@ -57,7 +58,77 @@ class ProductService
             return $product->getMedia('images')->isEmpty();
         });
 
-        $this->syncImages($products);
+        $products->each(function ($product) {
+            ProcessProductImages::dispatch($product);
+        });
+    }
+
+    protected function syncImages(Collection $products)
+    {
+        $username = config('app.my_store.username');
+        $password = config('app.my_store.password');
+        $encodedCredentials = base64_encode("{$username}:{$password}");
+
+        foreach ($products as $product) {
+            $prodExternalId = $product->external_id;
+            $jsonUrl = "https://api.moysklad.ru/api/remap/1.2/entity/product/{$prodExternalId}/images";
+
+            $response = Http::withHeaders([
+                'Authorization'   => 'Basic ' . $encodedCredentials,
+                'Accept-Encoding' => 'gzip',
+            ])->get($jsonUrl);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+
+                if (isset($data['rows']) && is_array($data['rows'])) {
+                    foreach ($data['rows'] as $image) {
+                        $downloadUrl = $image['meta']['downloadHref'] ?? null;
+                        if ($downloadUrl && filter_var($downloadUrl, FILTER_VALIDATE_URL)) {
+                            $this->handleImageDownload($product, $downloadUrl, $encodedCredentials);
+                        } else {
+                            Log::warning("Invalid download URL for product ID {$prodExternalId}");
+                        }
+                    }
+                } else {
+                    Log::warning("No images found for product ID {$prodExternalId}.");
+                }
+            } else {
+                Log::error("Failed to get images for product ID {$prodExternalId}. Status: {$response->status()}");
+            }
+        }
+
+        return response()->json([
+            'message' => 'Image synchronization completed.',
+        ]);
+    }
+
+    protected function handleImageDownload($product, $downloadUrl, $encodedCredentials): void
+    {
+        $imageResponse = Http::withHeaders([
+            'Authorization'   => 'Basic ' . $encodedCredentials,
+            'Accept-Encoding' => 'gzip',
+        ])->get($downloadUrl);
+
+        if ($imageResponse->successful()) {
+            $fileContent = $imageResponse->body();
+            $hash = md5($fileContent);
+            $uniqueFilename = $hash . '.png';
+
+            try {
+                $mediaItem = $product->addMediaFromStream($fileContent)
+                    ->usingFileName($uniqueFilename)
+                    ->toMediaCollection('images');
+
+                $mediaItem->getConversions();
+
+            } catch (\Exception $e) {
+                Log::error("Failed to save image for product ID {$product->external_id}. Error: {$e->getMessage()}");
+            }
+        } else {
+            Log::error("Failed to download image from {$downloadUrl}. Status: {$imageResponse->status()}");
+        }
     }
 
     /**
@@ -174,7 +245,7 @@ class ProductService
     {
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::SITE_CATEGORY) {
-                $categoryIds = $this->getCategoryIds($attribute->value->name);
+                $categoryIds = $this->getCategoryIds(trim($attribute->value->name));
                 $product->update(['category_id' => end($categoryIds)]);
             }
         }
@@ -667,68 +738,6 @@ class ProductService
             if ($attribute->id === ProductAttributeEnum::DEFAULT_QUANTITY) {
                 $this->saveProductAttribute($attribute, $product, 'default_quantity');
             }
-        }
-    }
-
-    protected function syncImages(Collection $products)
-    {
-        $username = config('app.my_store.username');
-        $password = config('app.my_store.password');
-        $encodedCredentials = base64_encode("{$username}:{$password}");
-
-        foreach ($products as $product) {
-            $prodExternalId = $product->external_id;
-            $jsonUrl = "https://api.moysklad.ru/api/remap/1.2/entity/product/{$prodExternalId}/images";
-
-            $response = Http::withHeaders([
-                'Authorization'   => 'Basic ' . $encodedCredentials,
-                'Accept-Encoding' => 'gzip',
-            ])->get($jsonUrl);
-
-            if ($response->successful()) {
-                $data = $response->json();
-
-                if (isset($data['rows']) && is_array($data['rows'])) {
-                    foreach ($data['rows'] as $image) {
-                        $downloadUrl = $image['meta']['downloadHref'] ?? null;
-                        if ($downloadUrl) {
-                            $this->handleImageDownload($product, $downloadUrl, $encodedCredentials);
-                        }
-                    }
-                } else {
-                    Log::warning("No images found for product ID {$prodExternalId}.");
-                }
-            } else {
-                Log::error("Failed to get images for product ID {$prodExternalId}. Status: {$response->status()}");
-            }
-        }
-
-        return response()->json([
-            'message' => 'Image synchronization completed.',
-        ]);
-    }
-
-    protected function handleImageDownload($product, $downloadUrl, $encodedCredentials): void
-    {
-        $imageResponse = Http::withHeaders([
-            'Authorization'   => 'Basic ' . $encodedCredentials,
-            'Accept-Encoding' => 'gzip',
-        ])->get($downloadUrl);
-
-        if ($imageResponse->successful()) {
-            $fileContent = $imageResponse->body();
-            $hash = md5($fileContent);
-            $uniqueFilename = $hash . '.png';
-
-            try {
-                $product->addMediaFromStream($fileContent)
-                    ->usingFileName($uniqueFilename)
-                    ->toMediaCollection('images');
-            } catch (\Exception $e) {
-                Log::error("Failed to save image for product ID {$product->external_id}. Error: {$e->getMessage()}");
-            }
-        } else {
-            Log::error("Failed to download image from {$downloadUrl}. Status: {$imageResponse->status()}");
         }
     }
 

@@ -67,10 +67,6 @@ class ProductService
     {
         $parseData = $item->jsonSerialize();
 
-        if ($parseData->code == 12435){
-            dd($parseData);
-        }
-
         $product = Product::updateOrCreate(
             ['external_id' => $parseData->id],
             [

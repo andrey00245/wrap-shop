@@ -46,7 +46,7 @@
                         <td class="">
                             <div class="price flex-wrap" id="price-block-2">
                                 <div class="default">
-                                    <span class="autocalc-product-price"><span class="total-price" id="total-price">0.00</span> ₴</span>
+                                    <span class="autocalc-product-price"><span class="total-price" >0.00</span> ₴</span>
                                 </div>
                             </div>
                         </td>

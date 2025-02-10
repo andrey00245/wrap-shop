@@ -1873,9 +1873,13 @@ body::-webkit-scrollbar {
 
 .additional-info .additional-text {
   color: white;
+  text-align: center;
   text-transform: uppercase;
 }
 
+.error {
+    color: red;
+}
 .text-banner-home-product {
   display: flex;
   flex-direction: column;
@@ -2383,6 +2387,12 @@ body::-webkit-scrollbar {
   text-transform: uppercase;
   line-height: 14px;
   white-space: nowrap;
+}
+
+.product-default .bottom .button:disabled {
+    color: #A9A9A9;
+    cursor: not-allowed;
+    text-shadow: none;
 }
 
 .product-default .bottom .button i {

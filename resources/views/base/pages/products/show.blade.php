@@ -137,7 +137,7 @@
         </div>
         <div class="center flex-justify">
           @php
-            $count=30
+            $count= $product->getStock()
           @endphp
           <div class="left">
             <div class="info flex-center">
@@ -152,21 +152,24 @@
 
             <div class="price flex-wrap">
               <div class="default">
-                {{--                <span class="text_price_XVR label-name">{{__('product-show.price')}} </span>--}}
+{{--                                <span class="text_price_XVR label-name">{{__('product-show.price')}} </span>--}}
                 <div class="flex-center price-wrap">
                   <span class="item-price"
-                        data-discount='{"0": {"discountFrom": 0, "price": {{$product->getPrice()}}},"1": {"discountFrom": 10, "price": 5700},"2": {"discountFrom": 25, "price": 5300}}'
-                        data-value="{{number_format($product->getPrice(), 2, '.', '')}}"><span
+                        data-discount='{"0": {"discountFrom": 0, "price": {{$product->getPrice()}}},"1": {"discountFrom": 10, "price": {{$product->getSmallPrice()}}},"2": {"discountFrom": 25, "price": {{$product->getBigPrice()}}}}'
+                        data-value="{{number_format($product->getPrice(), 2, '.', '')}}">
+
+                      <span
                       class="only-price">{{number_format($product->getPrice(), 2, '.', '')}}</span> ₴</span>
-                  <span class="label-lenght"> {{$product->getRollSize() ? 'за 1 м.п.' : 'за 1  шт'}}</span><span class="cur">$ {{$product->getPriceByDollars()}}</span>
+                  <span class="label-lenght"> {{$product->getRollSize() ? 'за 1 м.п.' : 'за 1  шт'}}</span><span class="cur">$ {{$product->getPriceByDollars($product->getPrice())}}</span>
                 </div>
               </div>
             </div>
-              @if($product->getRollSize())
+
+              @if($product->getRollSize() && $count >= 10)
               <ul class="product-discounts">
               <li>
                 <div class="item-text">
-                  10 м.п. і більше: <span class="colord">5700 ₴</span> <span class="cur">| 142.5 $</span>
+                  10 м.п. і більше: <span class="colord">{{$product->getSmallPrice()}} ₴</span> <span class="cur">| {{$product->getPriceByDollars($product->getSmallPrice())}} $</span>
                 </div>
                 <div class="item-btn">
                   <span data-quantity="10"
@@ -178,7 +181,7 @@
 
               <li>
                 <div class="item-text">
-                  25 м.п. і більше: <span class="colord">5300 ₴</span> <span class="cur">| 132.5 $</span>
+                  25 м.п. і більше: <span class="colord">{{$product->getBigPrice()}} ₴</span> <span class="cur">| {{$product->getPriceByDollars($product->getBigPrice())}} $</span>
                 </div>
                 <div class="item-btn">
                   <span data-quantity="25"
@@ -203,7 +206,7 @@
                   <span class="input-group-btn">
                     <button type="button" class="btn btn-primary" id="minus-btn">-</button>
                   </span>
-                    <input type="text" name="quantity" data-min="{{$product->getMinOrderCount()}}" data-max="{{$count}}" data-step="{{$product->getOrderStep()}}" value="{{$product->getDefaultQuantity()}}"
+                    <input type="text" name="quantity" data-min="{{$count > 0 ? $product->getMinOrderCount() : 0}}" data-max="{{$count}}" data-step="{{$count > 0 ? $product->getOrderStep(): 0}}" value="{{$count > 0 ?$product->getDefaultQuantity() : 0}}"
                            id="input-quantity-{{$product->id}}" class="input-quantity">
                     <span class="input-group-btn">
                     <button type="button" class="btn btn-primary colord" id="plus-btn">+</button>
@@ -218,27 +221,13 @@
               </div>
             </div>
 
-{{--            <div class="price flex-wrap">--}}
-{{--              <div class="default">--}}
-{{--                <div class="top-wrapper">--}}
-{{--                  <span class="text-total-summ">{{__('product-show.total')}} </span>--}}
-{{--                  <span class="text-discount">--}}
-{{--                    {!! __('product-show.discont-text')  !!}--}}
-{{--                  </span>--}}
-{{--                    TODO --}}
-{{--                </div>--}}
-{{--                <span class="autocalc-product-price"><span class="total-price">0.00</span> ₴</span>--}}
-{{--              </div>--}}
-{{--            </div>--}}
-
-              <div class="price flex-wrap" id="price-block-1">
+              <div class="price flex-wrap">
                   <div class="default">
                       <div class="top-wrapper">
                           <span class="text-total-summ">{{__('product-show.total')}}</span>
                           <span class="text-discount">
-{{--                                              {!! __('product-show.discont-text')  !!}--}}
-                          {{--                  </span>--}}
-                          {{--                    TODO --}}
+                                              {!! __('product-show.discont-text')  !!}
+                                            </span>
                       </div>
                       <span class="autocalc-product-price"><span class="total-price">0.00</span> ₴</span>
                   </div>

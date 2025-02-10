@@ -175,11 +175,13 @@ return [
     */
 
   'attributes' => [
-    'email' => 'Email',
-    'name' => 'Name',
-    'phone' => 'Phone'
+      'email'            => 'Email',
+      'name'             => 'Name',
+      'phone'            => 'Phone',
+      'first-name'       => "First Name",
+      'last-name'        => 'Last Name',
+      'city'             => 'City',
+      'shipping_address' => 'Department / Address',
   ],
-
-
 ]
 ?>

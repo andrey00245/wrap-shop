@@ -44,7 +44,7 @@
                   <span class="input-group-btn">
                     <button type="button" class="btn btn-primary" id="minus-btn-cart">-</button>
                   </span>
-                                <input type="text"   name="quantity" data-min="{{$item['product']->getMinOrderCount()}}" data-max="{{10}}" data-step="{{$item['product']->getOrderStep()}}" value="{{$item['quantity']}}"
+                                <input type="text"  name="quantity" data-min="{{$item['product']->getMinOrderCount()}}" data-max="{{$item['product']->getStock()}}" data-step="{{$item['product']->getOrderStep()}}" value="{{$item['quantity']}}"
                                        id="input-quantity-1" class="input-quantity">
                                 <span class="input-group-btn">
                     <button type="button" class="btn btn-primary colord" id="plus-btn-cart">+</button>
@@ -52,7 +52,7 @@
                             </div>
 
                             <div class="max-value-group">
-                                <span class="max-value">{{__('product-show.max-quantity', ['max' => 10])}}</span>
+                                <span class="max-value">{{__('product-show.max-quantity', ['max' => $item['product']->getStock()])}}</span>
                             </div>
                         </div>
                     </td>
@@ -61,7 +61,7 @@
                         {{$item['product']->getPriceByCount($item['quantity']) ?? $sum}} ₴
                     </td>
                     <td class="delete">
-                        <button type="button" title="Видалити" data-id="{{$item->id ?? $item['product']->id}}"
+                        <button type="button" title="Видалити" data-id="{{$item->product->id ?? $item['product']->id}}"
                                 class="btn btn-danger btn-xs remove-cart-button"><i
                                 class="fas fa-trash"></i></button>
                     </td>

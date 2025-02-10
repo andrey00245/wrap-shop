@@ -397,6 +397,40 @@ class Product extends Model implements HasMedia
         return $this->attributes()->where('field_name', 'default_quantity')->first()?->pivot?->value;
     }
 
+    public function getFirstStock()
+    {
+        return $this->attributes()->where('field_name', 'first_stock')->first()?->pivot?->value;
+    }
+
+    public function getSecondStock()
+    {
+        return $this->attributes()->where('field_name', 'second_stock')->first()?->pivot?->value;
+    }
+
+    public function getThirdStock()
+    {
+        return $this->attributes()->where('field_name', 'third_stock')->first()?->pivot?->value;
+    }
+
+    public function getStock(): float
+    {
+        return (float) $this->getFirstStock() + (float) $this->getSecondStock() + ( float) $this->getThirdStock();
+    }
+
+    public function getSmallPrice(): float
+    {
+        return $this->prices()->whereHas('type', function ($query) {
+            $query->where('price_types.external_id', 'bb2a9b0f-26f6-11ee-0a80-0f50000d072f');
+        })->value('price');
+    }
+
+    public function getBigPrice(): float
+    {
+        return $this->prices()->whereHas('type', function ($query) {
+            $query->where('price_types.external_id', 'bb2a9b91-26f6-11ee-0a80-0f50000d0730');
+        })->value('price');
+    }
+
     public function getWarranty()
     {
         return $this->attributes()->where('field_name', 'warranty')->first()?->pivot?->value;
@@ -417,9 +451,9 @@ class Product extends Model implements HasMedia
         return $this->attributes()->where('field_name', 'master_qualification')->first()?->pivot?->value;
     }
 
-    public function getPriceByDollars()
+    public function getPriceByDollars($price)
     {
-       return round($this->getPrice() / 42,0);
+       return round($price / 42,0);
     }
 
     public function getMinOrderCount()
@@ -437,11 +471,35 @@ class Product extends Model implements HasMedia
         return $this->attributes()->where('field_name', 'roll_size')->first()?->pivot?->value;
     }
 
+    public function getStructure()
+    {
+        return $this->attributes()->where('field_name', 'structure')->first();
+    }
+
+    public function getPurpose()
+    {
+        return $this->attributes()->where('field_name', 'purpose')->first();
+    }
+
+    public function getType()
+    {
+        return $this->attributes()->where('field_name', 'type')->first();
+    }
+
     public function getPriceByCount($count)
     {
         $productPrice = $this->getPrice();
 
         if ($this->getRollSize()) {
+
+            if ($count >= 10 && $count <= 24){
+                $productPrice = $this->getSmallPrice();
+            }
+
+            if ($count >= 25 ){
+                $productPrice = $this->getBigPrice();
+            }
+
             return $productPrice * $count;
         }
 

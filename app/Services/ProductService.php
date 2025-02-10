@@ -95,6 +95,9 @@ class ProductService
 //           $this->processExpenseCategory($attributes, $product);
            $this->processBrand($attributes, $product);
            $this->processRollSize($attributes, $product);
+           $this->processFirstStock($attributes, $product);
+           $this->processSecondStock($attributes, $product);
+           $this->processThirdStock($attributes, $product);
            $this->processThickness($attributes, $product);
            $this->processMaterialStretchingPercent($attributes, $product);
            $this->processProtectionLiner($attributes, $product);
@@ -263,6 +266,46 @@ class ProductService
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::ROLL_SIZE) {
                 $this->saveProductAttribute($attribute, $product, 'roll_size');
+            }
+        }
+    }
+
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processFirstStock($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::STOCK_QUANTITY_1) {
+                $this->saveProductAttribute($attribute, $product, 'first_stock');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processSecondStock($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::STOCK_QUANTITY_2) {
+                $this->saveProductAttribute($attribute, $product, 'second_stock');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processThirdStock($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::STOCK_QUANTITY_3) {
+                $this->saveProductAttribute($attribute, $product, 'third_stock');
             }
         }
     }

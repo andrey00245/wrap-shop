@@ -18,17 +18,16 @@ class CartController extends Controller
         $sum = 0;
 
         if (Auth::check()) {
-            /**
-             * @var User $user;
-             */
             $user = Auth::user();
 
+            // Поиск товара в корзине
             $cartItem = $user->cartItems()->where('product_id', $productId)->first();
 
             if ($cartItem) {
                 $cartItem->quantity += $quantity;
                 $cartItem->save();
             } else {
+                // Если товара нет в корзине, добавляем новый
                 CartItem::create([
                     'product_id' => $productId,
                     'user_id' => $user->id,
@@ -36,25 +35,29 @@ class CartController extends Controller
                 ]);
             }
 
-            foreach ($user->cartItems  as $item)
-            {
-                $sum += $item->getPriceByCount($item->quantity);
+            // Пересчитываем общую сумму корзины
+            foreach ($user->cartItems as $item) {
+                $sum += $item->product->getPriceByCount($item->quantity);
             }
 
-            $html = view('base.components.cart-items',
-                [
-                    'cartItems' => $user->cartItems,
-                    'cartItemsCount' => $user->cartItems->count(),
-                    'sum' => $sum,
-                ]
-            )->render();
+            // Округление суммы до 2 знаков после запятой
+            $sum = round($sum, 2);
+
+            // Генерация HTML для корзины
+            $html = view('base.components.cart-items', [
+                'cartItems' => $user->cartItems,
+                'cartItemsCount' => $user->cartItems->count(),
+                'sum' => $sum,
+            ])->render();
 
             return response()->json([
                 'cartItems' => $html,
-                'cartItemsCount' => $user->cartItems->count()
+                'cartItemsCount' => $user->cartItems->count(),
+                'sum' => $sum,
             ]);
         }
 
+        // Для неавторизованных пользователей
         $cartItems = Session::get('cart', []);
 
         if (isset($cartItems[$productId])) {
@@ -69,23 +72,29 @@ class CartController extends Controller
             }
         }
 
-
+        // Сохраняем изменения в сессии
         Session::put('cart', $cartItems);
         $cartItemsCount = count($cartItems);
 
-        foreach ($cartItems  as $item)
-        {
+        // Пересчитываем общую сумму корзины
+        foreach ($cartItems as $item) {
             $sum += $item['product']->getPriceByCount($item['quantity']);
         }
 
+        // Округление суммы до 2 знаков после запятой
+        $sum = round($sum, 2);
+
+        // Генерация HTML для корзины
         $html = view('base.components.cart-items', compact([
             'cartItems',
             'cartItemsCount',
-            'sum'
+            'sum',
         ]))->render();
+
         return response()->json([
             'cartItems' => $html,
             'cartItemsCount' => $cartItemsCount,
+            'sum' => $sum,
         ]);
     }
 
@@ -94,51 +103,61 @@ class CartController extends Controller
         $sum = 0;
         if (Auth::check()) {
             $user = Auth::user();
-           CartItem::where('product_id', $productId)
+
+            // Удаление товара из корзины
+            CartItem::where('product_id', $productId)
                 ->where('user_id', $user->id)
                 ->delete();
 
-            foreach ($user->cartItems  as $item)
-            {
-                $sum += $item->getPriceByCount($item->quantity);
+            // Пересчитываем общую сумму корзины
+            foreach ($user->cartItems as $item) {
+                $sum += $item->product->getPriceByCount($item->quantity);
             }
 
-            $html = view('base.components.cart-items',
-                [
-                    'cartItems' => $user->cartItems,
-                    'cartItemsCount' => $user->cartItems->count(),
-                    'sum',
-                ]
-            )->render();
+            // Округляем сумму
+            $sum = round($sum, 2);
+
+            // Генерация HTML для корзины
+            $html = view('base.components.cart-items', [
+                'cartItems' => $user->cartItems,
+                'cartItemsCount' => $user->cartItems->count(),
+                'sum' => $sum,
+            ])->render();
 
             return response()->json([
                 'cartItems' => $html,
                 'cartItemsCount' => $user->cartItems->count(),
+                'sum' => $sum,
             ]);
         }
 
+        // Для неавторизованных пользователей
         $cartItems = Session::get('cart', []);
-
 
         if (isset($cartItems[$productId])) {
             unset($cartItems[$productId]);
             Session::put('cart', $cartItems);
             $cartItemsCount = count($cartItems);
-            foreach ($cartItems  as $item)
-            {
 
+            // Пересчитываем общую сумму корзины
+            foreach ($cartItems as $item) {
                 $sum += $item['product']->getPriceByCount($item['quantity']);
             }
 
+            // Округляем сумму
+            $sum = round($sum, 2);
+
+            // Генерация HTML для корзины
             $html = view('base.components.cart-items', compact([
                 'cartItems',
                 'cartItemsCount',
-                'sum'
+                'sum',
             ]))->render();
 
             return response()->json([
                 'cartItems' => $html,
                 'cartItemsCount' => $cartItemsCount,
+                'sum' => $sum,
             ]);
         }
 
@@ -178,34 +197,40 @@ class CartController extends Controller
 
             // Пересчитываем общую сумму корзины
             foreach ($user->cartItems as $item) {
-                $sum += $item->getPriceByCount($item->quantity);
+                $sum += $item->product->getPriceByCount($item->quantity);
             }
 
-            // Генерируем HTML для обновления корзины
+            // Округляем сумму до 2 знаков после запятой
+            $sum = round($sum, 2);
+
+            // Генерация HTML для корзины
             $html = view('base.components.cart-items', [
                 'cartItems' => $user->cartItems,
                 'cartItemsCount' => $user->cartItems->count(),
-                'sum' => round($sum, 2),
+                'sum' => $sum,
             ])->render();
 
-            // Возвращаем обновленные данные корзины
+            // Округляем цену обновленного товара
+            $updatedPrice = round($cartItem->product->getPriceByCount($quantity), 2);
+
+            // Возвращаем обновленные данные
             return response()->json([
                 'cartItems' => $html,
                 'cartItemsCount' => $user->cartItems->count(),
-                'sum' => round($sum, 2),
-                'updatedPrice' => $cartItem->product->getPriceByCount($quantity),
+                'sum' => $sum,
+                'updatedPrice' => $updatedPrice,
                 'cartTotal' => $sum,
             ]);
         }
 
-        // Если пользователь не авторизован, то работаем с сессионной корзиной
+        // Для неавторизованных пользователей
         $cartItems = Session::get('cart', []);
 
         if (isset($cartItems[$productId])) {
-            // Если товар уже есть в корзине, обновляем количество
+            // Обновляем количество товара
             $cartItems[$productId]['quantity'] = $quantity;
         } else {
-            // Если товара нет в корзине, добавляем новый товар
+            // Если товара нет в корзине, добавляем его
             $product = Product::find($productId);
             if ($product) {
                 $cartItems[$productId] = [
@@ -215,7 +240,7 @@ class CartController extends Controller
             }
         }
 
-        // Сохраняем обновленные данные корзины в сессии
+        // Сохраняем изменения в сессии
         Session::put('cart', $cartItems);
 
         // Пересчитываем общую сумму корзины
@@ -223,19 +248,24 @@ class CartController extends Controller
             $sum += $item['product']->getPriceByCount($item['quantity']);
         }
 
-        // Генерируем HTML для обновления корзины
+        // Округляем сумму до 2 знаков после запятой
+        $sum = round($sum, 2);
+
+        // Генерация HTML для корзины
         $html = view('base.components.cart-items', [
             'cartItems' => $cartItems,
             'cartItemsCount' => count($cartItems),
             'sum' => $sum,
         ])->render();
 
-        // Возвращаем обновленные данные
+        // Округляем цену обновленного товара
+        $updatedPrice = round($cartItems[$productId]['product']->getPriceByCount($quantity), 2);
+
         return response()->json([
             'cartItems' => $html,
             'cartItemsCount' => count($cartItems),
             'sum' => $sum,
-            'updatedPrice' => $cartItems[$productId]['product']->getPriceByCount($quantity),
+            'updatedPrice' => $updatedPrice,
             'cartTotal' => $sum,
         ]);
     }

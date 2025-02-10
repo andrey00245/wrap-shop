@@ -14,8 +14,23 @@
   @endpush
   {{--  </div>--}}
 
+
   <section id="content" class="page-checkout wrap row">
-    <div class="simple-content">
+      @if($cartItemsCount == 0)
+          <div class="simple-content">
+              <div id="simplecheckout_form_0">
+                  <div class="simplecheckout">
+                      <div class="content">Ваш кошик порожній!</div>
+                      <div style="display:none;" id="simplecheckout_cart_total">0</div>
+                      <div class="simplecheckout-button-block buttons">
+                          <div class="simplecheckout-button-right right"><a href="{{route('index')}}" class="button btn-primary button_oc btn colord"><i class="fas fa-chevron-right"></i><span>Продовжити</span></a></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      @endif
+          @if($cartItemsCount > 0)
+          <div class="simple-content">
       <div id="simplecheckout_form_0">
           <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm">
               @csrf
@@ -74,6 +89,7 @@
                 </div>
               </div>
 
+                @guest
               <div class="has-account">
                 <div class="container">
                   <div class="has-account-background">
@@ -81,21 +97,21 @@
                   </div>
                 </div>
               </div>
-
+                @endguest
               <div class="data-for-order">
                 <div class="container">
                   <div class="input-fields-wrapper">
                     <p class="title"><span>01</span> Контактні данні</p>
                     <div class="input-group">
                       <label for="phone">Номер телефону</label>
-                        <input type="text" name="phone" id="phone" placeholder="Телефон" value="{{ old('phone') }}" required>
+                        <input type="text" name="phone" id="phone" placeholder="Телефон" value="{{ old('phone') ?? (auth()->check() ? auth()->user()->phone : '') }}" required>
                         @error('phone')
                         <div class="error">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="input-group">
                       <label for="first-name">Ім'я</label>
-                        <input type="text" name="first-name" placeholder="Ім'я" id="first-name" value="{{ old('first-name') }}" required>
+                        <input type="text" name="first-name" placeholder="Ім'я" id="first-name" value="{{ old('first-name') ?? (auth()->check() ? auth()->user()->name : '') }}" required>
                         @error('first-name')
                         <div class="error">{{ $message }}</div>
                         @enderror
@@ -103,12 +119,13 @@
 
                     <div class="input-group">
                       <label for="last-name">Прізвище</label>
-                        <input type="text" name="last-name" id="last-name" placeholder="Прізвище" value="{{ old('last-name') }}" required>
+                        <input type="text" name="last-name" id="last-name" placeholder="Прізвище" value="{{ old('last-name') ?? (auth()->check() ? auth()->user()->last_name : '') }}" required>
                         @error('last-name')
                         <div class="error">{{ $message }}</div>
                         @enderror
                     </div>
 
+                      @guest
                     <div class="input-group">
                       <label for="email">Email</label>
                         <input type="email" name="email" id="email" placeholder="Email" value="{{ old('email') }}" required>
@@ -116,6 +133,7 @@
                         <div class="error">{{ $message }}</div>
                         @enderror
                     </div>
+                      @endguest
                   </div>
 
                   <div class="input-fields-wrapper">
@@ -124,31 +142,31 @@
                     <div class="simplecheckout-block-content" id="simplecheckout_shipping" style="overflow: visible;">
                       <div class="radio">
                         <label for="pickup" class="custom-radio">
-                          <input type="radio" data-onchange="reloadAll" name="shipping_method" value="pickup"
-                                 id="pickup" checked="checked">
+                            <input type="radio" data-onchange="reloadAll" name="shipping_method" value="pickup"
+                                   id="pickup" {{ old('shipping_method') == 'pickup' ? 'checked' : '' }}>
                           <span class="radio-label">Самовивіз з ательє <span
                               class="colord">м. Київ, вул. Ізюмська 5а</span></span>
                         </label>
                       </div>
                       <div class="radio">
                         <label for="flat" class="custom-radio">
-                          <input type="radio" data-onchange="reloadAll" name="shipping_method" value="flat"
-                                 id="flat">
+                            <input type="radio" data-onchange="reloadAll" name="shipping_method" value="flat"
+                                   id="flat" {{ old('shipping_method') == 'flat' ? 'checked' : '' }}>
                           <span class="radio-label">Доставка по Києву</span>
                         </label>
                       </div>
                       <div class="radio">
                         <label for="novaposhta" class="custom-radio">
-                          <input type="radio" data-onchange="reloadAll" name="shipping_method"
-                                 value="novaposhta" id="novaposhta">
+                            <input type="radio" data-onchange="reloadAll" name="shipping_method" value="novaposhta"
+                                   id="novaposhta" {{ old('shipping_method') == 'novaposhta' ? 'checked' : '' }}>
                           <span class="radio-label">Відділення Нової Пошти</span>
                         </label>
                       </div>
                       <fieldset id="novaposhta_desc" class="radio-description">Оплата за тарифами перевізника</fieldset>
                       <div class="radio">
                         <label for="novaposhta_doors" class="custom-radio">
-                          <input type="radio" data-onchange="reloadAll" name="shipping_method" value="novaposhta_doors"
-                                 id="novaposhta_doors">
+                            <input type="radio" data-onchange="reloadAll" name="shipping_method" value="novaposhta_doors"
+                                   id="novaposhta_doors" {{ old('shipping_method') == 'novaposhta_doors' ? 'checked' : '' }}>
                           <span class="radio-label">Кур'єр Нової Пошти</span>
                         </label>
                       </div>
@@ -162,15 +180,22 @@
                       <fieldset>
                         <div class="input-group">
                           <label for="city">Населений пункт</label>
-                          <input type="text" name="city" id="city">
+                            <input type="text" id="city" name="city" value="{{ old('city') }}" class="form-control">
+                            @error('city')
+                            <div class="error">{{ $message }}</div>
+                            @enderror
                           <div style="display:none;" data-for="shipping_address_address_1" data-for-type="text"
                                data-rule="notEmpty" class="simplecheckout-error-text simplecheckout-rule"
                                data-not-empty="1" data-required="true">Це поле обов'язкове!
                           </div>
+
                         </div>
                         <div class="input-group">
                           <label for="shipping_address">Відділення / Адреса</label>
-                          <input type="text" name="shipping_address" id="shipping_address">
+                            <input type="text" id="shipping_address" name="shipping_address" value="{{ old('shipping_address') }}" class="form-control">
+                            @error('shipping_address')
+                            <div class="error">{{ $message }}</div>
+                            @enderror
                           <div style="display:none;" data-for="shipping_address_address_1" data-for-type="text"
                                data-rule="notEmpty" class="simplecheckout-error-text simplecheckout-rule"
                                data-not-empty="1" data-required="true">Це поле обов'язкове!
@@ -178,9 +203,7 @@
                         </div>
                       </fieldset>
                     </div>
-
                   </div>
-
 
                   <div class="input-fields-wrapper">
                     <p class="title"><span>03</span> Оплата</p>
@@ -211,7 +234,7 @@
                   </div>
                   <div class="input-group">
                     <label for="comment">Хочете залишити коментар?</label>
-                      <input name="comment" id="comment" placeholder="Коментар">{{ old('comment') }}
+                      <input name="comment" id="comment" placeholder="Коментар" value="{{ old('comment') }}">
                       @error('comment')
                       <div class="error">{{ $message }}</div>
                       @enderror
@@ -282,7 +305,7 @@
                           {{$item['product']->getPrice()}} ₴<span class="price-unit-xvr"></span>
                       </td>
                       <td class="total">
-                          {{$item['product']->getPrice()}} ₴<span class="count">х {{$item['product']->getRollSize() ? 'за 1 м.п.' : 'за 1  шт'}}</span>
+                          {{$item['product']->getPriceByCount($item['quantity']) ?? $sum}} ₴<span class="count">х {{$item['product']->getRollSize() ? 'за '.$item['quantity']. ' м.п.' : 'за '.$item['quantity']. ' шт'}}</span>
                       </td>
                     </tr>
                     @endforeach
@@ -330,10 +353,8 @@
           </form>
         </div>
       </div>
-    </div>
-
+              @endif
   </section>
-
   @push('scripts')
     <script src="{{mix('build/js/checkoutPage.js')}}"></script>
   @endpush

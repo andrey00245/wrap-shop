@@ -31,7 +31,7 @@
                   class="button account-wishlist-count">{{auth()->user()->favoriteCount()}}</span></a></li>
             <li><a href="{{route('viewed-products')}}">{{__('personal-account.account.viewed-products')}}</a></li>
             <li><a class="cart-open" href="#">{{__('personal-account.account.cart')}} <span
-                  class="button account-cart-count">1</span></a></li>
+                  class="button account-cart-count">{{$cartItemsCount}}</span></a></li>
           </ul>
         </nav>
       </div>

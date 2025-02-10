@@ -64,22 +64,30 @@
                title="{{$product->name}}" class="name">{{$product->name}}</a>
             <div class="bottom flex-center">
               <div class="price">{{number_format($product->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
-              <button class="button colord remarketing_cart_button" data-product_id="{{$product->id}}">
-                <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
+                <button  {{$product->getStock() > 0 ? '' : 'disabled'}} class="button button-cart-product colord remarketing_cart_button" data-product-quantity="{{$product->getDefaultQuantity()}}" data-product-id="{{$product->id}}">
+                    <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
             </div>
           </div>
 
-
-          <div class="hover-additional-info">
-            <div class="additional-info">
-              <p class="text-left additional-title">Призначення</p>
-              <p class="text-left additional-text">декоративна</p>
+            <div class="hover-additional-info">
+                @if($product->getPurpose())
+                    <div class="additional-info">
+                        <p class="text-left additional-title">{{$product->getPurpose()->name}}</p>
+                        <p class="text-left additional-text">{{$product->getPurpose()?->pivot?->value}}</p>
+                    </div>
+                @endif
+                @if($product->getStructure())
+                    <div class="additional-info">
+                        <p class="text-left additional-title">{{$product->getStructure()->name}}</p>
+                        <p class="text-left additional-text">{{$product->getStructure()?->pivot?->value}}</p>
+                    </div>
+                @elseif($product->getType())
+                    <div class="additional-info">
+                        <p class="text-left additional-title">{{$product->getType()->name}}</p>
+                        <p class="text-left additional-text">{{$product->getType()?->pivot?->value}}</p>
+                    </div>
+                @endif
             </div>
-            <div class="additional-info">
-              <p class="text-left additional-title">Структура</p>
-              <p class="text-left additional-text">сатинова</p>
-            </div>
-          </div>
         </div>
       @endforeach
     </div>

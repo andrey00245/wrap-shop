@@ -196,6 +196,9 @@ return [
     'time'                  => 'Время',
     'available'             => 'Доступно',
     'size'                  => 'Размер',
+    'first-name' => "Имя",
+    'last-name' => 'Фамилия',
+    'shipping_address' => 'Отделение / Адрес',
   ],
 
 ]

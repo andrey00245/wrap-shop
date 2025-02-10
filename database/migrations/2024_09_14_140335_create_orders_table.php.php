@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('shipping_address')->nullable();
             $table->string('city')->nullable();
             $table->string('status')->default('new');
+            $table->float('total')->nullable();
             $table->timestamps();
         });
     }

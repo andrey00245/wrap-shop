@@ -70,9 +70,9 @@
                title="{{$wishlist->name}}" class="name">{{$wishlist->name}}</a>
             <div class="bottom flex-center">
               <div class="price">{{number_format($wishlist->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
-              <button class="button colord remarketing_cart_button" data-product_id="{{$wishlist->id}}"><i
-                  class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
-              </button>
+                <button  {{$wishlist->getStock() > 0 ? '' : 'disabled'}} class="button button-cart-product colord remarketing_cart_button" data-product-quantity="{{$wishlist->getDefaultQuantity()}}" data-product-id="{{$wishlist->id}}">
+                    <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
+                </button>
             </div>
           </div>
         </div>

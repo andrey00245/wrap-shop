@@ -29,7 +29,7 @@ class ProductService
 
         $list = ApiProduct::query($myStore, QuerySpecs::create([
             'offset'     => 0,
-            'maxResults' => 50,
+            'maxResults' => 100,
         ]))->getList();
 
         foreach ($list as $item) {
@@ -67,6 +67,10 @@ class ProductService
     {
         $parseData = $item->jsonSerialize();
 
+        if ($parseData->code == 12435){
+            dd($parseData);
+        }
+
         $product = Product::updateOrCreate(
             ['external_id' => $parseData->id],
             [
@@ -90,7 +94,7 @@ class ProductService
 
        if (property_exists($parseData, 'attributes')) {
            $attributes = $parseData?->attributes?->attrs;
-//           $this->processCategories($attributes, $product);
+           $this->processCategories($attributes, $product);
            $this->updateName($attributes, $product);
 //           $this->processExpenseCategory($attributes, $product);
            $this->processBrand($attributes, $product);
@@ -206,6 +210,13 @@ class ProductService
                     'parent_id' => $parentId
                 ]);
             }
+
+                $category->slug = [
+                    'en' => Str::slug($category->getTranslation('name', 'en')),
+                    'uk' => Str::slug($category->getTranslation('name', 'uk')),
+                    'ru' => Str::slug($category->getTranslation('name', 'ru'))
+                ];
+                $category->save();
 
             $parentId = $category->id;
             $categoryIds[] = $category->id;

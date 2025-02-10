@@ -194,7 +194,9 @@ class Product extends Model implements HasMedia
                 'warranty',
                 'quantity_step',
                 'min_order_quantity',
-                'room_temperature'
+                'first_stock',
+                'second_stock',
+                'third_stock',
             ])
             ->get();
     }

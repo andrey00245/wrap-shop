@@ -221,6 +221,7 @@
               </div>
             </div>
 
+              @if($count > 0)
               <div class="price flex-wrap">
                   <div class="default">
                       <div class="top-wrapper">
@@ -232,6 +233,7 @@
                       <span class="autocalc-product-price"><span class="total-price">0.00</span> ₴</span>
                   </div>
               </div>
+              @endif
 
 
               <div class="alert alert-info alert-info-xvr">

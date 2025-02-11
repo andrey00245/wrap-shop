@@ -268,11 +268,12 @@ class ProductService
         try {
         foreach ($parts as $part) {
 
+           $createSlug =  Str::slug($part);
             // Проверяем, существует ли категория с таким именем на всех языках (украинском, английском, русском)
             $category = Category::query()
-                ->whereJsonContains('name->uk', $part)
-                ->orWhereJsonContains('name->en', $part)
-                ->orWhereJsonContains('name->ru', $part)
+                ->whereJsonContains('slug->uk', $createSlug)
+                ->orWhereJsonContains('slug->en', $createSlug)
+                ->orWhereJsonContains('slug->ru', $createSlug)
                 ->first();
 
             // Если категория не найдена, создаем новую

@@ -256,6 +256,7 @@ class ProductService
      *
      * @return array
      * @throws \JsonException
+     * @throws \Exception
      */
     protected function getCategoryIds(string $categoryPath): array
     {
@@ -263,6 +264,8 @@ class ProductService
         $parentId = null;
         $categoryIds = [];
 
+        DB::beginTransaction(); // Начало транзакции
+        try {
         foreach ($parts as $part) {
 
             // Проверяем, существует ли категория с таким именем на всех языках (украинском, английском, русском)
@@ -294,6 +297,12 @@ class ProductService
 
             $parentId = $category->id;
             $categoryIds[] = $category->id;
+        }
+
+            DB::commit(); // Завершаем транзакцию
+        } catch (\Exception $e) {
+            DB::rollBack(); // Откатываем транзакцию в случае ошибки
+            throw $e;
         }
 
         return $categoryIds;

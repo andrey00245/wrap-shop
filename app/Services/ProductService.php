@@ -265,8 +265,14 @@ class ProductService
 
         foreach ($parts as $part) {
 
-            $category = Category::query()->whereJsonContains('name->uk', $part)->first();
+            // Проверяем, существует ли категория с таким именем на всех языках (украинском, английском, русском)
+            $category = Category::query()
+                ->whereJsonContains('name->uk', $part)
+                ->orWhereJsonContains('name->en', $part)
+                ->orWhereJsonContains('name->ru', $part)
+                ->first();
 
+            // Если категория не найдена, создаем новую
             if (!$category) {
                 $category = Category::create([
                     'name' => [
@@ -278,12 +284,13 @@ class ProductService
                 ]);
             }
 
-                $category->slug = [
-                    'en' => Str::slug($category->getTranslation('name', 'en')),
-                    'uk' => Str::slug($category->getTranslation('name', 'uk')),
-                    'ru' => Str::slug($category->getTranslation('name', 'ru'))
-                ];
-                $category->save();
+            // Создаем слаг для каждой категории на разных языках
+            $category->slug = [
+                'en' => Str::slug($category->getTranslation('name', 'en')),
+                'uk' => Str::slug($category->getTranslation('name', 'uk')),
+                'ru' => Str::slug($category->getTranslation('name', 'ru'))
+            ];
+            $category->save();
 
             $parentId = $category->id;
             $categoryIds[] = $category->id;

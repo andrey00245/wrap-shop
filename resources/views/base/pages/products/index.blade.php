@@ -484,8 +484,12 @@
                 <div class="bottom flex-center">
                   <div class="price">{{number_format($product->getPrice())}} ₴<span
                       class="price-unit-xvr"></span></div>
-                  <button class="button colord remarketing_cart_button" data-product_id="{{$product->id}}"><i
-                      class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
+                    @if($product->getStock() > 0)
+                        <button class="button button-cart-product colord remarketing_cart_button" data-product-quantity="{{$product->getDefaultQuantity()}}" data-product-id="{{$product->id}}">
+                            <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
+                    @else
+                        <button class="button colord remarketing_cart_button report-availability-open" data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                    @endif
                 </div>
               </div>
               {{--              <div class="params">--}}

@@ -368,7 +368,7 @@
   </section>
 
   @include('base.components.examples-of-work')
-  @include('base.components.latest')
+  @include('base.components.recommendations')
   @include('base.components.consult-popup')
   @include('base.components.fast-order-popup')
 

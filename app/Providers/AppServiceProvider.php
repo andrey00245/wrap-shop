@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Nova\Support\DynamicSettings;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
@@ -48,6 +49,19 @@ class AppServiceProvider extends ServiceProvider
             })->has('category')
             ->get();
 
+        $instruments = Product::query()
+            ->where('is_active', true)
+            ->whereHas('prices', function ($query) {
+                $query->where('type_id', function ($subQuery) {
+                    $subQuery->select('id')
+                        ->from('price_types')
+                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+                })->where('price', '>', 0);
+            })->whereHas('category', function (\Illuminate\Database\Eloquent\Builder $query) {
+                    $query->whereJsonContains('slug->en', 'instrumenti-rozxidniki');
+                })
+            ->get();
+
         $mainCategories = Category::query()
             ->whereNull('parent_id');
 
@@ -57,6 +71,7 @@ class AppServiceProvider extends ServiceProvider
         View::share([
             'settings' => $settings,
             'products' => $products,
+            'instruments' => $instruments,
             'mainCategories' => $mainCategories->get(),
             'productCategories' => $productCategories->get(),
         ]);

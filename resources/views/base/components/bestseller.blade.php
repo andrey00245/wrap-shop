@@ -62,11 +62,16 @@
                  title="{{$product->name}}" class="name">{{$product->name}}</a>
               <div class="bottom flex-center">
                 <div class="price">{{number_format($product->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
-                  <button  {{$product->getStock() > 0 ? '' : 'disabled'}} class="button button-cart-product colord remarketing_cart_button" data-product-quantity="{{$product->getDefaultQuantity()}}" data-product-id="{{$product->id}}">
+                  @if($product->getStock() > 0)
+                  <button class="button button-cart-product colord remarketing_cart_button" data-product-quantity="{{$product->getDefaultQuantity()}}" data-product-id="{{$product->id}}">
                       <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
+                  @else
+                      <button class="button colord remarketing_cart_button report-availability-open" data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                  @endif
               </div>
             </div>
 
+              @if($product->getPurpose() || $product->getStructure() || $product->getType())
               <div class="hover-additional-info">
                   @if($product->getPurpose())
                       <div class="additional-info">
@@ -86,7 +91,7 @@
                       </div>
                   @endif
               </div>
-
+              @endif
           </div>
         @endforeach
       </div>

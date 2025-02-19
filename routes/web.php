@@ -11,6 +11,7 @@ use App\Http\Controllers\IndexController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ReportAvailabilityController;
 use App\Http\Controllers\SubscribeController;
 use App\Http\Controllers\SyncProductImagesController;
 use App\Http\Controllers\VideosController;
@@ -56,6 +57,7 @@ Route::post('/cart/update/', [CartController::class, 'update']);
 Route::get('/cart', [CartController::class, 'index']);
 Route::post('/consultation', [ConsultationController::class, 'store']);
 Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+Route::post('/report-availability', [ReportAvailabilityController::class, 'store'])->name('report.availability');
 
 
 Route::post('/fast-order', [FastOrderController::class, 'store'])->name('fast-order.store');

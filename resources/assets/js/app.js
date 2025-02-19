@@ -47,6 +47,7 @@ $(document).ready(function () {
     $('#search-popup').removeClass('active');
     $('#login-popup').removeClass('active');
     $('#fast-order-popup').removeClass('active');
+    $('#freport-availability-popup').removeClass('active');
     $('.head-top').removeClass('active');
     if($('#cart-popup').hasClass('active')){
       $("html").addClass('no-overflow');
@@ -60,6 +61,7 @@ $(document).ready(function () {
     $('#search-popup').toggleClass('active');
     $('#simple-popup').removeClass('active');
     $('#cart-popup').removeClass('active');
+    $('#report-availability-popup').removeClass('active');
     $('#login-popup').removeClass('active');
     $('.head-top').removeClass('active');
   }
@@ -68,6 +70,7 @@ $(document).ready(function () {
     $('#login-popup').toggleClass('active');
     $('#search-popup').removeClass('active');
     $('#simple-popup').removeClass('active');
+    $('#report-availability-popup').removeClass('active');
     $('#cart-popup').removeClass('active');
     $('.head-top').removeClass('active');
   }
@@ -76,6 +79,7 @@ $(document).ready(function () {
         $('#consult-popup').toggleClass('active');
         $('#search-popup').removeClass('active');
         $('#simple-popup').removeClass('active');
+        $('#report-availability-popup').removeClass('active');
         $('#cart-popup').removeClass('active');
         $('#fast-order-popup').removeClass('active');
         $('.head-top').removeClass('active');
@@ -83,6 +87,17 @@ $(document).ready(function () {
 
     function fastOrderPopup(){
         $('#fast-order-popup').toggleClass('active');
+        $('#consult-popup').removeClass('active');
+        $('#report-availability-popup').removeClass('active');
+        $('#search-popup').removeClass('active');
+        $('#simple-popup').removeClass('active');
+        $('#cart-popup').removeClass('active');
+        $('.head-top').removeClass('active');
+    }
+
+    function reportAvailabilityPopup(){
+        $('#report-availability-popup').toggleClass('active');
+        $('#fast-order-popup').removeClass('active');
         $('#consult-popup').removeClass('active');
         $('#search-popup').removeClass('active');
         $('#simple-popup').removeClass('active');
@@ -95,6 +110,7 @@ $(document).ready(function () {
     $('#login-popup').removeClass('active');
     $('#search-popup').removeClass('active');
     $('#simple-popup').removeClass('active');
+    $('#report-availability-popup').removeClass('active');
     $('#cart-popup').removeClass('active');
       $('#fast-order-popup').removeClass('active');
 
@@ -155,6 +171,20 @@ $(document).ready(function () {
 
     $(".fast-order-popup-close").on("click", function () {
         fastOrderPopup()
+    })
+
+    $(".report-availability-open").on("click", function () {
+        $('#button-submit-report-availability').attr('data-product-id', $(this).data('product-id'));
+        $('.error-message-report-order').hide();
+
+        reportAvailabilityPopup()
+    })
+
+    $(".report-availability-close").on("click", function () {
+        $('.report-availability-success').hide();
+        $('#report-availability-form').show();
+
+        reportAvailabilityPopup()
     })
   //
   // $("#button-verify-loginpopup").click(function (){
@@ -363,6 +393,48 @@ function cartPopupSlider(){
                 }
             });
         });
+
+        $('#button-submit-report-availability').on('click', function(e) {
+            e.preventDefault();
+
+            console.log($(this).data('product-id'));
+            let formData = {
+                product_id: $(this).data('product-id'),
+                name: $('#report_order_name').val(),
+                phone: $('#report_order_phone').val(),
+                email: $('#report_order_email').val(),
+            };
+
+            console.log(formData);
+
+            $.ajax({
+                url: '/report-availability',
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#report-availability-form').hide();
+                        $('.report-availability-success').show();
+                        $('#report_order_name').val('');
+                        $('#report_order_phone').val('');
+                        $('#report_order_email').val('');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('.error-message-report-order').empty().show();
+
+                    if (xhr.status === 422) {
+                        var errors = xhr.responseJSON.errors;
+                        for (var field in errors) {
+                            var errorMessage = errors[field].join('<br>');
+                            var errorElement = '<div class="error-item"><span>' + errorMessage + '</span></div>';
+                            $('.error-message-report-order').append(errorElement);
+                        }
+                    }
+                }
+            });
+        });
+
     });
 }
 

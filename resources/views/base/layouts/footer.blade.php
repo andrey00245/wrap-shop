@@ -25,6 +25,7 @@
 @include('base.components.login-registration')
 @include('base.components.cart-popup')
 @include('base.components.search-popup')
+@include('base.components.report-availability-popup')
 
 <footer class="footer">
   <div class="seo-wrapper">

@@ -440,6 +440,16 @@ class Product extends Model implements HasMedia
         return $this->attributes()->where('field_name', 'store_terms')->first()?->pivot?->value;
     }
 
+    public function getMainColor()
+    {
+        return $this->attributes()->where('field_name', 'main_shade')->first()?->pivot?->value;
+    }
+
+    public function getBrand()
+    {
+        return $this->attributes()->where('field_name', 'brand')->first()?->pivot?->value;
+    }
+
     public function getRoomTemperature()
     {
         return $this->attributes()->where('field_name', 'room_temperature')->first()?->pivot?->value;

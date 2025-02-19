@@ -1,7 +1,8 @@
+@if($recommends->count() > 0)
 <section class="home-products row" id="homeLatest">
   <div class="wrap">
     <div class="home-products-top flex-justify">
-      <h2 class="home-title">{!! __('general-translate.latest') !!}</h2>
+      <h2 class="home-title"><span class="colord">Cхожi</span> Товари</h2>
     </div>
     <div class="home-products-nav">
       <div data-cat="all" class="item button active all">{{__('general-translate.all')}}</div>
@@ -11,7 +12,7 @@
     </div>
     <div class="home-products-list swiper">
       <div class="swiper-wrapper" aria-live="polite">
-      @foreach($products as $key => $product)
+      @foreach($recommends as $key => $product)
           <div class="swiper-slide home-products-item product-default" data-ids="{{$product->category->id}}" id="homeLatest{{$key}}"
                role="group">
             <div class="product-default-texts-wrapper">
@@ -100,3 +101,4 @@
       <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
   </div>
 </section>
+@endif

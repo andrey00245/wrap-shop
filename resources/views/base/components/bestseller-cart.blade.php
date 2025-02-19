@@ -13,17 +13,13 @@
 
   <div class="popup-list swiper">
     <div class="swiper-wrapper" aria-live="polite">
-      @foreach($products as $key => $product)
+      @foreach($instruments as $key => $product)
         <div class="swiper-slide popup-products-item product-default"
              data-ids="{{$product->category->id}}" id="homeBestsellerItem{{$key}}"
              role="group">
           <div class="product-default-texts-wrapper">
             <div class="top flex-justify">
               <div class="sale statuses">
-                <div class="category-status category-status-1 status-inline text rectangle "
-                     style=" color:#ffffff; background-color:#d04b4b;">
-                  {{__('general-translate.sales_hit')}}
-                </div>
               </div>
               <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
               <div class="wishlist">
@@ -64,11 +60,16 @@
                title="{{$product->name}}" class="name">{{$product->name}}</a>
             <div class="bottom flex-center">
               <div class="price">{{number_format($product->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
-                <button  {{$product->getStock() > 0 ? '' : 'disabled'}} class="button button-cart-product colord remarketing_cart_button" data-product-quantity="{{$product->getDefaultQuantity()}}" data-product-id="{{$product->id}}">
-                    <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
+                @if($product->getStock() > 0)
+                    <button class="button button-cart-product colord remarketing_cart_button" data-product-quantity="{{$product->getDefaultQuantity()}}" data-product-id="{{$product->id}}">
+                        <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
+                @else
+                    <button class="button colord remarketing_cart_button report-availability-open" data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                @endif
             </div>
           </div>
 
+            @if($product->getPurpose() || $product->getStructure() || $product->getType())
             <div class="hover-additional-info">
                 @if($product->getPurpose())
                     <div class="additional-info">
@@ -88,6 +89,7 @@
                     </div>
                 @endif
             </div>
+            @endif
         </div>
       @endforeach
     </div>

@@ -8,6 +8,7 @@ use App\Models\OrderProduct;
 use App\Models\User;
 use App\Notifications\TemporaryPasswordNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -72,15 +73,15 @@ class OrderController extends Controller
         }
 
         $order = new Order();
-        $order->phone = $validated['phone'];
-        $order->first_name = $validated['first-name'];
-        $order->last_name = $validated['last-name'];
-        $order->email = Auth::check() ? Auth::user()->email : $validated['email'];
-        $order->shipping_method = $validated['shipping_method'];
-        $order->payment_method = $validated['payment_method'];
-        $order->comment = $validated['comment'];
-        $order->shipping_address = $validated['shipping_address'];
-        $order->city = $validated['city'];
+        $order->phone = Arr::get($validated,'phone');
+        $order->first_name = Arr::get($validated,'first-name');
+        $order->last_name = Arr::get($validated,'last-name');
+        $order->email = Auth::check() ? Auth::user()->email : Arr::get($validated,'email');
+        $order->shipping_method = Arr::get($validated,'shipping_method','-');
+        $order->payment_method = Arr::get($validated,'payment_method');
+        $order->comment = Arr::get($validated,'comment');
+        $order->shipping_address = Arr::get($validated,'shipping_address');
+        $order->city = Arr::get($validated,'city');
         $order->status = 'pending';
         $order->user_id = Auth::check() ? Auth::id() : null;
         $order->total = $totalSum;

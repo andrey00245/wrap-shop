@@ -113,8 +113,7 @@ class Product extends Model implements HasMedia
             ->fit(Fit::Crop, 310, 310) // Указываем корректный enum
             ->format('png')
             ->quality(100) // Улучшение качества
-            ->withManipulations(['-colorspace' => 'RGB', '-gamma' => '1.5'])
-            ->nonQueued();
+          ->nonQueued();
     }
 
     public function registerMediaCollections(): void

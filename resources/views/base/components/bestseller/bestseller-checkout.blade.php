@@ -33,7 +33,7 @@
             </div>
             <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
               <a href="{{route('products.show', ['product'=>$product->id])}}"
-                 title="{{$product->name}}" class="swiper-wrapper"
+                 title="{{$product->getName()}}" class="swiper-wrapper"
                  id="swiper-wrapper-c1ba02d97e25995b" aria-live="polite">
                 @foreach($product->getMedia('images') as $key => $image)
                 <div class="swiper-slide item flex-center swiper-slide-active" role="group">
@@ -41,12 +41,12 @@
                     <div class="hide"
                          data-src="{{$image->getUrl()}}"
                          data-fancybox="checkout-gallery{{$product->id}}"
-                         data-caption="{{$product->name}}"></div>
+                         data-caption="{{$product->getName()}}"></div>
                   @endif
                   <img loading="lazy"
                        src="{{$image->getUrl('preview')}}"
-                       alt="{{$product->name}}"
-                       title="{{$product->name}}" class="swiper-lazy swiper-lazy-loaded"
+                       alt="{{$product->getName()}}"
+                       title="{{$product->getName()}}" class="swiper-lazy swiper-lazy-loaded"
                        width="310" height="310">
                 </div>
                 @endforeach
@@ -55,11 +55,15 @@
             <div class="product-default-texts-wrapper">
               <div class="category">{{$product->category->name}}</div>
               <a href="{{route('products.show', ['product'=>$product->id])}}"
-                 title="{{$product->name}}" class="name">{{$product->name}}</a>
+                 title="{{$product->getName()}}" class="name">{{$product->getName()}}</a>
               <div class="bottom flex-center">
                 <div class="price">{{number_format($product->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
-                  <button  {{$product->getStock() > 0 ? '' : 'disabled'}} class="button button-cart-product colord remarketing_cart_button" data-product-quantity="{{$product->getDefaultQuantity()}}" data-product-id="{{$product->id}}">
-                      <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
+                  @if($product->getStock() > 0)
+                      <button class="button button-cart-product colord remarketing_cart_button" data-product-quantity="{{$product->getDefaultQuantity()}}" data-product-id="{{$product->id}}">
+                          <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}</button>
+                  @else
+                      <button class="button colord remarketing_cart_button report-availability-open" data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                  @endif
               </div>
             </div>
 

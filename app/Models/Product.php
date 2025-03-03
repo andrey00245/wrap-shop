@@ -490,6 +490,12 @@ class Product extends Model implements HasMedia
         return $this->attributes()->where('field_name', 'purpose')->first();
     }
 
+    public function getName()
+    {
+        return $this->attributes()->where('field_name', 'name')->first()?->pivot?->value
+            ?? $this->name;
+    }
+
     public function getType()
     {
         return $this->attributes()->where('field_name', 'type')->first();

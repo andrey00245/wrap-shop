@@ -35,7 +35,7 @@
           </div>
           <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
             <a href="{{route('products.show', ['product'=>$product->id])}}"
-               title="{{$product->name}}" class="swiper-wrapper"
+               title="{{$product->getName()}}" class="swiper-wrapper"
                id="swiper-wrapper-c1ba02d97e25995b" aria-live="polite">
               @foreach($product->getMedia('images') as $key => $image)
                 <div class="swiper-slide item flex-center swiper-slide-active" role="group">

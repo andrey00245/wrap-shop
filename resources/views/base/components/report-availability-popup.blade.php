@@ -1,4 +1,4 @@
-<div id="report-availability-popup" class="popup-overlay popup-right">
+<div id="report-availability-popup" class="popup-overlay popup-right" style="display: none">
     <div class="consult-title">Повідомити про наявність</div>
     <br>
     <div class="popup-window active" id="report-availability-form" style="display: block;">

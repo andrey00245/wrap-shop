@@ -179,9 +179,6 @@ return [
       'label' => 'Відеобанер опис[EN]',
       'panel' => 'Слоган',
       'type' => 'textarea'
-
     ],
-
   ],
-
 ];

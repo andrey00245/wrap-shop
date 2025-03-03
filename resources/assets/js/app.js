@@ -47,7 +47,7 @@ $(document).ready(function () {
     $('#search-popup').removeClass('active');
     $('#login-popup').removeClass('active');
     $('#fast-order-popup').removeClass('active');
-    $('#freport-availability-popup').removeClass('active');
+    $('#report-availability-popup').removeClass('active');
     $('.head-top').removeClass('active');
     if($('#cart-popup').hasClass('active')){
       $("html").addClass('no-overflow');

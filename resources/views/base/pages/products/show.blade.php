@@ -114,8 +114,8 @@
                   class="swiper-slide item swiper-slide-visible swiper-slide-active swiper-slide-thumb-active"
                   role="group">
                   <img data-src="{{$image->getUrl('preview')}}"
-                       title="{{$product->name}}"
-                       alt="{{$product->name}}"
+                       title="{{$product->getName()}}"
+                       alt="{{$product->getName()}}"
                        src="{{$image->getUrl('preview')}}">
                 </div>
               @endforeach
@@ -133,7 +133,7 @@
       </div>
       <div class="product-page-right">
         <div class="top flex-justify">
-          <h1 class="title">{{$product->name}}</h1>
+          <h1 class="title">{{$product->getName()}}</h1>
         </div>
         <div class="center flex-justify">
           @php
@@ -277,14 +277,12 @@
           <p><img alt="{{__('product-show.payment')}}" src="{{asset('assets/img/pay.svg')}}"
                   style="width: 350px; float: left;" class="note-float-left"><br></p>
         </div>
-          @if($product->getWarranty())
         <div class="item garant">
           <span class="icon"><img width="68" height="79" src="{{asset('assets/img/icons/protection.svg')}}"
                                   alt="{{__('product-show.guarantee')}}"></span>
           <span class="title">{{__('product-show.guarantee')}}</span>
-          <p>{{$product->getWarranty() ?? '-' }}</p>
+          <p>{{$product->getWarranty() ?? '12 мiсяцiв' }}</p>
         </div>
-          @endif
       </div>
 
       <div class="code-wishlist-wrapper mobil">
@@ -367,8 +365,8 @@
       @endif
   </section>
 
-  @include('base.components.examples-of-work')
   @include('base.components.recommendations')
+  @include('base.components.examples-of-work')
   @include('base.components.consult-popup')
   @include('base.components.fast-order-popup')
 

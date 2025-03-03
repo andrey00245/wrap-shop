@@ -59,7 +59,7 @@
 
               <div class="category">{{$product->category->name}}</div>
               <a href="{{route('products.show', ['product'=>$product->id])}}"
-                 title="{{$product->name}}" class="name">{{$product->name}}</a>
+                 title="{{$product->getName()}}" class="name">{{$product->getName()}}</a>
               <div class="bottom flex-center">
                 <div class="price">{{number_format($product->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
                   @if($product->getStock() > 0)

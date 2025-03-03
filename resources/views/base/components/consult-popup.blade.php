@@ -51,12 +51,5 @@
         <i class="fal fa-smile"></i>
         <span>{!! __('popup.consult_popup.thanks_message') !!}</span>
     </div>
-
-{{--    <div class="popup-window" id="popup-registration-success">--}}
-{{--        <button type="button" class="close-popup btn-close-popup"><span></span></button>--}}
-{{--        <div class="inner form-horizontal">--}}
-{{--            <div class="popup-title">{{__('popup.consult_popup.success_message')}}</div>--}}
-{{--        </div>--}}
-{{--    </div>--}}
     <div class="close button fal fa-times consult-popup-close"></div>
 </div>

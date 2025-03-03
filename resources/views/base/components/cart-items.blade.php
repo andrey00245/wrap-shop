@@ -27,10 +27,10 @@
                             href="{{route('products.show', ['product' => $item['product']->id])}}"><img
                                 loading="lazy"
                                 src="{{$item['product']->getMedia('images')[0]->getUrl('preview')}}"
-                                alt="{{$item['product']->name}}"
-                                title="{{$item['product']->name}}" class="img-thumbnail"></a></td>
+                                alt="{{$item['product']->getName()}}"
+                                title="{{$item['product']->getName()}}" class="img-thumbnail"></a></td>
                     <td class="name"><span class="cat">{{$item['product']->category->name}}</span><a
-                            href="{{route('products.show', ['product'=>$item['product']->id])}}">{{$item['product']->name}}</a>
+                            href="{{route('products.show', ['product'=>$item['product']->id])}}">{{$item['product']->getName()}}</a>
                     </td>
                     <td class="price-default" style="min-width: 75px">
                         {{$item['product']->getPrice()}} ₴<span class="price-unit-xvr"></span>

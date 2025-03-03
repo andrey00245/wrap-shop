@@ -138,32 +138,47 @@ class ProductService
     {
         $parseData = $item->jsonSerialize();
 
-        $product = Product::updateOrCreate(
-            ['external_id' => $parseData->id],
-            [
-                'external_code' => $parseData->externalCode,
-                'code'          => $parseData->code,
-                'article'       => $parseData->article ?? null,
-                'name'          => [
-                    'ru' => $parseData->name ?? '',
-                    'uk' => $parseData->name ?? '',
-                    'en' => $parseData->name ?? '',
-                ],
-                'descriptions'   => [
-                    'ru' => $parseData->description ?? '',
-                    'uk' => $parseData->description ?? '',
-                    'en' => $parseData->description ?? '',
-                ],
-            ]
-        );
-
-        $this->processPrices($parseData->salePrices, $product);
-
        if (property_exists($parseData, 'attributes')) {
            $attributes = $parseData?->attributes?->attrs;
+
+           $product = null;
+
+           foreach ($attributes as $attribute) {
+               if ($attribute->id === ProductAttributeEnum::SITE) {
+                   if ($attribute->value->name === 'так'){
+                       $product = Product::updateOrCreate(
+                           ['external_id' => $parseData->id],
+                           [
+                               'external_code' => $parseData->externalCode,
+                               'code'          => $parseData->code,
+                               'article'       => $parseData->article ?? null,
+                               'name'          => [
+                                   'ru' => $parseData->name ?? '',
+                                   'uk' => $parseData->name ?? '',
+                                   'en' => $parseData->name ?? '',
+                               ],
+                               'descriptions'   => [
+                                   'ru' => $parseData->description ?? '',
+                                   'uk' => $parseData->description ?? '',
+                                   'en' => $parseData->description ?? '',
+                               ],
+                           ]
+                       );
+
+                       $this->processPrices($parseData->salePrices, $product);
+                   }
+                   else{
+                       return;
+                   }
+               }
+           }
+
+           if (!$product){
+               return;
+           }
+
            $this->processCategories($attributes, $product);
            $this->updateName($attributes, $product);
-//           $this->processExpenseCategory($attributes, $product);
            $this->processBrand($attributes, $product);
            $this->processRollSize($attributes, $product);
            $this->processFirstStock($attributes, $product);
@@ -312,9 +327,14 @@ class ProductService
     protected function updateName($attributes, $product): void
     {
         foreach ($attributes as $attribute) {
-
             if ($attribute->id === ProductAttributeEnum::NAME) {
-                $this->saveProductAttribute($attribute, $product, 'name');
+                $product->update([
+                    'name' => [
+                        'uk' => $attribute->value,
+                        'ru' => $attribute->value,
+                        'en' => $attribute->value,
+                    ]
+                ]);
             }
         }
     }

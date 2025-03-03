@@ -170,42 +170,72 @@
                           <span class="radio-label">Кур'єр Нової Пошти</span>
                         </label>
                       </div>
+                        @if(auth()->check() && auth()->user()->addresses->count() > 0)
+                            <div class="radio">
+                                <label for="my_addresses" class="custom-radio">
+                                    <input type="radio" data-onchange="reloadAll" name="shipping_method" value="my_addresses"
+                                           id="my_addresses" {{ old('shipping_method') == 'my_addresses' ? 'checked' : '' }}>
+                                    <span class="radio-label">Мої адреси</span>
+                                </label>
+                            </div>
+                        @endif
                     </div>
                   </div>
 
-                  <div class="input-fields-wrapper" style="display: none" id="simplecheckout_shipping_address">
-                    <p class="title">Адреса доставки</p>
+                    <div class="input-fields-wrapper" style="display: none" id="simplecheckout_shipping_address">
+                        <p class="title">Адреса доставки</p>
 
-                    <div class="simplecheckout-block-content">
-                      <fieldset>
-                        <div class="input-group">
-                          <label for="city">Населений пункт</label>
-                            <input type="text" id="city" name="city" value="{{ old('city') }}" class="form-control">
-                            @error('city')
-                            <div class="error">{{ $message }}</div>
-                            @enderror
-                          <div style="display:none;" data-for="shipping_address_address_1" data-for-type="text"
-                               data-rule="notEmpty" class="simplecheckout-error-text simplecheckout-rule"
-                               data-not-empty="1" data-required="true">Це поле обов'язкове!
-                          </div>
+                        <div class="simplecheckout-block-content">
+                            <fieldset>
+                                <div class="input-group">
+                                    <label for="city">Населений пункт</label>
 
+                                    <div id="city-select-wrapper" style="display:none;">
+                                        <select id="city_select" name="city_select" class="form-control">
+                                            <option value="">Оберіть місто</option>
+                                            @foreach(auth()->user()->addresses as $address)
+                                                <option value="{{ $address->city }}"
+                                                        data-address="{{ $address->address }}"
+                                                    {{ old('city') == $address->city ? 'selected' : '' }}>
+                                                    {{ $address->city }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div id="city-input-wrapper">
+                                        <input type="text" id="city" name="city" value="{{ old('city') }}" class="form-control">
+                                    </div>
+
+                                    @error('city')
+                                    <div class="error">{{ $message }}</div>
+                                    @enderror
+                                    <div style="display:none;" data-for="shipping_address_address_1" data-for-type="text"
+                                         data-rule="notEmpty" class="simplecheckout-error-text simplecheckout-rule"
+                                         data-not-empty="1" data-required="true">Це поле обов'язкове!
+                                    </div>
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="shipping_address">Відділення / Адреса</label>
+
+                                    <!-- Это поле будет заполняться автоматически после выбора города -->
+                                    <input type="text" id="shipping_address" name="shipping_address" value="{{ old('shipping_address') }}" class="form-control">
+
+                                    @error('shipping_address')
+                                    <div class="error">{{ $message }}</div>
+                                    @enderror
+                                    <div style="display:none;" data-for="shipping_address_address_1" data-for-type="text"
+                                         data-rule="notEmpty" class="simplecheckout-error-text simplecheckout-rule"
+                                         data-not-empty="1" data-required="true">Це поле обов'язкове!
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>
-                        <div class="input-group">
-                          <label for="shipping_address">Відділення / Адреса</label>
-                            <input type="text" id="shipping_address" name="shipping_address" value="{{ old('shipping_address') }}" class="form-control">
-                            @error('shipping_address')
-                            <div class="error">{{ $message }}</div>
-                            @enderror
-                          <div style="display:none;" data-for="shipping_address_address_1" data-for-type="text"
-                               data-rule="notEmpty" class="simplecheckout-error-text simplecheckout-rule"
-                               data-not-empty="1" data-required="true">Це поле обов'язкове!
-                          </div>
-                        </div>
-                      </fieldset>
                     </div>
-                  </div>
 
-                  <div class="input-fields-wrapper">
+
+                    <div class="input-fields-wrapper">
                     <p class="title"><span>03</span> Оплата</p>
 
                     <div class="simplecheckout-block-content" id="simplecheckout_shipping" style="overflow: visible;">
@@ -240,9 +270,9 @@
                       @enderror
                   </div>
 
-{{--                  <div class="input-group">--}}
-{{--                    @include('base.components.bestseller.bestseller-checkout')--}}
-{{--                  </div>--}}
+                  <div class="input-group">
+                    @include('base.components.bestseller.bestseller-checkout')
+                  </div>
 
                   <div class="input-group">
                       <div id="buttons">
@@ -360,8 +390,19 @@
   @endpush
 
   <script>
-      document.getElementById('submitBtn').addEventListener('click', function() {
-          document.getElementById('checkoutForm').submit();
+      document.getElementById('submitBtn').addEventListener('click', function(event) {
+          const citySelectWrapper = document.querySelector('#city-select-wrapper');
+          const cityInput = document.querySelector('input[name="city"]');
+          const citySelect = document.querySelector('select[name="city_select"]');
+
+          if (citySelectWrapper.style.display === 'block') {
+              cityInput.value = citySelect.options[citySelect.selectedIndex].dataset.address;
+          }
+
+          if (!cityInput.value) {
+              cityInput.value = document.querySelector('input[name="city"]').value;
+          }
+              document.getElementById('checkoutForm').submit();
       });
   </script>
 

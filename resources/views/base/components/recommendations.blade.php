@@ -31,9 +31,9 @@
             </div>
             <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
               <i class="far fa-search-plus colord" data-src="{{$product->getMedia('images')->first()->getUrl()}}"
-                 data-fancybox="gallery{{$product->id}}" data-caption="{{$product->name}}"></i>
+                 data-fancybox="gallery{{$product->id}}" data-caption="{{$product->getName()}}"></i>
               <a href="{{route('products.show', ['product'=>$product->id])}}"
-                 title="{{$product->name}}" class="swiper-wrapper"
+                 title="{{$product->getName()}}" class="swiper-wrapper"
                  id="swiper-wrapper-c1ba02d97e25995b" aria-live="polite">
                 @foreach($product->getMedia('images') as $key => $image)
                 <div class="swiper-slide item flex-center swiper-slide-active" role="group">
@@ -41,12 +41,12 @@
                     <div class="hide"
                          data-src="{{$image->getUrl()}}"
                          data-fancybox="gallery{{$product->id}}"
-                         data-caption="{{$product->name}}"></div>
+                         data-caption="{{$product->getName()}}"></div>
                   @endif
                   <img loading="lazy"
                        src="{{$image->getUrl('preview')}}"
-                       alt="{{$product->name}}"
-                       title="{{$product->name}}" class="swiper-lazy swiper-lazy-loaded"
+                       alt="{{$product->getName()}}"
+                       title="{{$product->getName()}}" class="swiper-lazy swiper-lazy-loaded"
                        width="310" height="310">
                 </div>
                 @endforeach
@@ -56,7 +56,7 @@
 
               <div class="category">{{$product->category->name}}</div>
               <a href="{{route('products.show', ['product'=>$product->id])}}"
-                 title="{{$product->name}}" class="name">{{$product->name}}</a>
+                 title="{{$product->getName()}}" class="name">{{$product->getName()}}</a>
               <div class="bottom flex-center">
                 <div class="price">{{number_format($product->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
                   @if($product->getStock() > 0)

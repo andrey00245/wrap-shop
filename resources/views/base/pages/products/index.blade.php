@@ -450,8 +450,8 @@
 
               <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
                 <i class="far fa-search-plus colord" data-src="{{$product->getImage()}}"
-                   data-fancybox="product-gallery{{$product->id}}" data-caption="{{$product->name}}"></i>
-                <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->name}}"
+                   data-fancybox="product-gallery{{$product->id}}" data-caption="{{$product->getName()}}"></i>
+                <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->getName()}}"
                    class="swiper-wrapper">
 
                   @foreach($product->getMedia('images') as $key => $image)
@@ -461,12 +461,12 @@
                         <div class="hide"
                              data-src="{{$image->getUrl()}}"
                              data-fancybox="product-gallery{{$product->id}}"
-                             data-caption="{{$product->name}}"></div>
+                             data-caption="{{$product->getName()}}"></div>
                       @endif
                       <img loading="lazy"
                            src="{{$image->getUrl('preview')}}"
-                           alt="{{$product->name}}"
-                           title="{{$product->name}}" class="swiper-lazy swiper-lazy-loaded"
+                           alt="{{$product->getName()}}"
+                           title="{{$product->getName()}}" class="swiper-lazy swiper-lazy-loaded"
                            width="310" height="310">
                     </div>
                   @endforeach
@@ -478,8 +478,8 @@
 
                 <div class="center">
                   <div class="category">{{$product->category?->name}}</div>
-                  <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->name}}"
-                     class="name">{{$product->name}}</a>
+                  <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->getName()}}"
+                     class="name">{{$product->getName()}}</a>
                 </div>
                 <div class="bottom flex-center">
                   <div class="price">{{number_format($product->getPrice())}} ₴<span

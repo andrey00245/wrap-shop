@@ -19,56 +19,59 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        // Ваши правила валидации
         $rules = [
             'phone' => 'required|string',
             'first-name' => 'required|string',
             'last-name' => 'required|string',
-            'email'            => Auth::check() ? 'nullable' : 'required|string|email|max:255|unique:' . User::class, // Убираем проверку для авторизованных
-            'shipping_method' => 'required|in:pickup,flat,novaposhta,novaposhta_doors',
+            'email' => Auth::check() ? 'nullable' : 'required|string|email|max:255|unique:' . User::class,
+            'shipping_method' => 'required|in:pickup,flat,novaposhta,novaposhta_doors,my_addresses', // добавили my_addresses
             'payment_method' => 'required|in:cash,online,bank_transfer',
             'comment' => 'nullable|string',
         ];
 
-        if (in_array($request->input('shipping_method'), ['flat', 'novaposhta', 'novaposhta_doors'])) {
+        // Проверка для метода доставки "my_addresses"
+        if (in_array($request->input('shipping_method'), ['flat', 'novaposhta', 'novaposhta_doors', 'pickup','my_addresses'])) {
+            // Если выбран метод доставки "my_addresses", city и shipping_address должны быть обязательными
             $rules['city'] = 'required|string';
             $rules['shipping_address'] = 'required|string';
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules);  // Применение валидации
 
+        // Ваши дальнейшие действия с корзиной
         if (Auth::check()) {
             $cartItems = CartItem::where('user_id', Auth::id())->get();
         } else {
             $cartItems = Session::get('cart', []);
         }
 
+        // Обработка корзины
         if (Auth::check()) {
             CartItem::where('user_id', Auth::id())->delete();
         } else {
             Session::forget('cart');
         }
 
+        // Проверка для неавторизованных пользователей
         if (!Auth::check()) {
             $password = Str::random(8);
-
             $user = User::create([
-                'name'      => $validated['first-name'],
+                'name' => $validated['first-name'],
                 'last_name' => $validated['last-name'],
-                'email'     => $validated['email'],
-                'phone'     => $validated['phone'],
-                'password'  => Hash::make($password),
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
+                'password' => Hash::make($password),
             ]);
-
             Auth::login($user);
-
             $user->notify(new TemporaryPasswordNotification($user->email, $password));
         }
 
+        // Подсчет суммы заказа
         $totalSum = 0;
         foreach ($cartItems as $cartItem) {
             $product = is_object($cartItem) ? $cartItem->product : $cartItem['product'];
             $quantity = is_object($cartItem) ? $cartItem->quantity : $cartItem['quantity'];
-
             $totalSum += $product->getPriceByCount($quantity);
         }
 
@@ -87,26 +90,25 @@ class OrderController extends Controller
         $order->total = $totalSum;
         $order->save();
 
+        // Сохранение продуктов в заказе
         foreach ($cartItems as $cartItem) {
             $product = is_object($cartItem) ? $cartItem->product : $cartItem['product'];
             $quantity = is_object($cartItem) ? $cartItem->quantity : $cartItem['quantity'];
-
             $productPrice = $product->getPrice();
-
             if ($product->getRollSize()) {
-                if ($quantity >= 10 && $quantity <= 24){
+                if ($quantity >= 10 && $quantity <= 24) {
                     $productPrice = $product->getSmallPrice();
                 }
-                if ($quantity >= 25 ){
+                if ($quantity >= 25) {
                     $productPrice = $product->getBigPrice();
                 }
             }
 
             OrderProduct::create([
-                'order_id'   => $order->id,
+                'order_id' => $order->id,
                 'product_id' => $product->id,
-                'quantity'   => $quantity,
-                'price'      => $productPrice,
+                'quantity' => $quantity,
+                'price' => $productPrice,
             ]);
         }
 

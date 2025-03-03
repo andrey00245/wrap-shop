@@ -16,6 +16,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
+use Spatie\Image\Enums\Fit;
 
 class Product extends Model implements HasMedia
 {
@@ -109,9 +110,10 @@ class Product extends Model implements HasMedia
     {
         $this
             ->addMediaConversion('preview')
-            ->width(310)
-            ->height(310)
+            ->fit(Fit::Crop, 310, 310) // Указываем корректный enum
             ->format('png')
+            ->quality(100) // Улучшение качества
+            ->withManipulations(['-colorspace' => 'RGB', '-gamma' => '1.5'])
             ->nonQueued();
     }
 

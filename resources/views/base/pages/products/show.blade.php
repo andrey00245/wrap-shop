@@ -97,7 +97,7 @@
                 href="{{$image->getUrl()}}"
                 title="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
                 role="group">
-                <img loading="lazy" src="{{$image->getUrl('preview')}}"
+                <img loading="lazy" src="{{$image->getUrl()}}"
                      title="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
                      alt="Плівка глянцева Avery Gloss Metallic Brown CB1630001">
               </a>

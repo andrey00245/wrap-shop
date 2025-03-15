@@ -31,8 +31,8 @@ class ProductService
         $myStore = MoySklad::getInstance(config('app.my_store.username'), config('app.my_store.password'));
 
         $list = ApiProduct::query($myStore, QuerySpecs::create([
-            'offset'     => 4500,
-            'maxResults' => 500,
+            'offset'     => 0,
+            'maxResults' => 1000,
         ]))->getList();
 
         $jsonUrl = "https://api.moysklad.ru/api/remap/1.2/entity/currency/76e1fb94-76b8-11eb-0a80-00ab004bdad2";
@@ -47,7 +47,6 @@ class ProductService
         ])->get($jsonUrl);
 
         if ($response->successful()) {
-            dd($response->json());
             $data = $response->json()['rate'];
             File::put(storage_path('app/currency_rate.json'), json_encode(['rate' => $data]));
          }

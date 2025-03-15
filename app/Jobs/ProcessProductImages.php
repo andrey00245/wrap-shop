@@ -22,7 +22,7 @@ class ProcessProductImages implements ShouldQueue
         $this->product = $product;
     }
 
-    public function handle()
+    public function handle(): void
     {
         $product = $this->product;
         $username = config('app.my_store.username');
@@ -43,7 +43,7 @@ class ProcessProductImages implements ShouldQueue
                 foreach ($data['rows'] as $image) {
                     $downloadUrl = $image['meta']['downloadHref'] ?? null;
                     if ($downloadUrl) {
-                        $this->handleImageDownload($product, $downloadUrl, $encodedCredentials);
+                        $this->handleImageDownload($product, $downloadUrl, $encodedCredentials, $image['filename']);
                     }
                 }
             } else {
@@ -54,8 +54,18 @@ class ProcessProductImages implements ShouldQueue
         }
     }
 
-    protected function handleImageDownload($product, $downloadUrl, $encodedCredentials): void
+    protected function handleImageDownload($product, $downloadUrl, $encodedCredentials, $filename): void
     {
+        $existingMediaItem = $product->getMedia('images')->first(function ($media) use ($downloadUrl) {
+            return $media->getCustomProperty('download_url') === $downloadUrl;
+        });
+
+        if ($existingMediaItem) {
+            dump('Skip');
+            Log::info("Image from '{$downloadUrl}' already exists for product ID {$product->external_id}. Skipping...");
+            return;
+        }
+
         $imageResponse = Http::withHeaders([
             'Authorization'   => 'Basic ' . $encodedCredentials,
             'Accept-Encoding' => 'gzip',
@@ -71,9 +81,14 @@ class ProcessProductImages implements ShouldQueue
                     ->usingFileName($uniqueFilename)
                     ->toMediaCollection('images');
 
+                $mediaItem->setCustomProperty('download_url', $downloadUrl);
+                $mediaItem->save();
+
                 $mediaItem->getConversions();
+
+                Log::info("Image '{$filename}' added for product ID {$product->external_id}.");
             } catch (\Exception $e) {
-                Log::error("Failed to save image for product ID {$product->external_id}. Error: {$e->getMessage()}");
+                Log::error("Failed to save image '{$filename}' for product ID {$product->external_id}. Error: {$e->getMessage()}");
             }
         } else {
             Log::error("Failed to download image from {$downloadUrl}. Status: {$imageResponse->status()}");

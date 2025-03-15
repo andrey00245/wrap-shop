@@ -82,7 +82,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                 MenuSection::resource(PrivacyPolicy::class)->icon('document'),
 
                 MenuSection::make(__(config('nova-settings-tool.sidebar-label', 'Settings')))
-                 ->path('/settings')
+                 ->path('nova-vendor/nova-settings-tool')
                  ->icon('cog')
             ];
         });

@@ -189,11 +189,11 @@
                             <fieldset>
                                 <div class="input-group">
                                     <label for="city">Населений пункт</label>
-
-                                    <div id="city-select-wrapper" style="display:none;">
-                                        <select id="city_select" name="city_select" class="form-control">
+                                    @auth
+                                    <div id="city-select-wrapper" style="display:none">
+                                        <select id="city_select" name="city_select" class="form-control custom-select">
                                             <option value="">Оберіть місто</option>
-                                            @foreach(auth()->user()->addresses as $address)
+                                            @foreach(auth()->user()?->addresses as $address)
                                                 <option value="{{ $address->city }}"
                                                         data-address="{{ $address->address }}"
                                                     {{ old('city') == $address->city ? 'selected' : '' }}>
@@ -202,9 +202,13 @@
                                             @endforeach
                                         </select>
                                     </div>
-
+                                        @error('city_select')
+                                        <div class="error">{{ $message }}</div>
+                                        @enderror
+                                    @endauth
                                     <div id="city-input-wrapper">
                                         <input type="text" id="city" name="city" value="{{ old('city') }}" class="form-control">
+                                        <ul class="dropdown-suggestions" id="city-suggestions" style="display: none;"></ul>
                                     </div>
 
                                     @error('city')
@@ -217,11 +221,9 @@
                                 </div>
 
                                 <div class="input-group">
-                                    <label for="shipping_address">Відділення / Адреса</label>
-
-                                    <!-- Это поле будет заполняться автоматически после выбора города -->
-                                    <input type="text" id="shipping_address" name="shipping_address" value="{{ old('shipping_address') }}" class="form-control">
-
+                                        <label for="shipping_address">Відділення / Адреса</label>
+                                        <input type="text" id="shipping_address" name="shipping_address" class="form-control" placeholder="Введіть відділення" disabled>
+                                        <ul class="dropdown-suggestions" id="address-suggestions" style="display: none;"></ul>
                                     @error('shipping_address')
                                     <div class="error">{{ $message }}</div>
                                     @enderror

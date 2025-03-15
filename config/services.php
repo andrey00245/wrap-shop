@@ -52,4 +52,8 @@ return [
         'client_secret' => env('APPLE_CLIENT_SECRET'),
         'redirect'      => env('APPLE_REDIRECT'),
     ],
+
+    'novaposhta' => [
+        'api_key' => env('NOVA_POSHTA_API_KEY'),
+    ],
 ];

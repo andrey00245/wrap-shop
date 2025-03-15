@@ -9,6 +9,7 @@ use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\FastOrderController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\NovaPoshtaController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportAvailabilityController;
@@ -64,6 +65,10 @@ Route::post('/fast-order', [FastOrderController::class, 'store'])->name('fast-or
 
 Route::group(['prefix' => LaravelLocalization::setLocale(),
   'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
+
+  Route::get('/api/get-cities', [NovaPoshtaController::class, 'getCities']);
+  Route::get('/api/get-branches', [NovaPoshtaController::class, 'getBranches']);
+
   Route::get('/',IndexController::class)->name('index');
 
   Route::get('/get-count', [ProductController::class, 'getCount'])->name('get-count');

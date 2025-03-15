@@ -2,6 +2,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="locale" content="{{ app()->getLocale() }}"/>
   <title>@yield('title', 'Default')</title>
   <meta name="description" content="@yield('description', 'Default')">
 
@@ -18,7 +19,6 @@
 
   <link rel="apple-touch-icon" href="{{asset('assets/favicon/apple-touch-icon.png')}}">
   <link rel="icon" type="image/png" sizes="192x192" href="{{asset('assets/favicon/android-chrome-96x96.png')}}">
-
 
   @stack('styles')
 

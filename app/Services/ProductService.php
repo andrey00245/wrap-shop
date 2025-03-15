@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\GalleryImageDownloadJob;
 use App\Jobs\ProcessProductImages;
 use App\Models\Attribute;
 use App\Models\ExpenseCategory;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use MoySklad\Components\Specs\QuerySpecs\QuerySpecs;
 use MoySklad\Entities\Products\Product as ApiProduct;
+use Illuminate\Support\Facades\File;
 use MoySklad\MoySklad;
 
 class ProductService
@@ -29,9 +31,26 @@ class ProductService
         $myStore = MoySklad::getInstance(config('app.my_store.username'), config('app.my_store.password'));
 
         $list = ApiProduct::query($myStore, QuerySpecs::create([
-            'offset'     => 0,
-            'maxResults' => 100,
+            'offset'     => 4500,
+            'maxResults' => 500,
         ]))->getList();
+
+        $jsonUrl = "https://api.moysklad.ru/api/remap/1.2/entity/currency/76e1fb94-76b8-11eb-0a80-00ab004bdad2";
+
+        $username = config('app.my_store.username');
+        $password = config('app.my_store.password');
+        $encodedCredentials = base64_encode("{$username}:{$password}");
+
+        $response = Http::withHeaders([
+            'Authorization'   => 'Basic ' . $encodedCredentials,
+            'Accept-Encoding' => 'gzip',
+        ])->get($jsonUrl);
+
+        if ($response->successful()) {
+            dd($response->json());
+            $data = $response->json()['rate'];
+            File::put(storage_path('app/currency_rate.json'), json_encode(['rate' => $data]));
+         }
 
         foreach ($list as $item) {
             try {
@@ -54,8 +73,8 @@ class ProductService
      */
     public function processImages(): void
     {
-        $products = Product::all()->filter(function ($product) {
-            return $product->getMedia('images')->isEmpty();
+        $products = Product::all()->filter(function (Product $product) {
+            return $product->whereNotNull('external_id');
         });
 
         $products->each(function ($product) {
@@ -143,6 +162,14 @@ class ProductService
 
            $product = null;
 
+//           //10726
+//           if ($parseData->code == 10726)
+//           {
+//               dd($parseData);
+//           }else{
+//               return;
+//           }
+
            foreach ($attributes as $attribute) {
                if ($attribute->id === ProductAttributeEnum::SITE) {
                    if ($attribute->value->name === 'так'){
@@ -164,6 +191,14 @@ class ProductService
                                ],
                            ]
                        );
+
+                       $product->slug = [
+                           'en' => Str::slug($product->getTranslation('name', 'en')),
+                           'uk' => Str::slug($product->getTranslation('name', 'uk')),
+                           'ru' => Str::slug($product->getTranslation('name', 'ru'))
+                       ];
+
+                       $product->save();
 
                        $this->processPrices($parseData->salePrices, $product);
                    }
@@ -211,7 +246,32 @@ class ProductService
            $this->processVolume($attributes, $product);
            $this->processCountryManufacture($attributes, $product);
            $this->processDefaultQuantity($attributes, $product);
+           $this->saveProductGalleryLinks($attributes, $product);
        }
+    }
+
+    protected function saveProductGalleryLinks($attributes, Product $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->type === 'link') {
+                $this->saveGalleryLink($attribute, $product);
+            }
+
+            if (!$product->banner_title){
+                $product->update(['banner_title' => [
+                    'en' => 'Look at how this film will look on the car',
+                    'uk' => 'Подивіться, як виглядатиме ця плівка на автомобілі',
+                    'ru' => 'Посмотрите, как будет выглядеть эта пленка на автомобиле'
+                ]]);
+            }
+        }
+    }
+
+    protected function saveGalleryLink($attribute, $product): void
+    {
+        if (filter_var($attribute->value, FILTER_VALIDATE_URL)) {
+            GalleryImageDownloadJob::dispatch($attribute->value, $product);
+        }
     }
 
     /**
@@ -245,7 +305,7 @@ class ProductService
                     'type_id'       => $priceType->id,
                     'product_id'    => $product->id,
                 ],
-                ['price' => $priceData['price']]
+                ['price' => $priceData['price'] / 100]
             );
         }
     }
@@ -333,8 +393,16 @@ class ProductService
                         'uk' => $attribute->value,
                         'ru' => $attribute->value,
                         'en' => $attribute->value,
-                    ]
+                    ],
                 ]);
+
+                $product->slug = [
+                    'en' => Str::slug($product->getTranslation('name', 'en')),
+                    'uk' => Str::slug($product->getTranslation('name', 'uk')),
+                    'ru' => Str::slug($product->getTranslation('name', 'ru'))
+                ];
+
+                $product->save();
             }
         }
     }

@@ -23,7 +23,5 @@ return [
   'date_added' => 'Датой добавления',
   'reset' => 'Сбросить',
   'price_from_to' => 'от :min до :max ₴',
-
-
 ];
 ?>

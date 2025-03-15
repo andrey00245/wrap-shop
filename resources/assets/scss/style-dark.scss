@@ -4920,3 +4920,98 @@ table .notify-quantity {
     transform: scale(1.0)
   }
 }
+
+
+/* Общие стили для dropdown-списков */
+.dropdown-suggestions {
+    border: 1px solid #ccc; /* Граница вокруг всего списка */
+    border-radius: 5px;
+    max-height: 300px; /* Ограничиваем высоту списка */
+    overflow-y: auto; /* Добавляем прокрутку по вертикали */
+    background-color: #494C50;
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+}
+
+/* Стили для каждого элемента списка */
+.dropdown-suggestions li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd; /* Разделение элементов */
+    cursor: pointer;
+}
+
+/* Стили для последнего элемента списка (без нижней границы) */
+.dropdown-suggestions li:last-child {
+    border-bottom: none;
+}
+
+/* Эффект при наведении на элемент списка */
+.dropdown-suggestions li:hover {
+    background-color: #FFCE1C;
+}
+
+/* Стили для таблицы */
+.dropdown-suggestions li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-suggestions li span {
+    flex: 1;
+    padding-right: 10px;
+}
+
+/* Если нужно сделать таблицу с информацией */
+.dropdown-suggestions li span:first-child {
+    font-weight: bold;
+    color: #333;
+}
+
+.dropdown-suggestions li span:last-child {
+    font-size: 12px;
+    color: #888;
+}
+
+/* Стили для кастомного select */
+.custom-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: relative;
+    background-color: #494C50; /* Цвет фона */
+    color: #fff; /* Цвет текста */
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Стили для стрелки в select */
+.custom-select::after {
+    content: '\25BC'; /* Код стрелки вниз */
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #fff;
+    pointer-events: none;
+}
+
+/* Стиль для options при наведении */
+.custom-select option {
+    background-color: #494C50;
+    color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+/* Эффект при наведении на option */
+.custom-select option:hover {
+    background-color: #FFCE1C;
+    color: #333;
+}

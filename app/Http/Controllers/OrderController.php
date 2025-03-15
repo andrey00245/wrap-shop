@@ -25,15 +25,19 @@ class OrderController extends Controller
             'first-name' => 'required|string',
             'last-name' => 'required|string',
             'email' => Auth::check() ? 'nullable' : 'required|string|email|max:255|unique:' . User::class,
-            'shipping_method' => 'required|in:pickup,flat,novaposhta,novaposhta_doors,my_addresses', // добавили my_addresses
             'payment_method' => 'required|in:cash,online,bank_transfer',
             'comment' => 'nullable|string',
         ];
 
-        // Проверка для метода доставки "my_addresses"
-        if (in_array($request->input('shipping_method'), ['flat', 'novaposhta', 'novaposhta_doors', 'pickup','my_addresses'])) {
+        if (in_array($request->input('shipping_method'), ['flat', 'novaposhta', 'novaposhta_doors','my_addresses'])) {
             // Если выбран метод доставки "my_addresses", city и shipping_address должны быть обязательными
             $rules['city'] = 'required|string';
+            $rules['shipping_address'] = 'required|string';
+        }
+
+        if ($request->input('shipping_method') == 'my_addresses') {
+            // Если выбран метод доставки "my_addresses", city и shipping_address должны быть обязательными
+            $rules['city_select'] = 'required|string';
             $rules['shipping_address'] = 'required|string';
         }
 

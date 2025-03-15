@@ -17,6 +17,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 use Spatie\Image\Enums\Fit;
+use Illuminate\Support\Facades\File;
 
 class Product extends Model implements HasMedia
 {
@@ -49,6 +50,7 @@ class Product extends Model implements HasMedia
         'name',
         'slug',
         'descriptions',
+        'banner_title'
     ];
 
     protected $casts = [
@@ -161,11 +163,14 @@ class Product extends Model implements HasMedia
         return $value;
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function getPrice()
     {
         return $this->prices()->whereHas('type', function ($query) {
             $query->where('price_types.external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-        })->value('price');
+        })->value('price') * self::getCurrencyRate();
     }
 
     public function getImage(): string
@@ -421,14 +426,14 @@ class Product extends Model implements HasMedia
     {
         return $this->prices()->whereHas('type', function ($query) {
             $query->where('price_types.external_id', 'bb2a9b0f-26f6-11ee-0a80-0f50000d072f');
-        })->value('price');
+        })->value('price') * self::getCurrencyRate();
     }
 
     public function getBigPrice(): float
     {
         return $this->prices()->whereHas('type', function ($query) {
             $query->where('price_types.external_id', 'bb2a9b91-26f6-11ee-0a80-0f50000d0730');
-        })->value('price');
+        })->value('price') * self::getCurrencyRate();
     }
 
     public function getWarranty()
@@ -463,7 +468,7 @@ class Product extends Model implements HasMedia
 
     public function getPriceByDollars($price)
     {
-       return round($price / 42,0);
+       return round($price / self::getCurrencyRate(),0);
     }
 
     public function getMinOrderCount()
@@ -502,6 +507,9 @@ class Product extends Model implements HasMedia
         return $this->attributes()->where('field_name', 'type')->first();
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function getPriceByCount($count)
     {
         $productPrice = $this->getPrice();
@@ -521,4 +529,17 @@ class Product extends Model implements HasMedia
 
         return $productPrice * $count;
     }
+
+   public static function getCurrencyRate() {
+       $filePath = storage_path('app/currency_rate.json');
+
+       if (file_exists($filePath)) {
+           $jsonData = File::get($filePath);
+           $data = json_decode($jsonData, true, 512, JSON_THROW_ON_ERROR);
+
+          return $data['rate'] ?? 42;
+       }
+
+       return 42;
+   }
 }

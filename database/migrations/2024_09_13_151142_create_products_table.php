@@ -21,6 +21,7 @@ return new class extends Migration
             $table->boolean('is_top_seller')->default(false);
             $table->boolean('is_best_seller')->default(false);
             $table->boolean('is_active')->default(true);
+            $table->float('stock')->default(0);
             $table->json('name')->nullable();
             $table->json('slug')->nullable();
             $table->json('descriptions')->nullable();

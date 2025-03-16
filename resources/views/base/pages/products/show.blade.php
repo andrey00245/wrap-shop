@@ -8,13 +8,25 @@
     {{--    <link rel="stylesheet" href="https://wrap.shop/catalog/view/javascript/xvrproductquantities.css">--}}
   @endpush
 
-  {{--  <nav class="breadcrumbs breadcrumbs-product wrap row">--}}
-  {{--    <ul class="flex-center">--}}
-  {{--      <li><a href="#" title="{{__('header_footer.home')}}" class="button">{{__('header_footer.home')}}</a></li>--}}
-  {{--      <li><a href="#" title="{{$product->categories->first()->parent->name}}" class="button">{{$product->categories->first()->parent->name}}</a></li>--}}
-  {{--      <li><a href="#" title="{{$product->categories->value('name')}}" class="button">{{$product->categories->value('name')}}</a></li>--}}
-  {{--    </ul>--}}
-  {{--  </nav>--}}
+    <nav class="breadcrumbs breadcrumbs-product wrap row">
+      <ul class="flex-center">
+        <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}" class="button">{{__('header_footer.home')}}</a></li>
+          @php
+              $category = $product->category;
+              $parents[] = $category;
+
+              while ($category->parent) {
+                  $parents[] = $category->parent;
+                  $category = $category->parent;
+              }
+              $reversedParents = array_reverse($parents);
+
+              foreach ($reversedParents as $parent) {
+                  echo '<li><a href="'.route('products.category', ['category' => $parent->slug]).'" title="12231231" class="button">'.$parent->name.'</a></li>';
+              }
+          @endphp
+      </ul>
+    </nav>
 
   <section class="product-page row" id="product-product">
     <div class="product-page-top flex-justify wrap">

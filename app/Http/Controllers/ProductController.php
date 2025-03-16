@@ -207,14 +207,14 @@ class ProductController extends Controller
 
         $temp = $products->get();
 
-        $maxPrice = $temp->max('price');
-        $minPrice = $temp->min('price');
+        $maxPrice = $temp->max('price') * Product::getCurrencyRate();
+        $minPrice = $temp->min('price')  * Product::getCurrencyRate();
         $step = ceil(($maxPrice - $minPrice) / 4);
 
         if (request()->get('min_price') && request()->get('max_price')) {
             $productsAllCollection = $products
-                ->where('product_prices.price', '>=', request()->get('min_price'))
-                ->where('product_prices.price', '<=', request()->get('max_price'))
+                ->where('product_prices.price', '>=', request()->get('min_price') / Product::getCurrencyRate())
+                ->where('product_prices.price', '<=', request()->get('max_price') / Product::getCurrencyRate())
                 ->get();
         } else {
             $productsAllCollection = $temp;

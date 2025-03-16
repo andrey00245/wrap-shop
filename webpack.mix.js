@@ -20,3 +20,12 @@ mix.sass('resources/assets/scss/style-category-dark.scss', 'public/build/css').v
 mix.sass('resources/assets/scss/all-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-product-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/simple-dark.scss', 'public/build/css').version();
+
+mix.sass('resources/assets/scss/style-light.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/style-information-light.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/style-blog-light.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/account-light.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/style-category-light.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/all-light.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/style-product-light.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/simple-light.scss', 'public/build/css').version();

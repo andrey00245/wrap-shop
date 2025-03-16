@@ -52,6 +52,8 @@ class ProcessProductImages implements ShouldQueue
         } else {
             Log::error("Failed to get images for product ID {$prodExternalId}. Status: {$response->status()}");
         }
+
+        $this->syncProductStock($product);
     }
 
     protected function handleImageDownload($product, $downloadUrl, $encodedCredentials, $filename): void
@@ -92,6 +94,33 @@ class ProcessProductImages implements ShouldQueue
             }
         } else {
             Log::error("Failed to download image from {$downloadUrl}. Status: {$imageResponse->status()}");
+        }
+    }
+
+    protected function syncProductStock(): void
+    {
+        /** @var \App\Models\Product $product */
+        $product = $this->product;
+
+        $username = config('app.my_store.username');
+        $password = config('app.my_store.password');
+        $encodedCredentials = base64_encode("{$username}:{$password}");
+
+        $jsonUrl = "https://api.moysklad.ru/api/remap/1.2/entity/assortment?filter=code~{$product->code}";
+
+        $response = Http::withHeaders([
+            'Authorization'   => 'Basic ' . $encodedCredentials,
+            'Accept-Encoding' => 'gzip',
+        ])->get($jsonUrl);
+
+        if ($response->successful()) {
+            $data = $response->json();
+
+            if (isset($data['rows'][0]['stock'])) {
+                $product->update(['stock' => $data['rows'][0]['stock']]);
+            } else {
+                $product->update(['stock' => 0]);
+            }
         }
     }
 }

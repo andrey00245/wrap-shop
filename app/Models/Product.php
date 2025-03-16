@@ -50,7 +50,8 @@ class Product extends Model implements HasMedia
         'name',
         'slug',
         'descriptions',
-        'banner_title'
+        'banner_title',
+        'stock'
     ];
 
     protected $casts = [

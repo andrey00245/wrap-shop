@@ -26,13 +26,13 @@ class ProductService
     /**
      * @throws \Exception
      */
-    public function processProducts(): void
+    public function processProducts($offset = 0, $limit = 10): void
     {
         $myStore = MoySklad::getInstance(config('app.my_store.username'), config('app.my_store.password'));
 
         $list = ApiProduct::query($myStore, QuerySpecs::create([
-            'offset'     => 0,
-            'maxResults' => 1000,
+            'offset'     => $offset,
+            'maxResults' => $limit,
         ]))->getList();
 
         $jsonUrl = "https://api.moysklad.ru/api/remap/1.2/entity/currency/76e1fb94-76b8-11eb-0a80-00ab004bdad2";
@@ -65,6 +65,8 @@ class ProductService
                 Log::error('Ошибка при обработке продукта: ' . $e->getMessage());
             }
         }
+
+        $this->processImages();
     }
 
     /**
@@ -245,18 +247,21 @@ class ProductService
            $this->processVolume($attributes, $product);
            $this->processCountryManufacture($attributes, $product);
            $this->processDefaultQuantity($attributes, $product);
+           $this->processUnderOrder($attributes, $product);
            $this->saveProductGalleryLinks($attributes, $product);
        }
     }
 
     protected function saveProductGalleryLinks($attributes, Product $product): void
     {
+        $hasGallery = false;
         foreach ($attributes as $attribute) {
             if ($attribute->type === 'link') {
                 $this->saveGalleryLink($attribute, $product);
+                $hasGallery = true;
             }
 
-            if (!$product->banner_title){
+            if ($hasGallery){
                 $product->update(['banner_title' => [
                     'en' => 'Look at how this film will look on the car',
                     'uk' => 'Подивіться, як виглядатиме ця плівка на автомобілі',
@@ -815,6 +820,19 @@ class ProductService
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::VOLUME) {
                 $this->saveProductAttribute($attribute, $product, 'volume');
+            }
+        }
+    }
+
+    /**
+     * @param $attributes
+     * @param $product
+     */
+    protected function processUnderOrder($attributes, $product): void
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->id === ProductAttributeEnum::UNDER_ORDER) {
+                $this->saveProductAttribute($attribute, $product, 'under_order');
             }
         }
     }

@@ -41,6 +41,7 @@ class ProductAttributeEnum
     const STOCK_QUANTITY_1 = 'c3445e88-48c1-11ee-0a80-0b12000d01c4';
     const STOCK_QUANTITY_2 = 'c34460ad-48c1-11ee-0a80-0b12000d01c5';
     const STOCK_QUANTITY_3 = 'c3446408-48c1-11ee-0a80-0b12000d01c6';
+    const UNDER_ORDER = 'ec811def-cfd6-11ee-0a80-133d000e7679';
 
     // Опционально: добавить методы для получения данных или обработки
 }

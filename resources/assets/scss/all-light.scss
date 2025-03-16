@@ -1,6 +1,9 @@
 @import "variables";
 
-$modifiable-main-color: $main-color-light;
-$modifiable-main-color-075: $main-color-light-075;
+$mod-main-color: $main-color-light;
+$mod-main-color-075: $main-color-light-075;
+$mod-product-default-bg: $product-default-bg-light;
+$mod-product-default-border: $product-default-border-light;
+
 
 @import "all-general";

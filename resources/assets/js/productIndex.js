@@ -103,37 +103,38 @@ $(document).ready(function () {
     filterProductsClick()
     updateStatusFilters()
     unselectAllFilters()
-    filterProductsPriceClick();
+    // filterProductsPriceClick();
     checkFiltersOnPageLoad();
+    initializationPriceSlider();
 
-    function filterProductsPriceClick() {
-        filterProductsPrice.on('click', function () {
-            if (!$(this).hasClass('ocf-selected')) {
-                filterProductsPrice.each(function () {
-                    $(this).removeClass('ocf-selected');
-                })
-            }
+    // function filterProductsPriceClick() {
+    //     filterProductsPrice.on('click', function () {
+    //         if (!$(this).hasClass('ocf-selected')) {
+    //             filterProductsPrice.each(function () {
+    //                 $(this).removeClass('ocf-selected');
+    //             })
+    //         }
+    //
+    //         $(this).toggleClass('ocf-selected')
+    //         // setMaxMinVal();
+    //         getCountAjax($(this))
+    //     })
+    // }
 
-            $(this).toggleClass('ocf-selected')
-            setMaxMinVal();
-            getCountAjax($(this))
-        })
-    }
-
-    function setMaxMinVal() {
-        let tempCount = 0;
-        filterProductsPrice.each(function () {
-            if ($(this).hasClass('ocf-selected')) {
-                tempCount++;
-                minPrice = $(this).data('value-min')
-                maxPrice = $(this).data('value-max')
-            }
-        })
-        if (tempCount === 0) {
-            minPrice = 0
-            maxPrice = 0
-        }
-    }
+    // function setMaxMinVal() {
+    //     let tempCount = 0;
+    //     filterProductsPrice.each(function () {
+    //         if ($(this).hasClass('ocf-selected')) {
+    //             tempCount++;
+    //             minPrice = $(this).data('value-min')
+    //             maxPrice = $(this).data('value-max')
+    //         }
+    //     })
+    //     if (tempCount === 0) {
+    //         minPrice = 0
+    //         maxPrice = 0
+    //     }
+    // }
 
     function changeFilterTotal(windowWidth) {
         if (windowWidth < 768) {
@@ -147,7 +148,7 @@ $(document).ready(function () {
 
     function updateStatusFilters() {
         filterProducts.each(function () {
-            setMaxMinVal()
+            // setMaxMinVal()
             let filterType = $(this).data('filter-type')
             let filterValue = $(this).data('filter')
             if ($(this).hasClass('ocf-selected')) {
@@ -183,11 +184,11 @@ $(document).ready(function () {
                     filters[filterType][filterValue]['active'] = false;
                     $(this).removeClass('ocf-selected');
                 })
-                filterProductsPrice.each(function () {
-                    $(this).removeClass('ocf-selected');
-                    minPrice = 0;
-                    maxPrice = 0;
-                })
+                // filterProductsPrice.each(function () {
+                //     $(this).removeClass('ocf-selected');
+                //     minPrice = 0;
+                //     maxPrice = 0;
+                // })
                 getCountAjax()
             } else {
                 window.location.href = $(this).data('link');
@@ -202,11 +203,17 @@ $(document).ready(function () {
                 filterSelected = true;
             }
         })
-        filterProductsPrice.each(function () {
-            if ($(this).hasClass('ocf-selected')) {
-                filterSelected = true;
-            }
-        })
+
+        let minInput = $('#min_price');
+        let maxInput = $('#max_price');
+
+        maxPrice = parseInt(maxInput.val());
+        minPrice = parseInt(minInput.val());
+
+        if(parseInt(minInput.attr('min')) !== parseInt(minInput.val()) || parseInt(maxInput.attr('max')) !== parseInt(maxInput.val())){
+            filterSelected = true;
+        }
+
         if (filterSelected) {
             $('#cancel').prop("disabled", false)
         }
@@ -217,7 +224,6 @@ $(document).ready(function () {
         $('.ocfFilterBottom').each(function () {
             $(this).html(count)
         });
-        console.log(1)
 
         let selectedFilters = countSelected(filters);
 
@@ -315,6 +321,61 @@ $(document).ready(function () {
             }
             getCountAjax(button)
         })
+    }
+
+    function initializationPriceSlider() {
+        const priceSlider = document.getElementById('price-slider');
+
+        const sliderMin = parseInt($('#min_price').attr('min'));
+        const sliderMinVal = parseInt($('#min_price').val());
+        const sliderMax = parseInt($('#max_price').attr('max'));
+        const sliderMaxVal = parseInt($('#max_price').val());
+
+        let minInput = document.querySelector('#min_price');
+        let maxInput = document.querySelector('#max_price');
+        let maxInputJq = $('#max_price');
+
+        noUiSlider.create(priceSlider, {
+            start: [sliderMinVal, sliderMaxVal],
+            connect: true,
+            range: {
+                'min': sliderMin,
+                'max': sliderMax
+            },
+            step: 1,
+            format: {
+                to: function (value) {
+                    return Math.round(value);
+                },
+                from: function (value) {
+                    return Number(value);
+                }
+            }
+        });
+
+        priceSlider.noUiSlider.on('update', function (values, handle) {
+            minInput.value = values[0];
+            maxInput.value = values[1];
+        });
+
+        priceSlider.noUiSlider.on('change', function (values, handle) {
+            minPrice = values[0];
+            maxPrice = values[1];
+            getCountAjax(maxInputJq)
+        });
+
+        minInput.addEventListener('input', function () {
+            priceSlider.noUiSlider.set([this.value, null]);
+        });
+        minInput.addEventListener('change', function () {
+            getCountAjax(maxInputJq)
+        });
+        maxInput.addEventListener('input', function () {
+            priceSlider.noUiSlider.set([null, this.value]);
+        });
+        maxInput.addEventListener('change', function () {
+            getCountAjax(maxInputJq)
+        });
     }
 
     function getCountAjax(button = null) {

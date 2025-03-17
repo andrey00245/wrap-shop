@@ -226,8 +226,8 @@ class Product extends Model implements HasMedia
             $query->where('type_id', DB::table('price_types')
               ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
               ->value('id'))
-              ->where('price', '>=', (int)$request->get('min_price'))
-              ->where('price', '<=', (int)$request->get('max_price'));
+              ->where('price', '>=', (int)$request->get('min_price') / Product::getCurrencyRate())
+              ->where('price', '<=', (int)$request->get('max_price') / Product::getCurrencyRate());
           };
         }
       }

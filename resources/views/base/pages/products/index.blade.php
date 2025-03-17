@@ -150,32 +150,43 @@
                     </div>
                     <div class="ocf-filter-collapse ocf-collapse ocf-in">
                       <div class="ocf-input-group ocf-slider-input-group">
-                        <input type="number" name="min_price" min="{{request()->get('min_price') ? request()->get('min_price') : $minPrice}}" max="{{request()->get('max_price') ? request()->get('max_price') : $maxPrice}}"
+{{--                          <div class="inputs-wrapper mbforslider">--}}
+
+                          <input type="number" name="min_price" id="min_price" min="{{$minPrice}}" max="{{$maxPrice}}"
                                value="{{request()->get('min_price') ? request()->get('min_price') : $minPrice}}"
                                class="ocf-form-control ocf-grouping ocf-min"
                                autocomplete="off" aria-label="{{__('product-index.price')}}">
-                        <input type="number" name="max_price" min="{{request()->get('min_price') ? request()->get('min_price') : $minPrice}}" max="{{request()->get('max_price') ? request()->get('max_price') : $maxPrice}}"
+                        <input type="number" name="max_price" id="max_price" min="{{$minPrice}}" max="{{$maxPrice}}"
                                value="{{request()->get('max_price') ? request()->get('max_price') : $maxPrice}}"
                                class="ocf-form-control ocf-grouping ocf-max"
                                autocomplete="off" aria-label="{{__('product-index.price')}}">
-                      </div>
 
-                      <div class="ocf-value-list">
-                        <div class="ocf-value-list-body">
-                          @for($i = 0; $i<4;$i++)
-                            @php
-                                $selected = ((float)request()->get('min_price') === $minPrice + $step*$i && (float)request()->get('max_price') === $minPrice + $step*($i+1))  ? 'ocf-selected' : '';
-                            @endphp
-                            <button type="button" class="ocf-value ocf-radio filterProductsPrice {{$selected}}"
-                                    data-value-min="{{$minPrice + $step*$i}}"
-                                    data-value-max="{{$minPrice + $step*($i+1)}}">
-                              <span class="ocf-value-input ocf-value-input-radio"></span>
-                              <span
-                                class="ocf-value-name">{{$minPrice + $step*$i}} - {{$minPrice + $step*($i+1)}} ₴</span>
-                            </button>
-                          @endfor
-                        </div>
+{{--                      </div>--}}
                       </div>
+                        <div class="slider-container">
+                            <div id="price-slider"></div>
+                        </div>
+
+{{--                      <div class="ocf-value-list">--}}
+{{--                        <div class="ocf-value-list-body">--}}
+
+
+{{--                            </div>--}}
+{{--                          @for($i = 0; $i<4;$i++)--}}
+{{--                            @php--}}
+{{--                                $selected = ((float)request()->get('min_price') === $minPrice + $step*$i && (float)request()->get('max_price') === $minPrice + $step*($i+1))  ? 'ocf-selected' : '';--}}
+{{--                            @endphp--}}
+
+{{--                            <button type="button" class="ocf-value ocf-radio filterProductsPrice {{$selected}}"--}}
+{{--                                    data-value-min="{{$minPrice + $step*$i}}"--}}
+{{--                                    data-value-max="{{$minPrice + $step*($i+1)}}">--}}
+{{--                              <span class="ocf-value-input ocf-value-input-radio"></span>--}}
+{{--                              <span--}}
+{{--                                class="ocf-value-name">{{$minPrice + $step*$i}} - {{$minPrice + $step*($i+1)}} ₴</span>--}}
+{{--                            </button>--}}
+{{--                          @endfor--}}
+{{--                        </div>--}}
+{{--                      </div>--}}
                     </div>
                   </div>
                 </div>
@@ -532,7 +543,9 @@
   </section>
 
   @push('scripts')
-    <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"></script>
+
+      <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
     {{--    <script>--}}
     {{--      let categoryProductsItem = new Swiper(".category-products-item .image", {--}}
     {{--        navigation: {--}}
@@ -548,4 +561,7 @@
     </script>
     <script src="{{mix('build/js/productIndex.js')}}"></script>
   @endpush
+    @push('styles')
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"/>
+    @endpush
 @endsection

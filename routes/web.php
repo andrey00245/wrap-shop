@@ -5,6 +5,7 @@ use App\Http\Controllers\Account\PersonalDataController;
 use App\Http\Controllers\Account\UserAddressController;
 use App\Http\Controllers\Account\ViewedProductsController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\ChangeThemeController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\FastOrderController;
 use App\Http\Controllers\IndexController;
@@ -60,11 +61,13 @@ Route::post('/consultation', [ConsultationController::class, 'store']);
 Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
 Route::post('/report-availability', [ReportAvailabilityController::class, 'store'])->name('report.availability');
 
-
 Route::post('/fast-order', [FastOrderController::class, 'store'])->name('fast-order.store');
 
+Route::post('/change-theme', ChangeThemeController::class)->name('change-theme');
+
+
 Route::group(['prefix' => LaravelLocalization::setLocale(),
-  'middleware' => ['localizationRedirect', 'localeViewPath' ]], function(){
+  'middleware' => ['localizationRedirect', 'localeViewPath', 'themeMiddleware' ]], function(){
 
   Route::get('/api/get-cities', [NovaPoshtaController::class, 'getCities']);
   Route::get('/api/get-branches', [NovaPoshtaController::class, 'getBranches']);

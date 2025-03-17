@@ -388,6 +388,16 @@ class Product extends Model implements HasMedia
 
     }
 
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug->en';
+    }
+
     public function getBenefits()
     {
         return $this->attributes()->where('field_name', 'benefits')->first()?->pivot?->value;
@@ -400,7 +410,7 @@ class Product extends Model implements HasMedia
 
     public function getDefaultQuantity()
     {
-        return $this->attributes()->where('field_name', 'default_quantity')->first()?->pivot?->value;
+        return $this->attributes()->where('field_name', 'default_quantity')->first()?->pivot?->value ?? 1;
     }
 
     public function getFirstStock()
@@ -420,7 +430,7 @@ class Product extends Model implements HasMedia
 
     public function getStock(): float
     {
-        return (float) $this->getFirstStock() + (float) $this->getSecondStock() + ( float) $this->getThirdStock();
+        return (float) $this->stock;
     }
 
     public function getSmallPrice(): float
@@ -474,12 +484,17 @@ class Product extends Model implements HasMedia
 
     public function getMinOrderCount()
     {
-        return $this->attributes()->where('field_name', 'min_order_quantity')->first()?->pivot?->value;
+        return $this->attributes()->where('field_name', 'min_order_quantity')->first()?->pivot?->value ?? 1;
     }
 
     public function getOrderStep()
     {
-        return $this->attributes()->where('field_name', 'quantity_step')->first()?->pivot?->value;
+        return $this->attributes()->where('field_name', 'quantity_step')->first()?->pivot?->value ?? 1;
+    }
+
+    public function getUnderOrder()
+    {
+        return $this->attributes()->where('field_name', 'under_order')->first()?->pivot?->value;
     }
 
     public function getRollSize()

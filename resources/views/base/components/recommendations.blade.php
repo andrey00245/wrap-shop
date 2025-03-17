@@ -32,7 +32,7 @@
             <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
               <i class="far fa-search-plus colord" data-src="{{$product->getMedia('images')->first()->getUrl()}}"
                  data-fancybox="gallery{{$product->id}}" data-caption="{{$product->getName()}}"></i>
-              <a href="{{route('products.show', ['product'=>$product->id])}}"
+              <a href="{{route('products.show', ['product'=>$product->slugEn])}}"
                  title="{{$product->getName()}}" class="swiper-wrapper"
                  id="swiper-wrapper-c1ba02d97e25995b" aria-live="polite">
                 @foreach($product->getMedia('images') as $key => $image)
@@ -55,7 +55,7 @@
             <div class="product-default-texts-wrapper">
 
               <div class="category">{{$product->category->name}}</div>
-              <a href="{{route('products.show', ['product'=>$product->id])}}"
+              <a href="{{route('products.show', ['product'=>$product->slugEn])}}"
                  title="{{$product->getName()}}" class="name">{{$product->getName()}}</a>
               <div class="bottom flex-center">
                 <div class="price">{{number_format($product->getPrice())}} ₴<span class="price-unit-xvr"></span></div>

@@ -20,7 +20,7 @@
               <div class="image swiper">
                 <div class="swiper-wrapper">
                   @foreach($viewedProduct->getMedia('images') as $key => $image)
-                    <a href="{{route('products.show', ['product' => $viewedProduct->id])}}"
+                    <a href="{{route('products.show', ['product' => $viewedProduct->slugEn])}}"
                        data-src="{{$image->getUrl()}}"
                        class="swiper-slide item flex-center swiper-slide-next" data-fancybox="viewed-products{{$viewedProduct->id}}"
                        data-caption="{{$viewedProduct->name}}">
@@ -50,7 +50,7 @@
                 </div>
               </div>
               <div class="category">{{$viewedProduct->category?->name}}</div>
-              <a href="{{route('products.show', ['product' => $viewedProduct->id])}}"
+              <a href="{{route('products.show', ['product' => $viewedProduct->slugEn])}}"
                  title="{{$viewedProduct->name}}" class="name">{{$viewedProduct->name}}</a>
               <div class="bottom flex-center">
                 <div class="price">{{number_format($viewedProduct->getPrice())}} ₴<span class="price-unit-xvr"></span></div>

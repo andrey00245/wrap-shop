@@ -141,7 +141,7 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
       return view('base.pages.account.order');
     })->name('order');
 
-    Route::get('/viewed-products', [ViewedProductsController::class, 'index'])->name('viewed-products');
+        Route::get('/viewed-products', [ViewedProductsController::class, 'index'])->name('viewed-products');
 
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
   })->middleware('redirect_if_not_authenticated');

@@ -36,6 +36,7 @@ return [
   'max-quantity' => 'Макс.: :max',
   'select-max' => 'Обрати максимум',
   'discont-text' => 'Замовте більше на <span class="count-for-discont">0</span> і заощаджуйте <span class="saving-val">0</span> ₴',
+  'under_order' => 'Під замовлення',
 
 
 

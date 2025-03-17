@@ -311,7 +311,7 @@
                     <tr class="item flex-justify">
                       <td class="image">
                           <a
-                              href="{{route('products.show', ['product' => $item['product']->id])}}"><img
+                              href="{{route('products.show', ['product' => $item['product']->slugEn])}}"><img
                                   loading="lazy"
                                   src="{{$item['product']->getMedia('images')[0]->getUrl('preview')}}"
                                   alt="{{$item['product']->name}}"
@@ -319,7 +319,7 @@
                       </td>
                       <td class="name">
                           <span class="cat">{{$item['product']->category->name}}</span><a
-                              href="{{route('products.show', ['product'=>$item['product']->id])}}">{{$item['product']->name}}</a>
+                              href="{{route('products.show', ['product'=>$item['product']->slugEn])}}">{{$item['product']->name}}</a>
                         <div class="options">
                         </div>
                       </td>

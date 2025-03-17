@@ -451,7 +451,7 @@
               <div class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
                 <i class="far fa-search-plus colord" data-src="{{$product->getImage()}}"
                    data-fancybox="product-gallery{{$product->id}}" data-caption="{{$product->getName()}}"></i>
-                <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->getName()}}"
+                <a href="{{route('products.show', ['product' => $product->slugEn])}}" title="{{$product->getName()}}"
                    class="swiper-wrapper">
 
                   @foreach($product->getMedia('images') as $key => $image)
@@ -478,7 +478,7 @@
 
                 <div class="center">
                   <div class="category">{{$product->category?->name}}</div>
-                  <a href="{{route('products.show', ['product' => $product->id])}}" title="{{$product->getName()}}"
+                  <a href="{{route('products.show', ['product' => $product->slugEn])}}" title="{{$product->getName()}}"
                      class="name">{{$product->getName()}}</a>
                 </div>
                 <div class="bottom flex-center">

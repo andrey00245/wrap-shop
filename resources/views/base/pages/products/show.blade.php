@@ -137,12 +137,17 @@
         </div>
         <div class="center flex-justify">
           @php
-            $count= $product->getStock()
+            $count= $product->getStock();
+            $secondStock = $product->getSecondStock();
+            $thirdStock = $product->getThirdStock();
           @endphp
           <div class="left">
             <div class="info flex-center">
               <div class="availability">
-                @if($count == 0)
+                  @if($product->getUnderOrder())
+                      <i class="fas fa-times nonstock"></i>{{__('product-show.under_order')}}
+                  @endif
+                @if($count == 0 && !$product->getUnderOrder())
                   <i class="fas fa-times nonstock"></i>{{__('product-show.out-of-stock')}}
                 @elseif($count>0)
                   <i class="fas fa-check"></i>{{__('product-show.in-stock')}}
@@ -154,42 +159,61 @@
               <div class="default">
 {{--                                <span class="text_price_XVR label-name">{{__('product-show.price')}} </span>--}}
                 <div class="flex-center price-wrap">
-                  <span class="item-price"
-                        data-discount='{"0": {"discountFrom": 0, "price": {{$product->getPrice()}}},"1": {"discountFrom": 10, "price": {{$product->getSmallPrice()}}},"2": {"discountFrom": 25, "price": {{$product->getBigPrice()}}}}'
-                        data-value="{{number_format($product->getPrice(), 2, '.', '')}}">
+                    @if($secondStock && $thirdStock)
+                        @php
+                            $discountData = [
+                                "0" => ["discountFrom" => 0, "price" => $product->getPrice()],
+                                "1" => ["discountFrom" => $secondStock, "price" => $product->getSmallPrice()],
+                                "2" => ["discountFrom" => $thirdStock, "price" => $product->getBigPrice()]
+                            ];
+                        @endphp
+
+                        <span class="item-price"
+                              data-discount='@json($discountData)'
+                              data-value="{{ number_format($product->getPrice(), 2, '.', '') }}">
+        <span class="only-price">{{ number_format($product->getPrice(), 2, '.', '') }}</span> ₴
+    </span>
+                    @else
+                        <span class="item-price"
+                              data-discount='{"0": {"discountFrom": 0, "price": {{$product->getPrice()}}},"1": {"discountFrom": 10, "price": {{$product->getPrice()}}},"2": {"discountFrom": 25, "price": {{$product->getPrice()}}}}'
+                              data-value="{{number_format($product->getPrice(), 2, '.', '')}}">
 
                       <span
-                      class="only-price">{{number_format($product->getPrice(), 2, '.', '')}}</span> ₴</span>
-                  <span class="label-lenght"> {{$product->getRollSize() ? 'за 1 м.п.' : 'за 1  шт'}}</span><span class="cur">$ {{$product->getPriceByDollars($product->getPrice())}}</span>
+                          class="only-price">{{number_format($product->getPrice(), 2, '.', '')}}</span> ₴</span>
+                    @endif
+                        <span class="label-lenght"> {{$product->getRollSize() ? 'за 1 м.п.' : 'за 1  шт'}}</span><span class="cur">$ {{$product->getPriceByDollars($product->getPrice())}}</span>
                 </div>
               </div>
             </div>
 
-              @if($product->getRollSize() && $count >= 10)
+              @if($product->getRollSize())
               <ul class="product-discounts">
+              @if($product->getSecondStock() && $product->getSecondStock() <= $count)
               <li>
                 <div class="item-text">
-                  10 м.п. і більше: <span class="colord">{{$product->getSmallPrice()}} ₴</span> <span class="cur">| {{$product->getPriceByDollars($product->getSmallPrice())}} $</span>
+                    {{$product->getSecondStock()}} м.п. і більше: <span class="colord">{{$product->getSmallPrice()}} ₴</span> <span class="cur">| {{$product->getPriceByDollars($product->getSmallPrice())}} $</span>
                 </div>
                 <div class="item-btn">
-                  <span data-quantity="10"
+                  <span data-quantity="{{$product->getSecondStock()}}"
                         data-chosen="{{__('product-show.chosen')}}"
                         data-choose="{{__('product-show.choose')}}"
                         class="select-quantity">{{__('product-show.choose')}}</span>
                 </div>
               </li>
-
+                  @endif
+                  @if($product->getThirdStock() && $product->getThirdStock() <= $count)
               <li>
                 <div class="item-text">
-                  25 м.п. і більше: <span class="colord">{{$product->getBigPrice()}} ₴</span> <span class="cur">| {{$product->getPriceByDollars($product->getBigPrice())}} $</span>
+                    {{$product->getThirdStock()}} м.п. і більше: <span class="colord">{{$product->getBigPrice()}} ₴</span> <span class="cur">| {{$product->getPriceByDollars($product->getBigPrice())}} $</span>
                 </div>
                 <div class="item-btn">
-                  <span data-quantity="25"
+                  <span data-quantity="{{$product->getThirdStock()}}"
                         data-chosen="{{__('product-show.chosen')}}"
                         data-choose="{{__('product-show.choose')}}"
                         class="select-quantity">{{__('product-show.choose')}}</span>
                 </div>
               </li>
+                @endif
             </ul>
               @endif
           </div>

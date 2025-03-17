@@ -19,7 +19,7 @@
                         {!! $works->descriptions !!}
                     </div>
                     <div class="example-product">
-                        <a class="product-link" href="{{route('products.show', ['product'=>$works->product->id])}}">
+                        <a class="product-link" href="{{route('products.show', ['product'=>$works->product->slugEn])}}">
                             <img class="image-product" src="{{$works->product->getImage()}}" alt="{{$works->product->name}}">
                             <div class="text-wrapper">
                                 <span class="title-product">{{$works->product->category->name}}</span>

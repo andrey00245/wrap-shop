@@ -355,13 +355,13 @@
 
 .order-list-item .info .item.icon {
   font-size: 34px;
-  color: rgba(255, 255, 255, 0.40);
+  color: $mod-page-account-left;
 }
 
 .order-list-item .info .item .label {
   font-weight: 400;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.70);
+  color: $mod-page-account-left;
   display: block;
   text-transform: initial;
 }
@@ -370,7 +370,7 @@
   min-width: 150px;
   margin-left: auto;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.70);
+  color: $mod-text-color;
 }
 
 .order-list-item .info .item.status:before {

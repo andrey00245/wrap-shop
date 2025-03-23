@@ -4,7 +4,11 @@
 @section('content')
 
   @push('styles')
-    <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-information-dark.css')}}">
+      @if($theme === 'dark')
+          <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-information-dark.css')}}">
+      @else
+          <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-information-light.css')}}">
+      @endif
   @endpush
   <nav class="breadcrumbs wrap row">
     <ul class="flex-center">

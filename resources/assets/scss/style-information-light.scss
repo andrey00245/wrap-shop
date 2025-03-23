@@ -1,6 +1,10 @@
 @import "variables";
 
-$modifiable-main-color: $main-color-light;
-$modifiable-main-color-075: $main-color-light-075;
+$mod-main-color: $main-color-light;
+$mod-main-color-075: $main-color-light-075;
+$mod-text-color: $text-color-light;
+$mod-home-product-nav-text: $home-product-nav-text-light;
+$mod-home-product-nav-border: $home-product-nav-border-light;
+$mod-delivery-text: $delivery-text-light;
 
 @import "style-information-general";

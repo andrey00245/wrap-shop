@@ -142,34 +142,38 @@ $(document).ready(function () {
         }
     }
 
-    function integerNumber (currentVal, step) {
-        currentVal = Math.round(currentVal / step) * step
-        return currentVal
+function integerNumber(currentVal, step) {
+    currentVal = Math.round(currentVal/step) * step
+    if (isNaN(currentVal)){
+        currentVal = 0;
     }
+    return currentVal
+}
 
-    function recalcTotalPrice (newVal) {
-        console.log(discounts);
-        for (const key in discounts) {
-            if (discounts.hasOwnProperty(key)) {
-                const item = discounts[key];
-                console.log(item);
-                if (key != 0) {
-                    const prevItem = discounts[key - 1];
-                    if (newVal < item.discountFrom && newVal >= prevItem.discountFrom) {
-                        countForDiscont.text((item.discountFrom - newVal).toFixed(1))
-                        savingVal.text(item.discountFrom * prevItem.price - item.discountFrom * item.price)
-                    }
-                    if (newVal >= item.discountFrom) {
-                        textDiscount.hide()
-                    } else {
-                        textDiscount.show()
+function recalcTotalPrice(newVal) {
+    for (const key in discounts) {
+        if (discounts.hasOwnProperty(key)) {
+            const item = discounts[key];
+            if(discounts.length === 1){
+                textDiscount.hide()
+            }
 
-                    }
+            if (key != 0) {
+                const prevItem = discounts[key - 1];
+                if (newVal < item.discountFrom && newVal >= prevItem.discountFrom) {
+                    countForDiscont.text((item.discountFrom - newVal).toFixed(1))
+                    savingVal.text(item.discountFrom*prevItem.price - item.discountFrom*item.price)
                 }
-                console.log(newVal, item.discountFrom);
-                if (newVal >= item.discountFrom) {
-                    price.text(item.price.toFixed(2))
-                    $('.autocalc-product-price .total-price').text((item.price * newVal).toFixed(2));
+                if(newVal >= item.discountFrom){
+                    textDiscount.hide()
+                }
+                else{
+                    textDiscount.show()
+                }
+            }
+            if (newVal >= item.discountFrom) {
+                price.text(item.price.toFixed(2))
+                $('.autocalc-product-price .total-price').text((item.price * newVal).toFixed(2));
 
                     restyleThreeLastChart('.price-wrap .only-price');
                     restyleThreeLastChart('.autocalc-product-price .total-price-main');
@@ -182,7 +186,6 @@ $(document).ready(function () {
 
     function restyleThreeLastChart (selector) {
         const element = $(selector);
-        console.log(element);
         let text = element.text()
         if (text.length > 3) {
             let lastThree = text.slice(-3);

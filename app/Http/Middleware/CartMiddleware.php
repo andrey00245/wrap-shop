@@ -39,10 +39,17 @@ class CartMiddleware
 
             $cartItemsCount = count($cartItems);
         }
+        $integerPart = (int)floor($sum);
+        $decimalPart = $sum - floor($sum);
+        $decimalStr = number_format($decimalPart, 2, '.', '');
+        $decimalStr = '.' . substr($decimalStr, 2);
+
+        $sum_html = $integerPart . '<span class="coins">'.$decimalStr.'</span>';
 
         view()->share('cartItemsCount', $cartItemsCount);
         view()->share('cartItems', $cartItems);
         view()->share('sum', $sum);
+        view()->share('sum_html', $sum_html);
 
         return $next($request);
     }

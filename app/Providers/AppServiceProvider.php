@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
-use App\Nova\Support\DynamicSettings;
+use App\Models\Setting;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -33,9 +33,9 @@ class AppServiceProvider extends ServiceProvider
         });
 
        /**
-       * @var DynamicSettings $settings
+       * @var Setting $settings
        */
-        $settings = new DynamicSettings();
+        $settings = Setting::query()->first();
 
         $products = Product::query()
             ->where('is_active', true)

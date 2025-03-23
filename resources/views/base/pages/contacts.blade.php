@@ -3,7 +3,11 @@
 
 @section('content')
   @push('styles')
-    <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-information-dark.css')}}">
+      @if($theme === 'dark')
+          <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-information-dark.css')}}">
+      @else
+          <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-information-light.css')}}">
+      @endif
   @endpush
 
   <nav class="breadcrumbs wrap row">
@@ -25,18 +29,18 @@
           {{__('contacts.call')}}
         </div>
 
-        <a href="tel:{{$settings->getPhone()}}" class="phone">{!! $settings->getPhoneView() !!}</a>
-        <a href="tel:{{$settings->getAditionalPhone()}}" class="phone">{!! $settings->getAditionalPhoneView() !!}</a>
+        <a href="tel:{{$settings->phone ?? '#'}}" class="phone">{!! $settings->phone_view ?? '#' !!}</a>
+        <a href="tel:{{$settings->phone_aditional ?? '#'}}" class="phone">{!! $settings->phone_aditional_view ?? '#' !!}</a>
       </div>
       <div class="item">
         <div class="title flex-wrap">
           <img src="{{asset('assets/img/icons/email.png')}}" alt="{{__('contacts.write')}}" title="{{__('contacts.write')}}">
           {{__('contacts.write')}}
         </div>
-        <a href="mailto:{{$settings->getEmail()}}" class="email" title="{{$settings->getEmail()}}">{{$settings->getEmail()}}</a>
+        <a href="mailto:{{$settings->email ?? '#'}}" class="email" title="{{$settings->email ?? '#'}}">{{$settings->email ?? '#'}}</a>
         <div class="social">
-          <a href="{{$settings->getTelegramUrl()}}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
-          <a href="{{$settings->getInstagramUrl()}}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
+          <a href="{{$settings->telegram ?? '#'}}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
+          <a href="{{$settings->instagram ?? '#'}}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
         </div>
       </div>
       <div class="item">
@@ -44,8 +48,8 @@
           <img src="{{asset('assets/img/icons/delivery-1.png')}}" alt="{{__('contacts.come_here')}}" title="{{__('contacts.come_here')}}">
           {{__('contacts.come_here')}}
         </div>
-        <div class="text">{{$settings->getAddress()}}</div>
-        <a href="{{$settings->getGoogleMapsUrl()}}" target="_blank" title="{{__('contacts.make_a_route')}}" class="addlink">{{__('contacts.make_a_route')}}</a>
+        <div class="text">{{$settings->address ?? '#'}}</div>
+        <a href="{{$settings->google_map_link ?? '#'}}" target="_blank" title="{{__('contacts.make_a_route')}}" class="addlink">{{__('contacts.make_a_route')}}</a>
       </div>
     </div>
   </section>

@@ -5,7 +5,7 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('click', '.remove-cart-button', function() {
+    $(document).on('click', '.remove-cart-button', function () {
         const itemId = $(this).data('id');
         $.ajax({
             url: '/cart/remove/' + itemId,
@@ -20,7 +20,7 @@ $(document).ready(function () {
         });
     });
 
-    $('#button-cart').on('click', function(e) {
+    $('#button-cart').on('click', function (e) {
         var productId = $(this).data('product-id');
         var quantity = $('#input-quantity-' + productId).val();
         if (parseFloat(quantity) > 0) {
@@ -31,12 +31,12 @@ $(document).ready(function () {
                     product_id: productId,
                     quantity: quantity
                 },
-                success: function(response) {
+                success: function (response) {
                     $('#cart-total').html(response.cartItemsCount)
                     $('.cart-shopping-items').html(response.cartItems);
                     cartPopup(e)
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert('Ошибка при добавлении в корзину: ' + error);
                 }
             });
@@ -45,7 +45,7 @@ $(document).ready(function () {
         }
     });
 
-    $('.button-cart-product').on('click', function(e) {
+    $('.button-cart-product').on('click', function (e) {
         var productId = $(this).data('product-id');
         var quantity = $(this).data('product-quantity');
         if (parseFloat(quantity) > 0) {
@@ -56,12 +56,12 @@ $(document).ready(function () {
                     product_id: productId,
                     quantity: quantity
                 },
-                success: function(response) {
+                success: function (response) {
                     $('#cart-total').html(response.cartItemsCount)
                     $('.cart-shopping-items').html(response.cartItems);
                     cartPopup(e)
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     alert('Ошибка при добавлении в корзину: ' + error);
                 }
             });
@@ -70,15 +70,16 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('click', '#plus-btn-cart, #minus-btn-cart', function() {
+
+    $('.cart-quantity-input-wrappper #input-quantity-1').on('change', function () {
+        updateCarts($(this).closest('tr').data('id'), $(this).val());
+    })
+
+    $(document).on('click', '#plus-btn-cart, #minus-btn-cart', function () {
         var quantityInput = $(this).closest('.cart-quantity-input-wrappper').find('#input-quantity-1');
         var currentQuantity = parseFloat(quantityInput.val());
 
-        console.log(quantityInput)
-        console.log(currentQuantity)
         currentQuantity = parseFloat(currentQuantity.toFixed(2));
-
-        console.log(currentQuantity);
 
         var step = parseFloat(quantityInput.data('step'));
         var newQuantity = currentQuantity;
@@ -112,22 +113,28 @@ $(document).ready(function () {
                 product_id: productId,
                 quantity: quantity,
             },
-            success: function(response) {
+            success: function (response) {
                 $('#cart-total').html(response.cartItemsCount);
-                $('.cart-shopping-items').html(response.cartItems);
+                // $('.cart-shopping-items').html(response.cartItems);
 
                 $('tr[data-id="' + productId + '"] .price-all').html(response.updatedPrice + ' ₴');
-                $('tr[data-id="' + productId + '"] .total .value').html(response.cartTotal + ' ₴');
+                // $('tr[data-id="' + productId + '"] .total .value').html(response.cartTotal + ' ₴');
+
+                let integerPart = Math.floor(response.cartTotal);
+                let decimalPart = response.cartTotal - integerPart;
+                let decimalStr = decimalPart.toFixed(2).slice(1);
+
+                $('.cart-mini-bott .total .value').html(integerPart + '<span class="coins">' + decimalStr + '</span>' + ' ₴');
             },
-            error: function() {
+            error: function () {
                 alert('Произошла ошибка при обновлении товара.');
             }
         });
     }
 
-    $('#input-telephone').inputmask('+380 99 999 99 99', { "placeholder": " " });
+    $('#input-telephone').inputmask('+380 99 999 99 99', {"placeholder": " "});
 
-    $('#registration-form').on('submit', function(e) {
+    $('#registration-form').on('submit', function (e) {
         e.preventDefault();
 
         $('.input-error').removeClass('input-error');
@@ -146,10 +153,10 @@ $(document).ready(function () {
             url: $(this).attr('action'),
             type: 'POST',
             data: formData,
-            success: function(response) {
+            success: function (response) {
                 window.location.href = response.redirect_url;
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 if (xhr.status === 422) {
                     var errors = xhr.responseJSON.errors;
 
@@ -165,7 +172,7 @@ $(document).ready(function () {
     });
 
 
-    $('#button-verify-loginpopup').on('click', function() {
+    $('#button-verify-loginpopup').on('click', function () {
         var phoneEmail = $('#name_email').val().trim();
         var password = $('#login_password').val().trim();
 
@@ -183,7 +190,7 @@ $(document).ready(function () {
                 data: {
                     phone_email: phoneEmail,
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.exists) {
                         $(".password-group").show();
                     } else {
@@ -191,17 +198,17 @@ $(document).ready(function () {
                         return open_pop_up("#popup-registration");
                     }
                 },
-                error: function() {
+                error: function () {
                     alert('Error occurred while checking user');
                 }
             });
         }
 
-        if (phoneEmail  && password) {
+        if (phoneEmail && password) {
             $.ajax({
                 url: '/auth/login',
                 method: 'POST',
-                data:  {
+                data: {
                     phone_email: phoneEmail,
                     password: password,
                 },
@@ -224,7 +231,7 @@ $(document).ready(function () {
         }
     });
 
-    $('.g_id_signout').on('click', function(event) {
+    $('.g_id_signout').on('click', function (event) {
         event.preventDefault();
         $('#logout-form').submit();
     });
@@ -241,6 +248,7 @@ $(document).ready(function () {
         $(e).show().addClass('active');
 
     }
+
     function cartPopup(e) {
         e.preventDefault()
 
@@ -248,10 +256,9 @@ $(document).ready(function () {
         $('#search-popup').removeClass('active');
         $('#login-popup').removeClass('active');
         $('.head-top').removeClass('active');
-        if($('#cart-popup').hasClass('active')){
+        if ($('#cart-popup').hasClass('active')) {
             $("html").addClass('no-overflow');
-        }
-        else {
+        } else {
             $('#cart-popup').toggleClass('active');
             $("html").removeClass('no-overflow');
         }

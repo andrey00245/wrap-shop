@@ -78,7 +78,7 @@
                     <div class="background"></div>
                     <div class="name">Разом</div>
                 </div>
-                <div class="value">{{$sum}}<span class="coins">.00</span> ₴</div>
+                <div class="value">{!! $sum_html !!} ₴</div>
             </div>
             <div class="cart-mini-button">
                 <a href="{{route('checkout')}}" title="Перейти до оформлення" class="checkout colord"><i

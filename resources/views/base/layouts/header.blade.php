@@ -25,14 +25,14 @@
                 @include('base.layouts.menu')
             </nav>
             <div class="head-social flex-center">
-                <a href="{{$settings->getTelegramUrl()}}" title="Telegram" target="_blank"
+                <a href="{{$settings->telegram ?? '#'}}" title="Telegram" target="_blank"
                    class="fab fa-telegram-plane"></a>
-                <a href="{{$settings->getInstagramUrl()}}" title="Instagram" target="_blank"
+                <a href="{{$settings->instagram  ?? '#'}}" title="Instagram" target="_blank"
                    class="fab fa-instagram"></a>
             </div>
             <div class="head-phone flex-center">
                 <div class="title">{{__('header_footer.phone')}}</div>
-                <a href="tel:{{$settings->getPhone()}}">{!! $settings->getPhoneView() !!}</a>
+                <a href="tel:{{$settings->phone ?? '#'}}">{!! $settings->phone_view ?? '#' !!}</a>
             </div>
             <div class="head-top-close button"><i class="fal fa-times"></i></div>
         </div>

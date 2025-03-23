@@ -1,21 +1,18 @@
 <section class="home-about">
-  <img loading="lazy" src="{{asset('assets/img/about.webp')}}" title="Wrap-Shop" alt="Wrap-Shop" width="1512"
-       height="549">
+{{--  <img loading="lazy" src="{{asset('assets/img/about.webp')}}" title="Wrap-Shop" alt="Wrap-Shop" width="1512"--}}
+{{--       height="549">--}}
 
-  {{--    <video width="1512" height="549" autoplay muted loop>--}}
-  {{--        <source src="image/catalog/video-preview/1.mp4" type="video/mp4">--}}
-  {{--        Your browser does not support the video tag.--}}
-  {{--      </video>--}}
+      <video width="1512" loading="lazy" height="549" autoplay muted loop>
+          <source src="{{asset('assets/video/video_short_compr_1000.mp4')}}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
 
 
   <div class="home-about-text">
-    <h2 class="title">{{$settings->getVideoBannerTitle()}}</h2>
-    {!! $settings->getVideoBannerDesc() !!}
+    <h2 class="title">{{$settings->video_banner_title}}</h2>
+    {!! $settings->video_banner_desc !!}
   </div>
 
-  <div class="home-about-play button" data-src="{{asset('assets/video/video.mp4')}}" data-fancybox="about-play">
-    <i class="far fa-play button colord"></i>
-  </div>
   <div class="home-about-play button" data-src="{{asset('assets/video/video.mp4')}}" data-fancybox="about-play">
     <i class="far fa-play button colord"></i>
   </div>
@@ -30,8 +27,8 @@
 <footer class="footer">
   <div class="seo-wrapper">
     <div class="seo-content">
-      <h2>{{$settings->getSloganTitle()}}</h2>
-      {!! $settings->getSloganDesc() !!}
+      <h2>{{$settings->slogan_title}}</h2>
+      {!! $settings->slogan_desc !!}
     </div>
     <span class="seo-btn show"><i class="fas fa-chevron-right"></i>{{__('header_footer.read_more')}}</span>
     <span class="seo-btn collapse" style="display: none"><i class="fas fa-chevron-right"></i>{{__('header_footer.read_less')}}</span>
@@ -65,18 +62,18 @@
     </nav>
     <div class="foot-add foot-item">
       <div class="title">{{__('header_footer.our_office')}}</div>
-      <a href="{{$settings->getGoogleMapsUrl()}}" target="_blank"
-         title="{{$settings->getAddress()}}">{{$settings->getAddress()}}</a>
+      <a href="{{$settings->google_map_link ?? '#'}}" target="_blank"
+         title="{{$settings->address ?? '#'}}">{{$settings->address ?? '#'}}</a>
 
     </div>
 
     <div class="foot-contact foot-item">
       <div class="title">{{__('header_footer.contact_us')}}</div>
-      <a href="tel:{{$settings->getPhone()}}" class="phone"> {!! $settings->getPhoneView() !!}</a>
-      <a href="mailto:{{$settings->getEmail()}}" class="email" title="Email">{{$settings->getEmail()}}</a>
+      <a href="tel:{{$settings->phone ?? '#'}}" class="phone"> {!! $settings->phone_view ?? '#' !!}</a>
+      <a href="mailto:{{$settings->email ?? '#'}}" class="email" title="Email">{{$settings->email ?? '#'}}</a>
       <div class="social">
-        <a href="{{$settings->getTelegramUrl()}}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
-        <a href="{{$settings->getInstagramUrl()}}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
+        <a href="{{$settings->telegram ?? '#'}}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
+        <a href="{{$settings->instagram ?? '#'}}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
       </div>
     </div>
     <div class="foot-copir">{{__('header_footer.all_rights_reserved', ['year'=> date('Y')])}}</div>
@@ -138,7 +135,7 @@
     });
 
     const linkHref = document.createElement("a")
-    linkHref.href = "https://maps.app.goo.gl/EYgRqUsBU19i7m1k8";
+    linkHref.href = "{{$settings->google_map_link}}";
     linkHref.target = "_blank";
 
     const beachFlagImg = document.createElement("img");

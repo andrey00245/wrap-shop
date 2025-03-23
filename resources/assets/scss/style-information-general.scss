@@ -139,17 +139,18 @@
 .page-payment-nav .button {
     height: 46px;
     padding: 2px 42px 0;
-    border: 1px solid;
+    border: 1px solid $mod-home-product-nav-border;
     margin: 0 10px;
     font-weight: 700;
     font-size: 16px;
     letter-spacing: 0.18em;
-    color: rgba(255, 255, 255, 0.25);
+    color: $mod-home-product-nav-text;
     text-transform: uppercase;
 }
 .page-payment-nav .button:hover,
 .page-payment-nav .button.active {
-    color: #fff;
+    color: $mod-main-color;
+    border-color: $mod-main-color;
 }
 .page-payment-tab {
     padding-bottom: 50px;
@@ -159,7 +160,7 @@
 .page-payment-tab .item .list li {
     font-family: 'InterVariable', sans-serif;
     line-height: 132%;
-    color: rgba(255, 255, 255, 0.66);
+    color: $mod-delivery-text;
     width: calc(33.333% - 60px);
 }
 .page-payment-tab .item .list li + li {
@@ -176,7 +177,7 @@
     font-weight: 700;
     font-size: 20px;
     text-transform: uppercase;
-    color: #fff;
+    color: $mod-text-color;
     margin-bottom: 24px;
     height: 31px;
     white-space: nowrap;

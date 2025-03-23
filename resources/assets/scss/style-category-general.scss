@@ -102,7 +102,7 @@
 
 .category-child-nav ul a:hover {
     color: #fff;
-    border: 1px solid $modifiable-main-color;
+    border: 1px solid $mod-main-color;
     background: rgba(255, 255, 255, 0.01);
 }
 
@@ -129,7 +129,7 @@
     font-size: 16px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #fff;
+    color: $mod-white;
     padding: 16px 18px;
     width: calc(100% - 48px);
     height: 48px;
@@ -160,7 +160,7 @@
 }
 
 .search-left #search {
-    border: 1px solid rgb(255 255 255 / 35%);
+    border: 1px solid $mod-white;
     border-radius: 3px;
     overflow: hidden;
 }
@@ -188,7 +188,7 @@
 
 .category-right-top .button {
     margin-left: 10px;
-    color: rgb(255 255 255 / 40%);
+    color: $mod-white-040;
 }
 
 .category-right-top .category-sort-close {
@@ -200,11 +200,11 @@
 }
 
 .category-sort .button.active, .category-sort .button:hover {
-    color: $modifiable-main-color;
+    color: $mod-main-color;
 }
 
 .category-view .button.active, .category-view .button:hover {
-    color: $modifiable-main-color;
+    color: $mod-main-color;
 }
 
 .category-button {
@@ -219,8 +219,8 @@
     font-size: 11px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: $modifiable-main-color;
-    border: 0.5px solid $modifiable-main-color;
+    color: $mod-main-color;
+    border: 0.5px solid $mod-main-color;
 }
 
 .category-button .button i {
@@ -350,8 +350,8 @@
         font-size: 16px;
     }
     .category-right-top .category-sort-close:hover {
-        color: $modifiable-main-color;
-        border-color: $modifiable-main-color;
+        color: $mod-main-color;
+        border-color: $mod-main-color;
     }
 }
 
@@ -492,7 +492,7 @@
     line-height: 125%;
     letter-spacing: 0.39em;
     text-transform: uppercase;
-    color: $modifiable-main-color;
+    color: $mod-main-color;
     text-shadow: 2px 3px 12px rgb(255 206 28 / 75%);
     flex-direction: column;
 }

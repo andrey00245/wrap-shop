@@ -21,7 +21,7 @@
     font-weight: 700;
     font-size: 20px;
     text-transform: uppercase;
-    color: #fff;
+    color: $mod-text-color;
     margin-bottom: 24px;
     height: 31px;
     white-space: nowrap;
@@ -69,7 +69,7 @@
 .page-contact-list .item .text {
     font-weight: 400;
     font-size: 20px;
-    color: rgba(255, 255, 255, 0.8);
+    color: $mod-text-color;
     max-width: 214px;
     padding-bottom: 6px;
 }
@@ -78,11 +78,11 @@
     font-weight: 500;
     font-size: 11px;
     text-transform: uppercase;
-    color: #FFCE1C;
+    color: $mod-main-color;
     border-bottom: 1px dashed rgba(255, 255, 255, 0.76);
 }
 .page-contact-list .item .addlink:hover {
-    border-bottom: 1px dashed #FFCE1C;
+    border-bottom: 1px dashed $mod-main-color;
 }
 @media screen and (max-width:1331px){
     .page-contact-list .item + .item {
@@ -160,7 +160,7 @@
 .page-payment-tab .item .list li {
     font-family: 'InterVariable', sans-serif;
     line-height: 132%;
-    color: $mod-delivery-text;
+    color: $mod-white-060;
     width: calc(33.333% - 60px);
 }
 .page-payment-tab .item .list li + li {

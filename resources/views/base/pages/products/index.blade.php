@@ -2,8 +2,14 @@
 @section('content')
 
   @push('styles')
-    <link rel="stylesheet" href="{{mix('build/css/all-dark.css')}}">
-    <link rel="stylesheet" href="{{mix('build/css/style-category-dark.css')}}">
+      @if($theme === 'dark')
+          <link rel="stylesheet" href="{{mix('build/css/all-dark.css')}}">
+          <link rel="stylesheet" href="{{mix('build/css/style-category-dark.css')}}">
+      @else
+          <link rel="stylesheet" href="{{mix('build/css/all-light.css')}}">
+          <link rel="stylesheet" href="{{mix('build/css/style-category-light.css')}}">
+      @endif
+
   @endpush
   <section class="category-page row">
     <div class="category-top">

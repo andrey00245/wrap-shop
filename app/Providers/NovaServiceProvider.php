@@ -15,11 +15,11 @@ use App\Nova\Order;
 use App\Nova\PriceType;
 use App\Nova\PrivacyPolicy;
 use App\Nova\Product;
+use App\Nova\Setting;
 use App\Nova\User;
 use App\Nova\Video;
 use App\Nova\VideoCategory;
 use App\Nova\VideoReview;
-use Bakerkretzmar\NovaSettingsTool\SettingsTool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
@@ -81,9 +81,9 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
                 MenuSection::resource(PrivacyPolicy::class)->icon('document'),
 
-                MenuSection::make(__(config('nova-settings-tool.sidebar-label', 'Settings')))
-                 ->path('nova-vendor/nova-settings-tool')
-                 ->icon('cog')
+                MenuSection::resource(Setting::class)
+                ->icon('cog'),
+
             ];
         });
 
@@ -142,9 +142,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
      */
     public function tools()
     {
-        return [
-          new SettingsTool,
-        ];
+        return [];
     }
 
     /**

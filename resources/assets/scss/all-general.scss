@@ -363,10 +363,10 @@ a.ocf-btn.ocf-disabled {
     font-size: 16px;
     line-height: 120%;
     letter-spacing: .5px;
-    color: rgb(255 255 255 / 35%);
+    color: $mod-white;
     background-color: transparent;
     background-image: none;
-    border: 1px solid rgb(255 255 255 / 35%);
+    border: 1px solid $mod-white;
     border-radius: 3px;
     box-shadow: none;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s, background-color ease-in-out .2s
@@ -536,7 +536,7 @@ a.ocf-btn.ocf-disabled {
     font-size: 14px;
     line-height: 21px;
     text-transform: uppercase;
-    color: #fff
+    color: $mod-text-color
 }
 
 .ocf-header .ocf-brand {
@@ -630,7 +630,7 @@ a.ocf-btn.ocf-disabled {
     background: transparent;
     box-shadow: none;
     outline: 0;
-    border: 1px solid rgb(255 255 255 / 35%);
+    border: 1px solid $mod-white;
     border-radius: 3px;
     font-style: normal;
     font-weight: 500;
@@ -638,7 +638,7 @@ a.ocf-btn.ocf-disabled {
     line-height: 16px;
     text-align: center;
     letter-spacing: 0;
-    color: rgb(255 255 255);
+    color: $mod-white;
     position: relative;
     @media screen and (max-width: 768px) {
         font-size: 13px;
@@ -670,16 +670,12 @@ a.ocf-btn.ocf-disabled {
     margin-bottom: 0
 }
 
-.ocf-value.ocf-disabled, .ocf-value[disabled], .ocf-value:disabled, .ocf-value:disabled:not(.ocf-selected) {
-
-}
-
 .ocf-value {
     &:not(.ocf-selected) {
         &.ocf-disabled, &[disabled], &:disabled {
-            color: rgba(255, 255, 255, 0.35);
+            color: $mod-white-035;
             cursor: not-allowed;
-            border-color: rgb(255 255 255 / 35%)
+            border-color: $mod-white-035;
         }
     }
 }
@@ -1472,7 +1468,7 @@ a.ocf-btn.ocf-disabled {
     font-size: 12px;
     line-height: 132%;
     text-transform: uppercase;
-    color: #fff;
+    color: $mod-text-color;
     margin-bottom: 0
 }
 

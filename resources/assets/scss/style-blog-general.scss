@@ -253,7 +253,7 @@
     line-height: 125%;
     letter-spacing: 0.39em;
     text-transform: uppercase;
-    color: $modifiable-main-color;
+    color: $mod-main-color;
 }
 .page-post-bottom .post-top i {
     font-weight: 900;
@@ -280,7 +280,7 @@
 }
 .post-social a:hover {
     color: #fff;
-    background: $modifiable-main-color;
+    background: $mod-main-color;
 }
 @media screen and (max-width:767px){
 	.page-post-content p, .page-post-content h2, .page-post-content h3, .page-post-content h4, .page-post-content h5, .page-post-content h6, .page-post-bottom {
@@ -326,7 +326,7 @@
     line-height: inherit;
     text-align: center;
     letter-spacing: 0.01em;
-    color: rgba(255, 255, 255, 0.62);
+    color: $mod-white-060;
     max-width: 470px;
     margin: 0 auto 70px;
 }
@@ -389,7 +389,7 @@
     font-family: 'Font Awesome 5 Pro';
     font-weight: 900;
     font-size: 14px;
-    color: $modifiable-main-color;
+    color: $mod-main-color;
     position: absolute;
     top: 11px;
     left: 0;

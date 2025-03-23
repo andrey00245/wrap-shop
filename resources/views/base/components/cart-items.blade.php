@@ -32,10 +32,10 @@
                     <td class="name"><span class="cat">{{$item['product']->category->name}}</span><a
                             href="{{route('products.show', ['product'=>$item['product']->slugEn])}}">{{$item['product']->getName()}}</a>
                     </td>
-                    <td class="price-default" style="min-width: 75px">
+                    <td class="price-default">
                         {{$item['product']->getPrice()}} ₴<span class="price-unit-xvr"></span>
                         <span class="length">
-                @include('base.svg-icons.question'){{$item['product']->getRollSize() ? 'за 1 м.п.' : 'за 1  шт'}}.
+                @include('base.svg-icons.question'){{$item['product']->getRollSize() ? 'за 1 м.п.' : 'за 1  шт.'}}
               </span>
                     </td>
                     <td class="count flex-justify" data-counter="">

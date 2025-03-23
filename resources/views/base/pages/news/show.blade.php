@@ -1,7 +1,11 @@
 @extends('base.layouts.app')
 
 @push('styles')
-  <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-blog-dark.css')}}">
+    @if($theme ==='dark')
+        <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-blog-dark.css')}}">
+    @else
+        <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-blog-light.css')}}">
+    @endif
 @endpush
 
 

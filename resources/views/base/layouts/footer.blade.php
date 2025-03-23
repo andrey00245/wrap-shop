@@ -1,11 +1,11 @@
 <section class="home-about">
-  <img loading="lazy" src="{{asset('assets/img/about.webp')}}" title="Wrap-Shop" alt="Wrap-Shop" width="1512"
-       height="549">
+{{--  <img loading="lazy" src="{{asset('assets/img/about.webp')}}" title="Wrap-Shop" alt="Wrap-Shop" width="1512"--}}
+{{--       height="549">--}}
 
-  {{--    <video width="1512" height="549" autoplay muted loop>--}}
-  {{--        <source src="image/catalog/video-preview/1.mp4" type="video/mp4">--}}
-  {{--        Your browser does not support the video tag.--}}
-  {{--      </video>--}}
+      <video width="1512" loading="lazy" height="549" autoplay muted loop>
+          <source src="{{asset('assets/video/video_short_compr_1000.mp4')}}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
 
 
   <div class="home-about-text">
@@ -13,9 +13,6 @@
     {!! $settings->video_banner_desc !!}
   </div>
 
-  <div class="home-about-play button" data-src="{{asset('assets/video/video.mp4')}}" data-fancybox="about-play">
-    <i class="far fa-play button colord"></i>
-  </div>
   <div class="home-about-play button" data-src="{{asset('assets/video/video.mp4')}}" data-fancybox="about-play">
     <i class="far fa-play button colord"></i>
   </div>

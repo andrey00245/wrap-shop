@@ -52,7 +52,6 @@ const savingVal = $('.text-discount .saving-val')
 recalcTotalPrice(quantityInput.val())
 initializationAllLessButtons()
 
-
 quantityPlus.on('click', function () {
     plusMinus(quantityInput, 'plus')
 })
@@ -75,7 +74,6 @@ quantityInput.on('input', function () {
     }
     $(this).val(newValue);
 })
-
 
 function plusMinus(input, action) {
     let currentVal = parseFloat(input.val())
@@ -142,6 +140,9 @@ function decimalPoint(val) {
 
 function integerNumber(currentVal, step) {
     currentVal = Math.round(currentVal/step) * step
+    if (isNaN(currentVal)){
+        currentVal = 0;
+    }
     return currentVal
 }
 
@@ -149,6 +150,10 @@ function recalcTotalPrice(newVal) {
     for (const key in discounts) {
         if (discounts.hasOwnProperty(key)) {
             const item = discounts[key];
+            if(discounts.length === 1){
+                textDiscount.hide()
+            }
+
             if (key != 0) {
                 const prevItem = discounts[key - 1];
                 if (newVal < item.discountFrom && newVal >= prevItem.discountFrom) {
@@ -160,7 +165,6 @@ function recalcTotalPrice(newVal) {
                 }
                 else{
                     textDiscount.show()
-
                 }
             }
             if (newVal >= item.discountFrom) {
@@ -178,7 +182,6 @@ restyleThreeLastChart('.price-wrap .only-price')
 
 function restyleThreeLastChart(selector) {
     const element = $(selector);
-    console.log(element);
     let text = element.text()
     if (text.length > 3) {
         let lastThree = text.slice(-3);
@@ -255,8 +258,6 @@ choseQuantity.on('click', function () {
 
 productSliderInitialization('homeLatest');
 imageSliderInProduct('home-products-item');
-
-
 
 var productPageExample = new Swiper(".product-page-example", {
     loop: true,

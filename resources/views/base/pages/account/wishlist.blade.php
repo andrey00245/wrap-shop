@@ -35,7 +35,7 @@
 {{--                @endforeach--}}
 
                 @foreach($wishlist->getMedia('images') as $key => $image)
-                  <a href="{{route('products.show', ['product' => $wishlist->id])}}"
+                  <a href="{{route('products.show', ['product' => $wishlist->slugEn])}}"
                      data-src="{{$image->getUrl()}}"
                      class="swiper-slide item flex-center swiper-slide-next" data-fancybox="gallery{{$wishlist->id}}"
                      data-caption="{{$wishlist->name}}">
@@ -66,7 +66,7 @@
               </div>
             </div>
             <div class="category">{{$wishlist->category?->name}}</div>
-            <a href="{{route('products.show', ['product' => $wishlist->id])}}"
+            <a href="{{route('products.show', ['product' => $wishlist->slugEn])}}"
                title="{{$wishlist->name}}" class="name">{{$wishlist->name}}</a>
             <div class="bottom flex-center">
               <div class="price">{{number_format($wishlist->getPrice())}} ₴<span class="price-unit-xvr"></span></div>

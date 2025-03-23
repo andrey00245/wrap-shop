@@ -9,13 +9,13 @@
                     <tbody>
                     <tr class="item flex-justify">
                         <td class="image"><a
-                                href="{{route('products.show', ['product' => $product->id])}}"><img
+                                href="{{route('products.show', ['product' => $product->slugEn])}}"><img
                                     loading="lazy"
                                     src="{{$product->getMedia('images')[0]->getUrl('preview')}}"
                                     alt="{{$product->name}}"
                                     title="{{$product->name}}" class="img-thumbnail"></a></td>
                         <td class="name"><span class="cat">{{$product->category->name}}</span><a
-                                href="{{route('products.show', $product->id)}}">{{$product->name}}</a>
+                                href="{{route('products.show', $product->slugEn)}}">{{$product->name}}</a>
                         </td>
                         <td class="price price-default">
                             {{$product->getPrice()}} ₴<span class="price-unit-xvr"></span>

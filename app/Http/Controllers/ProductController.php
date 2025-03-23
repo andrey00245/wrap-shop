@@ -197,6 +197,7 @@ class ProductController extends Controller
                 'products.category_id',
                 'products.created_at',
                 'products.updated_at',
+                'products.stock',
                 'products.banner_title')
             ->orderBy($sortBy, $sortDirection)
             ->with([

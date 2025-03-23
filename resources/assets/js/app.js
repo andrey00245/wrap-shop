@@ -130,9 +130,9 @@ $(document).ready(function () {
     cartPopup(e)
   })
 
-  $(".close-cart-popup").on("click", function (e) {
-    cartPopup(e)
-  })
+    $("body").on("click", ".close-cart-popup", function (e) {
+        cartPopup(e);
+    });
 
   $(".search-popup-open").on("click", function () {
     searchPopup()

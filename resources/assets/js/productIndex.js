@@ -364,14 +364,16 @@ $(document).ready(function () {
             getCountAjax(maxInputJq)
         });
 
-        minInput.addEventListener('input', function () {
+        minInput.addEventListener('change', function () {
             priceSlider.noUiSlider.set([this.value, null]);
+            minPrice = this.value;
         });
         minInput.addEventListener('change', function () {
             getCountAjax(maxInputJq)
         });
-        maxInput.addEventListener('input', function () {
+        maxInput.addEventListener('change', function () {
             priceSlider.noUiSlider.set([null, this.value]);
+            maxPrice = this.value;
         });
         maxInput.addEventListener('change', function () {
             getCountAjax(maxInputJq)

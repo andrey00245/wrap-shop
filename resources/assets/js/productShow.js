@@ -38,7 +38,6 @@ $(document).ready(function () {
     const quantityPlus = $('#quantity-block #plus-btn')
     const quantityMinus = $('#quantity-block #minus-btn')
     const discounts = $('.item-price').data('discount')
-    console.log(discounts);
     const price = $('.item-price .only-price')
     const totalPrice = $('.autocalc-product-price .total-price')
 

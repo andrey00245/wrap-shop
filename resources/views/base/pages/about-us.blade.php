@@ -37,11 +37,11 @@
       <a class="item image-item" href="{{asset('assets/img/about-us/3.jpg')}}" data-fancybox="pronas-gallery" title="{{__('about-us.title')}}">
         <img src="{{asset('assets/img/about-us/3.jpg')}}" data-src="{{asset('assets/img/about-us/3.jpg')}}" title="{{__('about-us.title')}}" alt="{{__('about-us.title')}}">
       </a>
-      <a class="item video-item" href="image/catalog/video.mp4" data-fancybox="pronas-gallery" title="{{__('about-us.title')}}" >
+      <a class="item video-item" href="{{asset('assets/img/about-us/5.jpg')}}" data-fancybox="pronas-gallery" title="{{__('about-us.title')}}" >
         <img src="{{asset('assets/img/about-us/5.jpg')}}" data-src="{{asset('assets/img/about-us/5.jpg')}}" title="{{__('about-us.title')}}" alt="{{__('about-us.title')}}">
         <i class="fal fa-play button"></i>
       </a>
-      <a class="item video-item" href="image/catalog/video.mp4" data-fancybox="pronas-gallery" title="{{__('about-us.title')}}">
+      <a class="item video-item" href="{{asset('assets/img/about-us/6.jpg')}}" data-fancybox="pronas-gallery" title="{{__('about-us.title')}}">
         <img src="{{asset('assets/img/about-us/6.jpg')}}" data-src="{{asset('assets/img/about-us/6.jpg')}}" title="{{__('about-us.title')}}" alt="{{__('about-us.title')}}">
         <i class="fal fa-play button"></i>
       </a>
@@ -54,7 +54,7 @@
       <a class="item image-item" href="{{asset('assets/img/about-us/7.jpg')}}" data-fancybox="pronas-gallery" title="{{__('about-us.title')}}">
         <img src="{{asset('assets/img/about-us/7.jpg')}}" data-src="{{asset('assets/img/about-us/7.jpg')}}" title="{{__('about-us.title')}}" alt="{{__('about-us.title')}}">
       </a>
-      <a class="item video-item" href="image/catalog/video.mp4" data-fancybox="pronas-gallery" title="{{__('about-us.title')}}">
+      <a class="item video-item" href="{{asset('assets/img/about-us/8.jpg')}}" data-fancybox="pronas-gallery" title="{{__('about-us.title')}}">
         <img src="{{asset('assets/img/about-us/8.jpg')}}" data-src="{{asset('assets/img/about-us/8.jpg')}}" title="{{__('about-us.title')}}" alt="{{__('about-us.title')}}">
         <i class="fal fa-play button"></i>
       </a>

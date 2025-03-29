@@ -4,6 +4,7 @@ $main-color-dark-075: rgba(255, 206, 28, 0.75);
 $main-color-dark-050: rgba(255, 206, 28, 0.50);
 $main-color-dark-010: rgba(255, 206, 28, 0.10);
 $text-color-dark: rgba(255, 255, 255, 1);
+$text-gray-dark: rgba(255, 255, 255, 0.62);
 $header-text-color-dark: rgba(255, 255, 255, 0.7);
 $header-btn-hover-color-dark: rgba(255, 255, 255, 1);
 $header-btn-border-color-dark: rgba(255, 255, 255, 0.19);
@@ -38,6 +39,10 @@ $quantity-input-gradient-dark: linear-gradient(to right, rgba(72, 74, 76, 1) 50%
 $product-wishlist-btn-bg-dark: rgb(255, 255, 255);
 $product-wishlist-btn-icon-dark: black;
 $product-review-bg-dark: rgba(60, 62, 65, 1);
+$card-bg-dark: url("../img/card-background.png");
+$claim-card-bg-dark: url("../img/claim-card-background.png");
+$claim-text-dark: rgba(255, 255, 255, 0.6);
+$consultation-bg-dark: linear-gradient(272deg, rgba(248, 236, 192, 0.5) -1.98%, rgba(255, 206, 28, 0.5) 107.6%);;
 
 $main-color-light: rgba(208, 75, 75, 1);
 $main-color-light-085: rgba(208, 75, 75, 0.85);
@@ -45,6 +50,7 @@ $main-color-light-075: rgba(208, 75, 75, 0.75);
 $main-color-light-050: rgba(208, 75, 75, 0.50);
 $main-color-light-010: rgba(208, 75, 75, 0.1);
 $text-color-light: rgba(33, 33, 33, 1);
+$text-gray-light: rgba(172, 172, 172, 1);
 $header-text-color-light: rgba(114, 114, 114, 0.7);
 $header-btn-hover-color-light: rgba(255, 255, 255, 1);
 $header-btn-border-color-light: rgba(0, 0, 0, 0.19);
@@ -79,15 +85,9 @@ $quantity-input-gradient-light: linear-gradient(to right, rgb(72, 74, 76, 0.2) 5
 $product-wishlist-btn-bg-light: rgba(72, 74, 76, 0.2);
 $product-wishlist-btn-icon-light: black;
 $product-review-bg-light: rgba(72, 74, 76, 0.2);
-
-
-
-
-
-
-
-
-
-
+$card-bg-light: url("../img/card-background-light.png");
+$claim-card-bg-light: url("../img/claim-card-background-light.png");
+$claim-text-light: rgba(0, 0, 0, 0.6);
+$consultation-bg-light: linear-gradient(272deg, rgba(253, 213, 213, 0.5) -1.98%, rgba(255, 115, 115, 0.5) 107.6%);
 
 

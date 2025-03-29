@@ -1,12 +1,17 @@
 @import "variables";
 
 $mod-main-color: $main-color-dark;
-//$mod-main-color-075: $main-color-dark-075;
 $mod-main-color-050: $main-color-dark-050;
+$mod-main-color-010: $main-color-dark-010;
 $mod-text-color: $text-color-dark;
 $mod-quantity-gradient: $quantity-input-gradient-dark;
 $mod-product-wishlist-btn-bg: $product-wishlist-btn-bg-dark;
 $mod-product-wishlist-btn-icon: $product-wishlist-btn-icon-dark;
 $mod-product-review-bg: $product-review-bg-dark;
+$mod-gray-text: $text-gray-dark;
+$mod-card-bg: $card-bg-dark;
+$mod-claim-card-bg: $claim-card-bg-dark;
+$mod-claim-text: $claim-text-dark;
+$mod-consultation-bg: $consultation-bg-dark;
 
 @import "style-product-general";

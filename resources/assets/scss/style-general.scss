@@ -2023,26 +2023,7 @@ body::-webkit-scrollbar {
     //}
 }
 
-
-.home-products-list {
-    .image {
-        @media screen and (max-width: 400px) {
-            //height: 220px !important;
-            .swiper-wrapper {
-                top: -20px;
-            }
-        }
-        @media screen and (max-width: 350px) {
-            //height: 200px !important;
-            .swiper-wrapper {
-                top: 0;
-            }
-        }
-    }
-}
-
 .home-products-list .swiper-wrapper {
-    //align-items: stretch;
     height: auto;
 }
 

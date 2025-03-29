@@ -1,6 +1,14 @@
 @import "variables";
 
-$modifiable-main-color: $main-color-light;
-$modifiable-main-color-075: $main-color-light-075;
+$mod-main-color: $main-color-light;
+//$mod-main-color-075: $main-color-light-075;
+$mod-main-color-050: $main-color-light-050;
+$mod-text-color: $text-color-light;
+$mod-quantity-gradient: $quantity-input-gradient-light;
+$mod-product-wishlist-btn-bg: $product-wishlist-btn-bg-light;
+$mod-product-wishlist-btn-icon: $product-wishlist-btn-icon-light;
+$mod-product-review-bg: $product-review-bg-light;
+
+
 
 @import "style-product-general";

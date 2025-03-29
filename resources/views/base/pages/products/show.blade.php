@@ -4,7 +4,11 @@
 @section('content')
 
   @push('styles')
-    <link rel="stylesheet" href="{{mix('build/css/style-product-dark.css')}}">
+      @if($theme === 'dark')
+          <link rel="stylesheet" href="{{mix('build/css/style-product-dark.css')}}">
+      @else
+          <link rel="stylesheet" href="{{mix('build/css/style-product-light.css')}}">
+      @endif
     {{--    <link rel="stylesheet" href="https://wrap.shop/catalog/view/javascript/xvrproductquantities.css">--}}
   @endpush
 

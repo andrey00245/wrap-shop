@@ -1,6 +1,7 @@
 $main-color-dark: rgba(255, 206, 28, 1);
 $main-color-dark-085: rgba(255, 206, 28, 0.85);
 $main-color-dark-075: rgba(255, 206, 28, 0.75);
+$main-color-dark-050: rgba(255, 206, 28, 0.50);
 $main-color-dark-010: rgba(255, 206, 28, 0.10);
 $text-color-dark: rgba(255, 255, 255, 1);
 $header-text-color-dark: rgba(255, 255, 255, 0.7);
@@ -32,14 +33,16 @@ $page-account-left-dark: rgba(255, 255, 255, 0.4);
 $you-addresses-table-dark: rgba(76, 75, 75, 1);
 $breadcrumbs-dark: rgba(255, 255, 255, 0.4);
 $breadcrumbs-active-dark: rgba(255, 255, 255, 1);
-//$delivery-text-dark: rgba(255, 255, 255, 0.66);
 $cart-item-bg-dark: rgba(76, 79, 82, 0.7);
 $quantity-input-gradient-dark: linear-gradient(to right, rgba(72, 74, 76, 1) 50%, rgba(255, 206, 28, 0.5) 100%);
-
+$product-wishlist-btn-bg-dark: rgb(255, 255, 255);
+$product-wishlist-btn-icon-dark: black;
+$product-review-bg-dark: rgba(60, 62, 65, 1);
 
 $main-color-light: rgba(208, 75, 75, 1);
 $main-color-light-085: rgba(208, 75, 75, 0.85);
 $main-color-light-075: rgba(208, 75, 75, 0.75);
+$main-color-light-050: rgba(208, 75, 75, 0.50);
 $main-color-light-010: rgba(208, 75, 75, 0.1);
 $text-color-light: rgba(33, 33, 33, 1);
 $header-text-color-light: rgba(114, 114, 114, 0.7);
@@ -71,9 +74,11 @@ $page-account-left-light: rgba(134, 132, 130, 1);
 $you-addresses-table-light: rgba(255, 255, 255, 0.6);
 $breadcrumbs-light: rgba(38, 38, 38, 0.66);
 $breadcrumbs-active-light: rgba(38, 38, 38, 1);
-//$delivery-text-light: rgba(38, 38, 38, 0.62);
-$cart-item-bg-ligh: rgba(165, 165, 165, 0.3);
-$quantity-input-gradient-ligh: linear-gradient(to right, rgb(72, 74, 76, 0.2) 50%, rgba(208, 75, 75, 0.5) 100%);
+$cart-item-bg-light: rgba(165, 165, 165, 0.3);
+$quantity-input-gradient-light: linear-gradient(to right, rgb(72, 74, 76, 0.2) 50%, rgba(208, 75, 75, 0.5) 100%);
+$product-wishlist-btn-bg-light: rgba(72, 74, 76, 0.2);
+$product-wishlist-btn-icon-light: black;
+$product-review-bg-light: rgba(72, 74, 76, 0.2);
 
 
 

@@ -13,6 +13,9 @@ $(document).ready(function () {
             success: function (response) {
                 $('#cart-total').html(response.cartItemsCount)
                 $('.cart-shopping-items').html(response.cartItems);
+
+                const numberParts = decimalAndIntParts(response.sum)
+                $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
             },
             error: function () {
                 alert('Произошла ошибка при удалении товара.');
@@ -59,6 +62,10 @@ $(document).ready(function () {
                 success: function (response) {
                     $('#cart-total').html(response.cartItemsCount)
                     $('.cart-shopping-items').html(response.cartItems);
+
+                    const numberParts = decimalAndIntParts(response.sum)
+                    $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
+
                     cartPopup(e)
                 },
                 error: function (xhr, status, error) {
@@ -120,11 +127,9 @@ $(document).ready(function () {
                 $('tr[data-id="' + productId + '"] .price-all').html(response.updatedPrice + ' ₴');
                 // $('tr[data-id="' + productId + '"] .total .value').html(response.cartTotal + ' ₴');
 
-                let integerPart = Math.floor(response.cartTotal);
-                let decimalPart = response.cartTotal - integerPart;
-                let decimalStr = decimalPart.toFixed(2).slice(1);
+                const numberParts = decimalAndIntParts(response.cartTotal)
 
-                $('.cart-mini-bott .total .value').html(integerPart + '<span class="coins">' + decimalStr + '</span>' + ' ₴');
+                $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
             },
             error: function () {
                 alert('Произошла ошибка при обновлении товара.');
@@ -264,3 +269,13 @@ $(document).ready(function () {
         }
     }
 });
+
+function decimalAndIntParts(number){
+    let integerPart = Math.floor(number);
+    let decimalPart = number - integerPart;
+    let decimalStr = decimalPart.toFixed(2).slice(1);
+    return {
+        integer: integerPart,
+        decimal: decimalStr
+    }
+}

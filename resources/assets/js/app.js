@@ -365,8 +365,6 @@ function cartPopupSlider(){
                 total_price: $('#total-price').text(),
             };
 
-            console.log(formData);
-
             $.ajax({
                 url: '/fast-order',
                 method: 'POST',
@@ -397,15 +395,12 @@ function cartPopupSlider(){
         $('#button-submit-report-availability').on('click', function(e) {
             e.preventDefault();
 
-            console.log($(this).data('product-id'));
             let formData = {
                 product_id: $(this).data('product-id'),
                 name: $('#report_order_name').val(),
                 phone: $('#report_order_phone').val(),
                 email: $('#report_order_email').val(),
             };
-
-            console.log(formData);
 
             $.ajax({
                 url: '/report-availability',

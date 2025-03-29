@@ -7,13 +7,12 @@
           Your browser does not support the video tag.
         </video>
 
-
   <div class="home-about-text">
     <h2 class="title">{{$settings->video_banner_title}}</h2>
     {!! $settings->video_banner_desc !!}
   </div>
 
-  <div class="home-about-play button" data-src="{{asset('assets/video/video.mp4')}}" data-fancybox="about-play">
+  <div class="home-about-play button" data-src="{{asset('assets/video/video_3000.mp4')}}" data-fancybox="about-play">
     <i class="far fa-play button colord"></i>
   </div>
 </section>

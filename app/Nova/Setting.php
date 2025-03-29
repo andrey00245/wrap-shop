@@ -60,20 +60,20 @@ class Setting extends Resource
     protected function contactsFields(){
         return[
             Text::make('Номер телефону', 'phone')->sortable(),
-            Text::make('Номер телефону для відображення', 'phone_view')->sortable(),
-            Text::make('Додатковий номер телефону', 'phone_aditional')->sortable(),
-            Text::make('Додатковий номер телефону для відображення', 'phone_aditional_view')->sortable(),
-            Text::make('Посилання на телеграм', 'telegram')->sortable(),
-            Text::make('Посилання на інстаграм', 'instagram')->sortable(),
-            Text::make('Email', 'email')->sortable()
+            Text::make('Номер телефону для відображення', 'phone_view')->sortable()->hideFromIndex(),
+            Text::make('Додатковий номер телефону', 'phone_aditional')->sortable()->hideFromIndex(),
+            Text::make('Додатковий номер телефону для відображення', 'phone_aditional_view')->sortable()->hideFromIndex(),
+            Text::make('Посилання на телеграм', 'telegram')->sortable()->hideFromIndex(),
+            Text::make('Посилання на інстаграм', 'instagram')->sortable()->hideFromIndex(),
+            Text::make('Email', 'email')->sortable()->hideFromIndex()
         ];
     }
     protected function addressFields(){
         return[
             NovaTabTranslatable::make([
                 Text::make('Адреса', 'address')->sortable(),
-            ]),
-            Text::make('Email', 'email')->sortable(),
+            ])->hideFromIndex(),
+            Text::make('Email', 'email')->sortable()->hideFromIndex(),
         ];
     }
     protected function videoBanerFields(){
@@ -81,15 +81,15 @@ class Setting extends Resource
             NovaTabTranslatable::make([
                 Text::make('Заголовок', 'video_banner_title')->sortable(),
                 Textarea::make('Контент', 'video_banner_desc'),
-            ]),
+            ])->hideFromIndex(),
         ];
     }
     protected function sloganFields(){
         return[
             NovaTabTranslatable::make([
                 Text::make('Заголовок', 'slogan_title')->sortable(),
-                Textarea::make('Контент', 'slogan_desc'),
-            ]),
+                Textarea::make('Контент', 'slogan_desc')->hideFromIndex(),
+            ])->hideFromIndex(),
         ];
     }
 
@@ -103,6 +103,9 @@ class Setting extends Resource
     {
         return [
             ID::make()->sortable(),
+            Text::make('-', function (){
+                return 'Налаштування';
+            })->onlyOnIndex(),
             new Panel('Контакти', $this->contactsFields()),
             new Panel('Aдреси', $this->addressFields()),
             new Panel('Відеобанер', $this->videoBanerFields()),

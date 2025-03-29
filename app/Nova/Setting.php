@@ -2,6 +2,7 @@
 
 namespace App\Nova;
 
+use Illuminate\Http\Request;
 use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
@@ -40,6 +41,21 @@ class Setting extends Resource
     public static $search = [
         'id',
     ];
+
+    public static function authorizedToCreate(Request $request) : bool
+    {
+        return false;
+    }
+
+    public function authorizedToDelete(Request $request) : bool
+    {
+        return false;
+    }
+
+    public function authorizedToReplicate(Request $request) : bool
+    {
+        return false;
+    }
 
     protected function contactsFields(){
         return[

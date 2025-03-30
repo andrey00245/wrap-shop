@@ -78,12 +78,12 @@ $(document).ready(function () {
     });
 
 
-    $('.cart-quantity-input-wrappper #input-quantity-1').on('change', function () {
+    $('.cart-quantity-input-wrappper .input-quantity').on('change', function () {
         updateCarts($(this).closest('tr').data('id'), $(this).val());
     })
 
     $(document).on('click', '#plus-btn-cart, #minus-btn-cart', function () {
-        var quantityInput = $(this).closest('.cart-quantity-input-wrappper').find('#input-quantity-1');
+        var quantityInput = $(this).closest('.cart-quantity-input-wrappper').find('.input-quantity');
         var currentQuantity = parseFloat(quantityInput.val());
 
         currentQuantity = parseFloat(currentQuantity.toFixed(2));

@@ -1,4 +1,4 @@
-<html dir="ltr" lang="">
+<html dir="ltr" lang="{{ app()->getLocale() }}">
 
 @include('base.layouts.head')
 

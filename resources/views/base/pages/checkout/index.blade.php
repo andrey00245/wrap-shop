@@ -395,10 +395,6 @@
     <script src="{{mix('build/js/checkoutPage.js')}}"></script>
   @endpush
 
-  <script>
-
-  </script>
-
 @endsection
 
 @push('fixed-catalog')

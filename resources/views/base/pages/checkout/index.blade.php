@@ -368,11 +368,11 @@
                   <div class="right">
                     <div class="simplecheckout-cart-total" id="total_sub_total">
                       <span class="simplecheckout-cart-total-label">Сума</span>
-                      <span class="simplecheckout-cart-total-value">{{$sum}}</span> ₴</span>
+                      <span class="simplecheckout-cart-total-value">{{$sum}}</span> ₴
                     </div>
                     <div class="simplecheckout-cart-total" id="total_total">
                       <span class="simplecheckout-cart-total-label">Разом</span>
-                      <span class="simplecheckout-cart-total-value">{{$sum}}</span> ₴</span>
+                      <span class="simplecheckout-cart-total-value">{{$sum}}</span> ₴
                     </div>
                   </div>
                 </div>

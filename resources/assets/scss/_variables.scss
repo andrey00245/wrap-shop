@@ -14,7 +14,7 @@ $header-btn-border-color-dark: rgba(255, 255, 255, 0.19);
 $catalog-menu-background-dark: rgba(0, 0, 0, 0.85);
 $home-slider-btn-border-dark: rgba(255, 255, 255, 0.3);
 $fixed-header-dark: rgba(74, 77, 80, 0.6);
-$fixed-header-before-dark: rgba(74, 77, 80, 1);
+$fixed-header-before-dark: rgb(74, 77, 80);
 $home-slider-bg-dark: rgba(255, 255, 255, 1);
 $home-slider-arrow-dark: rgba(197, 197, 197, 1);
 $home-slider-pagination-dark: rgba(255, 255, 255, 0.3);
@@ -50,6 +50,9 @@ $social-login-line-grad-90-dark: linear-gradient(90deg, rgba(255, 255, 255, 0.07
 $social-login-line-grad--90-dark: linear-gradient(-90deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.07) 80%, rgba(255, 255, 255, 0) 90%, rgba(255, 255, 255, 0) 100%);
 $iti-bg-dark: rgb(128, 128, 128);
 $iti-input-bg-dark: rgba(0, 0, 0, 0.2);
+$checkout-card-bg-dark: rgb(60, 62, 65);
+$checkout-product-card-bg-dark: rgba(76, 79, 82, 0.7);
+
 
 
 
@@ -70,7 +73,7 @@ $header-btn-border-color-light: rgba(0, 0, 0, 0.19);
 $catalog-menu-background-light: rgba(255, 255, 255, 0.85);
 $home-slider-btn-border-light: rgba(124, 124, 124, 0.3);
 $fixed-header-light: rgba(220, 220, 220, 0.6);
-$fixed-header-before-light: rgba(214, 214, 214, 1);
+$fixed-header-before-light: rgb(214, 214, 214);
 $home-slider-bg-light: rgba(130, 130, 130, 0.8);
 $home-slider-arrow-light: rgba(33, 33, 33, 1);
 $home-slider-pagination-light: rgba(124, 124, 124, 0.3);
@@ -106,5 +109,8 @@ $social-login-line-grad-90-light: linear-gradient(90deg, rgba(0, 0, 0, 0.07) 0%,
 $social-login-line-grad--90-light: linear-gradient(-90deg, rgba(0, 0, 0, 0.07) 0%, rgba(0, 0, 0, 0.07) 80%, rgba(0, 0, 0, 0) 90%, rgba(0, 0, 0, 0) 100%);
 $iti-bg-light: rgb(240, 240, 240);
 $iti-input-bg-light: rgba(105, 105, 105, 0.2);
+$checkout-card-bg-light: rgb(214, 214, 214);
+$checkout-product-card-bg-light: rgb(165, 165, 165);
+
 
 

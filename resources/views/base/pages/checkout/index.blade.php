@@ -9,7 +9,11 @@
     <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
   @endpush
   @push('styles')
-    <link rel="stylesheet" href="{{mix('build/css/simple-dark.css')}}">
+      @if($theme === 'dark')
+          <link rel="stylesheet" type="text/css" href="{{mix('build/css/simple-dark.css')}}">
+      @else
+          <link rel="stylesheet" type="text/css" href="{{mix('build/css/simple-light.css')}}">
+      @endif
 
   @endpush
   {{--  </div>--}}
@@ -104,14 +108,14 @@
                     <p class="title"><span>01</span> Контактні данні</p>
                     <div class="input-group">
                       <label for="phone">Номер телефону</label>
-                        <input type="text" name="phone_checkout" id="phone_checkout" placeholder="Телефон" value="{{ old('phone') ?? (auth()->check() ? auth()->user()->phone : '') }}" required>
+                        <input type="text" name="phone_checkout" id="phone_checkout" placeholder="Телефон" value="{{ old('phone') ?? (auth()->check() ? auth()->user()->phone : '') }}">
                         @error('phone')
                         <div class="error">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="input-group">
                       <label for="first-name">Ім'я</label>
-                        <input type="text" name="first-name" placeholder="Ім'я" id="first-name" value="{{ old('first-name') ?? (auth()->check() ? auth()->user()->name : '') }}" required>
+                        <input type="text" name="first-name" placeholder="Ім'я" id="first-name" value="{{ old('first-name') ?? (auth()->check() ? auth()->user()->name : '') }}">
                         @error('first-name')
                         <div class="error">{{ $message }}</div>
                         @enderror
@@ -119,7 +123,7 @@
 
                     <div class="input-group">
                       <label for="last-name">Прізвище</label>
-                        <input type="text" name="last-name" id="last-name" placeholder="Прізвище" value="{{ old('last-name') ?? (auth()->check() ? auth()->user()->last_name : '') }}" required>
+                        <input type="text" name="last-name" id="last-name" placeholder="Прізвище" value="{{ old('last-name') ?? (auth()->check() ? auth()->user()->last_name : '') }}">
                         @error('last-name')
                         <div class="error">{{ $message }}</div>
                         @enderror
@@ -128,7 +132,7 @@
                       @guest
                     <div class="input-group">
                       <label for="email">Email</label>
-                        <input type="email" name="email" id="email" placeholder="Email" value="{{ old('email') }}" required>
+                        <input type="email" name="email" id="email" placeholder="Email" value="{{ old('email') }}">
                         @error('email')
                         <div class="error">{{ $message }}</div>
                         @enderror

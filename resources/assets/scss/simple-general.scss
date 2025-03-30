@@ -47,7 +47,7 @@
 }
 
 .has-account-background {
-  background-color: #3C3E41;
+  background-color: $mod-checkout-card-bg;
   border-radius: 4px;
   padding: 19px;
 
@@ -62,6 +62,7 @@
       margin-left: 15px;
       text-decoration: underline;
       color: $mod-main-color;
+        cursor: pointer;
     }
   }
 }
@@ -107,7 +108,7 @@
       width: 100%;
       background: #FFFFFF0D;
       border-radius: 8px;
-      border: 1px solid #FFFFFF33;
+      border: 1px solid #97a3ac;
 
       &::placeholder {
         color: #7C7C7C;
@@ -220,11 +221,11 @@
 
 #buttons .button {
   text-transform: uppercase;
-  color: rgb(255 206 28 / 85%);
-  text-shadow: 2px 3px 3 8px rgb(255 206 28 / 85%);
+  color: $mod-main-color-085;
+  text-shadow: 2px 3px 3 8px $mod-main-color-085;
   height: 60px;
   border: 1px solid $mod-main-color;
-  background-color: #FFCE1C1A;
+  background-color: $mod-main-color-010;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -247,7 +248,7 @@
 
 #simplecheckout_cart {
   position: static;
-  background: #3C3E41;
+  background: $mod-checkout-card-bg;
   border-radius: 4px;
   padding: 35px 30px;
 }
@@ -322,7 +323,7 @@
 }
 
 .simplecheckout-cart .item {
-  background: #4C4F52B2;
+  background: $mod-product-checkout-card-bg;
   padding: 5px;
   margin-bottom: 15px;
   border-radius: 4px;

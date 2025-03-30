@@ -168,7 +168,7 @@ body::-webkit-scrollbar {
 }
 
 .wrap {
-    width: 1332px;
+    width: 1312px;
     margin: 0 auto;
     padding-left: 10px;
     padding-right: 10px;
@@ -261,19 +261,19 @@ body::-webkit-scrollbar {
 
 @media screen and (max-width: 1331px) {
     .wrap {
-        width: 1020px;
+        width: 1000px;
     }
 }
 
 @media screen and (max-width: 1019px) {
     .wrap {
-        width: 768px;
+        width: 750px;
     }
 }
 
 @media screen and (max-width: 767px) {
     .wrap {
-        width: 480px;
+        width: 460px;
     }
     .ellipse {
         display: none;
@@ -314,6 +314,9 @@ body::-webkit-scrollbar {
     top: 0;
     height: 75px;
     transition-duration: 0.35s;
+    .head-boot{
+        height: 100%;
+    }
 }
 
 .fixed-header.show::before {
@@ -883,7 +886,7 @@ body::-webkit-scrollbar {
     .head-top {
         padding: 30px 50px;
         line-height: initial;
-        background: rgba(0, 0, 0, 0.35);
+        background: $mod-popup-bg;
         -webkit-backdrop-filter: blur(34px);
         backdrop-filter: blur(34px);
         border-radius: 3px;
@@ -1057,7 +1060,7 @@ body::-webkit-scrollbar {
 
 .checkout-header {
     .fixed-header {
-        background-color: rgba(74, 77, 80, 0.6);
+        background-color: $mod-fixed-header-before;
         height: 75px;
         transition-duration: 0.35s;
 
@@ -1075,7 +1078,6 @@ body::-webkit-scrollbar {
     .head-boot {
         align-items: center;
         height: 100%;
-
 
         @media screen and (max-width: 767px) {
             display: flex;
@@ -3341,7 +3343,7 @@ body::-webkit-scrollbar {
                 margin-right: 5px;
 
                 button {
-                    color: rgba(255, 255, 255, .16);
+                    color: $mod-icon-gray-general;
                     font-size: 14px;
                 }
             }
@@ -3408,11 +3410,11 @@ body::-webkit-scrollbar {
     }
 }
 
-#order-popup{
-    .table-striped{
-        .item{
-            .price{
-                &:not(.price-default){
+#order-popup {
+    .table-striped {
+        .item {
+            .price {
+                &:not(.price-default) {
                     margin-right: 10px;
 
                 }
@@ -3925,7 +3927,7 @@ body::-webkit-scrollbar {
 }
 
 .form-horizontal .button-restore-password {
-    color: white;
+    color: $mod-text-color;
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -4141,10 +4143,6 @@ ul.pagination li.active span:before, ul.pagination li a:hover:before {
 
 .input-group-quantity-xvr .btn.btn-primary.colord, .input-group-catalog-xvr .btn.btn-primary.colord, #cart-popup .btn.btn-primary.colord, #popup-quickorder .btn.btn-primary.colord {
     color: $mod-main-color;
-}
-
-#column-login .social_block .soc_ico svg {
-    fill: $mod-text-color;
 }
 
 .popup-overlay .form-horizontal .form-control::-webkit-input-placeholder {
@@ -4700,6 +4698,28 @@ table .notify-quantity {
     background-color: $mod-main-color;
     color: #333;
 }
+
+.iti {
+    width: 100%;
+    margin-bottom: 12px;
+    .iti__search-input{
+        padding: 12px;
+        background-color: $iti-input-bg-dark;
+    }
+
+    .iti__dropdown-content {
+        background-color: $mod-iti-bg;
+
+        .iti__country-name {
+            color: $mod-text-color;
+        }
+
+        .iti__dial-code {
+            color: rgb(190, 190, 190);
+        }
+    }
+}
+
 
 @media screen and (max-width: 1000px) {
     #cart-popup, #order-popup {

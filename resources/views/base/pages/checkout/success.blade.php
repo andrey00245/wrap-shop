@@ -6,7 +6,11 @@
     <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
   @endpush
   @push('styles')
-    <link rel="stylesheet" href="{{mix('build/css/simple-dark.css')}}">
+      @if($theme === 'dark')
+          <link rel="stylesheet" type="text/css" href="{{mix('build/css/simple-dark.css')}}">
+      @else
+          <link rel="stylesheet" type="text/css" href="{{mix('build/css/simple-light.css')}}">
+      @endif
   @endpush
 
   <div id="account-success" class="page-account wrap">

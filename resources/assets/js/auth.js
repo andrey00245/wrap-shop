@@ -37,6 +37,10 @@ $(document).ready(function () {
                 success: function (response) {
                     $('#cart-total').html(response.cartItemsCount)
                     $('.cart-shopping-items').html(response.cartItems);
+
+                    const numberParts = decimalAndIntParts(response.sum)
+                    $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
+
                     cartPopup(e)
                 },
                 error: function (xhr, status, error) {
@@ -78,12 +82,12 @@ $(document).ready(function () {
     });
 
 
-    $('.cart-quantity-input-wrappper #input-quantity-1').on('change', function () {
+    $('.cart-quantity-input-wrappper .input-quantity').on('change', function () {
         updateCarts($(this).closest('tr').data('id'), $(this).val());
     })
 
     $(document).on('click', '#plus-btn-cart, #minus-btn-cart', function () {
-        var quantityInput = $(this).closest('.cart-quantity-input-wrappper').find('#input-quantity-1');
+        var quantityInput = $(this).closest('.cart-quantity-input-wrappper').find('.input-quantity');
         var currentQuantity = parseFloat(quantityInput.val());
 
         currentQuantity = parseFloat(currentQuantity.toFixed(2));
@@ -137,7 +141,7 @@ $(document).ready(function () {
         });
     }
 
-    $('#input-telephone').inputmask('+380 99 999 99 99', {"placeholder": " "});
+    // $('#input-telephone').inputmask('+380 99 999 99 99', {"placeholder": " "});
 
     $('#registration-form').on('submit', function (e) {
         e.preventDefault();
@@ -146,12 +150,13 @@ $(document).ready(function () {
         $('.error-message').remove();
 
         var isValid = true;
+
         var formData = {
             email: $('#register_name_email').val(),
             password: $('#register_password').val(),
             name: $('#input-name').val(),
             last_name: $('#input-last_name').val(),
-            phone: $('#input-telephone').val(),
+            phone: $(this).find('input[name="phone"]').val(),
         };
 
         $.ajax({
@@ -198,6 +203,7 @@ $(document).ready(function () {
                 success: function (response) {
                     if (response.exists) {
                         $(".password-group").show();
+                        $(".password-group #login_password").attr('readonly', false)
                     } else {
                         $(".password-group").hide();
                         return open_pop_up("#popup-registration");

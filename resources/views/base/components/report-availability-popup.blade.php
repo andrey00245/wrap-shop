@@ -1,22 +1,22 @@
-<div id="report-availability-popup" class="popup-overlay popup-right" style="display: none">
+<div id="report-availability-popup" class="popup-overlay popup-right">
     <div class="consult-title">Повідомити про наявність</div>
     <br>
-    <div class="popup-window active" id="report-availability-form" style="display: block;">
+    <form class="popup-window active" id="report-availability-form" style="display: block;">
         <div class="inner form-horizontal">
             <div class="form-group">
                 <div class="form">
                     <!-- Имя -->
                     <div class="form-group group-name">
                         <label for="name" class="login-info-text text-center margintop20">{!! __('popup.consult_popup.name') !!}</label>
-                        <input type="text" id="report_order_name" name="name" required class="form-control form-field"
+                        <input type="text" id="report_order_name" name="name" class="form-control form-field"
                                placeholder="{{__('popup.consult_popup.enter_name_placeholder')}}"
                                value="{{ auth()->check() ? auth()->user()->name : '' }}">
                     </div>
 
                     <!-- Телефон -->
                     <div class="form-group group-telephone">
-                        <label for="phone" class="login-info-text text-center margintop20">{!! __('popup.consult_popup.phone') !!}</label>
-                        <input type="tel" id="report_order_phone" name="phone" required class="form-control form-field"
+                        <label for="report_order_phone" class="login-info-text text-center margintop20">{!! __('popup.consult_popup.phone') !!}</label>
+                        <input type="tel" id="report_order_phone" name="phone" class="form-control form-field"
                                placeholder="{{__('popup.consult_popup.enter_phone_placeholder')}}"
                                value="{{ auth()->check() ? auth()->user()->phone : '' }}">
                     </div>
@@ -37,13 +37,13 @@
             <span class="input-group-btn">
                 <button class="send_otp_btn otp_btn-s btnverifyloginpopup button colord"
                         id="button-submit-report-availability"
-                        type="button">
+                        type="submit">
                     <i class="fas fa-chevron-right" aria-hidden="true"></i> Відпраавити
                 </button>
             </span>
             </div>
         </div>
-    </div>
+    </form>
 
     <div class="popup-consult-thanks flex-center report-availability-success" style="display:none;">
         <i class="fal fa-smile"></i>

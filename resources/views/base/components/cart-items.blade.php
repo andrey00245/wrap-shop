@@ -45,7 +45,7 @@
                     <button type="button" class="btn btn-primary" id="minus-btn-cart">-</button>
                   </span>
                                 <input type="text"  name="quantity" data-min="{{$item['product']->getMinOrderCount()}}" data-max="{{$item['product']->getStock()}}" data-step="{{$item['product']->getOrderStep()}}" value="{{$item['quantity']}}"
-                                       id="input-quantity-1" class="input-quantity">
+                                       class="input-quantity">
                                 <span class="input-group-btn">
                     <button type="button" class="btn btn-primary colord" id="plus-btn-cart">+</button>
                   </span>

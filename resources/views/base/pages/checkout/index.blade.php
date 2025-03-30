@@ -9,7 +9,11 @@
     <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
   @endpush
   @push('styles')
-    <link rel="stylesheet" href="{{mix('build/css/simple-dark.css')}}">
+      @if($theme === 'dark')
+          <link rel="stylesheet" type="text/css" href="{{mix('build/css/simple-dark.css')}}">
+      @else
+          <link rel="stylesheet" type="text/css" href="{{mix('build/css/simple-light.css')}}">
+      @endif
 
   @endpush
   {{--  </div>--}}
@@ -104,14 +108,14 @@
                     <p class="title"><span>01</span> Контактні данні</p>
                     <div class="input-group">
                       <label for="phone">Номер телефону</label>
-                        <input type="text" name="phone" id="phone" placeholder="Телефон" value="{{ old('phone') ?? (auth()->check() ? auth()->user()->phone : '') }}" required>
+                        <input type="text" name="phone_checkout" id="phone_checkout" placeholder="Телефон" value="{{ old('phone') ?? (auth()->check() ? auth()->user()->phone : '') }}">
                         @error('phone')
                         <div class="error">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="input-group">
                       <label for="first-name">Ім'я</label>
-                        <input type="text" name="first-name" placeholder="Ім'я" id="first-name" value="{{ old('first-name') ?? (auth()->check() ? auth()->user()->name : '') }}" required>
+                        <input type="text" name="first-name" placeholder="Ім'я" id="first-name" value="{{ old('first-name') ?? (auth()->check() ? auth()->user()->name : '') }}">
                         @error('first-name')
                         <div class="error">{{ $message }}</div>
                         @enderror
@@ -119,7 +123,7 @@
 
                     <div class="input-group">
                       <label for="last-name">Прізвище</label>
-                        <input type="text" name="last-name" id="last-name" placeholder="Прізвище" value="{{ old('last-name') ?? (auth()->check() ? auth()->user()->last_name : '') }}" required>
+                        <input type="text" name="last-name" id="last-name" placeholder="Прізвище" value="{{ old('last-name') ?? (auth()->check() ? auth()->user()->last_name : '') }}">
                         @error('last-name')
                         <div class="error">{{ $message }}</div>
                         @enderror
@@ -128,7 +132,7 @@
                       @guest
                     <div class="input-group">
                       <label for="email">Email</label>
-                        <input type="email" name="email" id="email" placeholder="Email" value="{{ old('email') }}" required>
+                        <input type="email" name="email" id="email" placeholder="Email" value="{{ old('email') }}">
                         @error('email')
                         <div class="error">{{ $message }}</div>
                         @enderror
@@ -278,9 +282,9 @@
 
                   <div class="input-group">
                       <div id="buttons">
-                          <a href="javascript:void(0);" class="button btn-primary button_oc btn" id="submitBtn">
+                          <button type="submit" class="button btn-primary button_oc btn" id="submitBtn">
                               <i class="fas fa-chevron-right"></i><span>Підтвердити й оформити покупку</span>
-                          </a>
+                          </button>
                       </div>
                   </div>
                 </div>
@@ -368,11 +372,11 @@
                   <div class="right">
                     <div class="simplecheckout-cart-total" id="total_sub_total">
                       <span class="simplecheckout-cart-total-label">Сума</span>
-                      <span class="simplecheckout-cart-total-value">{{$sum}}</span> ₴</span>
+                      <span class="simplecheckout-cart-total-value">{{$sum}}</span> ₴
                     </div>
                     <div class="simplecheckout-cart-total" id="total_total">
                       <span class="simplecheckout-cart-total-label">Разом</span>
-                      <span class="simplecheckout-cart-total-value">{{$sum}}</span> ₴</span>
+                      <span class="simplecheckout-cart-total-value">{{$sum}}</span> ₴
                     </div>
                   </div>
                 </div>
@@ -390,23 +394,6 @@
   @push('scripts')
     <script src="{{mix('build/js/checkoutPage.js')}}"></script>
   @endpush
-
-  <script>
-      document.getElementById('submitBtn').addEventListener('click', function(event) {
-          const citySelectWrapper = document.querySelector('#city-select-wrapper');
-          const cityInput = document.querySelector('input[name="city"]');
-          const citySelect = document.querySelector('select[name="city_select"]');
-
-          if (citySelectWrapper.style.display === 'block') {
-              cityInput.value = citySelect.options[citySelect.selectedIndex].dataset.address;
-          }
-
-          if (!cityInput.value) {
-              cityInput.value = document.querySelector('input[name="city"]').value;
-          }
-              document.getElementById('checkoutForm').submit();
-      });
-  </script>
 
 @endsection
 

@@ -1638,7 +1638,7 @@ a.ocf-btn.ocf-disabled {
         opacity: 0;
         transition: opacity 350ms;
         z-index: -1;
-        background: rgba(0, 0, 0, .5);
+        background: $mod-popup-bg;
         -webkit-backdrop-filter: blur(50px);
         backdrop-filter: blur(50px);
         padding: 20px
@@ -1656,8 +1656,8 @@ a.ocf-btn.ocf-disabled {
         justify-content: space-between
     }
     .ocf-header .ocf-close-mobile {
-        color: #fff;
-        border: 1px solid rgb(255 255 255 / 35%);
+        color: $mod-text-color;
+        border: 1px solid $mod-popup-close-btn-border;
         display: flex;
         width: 36px;
         height: 36px;

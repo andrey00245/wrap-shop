@@ -8,10 +8,11 @@
 
     @if($theme === 'dark')
         <link href="{{mix('build/css/style-dark.css')}}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login-dark.css')}}">
     @else
         <link href="{{mix('build/css/style-light.css')}}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login-light.css')}}">
     @endif
-    <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login.css')}}">
     <link rel="stylesheet" href="{{asset('assets/css/fonts.css')}}" type="text/css" media="screen">
     <link rel="stylesheet" href="{{asset('assets/css/font-awesome.css')}}" type="text/css" media="screen">
     <link rel="stylesheet" href="{{asset('assets/css/swiper-bundle.min.css')}}" media="screen">
@@ -24,6 +25,9 @@
     <link rel="apple-touch-icon" href="{{asset('assets/favicon/apple-touch-icon.png')}}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{asset('assets/favicon/android-chrome-96x96.png')}}">
 
+    <link rel="stylesheet" href="{{asset('assets/css/form.css')}}" media="screen">
+    <link rel="stylesheet" href="{{asset('third-party/fancybox/jquery.fancybox.min.css')}}" media="screen">
+    <link rel="stylesheet" href="{{asset('third-party/intlTelInput/css/intlTelInput.css')}}" media="screen">
     @stack('styles')
 
     <link rel="alternate" hreflang="uk-ua" href="{{LaravelLocalization::getLocalizedURL('uk')}}">

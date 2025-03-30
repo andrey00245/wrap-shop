@@ -1,7 +1,7 @@
 <div id="consult-popup" class="popup-overlay popup-right">
     <input type="hidden" name="product-id" id="consult-popup-product-id" value="{{$product->id}}">
     <div class="consult-title">{{__('popup.consult_popup.title')}}</div>
-    <div class="popup-window active" id="popup-consultation" style="display: block;">
+    <form class="popup-window active" id="popup-consultation" style="display: block;">
         <div class="inner form-horizontal">
             <div class="form-group">
                 <div class="form">
@@ -14,7 +14,7 @@
                     <!-- Телефон -->
                     <div class="form-group group-telephone">
                         <label for="phone" class="login-info-text text-center margintop20">{!! __('popup.consult_popup.phone') !!}</label>
-                        <input type="tel" id="phone" name="phone" required class="form-control form-field" placeholder="{{__('popup.consult_popup.enter_phone_placeholder')}}">
+                        <input type="tel" id="phone_consultation" name="phone" required class="form-control form-field" placeholder="{{__('popup.consult_popup.enter_phone_placeholder')}}">
                     </div>
 
                     <!-- Email -->
@@ -39,13 +39,13 @@
             <span class="input-group-btn">
 					      <button class="send_otp_btn otp_btn-s btnverifyloginpopup button colord"
                                   id="button-submit-consultation"
-                                  type="button">
+                                  type="submit">
                   <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.consult_popup.submit_button')}}
                 </button>
         </span>
             </div>
         </div>
-    </div>
+    </form>
 
     <div class="popup-consult-thanks flex-center" style="display:none;">
         <i class="fal fa-smile"></i>

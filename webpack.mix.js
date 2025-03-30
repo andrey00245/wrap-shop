@@ -11,7 +11,7 @@ mix.js('resources/assets/js/checkoutPage.js', 'public/build/js').version();
 mix.css('resources/assets/scss/reset.css', 'public/build/css').version();
 mix.sass('resources/assets/scss/form.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-dark.scss', 'public/build/css').version();
-mix.sass('resources/assets/scss/social-login.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/social-login-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-information-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-blog-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/account-dark.scss', 'public/build/css').version();
@@ -21,6 +21,7 @@ mix.sass('resources/assets/scss/style-product-dark.scss', 'public/build/css').ve
 mix.sass('resources/assets/scss/simple-dark.scss', 'public/build/css').version();
 
 mix.sass('resources/assets/scss/style-light.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/social-login-light.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-information-light.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-blog-light.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/account-light.scss', 'public/build/css').version();

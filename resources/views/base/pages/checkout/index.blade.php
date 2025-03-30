@@ -104,7 +104,7 @@
                     <p class="title"><span>01</span> Контактні данні</p>
                     <div class="input-group">
                       <label for="phone">Номер телефону</label>
-                        <input type="text" name="phone" id="phone" placeholder="Телефон" value="{{ old('phone') ?? (auth()->check() ? auth()->user()->phone : '') }}" required>
+                        <input type="text" name="phone_checkout" id="phone_checkout" placeholder="Телефон" value="{{ old('phone') ?? (auth()->check() ? auth()->user()->phone : '') }}" required>
                         @error('phone')
                         <div class="error">{{ $message }}</div>
                         @enderror
@@ -278,9 +278,9 @@
 
                   <div class="input-group">
                       <div id="buttons">
-                          <a href="javascript:void(0);" class="button btn-primary button_oc btn" id="submitBtn">
+                          <button type="submit" class="button btn-primary button_oc btn" id="submitBtn">
                               <i class="fas fa-chevron-right"></i><span>Підтвердити й оформити покупку</span>
-                          </a>
+                          </button>
                       </div>
                   </div>
                 </div>
@@ -392,20 +392,7 @@
   @endpush
 
   <script>
-      document.getElementById('submitBtn').addEventListener('click', function(event) {
-          const citySelectWrapper = document.querySelector('#city-select-wrapper');
-          const cityInput = document.querySelector('input[name="city"]');
-          const citySelect = document.querySelector('select[name="city_select"]');
 
-          if (citySelectWrapper.style.display === 'block') {
-              cityInput.value = citySelect.options[citySelect.selectedIndex].dataset.address;
-          }
-
-          if (!cityInput.value) {
-              cityInput.value = document.querySelector('input[name="city"]').value;
-          }
-              document.getElementById('checkoutForm').submit();
-      });
   </script>
 
 @endsection

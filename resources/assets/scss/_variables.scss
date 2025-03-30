@@ -5,6 +5,9 @@ $main-color-dark-050: rgba(255, 206, 28, 0.50);
 $main-color-dark-010: rgba(255, 206, 28, 0.10);
 $text-color-dark: rgba(255, 255, 255, 1);
 $text-gray-dark: rgba(255, 255, 255, 0.62);
+$text-gray-general-dark: rgb(151,150,150);
+$icon-gray-general-dark: rgb(106,102,100);
+$social-icon-dark: rgb(255,255,255);
 $header-text-color-dark: rgba(255, 255, 255, 0.7);
 $header-btn-hover-color-dark: rgba(255, 255, 255, 1);
 $header-btn-border-color-dark: rgba(255, 255, 255, 0.19);
@@ -42,7 +45,14 @@ $product-review-bg-dark: rgba(60, 62, 65, 1);
 $card-bg-dark: url("../img/card-background.png");
 $claim-card-bg-dark: url("../img/claim-card-background.png");
 $claim-text-dark: rgba(255, 255, 255, 0.6);
-$consultation-bg-dark: linear-gradient(272deg, rgba(248, 236, 192, 0.5) -1.98%, rgba(255, 206, 28, 0.5) 107.6%);;
+$consultation-bg-dark: linear-gradient(272deg, rgba(248, 236, 192, 0.5) -1.98%, rgba(255, 206, 28, 0.5) 107.6%);
+$social-login-line-grad-90-dark: linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.07) 80%, rgba(255, 255, 255, 0) 90%, rgba(255, 255, 255, 0) 100%);
+$social-login-line-grad--90-dark: linear-gradient(-90deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.07) 80%, rgba(255, 255, 255, 0) 90%, rgba(255, 255, 255, 0) 100%);
+$iti-bg-dark: rgb(128, 128, 128);
+$iti-input-bg-dark: rgba(0, 0, 0, 0.2);
+
+
+
 
 $main-color-light: rgba(208, 75, 75, 1);
 $main-color-light-085: rgba(208, 75, 75, 0.85);
@@ -51,6 +61,9 @@ $main-color-light-050: rgba(208, 75, 75, 0.50);
 $main-color-light-010: rgba(208, 75, 75, 0.1);
 $text-color-light: rgba(33, 33, 33, 1);
 $text-gray-light: rgba(172, 172, 172, 1);
+$text-gray-general-light: rgb(151,150,150);
+$icon-gray-general-light: rgb(106,102,100);
+$social-icon-light: rgb(33,33,33);
 $header-text-color-light: rgba(114, 114, 114, 0.7);
 $header-btn-hover-color-light: rgba(255, 255, 255, 1);
 $header-btn-border-color-light: rgba(0, 0, 0, 0.19);
@@ -89,5 +102,9 @@ $card-bg-light: url("../img/card-background-light.png");
 $claim-card-bg-light: url("../img/claim-card-background-light.png");
 $claim-text-light: rgba(0, 0, 0, 0.6);
 $consultation-bg-light: linear-gradient(272deg, rgba(253, 213, 213, 0.5) -1.98%, rgba(255, 115, 115, 0.5) 107.6%);
+$social-login-line-grad-90-light: linear-gradient(90deg, rgba(0, 0, 0, 0.07) 0%, rgba(0, 0, 0, 0.07) 80%, rgba(0, 0, 0, 0) 90%, rgba(0, 0, 0, 0) 100%);
+$social-login-line-grad--90-light: linear-gradient(-90deg, rgba(0, 0, 0, 0.07) 0%, rgba(0, 0, 0, 0.07) 80%, rgba(0, 0, 0, 0) 90%, rgba(0, 0, 0, 0) 100%);
+$iti-bg-light: rgb(240, 240, 240);
+$iti-input-bg-light: rgba(105, 105, 105, 0.2);
 
 

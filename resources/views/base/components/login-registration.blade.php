@@ -49,7 +49,7 @@
               <div class="password-group">
                 <label for="password"
                        class="login-info-text text-center margintop20">{{__('popup.login_register.password')}}</label>
-                <input id="login_password" type="password" name="password"
+                <input id="login_password" type="password" name="password" readonly
                        class="form-control form-field login-phone-email"
                        placeholder="{{__('popup.login_register.enter_password')}}">
               </div>

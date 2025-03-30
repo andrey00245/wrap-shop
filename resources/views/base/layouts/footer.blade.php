@@ -109,16 +109,13 @@
 <div class="map" id="map"></div>
 @stack('fixed-catalog')
 
-<link rel="stylesheet" href="{{asset('assets/css/form.css')}}" media="screen">
-<link rel="stylesheet" href="{{asset('third-party/fancybox/jquery.fancybox.min.css')}}" media="screen">
 
 <script src="{{asset('js/jquery/jquery.min.js')}}"></script>
 <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
 <script src="{{asset('third-party/fancybox/jquery.fancybox.min.js')}}"></script>
+<script src="{{asset('third-party/intlTelInput/js/intlTelInput.js')}}"></script>
 <script src="{{mix('build/js/app.js')}}" type="text/javascript"></script>
-<script src="{{mix('build/js/mask.js')}}" type="text/javascript"></script>
 <script src="{{mix('build/js/auth.js')}}" type="text/javascript"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
 
 @stack('scripts')
 
@@ -161,17 +158,6 @@
   }
 </script>
 <script id="map-script" defer></script>
-<script>
-
-  $('input[type="tel"]').on('click', function () {
-    $(this).prev('.notice-text').remove();
-    $(this).before('<span class="notice-text">{{__('header_footer.phone_notice')}}</span>');
-  });
-
-  $('input[type="tel"]').on('blur', function () {
-    $(this).prev('.notice-text').remove();
-  });
-</script>
 <script src="//code.tidio.co/qzgrxeqydewl3hb2slszufoiu8sb9we7.js" async></script>
 <script type="text/javascript" async>
   (function (d, w, s) {

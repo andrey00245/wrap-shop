@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <div class="popup-window active" id="fast-order-form" style="display: block;">
+    <form class="popup-window active"  method="POST" action="{{route('fast-order.store')}}" id="fast-order-form" style="display: block;">
         <div class="inner form-horizontal">
             <div class="form-group">
                 <div class="form">
@@ -100,13 +100,13 @@
             <span class="input-group-btn">
                 <button class="send_otp_btn otp_btn-s btnverifyloginpopup button colord"
                         id="button-submit-fast-order"
-                        type="button">
+                        type="submit">
                     <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.fast_order.submit')}}
                 </button>
             </span>
             </div>
         </div>
-    </div>
+    </form>
 
     <div class="popup-consult-thanks flex-center fast-order-success" style="display:none;">
         <i class="fal fa-smile"></i>

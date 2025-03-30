@@ -2,7 +2,6 @@ let mix = require('laravel-mix');
 
 mix.js('resources/assets/js/app.js', 'public/build/js').version();
 mix.js('resources/assets/js/sliders.js', 'public/build/js').version();
-mix.js('resources/assets/js/mask/mask.js', 'public/build/js').version();
 mix.js('resources/assets/js/delivery_tabs.js', 'public/build/js').version();
 mix.js('resources/assets/js/auth.js', 'public/build/js').version();
 mix.js('resources/assets/js/productShow.js', 'public/build/js').version();

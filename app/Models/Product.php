@@ -201,6 +201,7 @@ class Product extends Model implements HasMedia
                 'first_stock',
                 'second_stock',
                 'third_stock',
+                'under_order'
             ])
             ->get();
     }

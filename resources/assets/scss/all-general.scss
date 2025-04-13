@@ -366,7 +366,7 @@ a.ocf-btn.ocf-disabled {
     color: $mod-white;
     background-color: transparent;
     background-image: none;
-    border: 1px solid $mod-white;
+    border: 1px solid $mod-product-default-border;
     border-radius: 3px;
     box-shadow: none;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s, background-color ease-in-out .2s
@@ -751,7 +751,6 @@ a.ocf-btn.ocf-disabled {
     word-break: break-word;
     text-align: left;
     font-size: inherit;
-    //color: white
 }
 
 .ocf-auto-column .ocf-value-name {

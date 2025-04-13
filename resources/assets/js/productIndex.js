@@ -1,3 +1,4 @@
+import {language} from './app'
 $(document).ready(function () {
 
     function filertsDropdownAction(element) {
@@ -383,8 +384,8 @@ $(document).ready(function () {
     function getCountAjax(button = null) {
         let url = '/get-count'
 
-        if (lang !== 'uk') {
-            url = '/' + lang + url;
+        if (language !== 'uk') {
+            url = '/' + language + url;
         }
 
         $.ajax({

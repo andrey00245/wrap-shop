@@ -1,38 +1,34 @@
-import { imageSliderInProduct, productSliderInitialization } from "./sliderInitialization";
+import {imageSliderInProduct, productSliderInitialization} from "./sliderInitialization";
 
 $(document).ready(function () {
 
-    let productSliderNav = new Swiper(".product-slider-nav", {
-        loop: false,
-        spaceBetween: 10,
-        slidesPerView: 2,
-        freeMode: true,
-        watchSlidesProgress: true,
-        lazy: true,
-        navigation: {
-            nextEl: ".nav-slider-wrapper .swiper-button-next",
-            prevEl: ".nav-slider-wrapper .swiper-button-prev",
-        },
-
-        breakpoints: {
-            1020: {
-                slidesPerView: 2,
-                spaceBetween: 10
-            },
-            1332: {
-                slidesPerView: 2,
-                spaceBetween: 10
-            }
-        }
+    var main = new Splide('#product-slider', {
+        pagination: false,
+        arrows: false,
     });
 
-    let productSlider = new Swiper(".product-slider", {
-        loop: false,
-        thumbs: {
-            swiper: productSliderNav,
-        },
-        lazy: true,
+    var thumbnails = new Splide('#thumbnail-carousel', {
+        perPage: 2,
+        gap: 10,
+        pagination: false,
+        isNavigation: true,
     });
+
+    main.sync(thumbnails);
+    main.mount();
+    thumbnails.mount();
+
+    try {
+        var productExampleImages = new Splide('#product-example-slider', {
+            pagination: false,
+            arrows: true,
+            type: 'loop'
+        });
+        productExampleImages.mount()
+    } catch (e) {
+        console.log('gallery is empty')
+    }
+
 
     const quantityInput = $('#quantity-block input[name="quantity"]')
     const quantityPlus = $('#quantity-block #plus-btn')
@@ -78,7 +74,7 @@ $(document).ready(function () {
     })
 
 
-    function plusMinus (input, action) {
+    function plusMinus(input, action) {
         let currentVal = parseFloat(input.val())
         const step = parseFloat(input.data('step'))
         const maxVal = parseFloat(input.data('max'))
@@ -133,7 +129,7 @@ $(document).ready(function () {
         onOffSelectedQuantity()
     }
 
-    function decimalPoint (val) {
+    function decimalPoint(val) {
         if (val % 1 === 0) {
             return val.toFixed(0)
         } else {
@@ -141,38 +137,37 @@ $(document).ready(function () {
         }
     }
 
-function integerNumber(currentVal, step) {
-    currentVal = Math.round(currentVal/step) * step
-    if (isNaN(currentVal)){
-        currentVal = 0;
+    function integerNumber(currentVal, step) {
+        currentVal = Math.round(currentVal / step) * step
+        if (isNaN(currentVal)) {
+            currentVal = 0;
+        }
+        return currentVal
     }
-    return currentVal
-}
 
-function recalcTotalPrice(newVal) {
-    for (const key in discounts) {
-        if (discounts.hasOwnProperty(key)) {
-            const item = discounts[key];
-            if(discounts.length === 1){
-                textDiscount.hide()
-            }
-
-            if (key != 0) {
-                const prevItem = discounts[key - 1];
-                if (newVal < item.discountFrom && newVal >= prevItem.discountFrom) {
-                    countForDiscont.text((item.discountFrom - newVal).toFixed(1))
-                    savingVal.text(item.discountFrom*prevItem.price - item.discountFrom*item.price)
-                }
-                if(newVal >= item.discountFrom){
+    function recalcTotalPrice(newVal) {
+        for (const key in discounts) {
+            if (discounts.hasOwnProperty(key)) {
+                const item = discounts[key];
+                if (discounts.length === 1) {
                     textDiscount.hide()
                 }
-                else{
-                    textDiscount.show()
+
+                if (key != 0) {
+                    const prevItem = discounts[key - 1];
+                    if (newVal < item.discountFrom && newVal >= prevItem.discountFrom) {
+                        countForDiscont.text((item.discountFrom - newVal).toFixed(1))
+                        savingVal.text(item.discountFrom * prevItem.price - item.discountFrom * item.price)
+                    }
+                    if (newVal >= item.discountFrom) {
+                        textDiscount.hide()
+                    } else {
+                        textDiscount.show()
+                    }
                 }
-            }
-            if (newVal >= item.discountFrom) {
-                price.text(item.price.toFixed(2))
-                $('.autocalc-product-price .total-price').text((item.price * newVal).toFixed(2));
+                if (newVal >= item.discountFrom) {
+                    price.text(item.price.toFixed(2))
+                    $('.autocalc-product-price .total-price').text((item.price * newVal).toFixed(2));
 
                     restyleThreeLastChart('.price-wrap .only-price');
                     restyleThreeLastChart('.autocalc-product-price .total-price-main');
@@ -183,7 +178,7 @@ function recalcTotalPrice(newVal) {
 
     restyleThreeLastChart('.price-wrap .only-price')
 
-    function restyleThreeLastChart (selector) {
+    function restyleThreeLastChart(selector) {
         const element = $(selector);
         let text = element.text()
         if (text.length > 3) {
@@ -192,7 +187,7 @@ function recalcTotalPrice(newVal) {
         }
     }
 
-    function onOffSelectedQuantity () {
+    function onOffSelectedQuantity() {
         choseQuantity.each(function (index) {
             $(this).removeClass('is-active')
             $(this).text($(this).data('choose'))
@@ -213,19 +208,19 @@ function recalcTotalPrice(newVal) {
     }
 
 //show hide params and buttons
-    function initializationAllLessButtons () {
+    function initializationAllLessButtons() {
         if (hiddenParams.length !== 0) {
             showAll.show()
         }
     }
 
-    function showAllParameters () {
+    function showAllParameters() {
         hiddenParams.each(function (index) {
             $(this).removeClass('hide')
         });
     }
 
-    function hideAllParameters () {
+    function hideAllParameters() {
         hiddenParams.each(function (index) {
             $(this).addClass('hide')
         });
@@ -260,15 +255,6 @@ function recalcTotalPrice(newVal) {
     })
 
     productSliderInitialization('homeLatest');
-    imageSliderInProduct('home-products-item');
+    // imageSliderInProduct('home-products-item');
 
-
-    var productPageExample = new Swiper(".product-page-example", {
-        loop: true,
-        navigation: {
-            nextEl: ".product-page-example .swiper-button-next",
-            prevEl: ".product-page-example .swiper-button-prev",
-        },
-        lazy: true,
-    });
 });

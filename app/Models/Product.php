@@ -56,9 +56,9 @@ class Product extends Model implements HasMedia
 
     protected $casts = [
         'banner_title' => 'json',
-        'slug' => 'json',
-        'name' => 'json',
-        'description' => 'json',
+        'slug'         => 'json',
+        'name'         => 'json',
+        'descriptions' => 'json',
     ];
 
   public function getSlugEnAttribute()
@@ -481,6 +481,11 @@ class Product extends Model implements HasMedia
     public function getPriceByDollars($price)
     {
        return round($price / self::getCurrencyRate(),0);
+    }
+
+    public function customBlocks()
+    {
+        return $this->belongsToMany(CustomBlock::class);
     }
 
     public function getMinOrderCount()

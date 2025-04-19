@@ -22,19 +22,22 @@ class CartMiddleware
 
         if (Auth::check()) {
             $cartItems = CartItem::where('user_id', Auth::id())->get();
+            $cartItemsCount = 0;
+            if ($cartItems->count() > 0) {
 
-            foreach ($cartItems as $item) {
-                $sum += $item->product->getPriceByCount($item->quantity);
+                foreach ($cartItems as $item) {
+                    $sum += $item?->product?->getPriceByCount($item->quantity);
+                }
+
+                $cartItemsCount = $cartItems->count();
             }
-
-            $cartItemsCount = $cartItems->count();
 
         } else {
             $cartItems = Session::get('cart', []);
 
 
             foreach ($cartItems as $key => $item) {
-                $sum += $item['product']->getPriceByCount($item['quantity']);
+                $sum += $item['product']?->getPriceByCount($item['quantity']);
             }
 
             $cartItemsCount = count($cartItems);

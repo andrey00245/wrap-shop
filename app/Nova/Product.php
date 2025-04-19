@@ -36,6 +36,16 @@ class Product extends Resource
         'id', 'code', 'external_code',
     ];
 
+    public static function searchableColumns()
+    {
+        return ['name->' . app()->getLocale()];
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->getTranslation('name', app()->getLocale());
+    }
+
     public function fields(Request $request)
     {
         return [

@@ -30,7 +30,7 @@ $(document).ready(function () {
     }
 
 
-    const quantityInput = $('#quantity-block input[name="quantity"]')
+    const quantityInput = $('#quantity-block .quantity-input-show-page')
     const quantityPlus = $('#quantity-block #plus-btn')
     const quantityMinus = $('#quantity-block #minus-btn')
     const discounts = $('.item-price').data('discount')
@@ -72,7 +72,6 @@ $(document).ready(function () {
         }
         $(this).val(newValue);
     })
-
 
     function plusMinus(input, action) {
         let currentVal = parseFloat(input.val())

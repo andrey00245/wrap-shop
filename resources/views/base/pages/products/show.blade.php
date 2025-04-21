@@ -283,7 +283,7 @@
                                                data-max="{{$count}}"
                                                data-step="{{$count > 0 ? $product->getOrderStep(): 0}}"
                                                value="{{$count > 0 ?$product->getDefaultQuantity() : 0}}"
-                                               id="input-quantity-{{$product->id}}" class="input-quantity">
+                                               id="input-quantity-{{$product->id}}" class="input-quantity quantity-input-show-page">
                                         <span class="input-group-btn">
                     <button type="button" class="btn btn-primary colord" id="plus-btn">+</button>
                   </span>

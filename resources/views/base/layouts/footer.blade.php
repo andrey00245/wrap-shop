@@ -111,7 +111,7 @@
 
 
 <script src="{{asset('js/jquery/jquery.min.js')}}"></script>
-<script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
+<script src="{{asset('third-party/splide/js/splide.min.js')}}"></script>
 <script src="{{asset('third-party/fancybox/jquery.fancybox.min.js')}}"></script>
 <script src="{{asset('third-party/intlTelInput/js/intlTelInput.js')}}"></script>
 <script src="{{mix('build/js/app.js')}}" type="text/javascript"></script>

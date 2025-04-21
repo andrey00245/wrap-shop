@@ -105,51 +105,48 @@
                         </div>
                     </div>
                 @endif
-                <div
-                    class="product-slider swiper">
-                    <div class="swiper-wrapper">
 
-                        @foreach($product->getMedia('images') as $key => $image)
-                            <a
-                                data-fancybox="product-show-gallery"
-                                data-caption="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
-                                class="swiper-slide item flex-center swiper-slide-active"
-                                href="{{$image->getUrl()}}"
-                                title="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
-                                role="group">
-                                <img loading="lazy" src="{{$image->getUrl()}}"
-                                     title="Плівка глянцева Avery Gloss Metallic Brown CB1630001"
-                                     alt="Плівка глянцева Avery Gloss Metallic Brown CB1630001">
-                            </a>
-                        @endforeach
-                    </div>
-                    <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
 
-                <div class="nav-slider-wrapper">
-                    <div class="product-slider-nav swiper">
-                        <div class="swiper-wrapper" id="swiper-wrapper-3d5845e6fc3b91055" aria-live="polite">
-
+                <div id="product-slider" class="splide product-images-slider">
+                    <div class="splide__track">
+                        <ul class="splide__list">
                             @foreach($product->getMedia('images') as $key => $image)
-                                <div
-                                    class="swiper-slide item swiper-slide-visible swiper-slide-active swiper-slide-thumb-active"
-                                    role="group">
+                                <li class="splide__slide">
+                                    <a
+                                        data-fancybox="product-show-gallery"
+                                        data-caption="{{$product->getName()}}"
+                                        href="{{$image->getUrl()}}"
+                                        title="{{$product->getName()}}"
+                                        role="group">
+                                        <img loading="lazy" src="{{$image->getUrl()}}"
+                                             title="{{$product->getName()}}"
+                                             alt="{{$product->getName()}}">
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+
+                <div
+                    id="thumbnail-carousel"
+                    class="splide product-images-nav">
+                    <div class="splide__arrows"></div>
+
+                    <div class="splide__track">
+                        <ul class="splide__list">
+                            @foreach($product->getMedia('images') as $key => $image)
+                                <li class="splide__slide">
                                     <img data-src="{{$image->getUrl('preview')}}"
                                          title="{{$product->getName()}}"
                                          alt="{{$product->getName()}}"
                                          src="{{$image->getUrl('preview')}}">
-                                </div>
+                                </li>
                             @endforeach
-                        </div>
-
-                        <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+                        </ul>
                     </div>
-                    <div class="swiper-button-next button"
-                         tabindex="-1" role="button" aria-label="Next slide"
-                         aria-disabled="true"></div>
-                    <div class="swiper-button-prev button"
-                         tabindex="-1" role="button" aria-label="Previous slide"
-                         aria-disabled="true"></div>
                 </div>
+
             </div>
             <div class="product-page-right">
                 <div class="top flex-justify">
@@ -286,7 +283,7 @@
                                                data-max="{{$count}}"
                                                data-step="{{$count > 0 ? $product->getOrderStep(): 0}}"
                                                value="{{$count > 0 ?$product->getDefaultQuantity() : 0}}"
-                                               id="input-quantity-{{$product->id}}" class="input-quantity">
+                                               id="input-quantity-{{$product->id}}" class="input-quantity quantity-input-show-page">
                                         <span class="input-group-btn">
                     <button type="button" class="btn btn-primary colord" id="plus-btn">+</button>
                   </span>
@@ -389,33 +386,45 @@
             </div>
 
             <div class="code-wishlist-wrapper mobil">
-                <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
+                {{--                <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>--}}
                 <div class="wishlist">
                     <button
                         type="button"
                         title="В закладки"
-                        class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"
-                        data-product-id="{{$product->id}}"
+                        {{--                        class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"--}}
+                        {{--                        data-product-id="{{$product->id}}"--}}
                     ></button>
                 </div>
             </div>
         </div>
 
-        <div class="product-page-example swiper">
-            <div class="swiper-wrapper">
-                @foreach($product->getBannerImages() as $image)
-                    <div class="swiper-slide item">
-                        <img src="{{$image->getUrl()}}" title="" alt="" loading="lazy" class="swiper-lazy">
-                        <div class="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
+        @if($product->getBannerImages()->count() !== 0)
+            <div id="product-example-slider" class="splide product-page-example">
+                <div class="splide__track">
+                    <ul class="splide__list">
+                        @foreach($product->getBannerImages() as $image)
+                            <li class="splide__slide">
+                                <a
+                                    data-fancybox="product-show-gallery"
+                                    data-caption="{{$product->getName()}}"
+                                    href="{{$image->getUrl()}}"
+                                    title="{{$product->getName()}}"
+                                    role="group">
+                                    <img loading="lazy" src="{{$image->getUrl()}}"
+                                         title="{{$product->getName()}}"
+                                         alt="{{$product->getName()}}">
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+                <div class="bottom flex-center">
+                    <div class="splide__arrows">
+                        <div class="desc">{{$product->banner_title}}</div>
                     </div>
-                @endforeach
+                </div>
             </div>
-            <div class="bottom flex-center">
-                <div class="swiper-button-prev button"></div>
-                <div class="desc">{{$product->banner_title}}</div>
-                <div class="swiper-button-next button"></div>
-            </div>
-        </div>
+        @endif
 
         <div class="product-page-info flex-justify wrap">
             <div class="item">
@@ -483,7 +492,7 @@
     @include('base.components.fast-order-popup')
 
     @push('scripts')
-        <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
+        {{--        <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>--}}
         <script src="{{mix('build/js/productShow.js')}}"></script>
         <script src="{{asset('third-party/lazyloadmin.js')}}"></script>
     @endpush

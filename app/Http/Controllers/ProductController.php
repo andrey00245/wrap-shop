@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Implementation;
 use App\Models\Product;
-use App\Models\ProductAttribute;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use function Doctrine\DBAL\Query\andWhere;
-use function PHPUnit\Framework\isEmpty;
 use function Symfony\Component\VarExporter\Internal\f;
 
 class ProductController extends Controller
@@ -73,7 +70,7 @@ class ProductController extends Controller
     {
         if ($product->getRollSize()) {
             $products = Product::query()
-                ->where('id','<>', $product->id)
+                ->where('id', '<>', $product->id)
                 ->whereHas('prices', function ($query) {
                     $query->where('type_id', function ($subQuery) {
                         $subQuery->select('id')
@@ -86,12 +83,12 @@ class ProductController extends Controller
                 ->with(['media', 'category'])
                 ->get();
 
-            $filteredProducts = $products->filter(function (Product $productItem) use($product): bool {
+            $filteredProducts = $products->filter(function (Product $productItem) use ($product): bool {
                 return $product->getMainColor() === $productItem->getMainColor();
             });
 
             if ($filteredProducts->isEmpty()) {
-                $filteredProducts = $products->filter(function (Product $productItem) use($product): bool {
+                $filteredProducts = $products->filter(function (Product $productItem) use ($product): bool {
                     return $product->getBrand() === $productItem->getBrand();
                 });
             }
@@ -131,9 +128,9 @@ class ProductController extends Controller
         }
 
         return view('base.pages.products.show', [
-            'product'        => $product,
-            'recommends'     => $products,
-            'exampleWorks'   => $exampleWorks,
+            'product' => $product,
+            'recommends' => $products,
+            'exampleWorks' => $exampleWorks,
             'latestCategory' => $latestCategory,
         ]);
     }
@@ -145,6 +142,7 @@ class ProductController extends Controller
             $selectedFilterValues['sort_by'],
             $selectedFilterValues['sort_direction'],
             $selectedFilterValues['min_price'],
+            $selectedFilterValues['category_id'],
             $selectedFilterValues['max_price']);
 
         if ($subsubcategory) {
@@ -181,7 +179,7 @@ class ProductController extends Controller
             ->where('product_prices.price', '>', 0)
             ->whereIn('category_id', $categories)
             ->whereHas('media')
-            ->select('products.*', \DB::raw('MAX(product_prices.price) as price'))
+            ->select('products.*', DB::raw('MAX(product_prices.price) as price'))
             ->groupBy('products.id',
                 'products.code',
                 'products.external_code',
@@ -209,7 +207,7 @@ class ProductController extends Controller
         $temp = $products->get();
 
         $maxPrice = $temp->max('price') * Product::getCurrencyRate();
-        $minPrice = $temp->min('price')  * Product::getCurrencyRate();
+        $minPrice = $temp->min('price') * Product::getCurrencyRate();
         $step = ceil(($maxPrice - $minPrice) / 4);
 
         if (request()->get('min_price') && request()->get('max_price')) {
@@ -256,16 +254,16 @@ class ProductController extends Controller
         $responseArray = Product::getCountProducts($categories, request(), $selectedFilterValues, $attributesArray);
 
         return view('base.pages.products.index', [
-            'products'           => $products,
-            'category'           => $category,
-            'subcategory'        => $subcategory,
-            'subsubcategory'     => $subsubcategory,
+            'products' => $products,
+            'category' => $category,
+            'subcategory' => $subcategory,
+            'subsubcategory' => $subsubcategory,
             'childrenCategories' => $childrenCategories,
-            'minPrice'           => $minPrice,
-            'maxPrice'           => $maxPrice,
-            'step'               => $step,
-            'attributes'         => $attributes->flatten()->unique('field_name') ?? collect(),
-            'responseArray'      => $responseArray,
+            'minPrice' => $minPrice,
+            'maxPrice' => $maxPrice,
+            'step' => $step,
+            'attributes' => $attributes->flatten()->unique('field_name') ?? collect(),
+            'responseArray' => $responseArray,
         ]);
     }
 
@@ -278,10 +276,16 @@ class ProductController extends Controller
         $categories = [];
 
         $category = Category::query()->where('id', $request->get('category_id'))->first();
-        if ($category->hasChildren()) {
-            $categories = $category->children()->pluck('id');
-        } else {
-            $categories[] = $category->id;
+        if ($category !== null) {
+            if ($category->hasChildren()) {
+                $categories = $category->children()->pluck('id');
+            } else {
+                $categories[] = $category->id;
+            }
+        }
+
+        if (empty($categories)) {
+            $categories = Category::all()->pluck('id');
         }
 
         foreach ($request->get('filters') as $key => $filterType) {
@@ -291,8 +295,6 @@ class ProductController extends Controller
                 }
             }
         }
-
         return response()->json(Product::getCountProducts($categories, $request, $selectedFilterValues));
     }
-
 }

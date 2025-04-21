@@ -3,7 +3,7 @@
 
 @section('content')
   @push('scripts')
-    <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>
+{{--    <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>--}}
   @endpush
   @push('styles')
       @if($theme === 'dark')

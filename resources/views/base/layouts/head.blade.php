@@ -15,7 +15,6 @@
     @endif
     <link rel="stylesheet" href="{{asset('assets/css/fonts.css')}}" type="text/css" media="screen">
     <link rel="stylesheet" href="{{asset('assets/css/font-awesome.css')}}" type="text/css" media="screen">
-    <link rel="stylesheet" href="{{asset('assets/css/swiper-bundle.min.css')}}" media="screen">
 
     <link rel="icon" href="{{asset('assets/favicon/favicon.ico')}}" type="image/x-icon">
     <link rel="icon" sizes="16x16" href="{{asset('assets/favicon/favicon-16x16.png')}}">
@@ -26,6 +25,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="{{asset('assets/favicon/android-chrome-96x96.png')}}">
 
     <link rel="stylesheet" href="{{asset('assets/css/form.css')}}" media="screen">
+    <link rel="stylesheet" href="{{asset('third-party/splide/css/splide.min.css')}}" media="screen">
     <link rel="stylesheet" href="{{asset('third-party/fancybox/jquery.fancybox.min.css')}}" media="screen">
     <link rel="stylesheet" href="{{asset('third-party/intlTelInput/css/intlTelInput.css')}}" media="screen">
     @stack('styles')

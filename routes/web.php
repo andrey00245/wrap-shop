@@ -14,6 +14,7 @@ use App\Http\Controllers\NovaPoshtaController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportAvailabilityController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SubscribeController;
 use App\Http\Controllers\SyncProductImagesController;
 use App\Http\Controllers\VideosController;
@@ -73,9 +74,14 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   Route::get('/api/get-cities', [NovaPoshtaController::class, 'getCities']);
   Route::get('/api/get-branches', [NovaPoshtaController::class, 'getBranches']);
 
+  Route::get('/search', SearchController::class)->name('search');
+  Route::post('/get-search-items', [SearchController::class, 'popupSearch'])->name('get-count');
+
+
   Route::get('/',IndexController::class)->name('index');
 
-  Route::get('/get-count', [ProductController::class, 'getCount'])->name('get-count');
+  Route::post('/get-count', [ProductController::class, 'getCount'])->name('get-count');
+
 
   Route::get('/privacy-policy', function (){
     $privacy_policy = PrivacyPolicy::first();

@@ -141,8 +141,6 @@ $(document).ready(function () {
         });
     }
 
-    // $('#input-telephone').inputmask('+380 99 999 99 99', {"placeholder": " "});
-
     $('#registration-form').on('submit', function (e) {
         e.preventDefault();
 

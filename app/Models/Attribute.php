@@ -60,9 +60,41 @@ class Attribute extends Model
             ?? request()->route()->parameter('subcategory')
             ?? request()->route()->parameter('category');
 
-        $currentCategory = $category->isParent() ? $category->children()->pluck('id') : [$category->id];
+        $searchCategories = collect();
 
-        return $this->attributesValues()
+        if (request()->get('category_id')) {
+            if (request()->get('category_id') === "0"){
+                $searchCategories = Category::all()->pluck('id');
+            }
+            else {
+                if(request()->get('sub_category') === "true"){
+
+                    $searchCategories->push((int)request()->get('category_id'));
+                    $searchCategory = Category::query()->where('id', request()->get('category_id'))
+                        ->first()
+                        ->getAllChildren()
+                        ->pluck('id');
+                    $searchCategories = $searchCategories->merge($searchCategory)->values();
+                }
+                else{
+                    $searchCategories->push((int)request()->get('category_id'));
+                }
+            }
+        }
+
+        $currentCategory = null;
+        if ($category !== null) {
+            $currentCategory = $category->isParent() ? $category->children()->pluck('id') : [$category->id];
+        }
+
+        $columns = ['name'];
+        $searchValue = request()->get('search');
+        $includeDescription = request()->boolean('description');
+        if ($includeDescription) {
+            $columns[] = 'descriptions';
+        }
+
+        $result = $this->attributesValues()
             ->whereHas('prices', function ($query) {
                 $query->where('type_id', DB::table('price_types')
                     ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
@@ -70,13 +102,23 @@ class Attribute extends Model
                     ->where('price', '>', 0);
             })
             ->whereHas('media')
-            ->whereIn('category_id', $currentCategory)
+            ->when($currentCategory !== null, function ($query) use ($currentCategory) {
+                return $query->whereIn('category_id', $currentCategory);
+            })
+            ->when($searchCategories->isNotEmpty(), function ($query) use ($searchCategories) {
+                return $query->whereIn('category_id', $searchCategories);
+            })
+            ->when($searchValue, function ($query) use ($columns, $searchValue) {
+                $query->whereLikeInsensitive($columns, $searchValue);
+            })
+
             ->get()
             ->map(function ($product) {
                 return data_get(json_decode($product->pivot->value), App::getLocale());
             })
             ->filter()
             ->unique();
+        return $result;
     }
 
     public function getDefaultProductsCount($attributeId, $value) {

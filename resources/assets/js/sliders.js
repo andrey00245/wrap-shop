@@ -1,65 +1,45 @@
 import {
-  productSliderInitialization,
-  imageSliderInProduct} from "./sliderInitialization";
+    productSliderInitialization,
+    productSliderInitializationClass,
+    popupSliderInitialization,
+    imageSliderInProduct
+} from "./sliderInitialization";
 
 $(document).ready(function () {
-  topBannerSlider('topBannersSlider');
-  categoriesSlider('slideCategory');
-  productSliderInitialization('homeBestseller');
-  productSliderInitialization('homeLatest');
-  imageSliderInProduct('home-products-item');
+    productSliderInitialization('homeBestseller');
+    productSliderInitialization('homeLatest');
+    productSliderInitializationClass('customBlocks');
 });
 
-function topBannerSlider(id) {
-  let topBannersSlider = new Swiper("#" + id + " .swiper", {
-    navigation: {
-      nextEl: "#" + id + " .swiper-button-next",
-      prevEl: "#" + id + " .swiper-button-prev",
+new Splide('#topBannersSlider', {
+    autoplay: true,
+    interval: 3000,
+    classes: {
+        arrows: 'splide__arrows home-slide-buttons',
+        prev  : 'splide__arrow--prev home-banner-prev',
+        next  : 'splide__arrow--next home-banner-next',
     },
-    pagination: {
-      el: "#" + id + " .swiper-pagination",
-      clickable: true,
-    },
-    lazy: true,
-    autoplay: {
-      delay: 3000,
-    },
-  });
-
-  let nextButton = document.querySelector('#' + id + ' .swiper-button-next');
-  let prevButton = document.querySelector('#' + id + ' .swiper-button-prev');
-
-  nextButton.addEventListener('click', function () {
-    topBannersSlider.autoplay.stop();
-  });
-
-  prevButton.addEventListener('click', function () {
-    topBannersSlider.autoplay.stop();
-  });
-}
+}).mount();
 
 
-function categoriesSlider(id) {
-  $('.home-category .swiper-slide').css('display', 'flex');
-  let categoriesSlider = new Swiper("#" + id + " .swiper", {
-    navigation: {
-      nextEl: "#" + id + " .swiper-button-next",
-      prevEl: "#" + id + " .swiper-button-prev",
+new Splide('#slideCategory', {
+    autoplay: true,
+    interval: 3000,
+    type: 'loop',
+    pagination: false,
+    classes: {
+        arrows: 'splide__arrows home-category-buttons',
+        prev  : 'splide__arrow--prev home-banner-prev',
+        next  : 'splide__arrow--next home-banner-next',
     },
-    watchSlidesProgress: true,
-    autoplay: {
-      delay: 5000,
-    },
-    lazy: true,
-    speed: 400,
-    slidesPerView: 2,
-    spaceBetween: 10,
+    perPage: 3,
+    gap: '5px',
+    padding: {right: '8%'},
     breakpoints: {
-      768: {
-        spaceBetween: 5,
-        slidesPerView: 3.3
-      },
-    }
-  });
-}
+        768: {
+            perPage: 2,
+            padding: {right: 0},
 
+        },
+    }
+}).mount();

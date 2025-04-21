@@ -1,21 +1,29 @@
-<div class="home-banner wrap" id="topBannersSlider">
-  <div class="swiper">
-    <div class="swiper-wrapper">
-        @foreach($banners as $banner )
-      <div class="swiper-slide home-banner-item">
-        <a href="{{$banner->url}}">
-          <img loading="lazy" src="{{$banner->getImage()}}" width="1312" height="450" alt="#" title="#">
-        </a>
-{{--        <img loading="lazy" src="#" alt="#" title="#" width="1312" height="450">--}}
-      </div>
-        @endforeach
+<div class="splide home-banner wrap" id="topBannersSlider">
+    <div class="splide__track">
+        <ul class="splide__list">
+            @foreach($banners as $banner)
+                <li class="splide__slide swiper-slide home-banner-item">
+                    <a href="{{$banner->url}}">
+                        <img
+                            loading="lazy"
+                            src="{{$banner->getImage()}}"
+                            width="1312"
+                            height="450"
+                            alt="#"
+                            title="#">
+                    </a>
+                </li>
+            @endforeach
+        </ul>
     </div>
+
+
     <div class="home-banner-bott flex-justify">
-      <div class="swiper-pagination"></div>
-      <div class="home-slide-button">
-        <div class="swiper-button-next button"></div>
-        <div class="swiper-button-prev button"></div>
-      </div>
+        <ul class="splide__pagination"></ul>
+        <div class="splide__arrows home-slide-buttons">
+        </div>
     </div>
-  </div>
+
 </div>
+
+

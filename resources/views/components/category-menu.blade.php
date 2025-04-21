@@ -15,7 +15,7 @@
                                     <ul class="child-menu">
                                         @foreach($childCategory->children as $childChildCategory)
                                             <li>
-                                                <a href="{{ route('products.category', ['category' => $category->slugEn, 'subcategory' => $childCategory->slugEn, 'subsubcategory' => $childChildCategory->slugEn]) }}" title="{{ $childCategory->name }}">{{ $childCategory->name }}</a>
+                                                <a href="{{ route('products.category', ['category' => $category->slugEn, 'subcategory' => $childCategory->slugEn, 'subsubcategory' => $childChildCategory->slugEn]) }}" title="{{ $childChildCategory->name }}">{{ $childChildCategory->name }}</a>
                                             </li>
                                         @endforeach
                                     </ul>

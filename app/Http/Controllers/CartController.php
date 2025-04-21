@@ -24,7 +24,13 @@ class CartController extends Controller
             $cartItem = $user->cartItems()->where('product_id', $productId)->first();
 
             if ($cartItem) {
-                $cartItem->quantity += $quantity;
+                $newQuantity = $cartItem->quantity + $quantity;
+
+                if ($newQuantity > $cartItem->product->stock) {
+                    $newQuantity = $cartItem->product->stock;
+                }
+
+                $cartItem->quantity = $newQuantity;
                 $cartItem->save();
             } else {
                 // Если товара нет в корзине, добавляем новый
@@ -60,16 +66,29 @@ class CartController extends Controller
         // Для неавторизованных пользователей
         $cartItems = Session::get('cart', []);
 
+        $product = Product::find($productId);
+
+        if (!$product) {
+            throw new \Exception('Товар не знайдено');
+        }
+
         if (isset($cartItems[$productId])) {
-            $cartItems[$productId]['quantity'] += $quantity;
-        } else {
-            $product = Product::find($productId);
-            if ($product) {
-                $cartItems[$productId] = [
-                    'product' => $product,
-                    'quantity' => $quantity,
-                ];
+            $newQuantity = $cartItems[$productId]['quantity'] + $quantity;
+
+            if ($newQuantity > $product->stock) {
+                $newQuantity = $product->stock;
             }
+
+            $cartItems[$productId]['quantity'] = $newQuantity;
+        } else {
+            if ($quantity > $product->stock) {
+                $quantity = $product->stock;
+            }
+
+            $cartItems[$productId] = [
+                'product' => $product,
+                'quantity' => $quantity,
+            ];
         }
 
         // Сохраняем изменения в сессии

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\Pluralize;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,13 +20,30 @@ use Spatie\Translatable\HasTranslations;
 use Spatie\Image\Enums\Fit;
 use Illuminate\Support\Facades\File;
 
+/**
+ * @method static Builder whereLikeInsensitive(string $column, string $value)
+ * @property $code
+ * @property $external_code
+ * @property $external_id
+ * @property $barcodes
+ * @property $article
+ * @property $is_top_seller
+ * @property $is_active
+ * @property $details
+ * @property $category_id
+ * @property $name
+ * @property $slug
+ * @property $descriptions
+ * @property $banner_title
+ * @property $stock
+ */
 class Product extends Model implements HasMedia
 {
     use HasFactory,
         HasTranslations,
         InteractsWithMedia;
 
-    public $translatable = [
+    public array $translatable = [
         'name',
         'descriptions',
         'banner_title',
@@ -58,13 +76,36 @@ class Product extends Model implements HasMedia
         'banner_title' => 'json',
         'slug' => 'json',
         'name' => 'json',
-        'description' => 'json',
+        'descriptions' => 'json',
     ];
 
-  public function getSlugEnAttribute()
-  {
-    return $this->getTranslation('slug', 'en');
-  }
+    /**
+     * @param $query
+     * @param $column
+     * @param $value
+     * @return Builder
+     */
+    public function scopeWhereLikeInsensitive($query, array $columns, string $value): Builder
+    {
+        $keywords = preg_split('/\s+/', mb_strtolower($value), -1, PREG_SPLIT_NO_EMPTY);
+
+        $query->where(function ($outerQuery) use ($columns, $keywords) {
+            foreach ($columns as $column) {
+                $outerQuery->orWhere(function ($innerQuery) use ($column, $keywords) {
+                    foreach ($keywords as $word) {
+                        $innerQuery->orWhereRaw("LOWER(products.{$column}) LIKE ?", ['%' . $word . '%']);
+                    }
+                });
+            }
+        });
+
+        return $query;
+    }
+
+    public function getSlugEnAttribute()
+    {
+        return $this->getTranslation('slug', 'en');
+    }
 
     /**
      * Brand.
@@ -74,18 +115,18 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Brand::class);
     }
 
-   /**
-   * @return bool
-   * @throws \Psr\Container\ContainerExceptionInterface
-   * @throws \Psr\Container\NotFoundExceptionInterface
-   */
+    /**
+     * @return bool
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     public function isFavorite(): bool
     {
-        if(Auth::check()){
+        if (Auth::check()) {
             return $this->wishlists()->where('user_id', Auth::id())->exists();
         }
-        if(session()?->has('wishlist')){
-          return in_array($this->id, session()?->get('wishlist', []), true);
+        if (session()?->has('wishlist')) {
+            return in_array($this->id, session()?->get('wishlist', []), true);
         }
         return false;
     }
@@ -103,7 +144,7 @@ class Product extends Model implements HasMedia
      */
     public function wishlists(): belongsToMany
     {
-      return $this->belongsToMany(User::class, 'wishlists');
+        return $this->belongsToMany(User::class, 'wishlists');
     }
 
     /**
@@ -116,7 +157,7 @@ class Product extends Model implements HasMedia
             ->fit(Fit::Crop, 310, 310) // Указываем корректный enum
             ->format('png')
             ->quality(100) // Улучшение качества
-          ->nonQueued();
+            ->nonQueued();
     }
 
     public function registerMediaCollections(): void
@@ -133,13 +174,13 @@ class Product extends Model implements HasMedia
         return $this->hasMany(ProductPrice::class);
     }
 
-  /**
-   * Attributes.
-   */
-  public function products_attributes(): HasMany
-  {
-    return $this->hasMany(ProductAttribute::class);
-  }
+    /**
+     * Attributes.
+     */
+    public function products_attributes(): HasMany
+    {
+        return $this->hasMany(ProductAttribute::class);
+    }
 
     /**
      * Attributes.
@@ -170,8 +211,8 @@ class Product extends Model implements HasMedia
     public function getPrice()
     {
         return $this->prices()->whereHas('type', function ($query) {
-            $query->where('price_types.external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-        })->value('price') * self::getCurrencyRate();
+                $query->where('price_types.external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+            })->value('price') * self::getCurrencyRate();
     }
 
     public function getImage(): string
@@ -206,186 +247,215 @@ class Product extends Model implements HasMedia
             ->get();
     }
 
-    public static function getCountProducts($categories, $request, $selectedFilterValues, $arrAttr = null){
-      if($request->get('filters')){
-        $responseArray['attributes_count'] = $request->get('filters');
-      }
-      else {
-        $responseArray['attributes_count'] = $arrAttr;
-      }
+    public static function getCountProducts($categories, $request, $selectedFilterValues, $arrAttr = null)
+    {
+        if ($request->get('filters')) {
+            $responseArray['attributes_count'] = $request->get('filters');
+        } else {
+            $responseArray['attributes_count'] = $arrAttr;
+        }
 
-      $withPrice = function ($query) {
-        $query->where('type_id', DB::table('price_types')
-          ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
-          ->value('id'))
-          ->where('price', '>', 0);
-      };
-
-      if($request->get('min_price') && $request->get('max_price')){
-        if((int)$request->get('min_price') !== 0 && (int)$request->get('max_price') !== 0){
-          $withPrice = function ($query) use ($request) {
+        $withPrice = function ($query) {
             $query->where('type_id', DB::table('price_types')
-              ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
-              ->value('id'))
-              ->where('price', '>=', (int)$request->get('min_price') / Product::getCurrencyRate())
-              ->where('price', '<=', (int)$request->get('max_price') / Product::getCurrencyRate());
-          };
-        }
-      }
+                ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
+                ->value('id'))
+                ->where('price', '>', 0);
+        };
 
-      $products = self::query()
-        ->whereIn('category_id', $categories)
-        ->whereHas('attributes')
-        ->whereHas('media')
-        ->whereHas('prices', $withPrice)
-        ->with(['products_attributes' => function ($query) {
-          $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
-        }])
-        ->get();
-
-      $selectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
-        foreach ($selectedFilterValues as $key => $filterValues) {
-          $matchingValues = [];
-          foreach ($product->products_attributes as $products_attribute) {
-            if ($products_attribute->field_name === $key) {
-              $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
+        if ($request->get('min_price') && $request->get('max_price')) {
+            if ((int)$request->get('min_price') !== 0 && (int)$request->get('max_price') !== 0) {
+                $withPrice = function ($query) use ($request) {
+                    $query->where('type_id', DB::table('price_types')
+                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
+                        ->value('id'))
+                        ->where('price', '>=', (int)$request->get('min_price') / Product::getCurrencyRate())
+                        ->where('price', '<=', (int)$request->get('max_price') / Product::getCurrencyRate());
+                };
             }
-          }
-          if (empty($matchingValues)) {
-            return false;
-          }
         }
-        return $product;
-      });
 
-//      $responseArray['total_count'] = $selectedProducts->count();
-//      $responseArray['total_count'] = __('product-index.show_products.'. Pluralize::getDeclension($selectedProducts->count(), App::getLocale()), ['count' => $selectedProducts->count()]);
+        $products = collect();
 
+        if ($request->get('search')) {
 
-      if(empty($selectedFilterValues) && (int)$request->get('min_price') === 0 && (int)$request->get('max_price') === 0){
-        $responseArray['total_count'] = __('product-index.select_filters');
-      }
-      else{
-        $responseArray['total_count'] = __('product-index.show_products.'. Pluralize::getDeclension($selectedProducts->count(), App::getLocale()), ['count' => $selectedProducts->count()]);
-      }
-
-      $nonSelectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
-        foreach ($selectedFilterValues as $key => $filterValues) {
-          $matchingValues = [];
-          foreach ($product->products_attributes as $products_attribute) {
-            if ($products_attribute->field_name === $key) {
-              $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
+            $columns = ['name'];
+            $searchValue = $request->get('search');
+            $includeDescription = $request->boolean('description');
+            if ($includeDescription) {
+                $columns[] = 'descriptions';
             }
-          }
-          if (empty($matchingValues)) {
+
+            $products = self::query()
+                ->whereIn('category_id', $categories)
+                ->when($searchValue, function ($query) use ($columns, $searchValue) {
+                    $query->whereLikeInsensitive($columns, $searchValue);
+                })
+                ->whereHas('attributes')
+                ->whereHas('media')
+                ->whereHas('prices', $withPrice)
+                ->with(['products_attributes' => function ($query) {
+                    $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
+                }])
+                ->get();
+        } else {
+            $products = self::query()
+                ->whereIn('category_id', $categories)
+                ->whereHas('attributes')
+                ->whereHas('media')
+                ->whereHas('prices', $withPrice)
+                ->with(['products_attributes' => function ($query) {
+                    $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
+                }])
+                ->get();
+        }
+
+        $selectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
+            foreach ($selectedFilterValues as $key => $filterValues) {
+                $matchingValues = [];
+                foreach ($product->products_attributes as $products_attribute) {
+                    if ($products_attribute->field_name === $key) {
+                        $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
+                    }
+                }
+                if (empty($matchingValues)) {
+                    return false;
+                }
+            }
             return $product;
-          }
+        });
+
+        if (empty($selectedFilterValues) && (int)$request->get('min_price') === 0 && (int)$request->get('max_price') === 0) {
+            $responseArray['total_count'] = __('product-index.select_filters');
+        } else {
+            $responseArray['total_count'] = __('product-index.show_products.' . Pluralize::getDeclension($selectedProducts->count(), App::getLocale()), ['count' => $selectedProducts->count()]);
         }
-        return false;
-      });
 
-//      dd($responseArray['attributes_count']);
-
-      foreach ($responseArray['attributes_count'] as $key_i => $item) {
-        foreach ($item as $key_j => $attribute) {
-          if (!array_key_exists('count', (array)$responseArray['attributes_count'][$key_i][$key_j])) {
-            (array)$responseArray['attributes_count'][$key_i][$key_j]['count'] = 0;
-          }
-        }
-      }
-
-      foreach ($selectedProducts as $product) {
-        foreach ($product->products_attributes as $products_attribute) {
-          if (array_key_exists($products_attribute->field_name, $responseArray['attributes_count'])) {
-            if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]["count"])) {
-              ++$responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'];
+        $nonSelectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
+            foreach ($selectedFilterValues as $key => $filterValues) {
+                $matchingValues = [];
+                foreach ($product->products_attributes as $products_attribute) {
+                    if ($products_attribute->field_name === $key) {
+                        $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
+                    }
+                }
+                if (empty($matchingValues)) {
+                    return $product;
+                }
             }
-          }
-        }
-      }
+            return false;
+        });
 
-      foreach ($nonSelectedProducts as $product) {
-        $testArr = [];
-        $valArr = [];
-        foreach ($selectedFilterValues as $keyI => $selectedFilterValue) {
-          $testArr[] = $keyI;
-          foreach ($selectedFilterValue as $filterValue) {
-            $valArr[] = $filterValue;
-          }
-        }
-
-        $tempAddCount = 0;
-        $tempField = '';
-
-        foreach ($product->products_attributes as $products_attribute) {
-          if (in_array($products_attribute->field_name, $testArr, true)) {
-            if (in_array($products_attribute->value, $valArr, true)) {
-              $tempAddCount++;
-            } else {
-              $tempField = $products_attribute->field_name;
+        foreach ($responseArray['attributes_count'] as $key_i => $item) {
+            foreach ($item as $key_j => $attribute) {
+                if (!array_key_exists('count', (array)$responseArray['attributes_count'][$key_i][$key_j])) {
+                    (array)$responseArray['attributes_count'][$key_i][$key_j]['count'] = 0;
+                }
             }
-          }
         }
 
-        if ($tempAddCount === count($testArr) - 1) {
-          foreach ($product->products_attributes as $products_attribute) {
-            if ($products_attribute->field_name === $tempField) {
-              if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]["count"])) {
-                ++$responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'];
-              }
+        foreach ($selectedProducts as $product) {
+            foreach ($product->products_attributes as $products_attribute) {
+                if (array_key_exists($products_attribute->field_name, $responseArray['attributes_count'])) {
+                    if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]["count"])) {
+                        ++$responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'];
+                    }
+                }
             }
-          }
         }
-      }
 
-      $referer = $request->header('referer');
+        foreach ($nonSelectedProducts as $product) {
+            $testArr = [];
+            $valArr = [];
+            foreach ($selectedFilterValues as $keyI => $selectedFilterValue) {
+                $testArr[] = $keyI;
+                foreach ($selectedFilterValue as $filterValue) {
+                    $valArr[] = $filterValue;
+                }
+            }
 
-      if ($referer) {
-        $parsedUrl = parse_url($referer);
-        $newUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'];
+            $tempAddCount = 0;
+            $tempField = '';
 
-        if (isset($parsedUrl['query'])) {
-          parse_str($parsedUrl['query'], $queryParams);
-          $allowedParams = ['sort_by', 'sort_direction'];
-          $sortParams = Arr::only($queryParams, $allowedParams);
+            foreach ($product->products_attributes as $products_attribute) {
+                if (in_array($products_attribute->field_name, $testArr, true)) {
+                    if (in_array($products_attribute->value, $valArr, true)) {
+                        $tempAddCount++;
+                    } else {
+                        $tempField = $products_attribute->field_name;
+                    }
+                }
+            }
+
+            if ($tempAddCount === count($testArr) - 1) {
+                foreach ($product->products_attributes as $products_attribute) {
+                    if ($products_attribute->field_name === $tempField) {
+                        if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]["count"])) {
+                            ++$responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'];
+                        }
+                    }
+                }
+            }
         }
-      }
 
-      if (empty($newUrl)){
-        $newUrl = '';
-      }
+        $referer = $request->header('referer');
+        $sortParams = [];
+        $search = [];
+        $prices = [];
 
-      if(empty($selectedFilterValues)){
-        if(empty($sortParams)){
-          $responseArray['new_url'] = $newUrl;
+        if ($referer) {
+            $parsedUrl = parse_url($referer);
+            $newUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'];
+
+            if (isset($parsedUrl['query'])) {
+                parse_str($parsedUrl['query'], $queryParams);
+                $allowedParams = ['sort_by', 'sort_direction'];
+                $sortParams = Arr::only($queryParams, $allowedParams);
+            }
+        }
+
+        if (empty($newUrl)) {
+            $newUrl = '';
+        }
+//        dd(route('search'), request()->header('referer'));
+
+
+
+        if (preg_match('/\b' . preg_quote(route('search'), '/') . '\b/u', request()->header('referer'))) {
+//dd(1);
+            if ($request->get('search')) {
+                $search = ['search' => $request->get('search')];
+            }
+            if ($request->get('category_id')) {
+                $search += ['category_id' => $request->get('category_id')];
+            }
+            if ($request->get('sub_category')) {
+                $search += ['sub_category' => $request->get('sub_category')];
+            }
+            if ($request->get('description')) {
+                $search += ['description' => $request->get('description')];
+            }
+        }
+
+
+        if ((int)$request->get('min_price') !== 0 && (int)$request->get('max_price') !== 0) {
+            $prices = [
+                'min_price' => $request->get('min_price'),
+                'max_price' => $request->get('max_price'),
+            ];
+        }
+
+        $merged = array_merge($search, $prices, $selectedFilterValues, $sortParams);
+
+
+//        dd(http_build_query($merged));
+        if (http_build_query($merged) !== ""){
+            $responseArray['new_url'] = $newUrl . '?' . http_build_query($merged);
         }
         else {
-          $responseArray['new_url'] = $newUrl . '?' .http_build_query($sortParams);
+            $responseArray['new_url'] = $newUrl;
         }
-      }
-      else{
-        if(empty($sortParams)){
-          $responseArray['new_url'] = $newUrl . '?' . http_build_query($selectedFilterValues);
-        }
-        else {
-          $responseArray['new_url'] = $newUrl . '?' . http_build_query($selectedFilterValues). '&' .http_build_query($sortParams);
-        }
-      }
 
-      if((int)$request->get('min_price') !== 0 && (int)$request->get('max_price') !== 0){
-        $prices = [
-          'min_price' => $request->get('min_price'),
-          'max_price' => $request->get('max_price'),
-        ];
-        if(isset(parse_url($responseArray['new_url'])['query'])) {
-          $responseArray['new_url'] .= '&' . http_build_query($prices);
-        }
-        else {
-          $responseArray['new_url'] .= '?' . http_build_query($prices);
-        }
-      }
-
-      return $responseArray;
+        return $responseArray;
 
     }
 
@@ -431,21 +501,21 @@ class Product extends Model implements HasMedia
 
     public function getStock(): float
     {
-        return (float) $this->stock;
+        return (float)$this->stock;
     }
 
     public function getSmallPrice(): float
     {
         return $this->prices()->whereHas('type', function ($query) {
-            $query->where('price_types.external_id', 'bb2a9b0f-26f6-11ee-0a80-0f50000d072f');
-        })->value('price') * self::getCurrencyRate();
+                $query->where('price_types.external_id', 'bb2a9b0f-26f6-11ee-0a80-0f50000d072f');
+            })->value('price') * self::getCurrencyRate();
     }
 
     public function getBigPrice(): float
     {
         return $this->prices()->whereHas('type', function ($query) {
-            $query->where('price_types.external_id', 'bb2a9b91-26f6-11ee-0a80-0f50000d0730');
-        })->value('price') * self::getCurrencyRate();
+                $query->where('price_types.external_id', 'bb2a9b91-26f6-11ee-0a80-0f50000d0730');
+            })->value('price') * self::getCurrencyRate();
     }
 
     public function getWarranty()
@@ -480,7 +550,7 @@ class Product extends Model implements HasMedia
 
     public function getPriceByDollars($price)
     {
-       return round($price / self::getCurrencyRate(),0);
+        return round($price / self::getCurrencyRate(), 0);
     }
 
     public function getMinOrderCount()
@@ -533,11 +603,11 @@ class Product extends Model implements HasMedia
 
         if ($this->getRollSize()) {
 
-            if ($count >= 10 && $count <= 24){
+            if ($count >= 10 && $count <= 24) {
                 $productPrice = $this->getSmallPrice();
             }
 
-            if ($count >= 25 ){
+            if ($count >= 25) {
                 $productPrice = $this->getBigPrice();
             }
 
@@ -547,16 +617,17 @@ class Product extends Model implements HasMedia
         return $productPrice * $count;
     }
 
-   public static function getCurrencyRate() {
-       $filePath = storage_path('app/currency_rate.json');
+    public static function getCurrencyRate()
+    {
+        $filePath = storage_path('app/currency_rate.json');
 
-       if (file_exists($filePath)) {
-           $jsonData = File::get($filePath);
-           $data = json_decode($jsonData, true, 512, JSON_THROW_ON_ERROR);
+        if (file_exists($filePath)) {
+            $jsonData = File::get($filePath);
+            $data = json_decode($jsonData, true, 512, JSON_THROW_ON_ERROR);
 
-          return $data['rate'] ?? 42;
-       }
+            return $data['rate'] ?? 42;
+        }
 
-       return 42;
-   }
+        return 42;
+    }
 }

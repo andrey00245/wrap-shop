@@ -2,8 +2,7 @@ import './wishlist'
 import './subscription'
 import {ru, uk, en} from '/third-party/intlTelInput/js/i18n'
 import {imageSliderInProduct, imageSliderInDefaultProduct, popupSliderInitialization} from "./sliderInitialization";
-
-export const language = document.querySelector('html').getAttribute('lang')
+import {language} from './variables'
 
 $(document).ready(function () {
     showHideSubCategories();
@@ -189,14 +188,6 @@ $(document).ready(function () {
 
         reportAvailabilityPopup()
     })
-    //
-    // $("#button-verify-loginpopup").click(function (){
-    //   $(".password-group").show()
-    //   if($(".password-group").hasClass('active')){
-    //     return open_pop_up("#popup-registration");
-    //   }
-    //   $(".password-group").addClass('active')
-    // })
 
     // $(".login-show").click(function () {
     //   $(".registration-show").removeClass('active');
@@ -268,6 +259,7 @@ $(document).ready(function () {
 
 
     getUserData(telInputInitialization)
+    popupSearchAction()
 
 
 })
@@ -297,8 +289,6 @@ function getUserData(callback) {
 }
 
 function telInputInitialization() {
-    const language = document.querySelector('html').getAttribute('lang');
-
     let i18nFile;
 
     if (language === 'ru') {
@@ -494,4 +484,82 @@ function showHideSubCategories() {
             }
         })
     })
+}
+
+
+function popupSearchAction(){
+    const searchField = document.querySelector('#search-popup #search input[name="search-popup"]');
+    const searchButton = document.querySelector('#search-popup #search button');
+    const dropdownMenu = document.querySelector('#search-popup #search .dropdown-menu');
+    let searchLink = '/search';
+    if(language !== 'uk'){
+        searchLink = `/${language}/search`;
+    }
+
+    document.addEventListener('click', function (e){
+        if(!e.target.closest('.dropdown-menu') && !e.target.closest('input[name="search-popup"]')){
+            dropdownMenu.style.display = 'none';
+        }
+    })
+
+    searchField.addEventListener('click', function (){
+        if(searchField.value.length>=3){
+            dropdownMenu.style.display = 'block';
+        }
+    })
+
+    searchButton.addEventListener('click', function (){
+        if(searchField.value.trim().length !== 0){
+            searchLink = '/search?search='+searchField.value.trim();
+            if(language !== 'uk'){
+                searchLink = `/${language}/search?search=${searchField.value.trim()}`;
+            }
+        }
+        window.location.href = searchLink;
+    })
+
+    const debouncedSearch = debounce(popupSearchHandler.bind(null, dropdownMenu), 500);
+    searchField.addEventListener('input', debouncedSearch)
+}
+
+function popupSearchHandler(dropdownMenu, event) {
+    const query = event.target.value.trim();
+    let url = '/get-search-items';
+    if(language !== 'uk'){
+        let url = `/${language}/get-search-items`;
+    }
+
+    if(query.length >= 3){
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {search: query},
+            dataType: 'json',
+            success: function (response) {
+                dropdownMenu.innerHTML = response.data.view;
+                if(response.data.total_count === 0){
+                    dropdownMenu.style.display = 'none';
+                }
+                else{
+                    dropdownMenu.style.display = 'block';
+                }
+            },
+            error: function (xhr, status, error) {
+
+            }
+        });
+    }
+    else {
+        dropdownMenu.style.display = 'none';
+    }
+}
+
+function debounce(fn, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            fn.apply(this, args);
+        }, delay);
+    };
 }

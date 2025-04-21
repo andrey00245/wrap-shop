@@ -619,7 +619,6 @@ a.ocf-btn.ocf-disabled {
 }
 
 .ocf-theme-light .ocf-footer .ocf-btn, .ocf-value, .ocf-value:active, .ocf-value:focus, .ocf-value:visited, .ocf-value:hover {
-    cursor: pointer;
     display: inline-flex;
     flex-wrap: nowrap;
     align-items: flex-start;
@@ -676,6 +675,9 @@ a.ocf-btn.ocf-disabled {
             color: $mod-white-035;
             cursor: not-allowed;
             border-color: $mod-white-035;
+        }
+        &:not(&.ocf-disabled, &[disabled], &:disabled){
+            cursor: pointer;
         }
     }
 }
@@ -1238,7 +1240,7 @@ a.ocf-btn.ocf-disabled {
 }
 
 .ocf-dropdown.ocf-open .ocf-filter-header {
-    z-index: 21
+    z-index: 2
 }
 
 .ocf-active-label {

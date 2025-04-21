@@ -13,68 +13,22 @@
     @endpush
     <section class="category-page row">
         <div class="category-top">
-            <img class="products-background" src="{{asset('assets/img/products/fon_wrap_webp.webp')}}" alt="">
-            <div class="products-background"></div>
+            <img class="products-background" src="{{asset('assets/img/search-page/background.jpg')}}" alt="background">
             <nav class="category-breadcrumbs">
                 <ul class="flex-center">
                     <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}" class="button"><i
                                 class="far fa-chevron-left"></i>{{__('header_footer.home')}}</a>
                     </li>
-                    @if(isset($category) && isset($subcategory))
-                        <li><a href="{{route('products.category', ['category' => $category->slugEn])}}"
-                               title="{{$category->name}}"
-                               class="button"><i class="far fa-chevron-left"></i>{{$category->name}}</a></li>
-                    @endif
-                    @if(isset($category) && isset($subcategory) && isset($subsubcategory))
-                        <li><a
-                                href="{{route('products.category', ['category' => $category->slugEn, 'subcategory' => $subcategory->slugEn])}}"
-                                title="{{$subcategory->name}}" class="button"><i
-                                    class="far fa-chevron-left"></i>{{$subcategory->name}}
-                            </a></li>
-                    @endif
                 </ul>
             </nav>
-            @if(isset($subsubcategory))
-                <h1 class="title" id="categoryId"
-                    data-category-id="{{$subsubcategory->id}}">{{$subsubcategory->name ?? ''}}</h1>
-            @elseif(isset($subcategory))
-                <h1 class="title" id="categoryId"
-                    data-category-id="{{$subcategory->id}}">{{$subcategory->name ?? ''}}</h1>
-            @else
-                <h1 class="title" id="categoryId" data-category-id="{{$category->id}}">{{$category->name ?? ''}}</h1>
-            @endif
-            @if(isset($category))
-                <nav class="category-child-nav">
-                    <ul>
-                        @foreach($childrenCategories as $childrenCategory)
-                            @if($category && !$subcategory)
-                                <li>
-                                    <a
-                                        href="{{route('products.category', ['category' => $category->slugEn, 'subcategory'=>$childrenCategory->slugEn])}}"
-                                        title="{{$childrenCategory->name}}"
-                                        class="flex-center">
-                                        {{$childrenCategory->name}}
-                                    </a>
-                                </li>
-                            @elseif($category && $subcategory && !$subsubcategory)
-                                <li>
-                                    <a
-                                        href="{{route('products.category', ['category' => $category->slugEn, 'subcategory' => $subcategory->slugEn, 'subsubcategory'=>$childrenCategory->slugEn])}}"
-                                        title="{{$childrenCategory->name}}"
-                                        class="flex-center">{{$childrenCategory->name}}</a>
-                                </li>
-                            @endif
-                        @endforeach
-                    </ul>
-                </nav>
-            @endif
+            <h1 class="title">{{__('search-page.title', ['string'=> request()->get('search') ? '- ' . request()->get('search') : ''])}}</h1>
         </div>
         <div class="category-content wrap flex-justify">
             <div class="category-left">
                 <div class="search-left">
                     <div class="title">{{__('product-index.find-in-catalog')}}</div>
                     <div id="search" class="flex-justify">
-                        <input type="text" name="search1" value=""
+                        <input type="text" name="search1" value="{{request()->get('search')}}"
                                placeholder="{{__('product-index.i_am_looking_for')}}:"
                                class="form-control input-lg">
                         <button type="button" class="button colord btn btn-default btn-lg"><i
@@ -110,7 +64,7 @@
                                               unset($urlWithoutPrices['max_price']);
                                               unset($urlWithoutPrices['min_price']);
                                               echo
-                                              '<button type="button" onclick="location = \''.(http_build_query($urlWithoutPrices) === "" ? URL::current() : URL::current() . '?' . http_build_query($urlWithoutPrices)).'\'" class="ocf-selected-discard" title="'. __("product-index.price_from_to", ["min" => $queryParams['min_price'], "max" => $queryParams['max_price']]) .'">
+                                              '<button type="button" onclick="location = \''.URL::current() . '?' . http_build_query($urlWithoutPrices).'\'" class="ocf-selected-discard" title="'. __("product-index.price_from_to", ["min" => $queryParams['min_price'], "max" => $queryParams['max_price']]) .'">
                                                 <span class="ocf-selected-value-name">'. __("product-index.price_from_to", ["min" => $queryParams['min_price'], "max" => $queryParams['max_price']]) .'</span>
                                                 <i class="ocf-icon ocf-times"></i>
                                               </button>';
@@ -154,10 +108,10 @@
                                             <span class="ocf-active-label"></span>
                                             <span class="ocf-filter-name">{{__('product-index.price')}}</span>
                                             <span class="ocf-filter-header-append">
-                                                <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle"
-                                                      data-ocf-discard="2.0"></span>
-                                                <span class="ocf-plus-minus"></span>
-                                            </span>
+                        <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle"
+                              data-ocf-discard="2.0"></span>
+                        <span class="ocf-plus-minus"></span>
+                      </span>
                                         </div>
                                         <div class="ocf-filter-collapse ocf-collapse ocf-in">
                                             <div class="ocf-input-group ocf-slider-input-group">
@@ -179,27 +133,6 @@
                                             <div class="slider-container">
                                                 <div id="price-slider"></div>
                                             </div>
-
-                                            {{--                      <div class="ocf-value-list">--}}
-                                            {{--                        <div class="ocf-value-list-body">--}}
-
-
-                                            {{--                            </div>--}}
-                                            {{--                          @for($i = 0; $i<4;$i++)--}}
-                                            {{--                            @php--}}
-                                            {{--                                $selected = ((float)request()->get('min_price') === $minPrice + $step*$i && (float)request()->get('max_price') === $minPrice + $step*($i+1))  ? 'ocf-selected' : '';--}}
-                                            {{--                            @endphp--}}
-
-                                            {{--                            <button type="button" class="ocf-value ocf-radio filterProductsPrice {{$selected}}"--}}
-                                            {{--                                    data-value-min="{{$minPrice + $step*$i}}"--}}
-                                            {{--                                    data-value-max="{{$minPrice + $step*($i+1)}}">--}}
-                                            {{--                              <span class="ocf-value-input ocf-value-input-radio"></span>--}}
-                                            {{--                              <span--}}
-                                            {{--                                class="ocf-value-name">{{$minPrice + $step*$i}} - {{$minPrice + $step*($i+1)}} ₴</span>--}}
-                                            {{--                            </button>--}}
-                                            {{--                          @endfor--}}
-                                            {{--                        </div>--}}
-                                            {{--                      </div>--}}
                                         </div>
                                     </div>
                                 </div>
@@ -242,9 +175,7 @@
                                                                     </button>
                                                                 @endforeach
                                                             </div>
-
                                                         </div>
-
                                                     </div>
                                                 </div>
                                             </div>
@@ -264,7 +195,7 @@
                             <span class="ocf-filter-discard ocf-icon ocf-icon-16 ocf-minus-circle"
                                   data-ocf-discard="86.2"></span>
                             <span class="ocf-plus-minus"></span></span>
-                                                </div><!-- /.ocf-filter-header -->
+                                                </div>
                                                 <div class="ocf-filter-collapse ocf-collapse">
 
 
@@ -302,15 +233,12 @@
                             <div class="ocf-between">
                                 @php
                                     $queryParams = request()->query();
-                                    $allowedParams = ['sort_by', 'sort_direction'];
+                                    $allowedParams = ['sort_by', 'sort_direction', 'search', 'category_id', 'description',
+                                    'sub_category'];
                                     $queryParams = array_intersect_key($queryParams, array_flip($allowedParams));
                                 @endphp
-                                <button type="button" id="cancel" data-link="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                  ...$queryParams
-                  ])}}" class="ocf-btn" disabled>{{__('product-index.reset')}}</button>
+                                <button type="button" id="cancel" data-link="{{route('search', [...$queryParams])}}"
+                                        class="ocf-btn" disabled>{{__('product-index.reset')}}</button>
                                 <button type="button" class="ocf-btn ocf-btn-block ocfFilterBottom"
                                         disabled>{!! $responseArray['total_count'] !!}
                                 </button>
@@ -358,62 +286,22 @@
                                 unset($withoutSomeParams['sort_direction']);
                                 unset($withoutSomeParams['page']);
                             @endphp
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                  ...$withoutSomeParams
-                  ])}}"
+                            <a href="{{route('search', [...$withoutSomeParams])}}"
                                class="button {{!request()->get('sort_by') && !request()->get('sort_direction') ? 'active' : null}}"
                                title="{{__('product-index.default')}}">{{__('product-index.default')}}</a>
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                  ...$withoutSomeParams,
-                  'sort_by' => 'name',
-                  'sort_direction' => 'asc',
-                  ])}}"
+                            <a href="{{route('search', [...$withoutSomeParams,'sort_by' => 'name','sort_direction' => 'asc'])}}"
                                class="button {{request()->get('sort_by') === 'name' && request()->get('sort_direction') === 'asc' ? 'active' : null}}"
                                title="{{__('product-index.alphabet')}}">{{__('product-index.alphabet')}}</a>
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                  ...$withoutSomeParams,
-                  'sort_by' => 'price',
-                  'sort_direction' => 'asc',
-                  ])}}"
+                            <a href="{{route('search', [...$withoutSomeParams,'sort_by' => 'price','sort_direction' => 'asc'])}}"
                                class="button {{request()->get('sort_by') === 'price' && request()->get('sort_direction') === 'asc' ? 'active' : null}}"
                                title="{{__('product-index.ascending_price')}}">{{__('product-index.ascending_price')}}</a>
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                   ...$withoutSomeParams,
-                  'sort_by' => 'price',
-                  'sort_direction' => 'desc',
-                  ])}}"
+                            <a href="{{route('search', [...$withoutSomeParams,'sort_by' => 'price','sort_direction' => 'desc'])}}"
                                class="button {{request()->get('sort_by') === 'price' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
                                title="{{__('product-index.descending_price')}}">{{__('product-index.descending_price')}}</a>
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                  ...$withoutSomeParams,
-                  'sort_by' => 'is_top_seller',
-                  'sort_direction' => 'desc',
-                  ])}}"
+                            <a href="{{route('search', [...$withoutSomeParams,'sort_by' => 'is_top_seller','sort_direction' => 'desc'])}}"
                                class="button {{request()->get('sort_by') === 'is_top_seller' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
                                title="{{__('product-index.most_popular')}}">{{__('product-index.most_popular')}}</a>
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                   ...$withoutSomeParams,
-                  'sort_by' => 'created_at',
-                  'sort_direction' => 'desc',
-                  ])}}"
+                            <a href="{{route('search', [...$withoutSomeParams,'sort_by' => 'created_at','sort_direction' => 'desc',])}}"
                                class="button {{request()->get('sort_by') === 'created_at' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
                                title="{{__('product-index.date_added')}}">{{__('product-index.date_added')}}</a>
                         </div>
@@ -442,8 +330,9 @@
                              alt="3m color" title="3m color">
                     </a>
                     @foreach($products as $product)
-                        <div class="category-products-item product-default product-default__splide product-layout product-grid"
-                             id="categoryProductsItem{{$product->id}}">
+                        <div
+                            class="category-products-item product-default product-default__splide product-layout product-grid"
+                            id="categoryProductsItem{{$product->id}}">
                             @if($product->is_top_seller)
                                 <div class="sale statuses list">
                                     <div class="category-status category-status-1 status-inline text rectangle "
@@ -502,16 +391,16 @@
                                                      data-fancybox="products{{$product->id}}"
                                                      data-caption="{{$product->getName()}}"></div>
                                             @endif
-                                            <li class="splide__slide flex-center"
-                                                role="group">
-                                                <a href="{{route('products.show', ['product' => $product->slugEn])}}">
-                                                    <img loading="lazy"
-                                                         src="{{$image->getUrl('preview')}}"
-                                                         alt="{{$product->name}}"
-                                                         title="{{$product->name}}"
-                                                         width="310" height="310">
-                                                </a>
-                                            </li>
+                                                <li class="splide__slide flex-center"
+                                                    role="group">
+                                                    <a href="{{route('products.show', ['product' => $product->slugEn])}}">
+                                                        <img loading="lazy"
+                                                             src="{{$image->getUrl('preview')}}"
+                                                             alt="{{$product->name}}"
+                                                             title="{{$product->name}}"
+                                                             width="310" height="310">
+                                                    </a>
+                                                </li>
                                         @endforeach
                                     </ul>
                                 </div>

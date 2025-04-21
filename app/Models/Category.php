@@ -43,6 +43,18 @@ class Category extends Model implements HasMedia
             ->nonQueued();
     }
 
+    public function getAllChildren()
+    {
+        $children = $this->children;
+        $allChildren = collect($children);
+
+        foreach ($children as $child) {
+            $allChildren = $allChildren->merge($child->getAllChildren());
+        }
+
+        return $allChildren;
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('main')->singleFile();

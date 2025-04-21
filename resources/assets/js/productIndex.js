@@ -1,4 +1,5 @@
-import {language} from './app'
+import {language} from './variables'
+
 $(document).ready(function () {
 
     function filertsDropdownAction(element) {
@@ -107,6 +108,45 @@ $(document).ready(function () {
     // filterProductsPriceClick();
     checkFiltersOnPageLoad();
     initializationPriceSlider();
+    search();
+
+    function search() {
+        const searchInput = document.querySelector('#search input')
+        const searchButton = document.querySelector('#search button')
+        searchButton.addEventListener('click', function () {
+            redirectWithParameters(searchInput)
+        })
+        searchInput.addEventListener('keydown', function () {
+            if (event.key === 'Enter') {
+                redirectWithParameters(searchInput)
+            }
+        })
+    }
+
+    function redirectWithParameters(searchInput) {
+        const data = {}
+        const getParametesUrl = new URL(window.location.href);
+        const params = new URLSearchParams(getParametesUrl.search);
+
+        data.search = searchInput.value
+        if (params.get('sub_category') !== null) {
+            data.sub_category = params.get('sub_category');
+        }
+        if (params.get('description') !== null) {
+            data.description = params.get('description');
+        }
+        if (params.get('category_id') !== null) {
+            data.category_id = params.get('category_id');
+        }
+
+        const queryString = new URLSearchParams(data).toString();
+        if (language !== 'uk') {
+            window.location.href = `/${language}/search?${queryString}`;
+        } else {
+            window.location.href = `/search?${queryString}`;
+        }
+    }
+
 
     // function filterProductsPriceClick() {
     //     filterProductsPrice.on('click', function () {
@@ -211,7 +251,7 @@ $(document).ready(function () {
         maxPrice = parseInt(maxInput.val());
         minPrice = parseInt(minInput.val());
 
-        if(parseInt(minInput.attr('min')) !== parseInt(minInput.val()) || parseInt(maxInput.attr('max')) !== parseInt(maxInput.val())){
+        if (parseInt(minInput.attr('min')) !== parseInt(minInput.val()) || parseInt(maxInput.attr('max')) !== parseInt(maxInput.val())) {
             filterSelected = true;
         }
 
@@ -335,24 +375,43 @@ $(document).ready(function () {
         let minInput = document.querySelector('#min_price');
         let maxInput = document.querySelector('#max_price');
         let maxInputJq = $('#max_price');
-
-        noUiSlider.create(priceSlider, {
-            start: [sliderMinVal, sliderMaxVal],
-            connect: true,
-            range: {
-                'min': sliderMin,
-                'max': sliderMax
-            },
-            step: 1,
-            format: {
-                to: function (value) {
-                    return Math.round(value);
+        if (sliderMin !== 0 && sliderMax !== 0) {
+            noUiSlider.create(priceSlider, {
+                start: [sliderMinVal, sliderMaxVal],
+                connect: true,
+                range: {
+                    'min': sliderMin,
+                    'max': sliderMax
                 },
-                from: function (value) {
-                    return Number(value);
+                step: 1,
+                format: {
+                    to: function (value) {
+                        return Math.round(value);
+                    },
+                    from: function (value) {
+                        return Number(value);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            noUiSlider.create(priceSlider, {
+                start: [sliderMinVal, sliderMaxVal],
+                connect: true,
+                range: {
+                    'min': 0,
+                    'max': 1
+                },
+                step: 1,
+                format: {
+                    to: function (value) {
+                        return Math.round(value);
+                    },
+                    from: function (value) {
+                        return Number(value);
+                    }
+                }
+            });
+        }
 
         priceSlider.noUiSlider.on('update', function (values, handle) {
             minInput.value = values[0];
@@ -387,17 +446,34 @@ $(document).ready(function () {
         if (language !== 'uk') {
             url = '/' + language + url;
         }
+        const getParametesUrl = new URL(window.location.href);
+        const params = new URLSearchParams(getParametesUrl.search);
+        const search = params.get('search');
+        const category_id = params.get('category_id');
+        const sub_category = params.get('sub_category');
+        const description = params.get('description');
+        const data = {}
+
+
+        data.filters = filters
+        if(categoryId === undefined){
+            data.category_id = category_id
+        }else {
+            data.category_id = categoryId
+        }
+        data.min_price = minPrice
+        data.max_price = maxPrice
+        data.search = search
+        data.sub_category = sub_category
+        data.description = description
+        console.log(data)
+
 
         $.ajax({
             url: url,
-            type: 'GET',
+            type: 'POST',
             dataType: 'json',
-            data: {
-                filters: filters,
-                category_id: categoryId,
-                min_price: minPrice,
-                max_price: maxPrice,
-            },
+            data: data,
             success: function (response) {
                 let filterTypeActive = [];
 

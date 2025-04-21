@@ -73,11 +73,14 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   Route::get('/api/get-cities', [NovaPoshtaController::class, 'getCities']);
   Route::get('/api/get-branches', [NovaPoshtaController::class, 'getBranches']);
 
-//  Route::get('/search/', [SearchController::class, 'search']);
+  Route::get('/search', SearchController::class)->name('search');
+  Route::post('/get-search-items', [SearchController::class, 'popupSearch'])->name('get-count');
+
 
   Route::get('/',IndexController::class)->name('index');
 
-  Route::get('/get-count', [ProductController::class, 'getCount'])->name('get-count');
+  Route::post('/get-count', [ProductController::class, 'getCount'])->name('get-count');
+
 
   Route::get('/privacy-policy', function (){
     $privacy_policy = PrivacyPolicy::first();

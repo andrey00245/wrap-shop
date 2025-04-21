@@ -538,11 +538,11 @@ class Product extends Model implements HasMedia
 
         if ($this->getRollSize()) {
 
-            if ($count >= 10 && $count <= 24){
+            if ($count >= $this->getSecondStock() && $count <= $this->getThirdStock()){
                 $productPrice = $this->getSmallPrice();
             }
 
-            if ($count >= 25 ){
+            if ($count >= $this->getThirdStock() ){
                 $productPrice = $this->getBigPrice();
             }
 

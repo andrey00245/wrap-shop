@@ -125,8 +125,16 @@ $(document).ready(function () {
     }
 
     $(".child-popup-open.open").on("click", function () {
-        $(this).toggleClass("active").siblings(".child-popup").slideToggle();
+        if($(this).hasClass('active')){
+            $(".child-popup-open.open").removeClass('active').siblings(".child-popup").slideUp();
+        }
+        else{
+            $(".child-popup-open.open").removeClass('active').siblings(".child-popup").slideUp();
+            $(this).addClass("active").siblings(".child-popup").slideToggle();
+        }
     });
+
+
 
     $(".cart-open").on("click", function (e) {
         cartPopup(e)

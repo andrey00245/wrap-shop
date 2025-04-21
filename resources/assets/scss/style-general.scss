@@ -1285,7 +1285,6 @@ body::-webkit-scrollbar {
 
         margin-top: 12px;
         transition-property: transform;
-        height: fit-content;
         margin-bottom: 50px;
 
         &.hide {
@@ -1296,11 +1295,26 @@ body::-webkit-scrollbar {
             display: none;
         }
 
+        &.banner{
+            padding: 0;
+            a {
+                img{
+                    width: 100%;
+                }
+            }
+        }
+
         &:hover {
             box-shadow: none;
             transform: translateY(-10px);
             padding-bottom: 10px;
             margin-bottom: 0;
+
+            &.banner{
+                transform: translateY(0);
+                padding-bottom: 0;
+                margin-bottom: 50px;
+            }
 
 
             .bottom {
@@ -4078,12 +4092,6 @@ table .notify-quantity {
     }
     .home-products-list {
         padding-bottom: 15px;
-
-        .home-products-item.banner {
-            img {
-                top: -20px;
-            }
-        }
     }
     .product-default {
         .image {
@@ -4315,20 +4323,6 @@ table .notify-quantity {
                 font-size: 10px;
             }
 
-            &:hover {
-                &.banner {
-                    height: 368px;
-                }
-            }
-
-            &.banner {
-                height: 368px;
-
-                img {
-                    top: 0;
-                }
-            }
-
             .hover-additional-info {
                 .additional-info {
                     margin-right: 10px;
@@ -4371,8 +4365,19 @@ table .notify-quantity {
                 font-size: 13px;
                 padding: 7px 6px;
             }
+            &.banner {
+                a{
+                    height: 100%;
+                    img {
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                }
+
+            }
         }
     }
+
     .product-default {
         display: flex;
         flex-direction: column;
@@ -4700,16 +4705,6 @@ table .notify-quantity {
     .home-products-top {
         .home-title {
             font-size: 20px;
-        }
-    }
-
-    .home-products-list {
-        .home-products-item {
-            &.banner {
-                img {
-                    height: 100%;
-                }
-            }
         }
     }
 

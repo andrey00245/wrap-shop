@@ -1,5 +1,6 @@
 import {
     productSliderInitialization,
+    productSliderInitializationClass,
     popupSliderInitialization,
     imageSliderInProduct
 } from "./sliderInitialization";
@@ -7,6 +8,7 @@ import {
 $(document).ready(function () {
     productSliderInitialization('homeBestseller');
     productSliderInitialization('homeLatest');
+    productSliderInitializationClass('customBlocks');
 });
 
 new Splide('#topBannersSlider', {

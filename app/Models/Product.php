@@ -564,4 +564,31 @@ class Product extends Model implements HasMedia
 
        return 42;
    }
+
+    public function volumeVariants()
+    {
+        return $this->belongsToMany(Product::class, 'product_volume_variants', 'product_id', 'variant_product_id');
+    }
+
+    public function isVolumeVariantOf()
+    {
+        return $this->belongsToMany(Product::class, 'product_volume_variants', 'variant_product_id', 'product_id');
+    }
+
+    public function allVolumeVariants()
+    {
+        return $this->volumeVariants->merge($this->isVolumeVariantOf);
+    }
+
+    public function hasVolumeAttribute()
+    {
+        return $this->attributes()->where('field_name', 'volume')->exists();
+    }
+
+    public function scopeHasVolume($query)
+    {
+        return $query->whereHas('attributes', function ($q) {
+            $q->where('field_name', 'volume');
+        });
+    }
 }

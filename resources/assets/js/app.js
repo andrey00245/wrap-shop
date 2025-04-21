@@ -149,6 +149,11 @@ $(document).ready(function () {
         }
     })
 
+    $("#login-popup-back").on("click", function () {
+        $("#popup-registration").hide()
+        $("#popup-login").show()
+    })
+
     $(".login-popup-close").on("click", function () {
         loginPopup()
         $("html").removeClass('no-overflow');

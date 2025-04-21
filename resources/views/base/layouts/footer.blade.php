@@ -8,8 +8,8 @@
         </video>
 
   <div class="home-about-text">
-    <h2 class="title">{{$settings->video_banner_title}}</h2>
-    {!! $settings->video_banner_desc !!}
+    <h2 class="title">{{$settings->video_banner_title ?? ''}}</h2>
+    {!! $settings->video_banner_desc ?? '' !!}
   </div>
 
   <div class="home-about-play button" data-src="{{asset('assets/video/video_3000.mp4')}}" data-fancybox="about-play">
@@ -26,8 +26,8 @@
 <footer class="footer">
   <div class="seo-wrapper">
     <div class="seo-content">
-      <h2>{{$settings->slogan_title}}</h2>
-      {!! $settings->slogan_desc !!}
+      <h2>{{$settings->slogan_title ?? ''}}</h2>
+      {!! $settings->slogan_desc ?? '' !!}
     </div>
     <span class="seo-btn show"><i class="fas fa-chevron-right"></i>{{__('header_footer.read_more')}}</span>
     <span class="seo-btn collapse" style="display: none"><i class="fas fa-chevron-right"></i>{{__('header_footer.read_less')}}</span>
@@ -131,7 +131,7 @@
     });
 
     const linkHref = document.createElement("a")
-    linkHref.href = "{{$settings->google_map_link}}";
+    linkHref.href = "{{$settings->google_map_link ?? '#'}}";
     linkHref.target = "_blank";
 
     const beachFlagImg = document.createElement("img");

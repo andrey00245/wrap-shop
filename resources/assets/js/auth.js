@@ -242,6 +242,40 @@ $(document).ready(function () {
         }
     });
 
+    $('#form-forgot_password').on('submit', function (e) {
+        e.preventDefault();
+        const form = $(this);
+        const url = form.attr('action');
+        const formData = form.serialize();
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+                $('#forgot-response')
+                    .text(response.message || 'Успешно отправлено.')
+                    .css('color', 'green')
+                    .fadeIn();
+
+                form[0].reset();
+            },
+            error: function (xhr) {
+                let msg = 'Произошла ошибка. Попробуйте снова.';
+                if (xhr.responseJSON?.message) {
+                    msg = xhr.responseJSON.message;
+                } else if (xhr.responseJSON?.errors) {
+                    const errors = xhr.responseJSON.errors;
+                    msg = Object.values(errors).flat()[0];
+                }
+                $('#forgot-response')
+                    .text(msg)
+                    .css('color', 'red')
+                    .fadeIn();
+            }
+        });
+    });
+
     $('.g_id_signout').on('click', function (event) {
         event.preventDefault();
         $('#logout-form').submit();

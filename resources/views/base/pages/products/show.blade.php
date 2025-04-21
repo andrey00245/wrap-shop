@@ -208,6 +208,33 @@
                             </div>
                         </div>
 
+                        @if($product->allVolumeVariants()->count())
+                            <div class="volume flex-wrap">
+                                @php
+                                    $allVariants = $product->allVolumeVariants()->prepend($product)->unique('id');
+                                @endphp
+
+                                @foreach($allVariants as $variant)
+                                    @php
+                                        $volume = $variant->attributes()->where('field_name', 'volume')->first()?->pivot?->value ?? '—';
+                                        $isCurrent = $variant->id === $product->id;
+                                    @endphp
+
+                                    @if($isCurrent)
+                                    <a href="void:javascript(0)"
+                                       class="volume-box active">
+                                        {{ $volume }}
+                                    </a>
+                                   @else
+                                        <a href="{{route('products.show',['product' => $variant->slugEn])}}"
+                                           class="volume-box">
+                                            {{ $volume }}
+                                        </a>
+                                   @endif
+                                @endforeach
+                            </div>
+                        @endif
+
                         @if($product->getRollSize())
                             <ul class="product-discounts">
                                 @if($product->getSecondStock() && $product->getSecondStock() <= $count)
@@ -296,8 +323,7 @@
 
                         @if($count == 0)
                             <div class="stock-in-alert-wrapper">
-                                <input type="text" placeholder="Введіть номер або email">
-                                <button type="button" class="stock-in-alert"><i
+                                <button type="button" class="stock-in-alert report-availability-open" data-product-id="{{$product->id}}"><i
                                         class="fas fa-chevron-right"></i>{!! __('product-show.stock-in-alert') !!}
                                 </button>
                             </div>
@@ -461,5 +487,36 @@
         <script src="{{mix('build/js/productShow.js')}}"></script>
         <script src="{{asset('third-party/lazyloadmin.js')}}"></script>
     @endpush
+<style>
+    .volume {
+        display: flex;
+        gap: 10px;
+        margin-top: 1rem;
+        margin-bottom: 20px;
+    }
 
+    .volume-box {
+        display: inline-block;
+        padding: 10px;
+        text-align: center;
+        border: 2px solid rgb(255, 206, 28);
+        border-radius: 8px;
+        text-decoration: none;
+        color: rgb(255, 206, 28);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    .volume-box:hover {
+        border-color: rgb(255, 206, 28);
+        color: rgb(255, 206, 28);
+    }
+
+    .volume-box.active {
+        background: rgb(255, 206, 28);
+        color: #fff;
+        border-color: rgb(255, 206, 28);
+    }
+</style>
 @endsection

@@ -30,12 +30,6 @@ Route::prefix('auth')->middleware('guest')->group(function () {
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
                 ->name('password.email');
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-                ->name('password.reset');
-
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-                ->name('password.store');
-
     Route::get('google', [SocialController::class, 'redirectToGoogle'])->name('auth.google');
     Route::get('google/callback', [SocialController::class, 'handleGoogleCallback']);
 
@@ -44,6 +38,13 @@ Route::prefix('auth')->middleware('guest')->group(function () {
     Route::get('apple', [SocialController::class, 'redirectToApple'])->name('auth.apple');
     Route::get('apple/callback', [SocialController::class, 'handleAppleCallback']);
 });
+
+Route::get('password-reset/{token}', [NewPasswordController::class, 'create'])
+    ->name('password.reset');
+
+Route::post('reset-password', [NewPasswordController::class, 'store'])
+    ->name('password.store');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)

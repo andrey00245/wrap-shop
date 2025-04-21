@@ -56,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
             })->whereHas('category', function (\Illuminate\Database\Eloquent\Builder $query) {
                     $query->whereJsonContains('slug->en', 'instrumenti-rozxidniki');
                 })
-            ->get();
+            ->take(10)->get();
 
         $mainCategories = Category::query()
             ->whereNull('parent_id');

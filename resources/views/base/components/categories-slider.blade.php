@@ -1,17 +1,25 @@
-<div class="home-category flex-justify wrap" id="slideCategory" >
-  <div class="swiper">
-    <div class="swiper-wrapper">
-      @foreach($mainCategories as $mainCategory)
-        <a href="{{ route('products.category', ['category' => $mainCategory->slugEn]) }}" class="swiper-slide home-category-item flex-justify" title="" >
-          <figure class="img flex-center"><img loading="lazy" src="{{$mainCategory->getImage()}}" srcset="" alt="" title=""></figure>
-          <div class="right">
-            <div class="name">{{$mainCategory->name}}</div>
-            <div class="link button" ><i class="fas fa-chevron-right"></i>{{__('general-translate.view')}}</div>
-          </div>
-        </a>
-      @endforeach
+<div class="splide home-category flex-justify wrap" id="slideCategory">
+    <div class="splide__track">
+        <ul class="splide__list">
+            @foreach($mainCategories as $mainCategory)
+                <li class="splide__slide swiper-slide home-banner-item">
+                    <a href="{{ route('products.category', ['category' => $mainCategory->slugEn]) }}"
+                       class="swiper-slide home-category-item flex-justify" title="">
+                        <figure class="img flex-center"><img loading="lazy" src="{{$mainCategory->getImage()}}"
+                                                             srcset="" alt="" title=""></figure>
+                        <div class="right">
+                            <div class="name">{{$mainCategory->name}}</div>
+                            <div class="link button"><i
+                                    class="fas fa-chevron-right"></i>{{__('general-translate.view')}}</div>
+                        </div>
+                    </a>
+                </li>
+            @endforeach
+
+        </ul>
     </div>
-  </div>
-  <div class="swiper-button-next home-category-button button"></div>
-  <div class="swiper-button-prev home-category-button button"></div>
+
+    <div class="splide__arrows home-category-buttons"></div>
 </div>
+
+

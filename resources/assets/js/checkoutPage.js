@@ -107,37 +107,63 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Инициализация слайдера товаров в корзине
-    let cartSlider = new Swiper("#checkoutProductSlider .home-products-list", {
-        navigation: {
-            nextEl: "#checkoutProductSlider .home-slide-button .swiper-button-next",
-            prevEl: "#checkoutProductSlider .home-slide-button .swiper-button-prev",
+
+
+
+    let checkoutSlider = new Splide('#checkoutProductSlider .splide', {
+        pagination: false,
+        perPage: 2,
+        gap: '5px',
+        padding: {right: '3%'},
+        arrows: false,
+        classes: {
+            arrows: 'splide__arrows home-products-slide-buttons">',
+            prev: 'splide__arrow--prev',
+            next: 'splide__arrow--next',
         },
-        spaceBetween: 10,
-        slidesPerView: 2.1,
-        lazy: true,
-        observeSlideChildren: true,
-        observeParents: true,
-        observer: true,
         breakpoints: {
             1331: {
-                slidesPerView: 2.1,
-                spaceBetween: 10,
+                perPage: 1,
+                padding: {right: '35%'},
             },
-            1020: {
-                slidesPerView: 1.2,
-                spaceBetween: 10,
+            1019: {
+                perPage: 2,
+                padding: {right: '5%'},
             },
-            480: {
-                slidesPerView: 2.1,
-                spaceBetween: 10,
+            767: {
+                perPage: 1,
+                padding: {right: '35%'},
             },
-            280: {
-                slidesPerView: 1.1,
-                spaceBetween: 10,
-            },
+            400: {
+                perPage: 1,
+                padding: {right: 0},
+            }
         }
     });
 
+
+    const prevBtn = document.querySelector('.custom_arrows .custom_arrow.custom__prev-arrow');
+    const nextBtn = document.querySelector('.custom_arrows .custom_arrow.custom__next-arrow');
+
+    function updateArrows() {
+        const index = checkoutSlider.index;
+        const lastIndex = checkoutSlider.Components.Controller.getEnd();
+
+        prevBtn.classList.toggle('is-disabled', index === 0);
+        nextBtn.classList.toggle('is-disabled', index === lastIndex);
+    }
+
+    checkoutSlider.on('mounted move', updateArrows);
+
+    prevBtn.addEventListener('click', () => {
+        checkoutSlider.go('<');
+    });
+
+    nextBtn.addEventListener('click', () => {
+        checkoutSlider.go('>');
+    });
+
+    checkoutSlider.mount();
     updateAddressFields();  // Инициализация состояния
 
     let paymentMethods = document.querySelectorAll('input[name="payment_method"]');

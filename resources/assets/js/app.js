@@ -1,11 +1,14 @@
 import './wishlist'
 import './subscription'
 import {ru, uk, en} from '/third-party/intlTelInput/js/i18n'
-
+import {imageSliderInProduct, imageSliderInDefaultProduct, popupSliderInitialization} from "./sliderInitialization";
+import {language} from './variables'
 
 $(document).ready(function () {
-    cartPopupSlider();
     showHideSubCategories();
+    popupSliderInitialization('cartProductSlider')
+    imageSliderInProduct('home-products-item');
+    imageSliderInDefaultProduct('product-default__splide');
 
     let scroll = $(window).scrollTop();
     slideHeader(scroll);
@@ -190,14 +193,6 @@ $(document).ready(function () {
 
         reportAvailabilityPopup()
     })
-    //
-    // $("#button-verify-loginpopup").click(function (){
-    //   $(".password-group").show()
-    //   if($(".password-group").hasClass('active')){
-    //     return open_pop_up("#popup-registration");
-    //   }
-    //   $(".password-group").addClass('active')
-    // })
 
     // $(".login-show").click(function () {
     //   $(".registration-show").removeClass('active');
@@ -269,6 +264,7 @@ $(document).ready(function () {
 
 
     getUserData(telInputInitialization)
+    popupSearchAction()
 
 
 })
@@ -288,8 +284,7 @@ function getUserData(callback) {
                     sessionStorage.setItem('userData', JSON.stringify({country_code: "UA"}));
                     callback({country_code: "UA"});
                 });
-        }
-        else {
+        } else {
             const userData = sessionStorage.userData;
             callback(userData);
         }
@@ -299,8 +294,6 @@ function getUserData(callback) {
 }
 
 function telInputInitialization() {
-    const language = document.querySelector('html').getAttribute('lang');
-
     let i18nFile;
 
     if (language === 'ru') {
@@ -328,10 +321,10 @@ function telInputInitialization() {
 
     for (let key in inputs) {
         if (inputs.hasOwnProperty(key)) {
-            if(inputs[key]!==null && inputs[key]!==undefined){
+            if (inputs[key] !== null && inputs[key] !== undefined) {
                 iti[key] = window.intlTelInput(inputs[key], {
                     initialCountry: userData.country_code,
-                    hiddenInput: () => ({ phone: "phone" }),
+                    hiddenInput: () => ({phone: "phone"}),
                     strictMode: true,
                     separateDialCode: true,
                     i18n: i18nFile,
@@ -343,170 +336,133 @@ function telInputInitialization() {
 }
 
 
-function cartPopupSlider() {
-    let cartSlider = new Swiper("#cartProductSlider .popup-list", {
-        navigation: {
-            nextEl: "#cartProductSlider .home-slide-button .swiper-button-next",
-            prevEl: "#cartProductSlider .home-slide-button .swiper-button-prev",
-        },
-        spaceBetween: 10,
-        slidesPerView: 2,
-        lazy: true,
-        observeSlideChildren: true,
-        observeParents: true,
-        observer: true,
-        breakpoints: {
-            250: {
-                slidesPerView: 1,
+$(document).ready(function () {
+    $('#popup-consultation').on('submit', function (e) {
+        e.preventDefault()
+        var name = $('#name').val().trim();
+        var phone = $(this).find('input[type="hidden"][name="phone"]').val().trim();
+        var email = $('#email').val().trim();
+        var comment = $('#comment').val().trim();
+        var productId = $('#consult-popup-product-id').val();
+
+        var formData = {
+            'name': name,
+            'phone': phone,
+            'email': email,
+            'comment': comment,
+            'product_id': productId
+        };
+
+        $.ajax({
+            url: '/consultation',
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 'success') {
+                    $('#popup-consultation').hide();
+                    $('.popup-consult-thanks').show();
+                } else {
+                    $('.error-message-consultation').text(response.message).show();
+                }
             },
-            450: {
-                slidesPerView: 2,
+            error: function (xhr, status, error) {
+                $('.error-message-consultation').empty().show();
+
+                if (xhr.status === 422) {
+                    var errors = xhr.responseJSON.errors;
+                    for (var field in errors) {
+                        var errorMessage = errors[field].join('<br>');
+                        var errorElement = '<div class="error-item"><span>' + errorMessage + '</span></div>';
+                        $('.error-message-consultation').append(errorElement);
+                    }
+                } else {
+                    $('.error-message-consultation').text('Произошла ошибка. Попробуйте снова.').show();
+                }
             }
-        }
-    });
-    $('#cartProductSlider .home-products-nav .item').on('click', function () {
-        var activeItem = $(this).attr('data-cat');
-        if (activeItem != 'all') {
-            $('#cartProductSlider .home-products-nav .item').removeClass('active');
-            $('#cartProductSlider .home-products-item').removeClass('show').addClass('hide');
-            $(this).addClass('active');
-            $('#cartProductSlider .home-products-item[data-ids="' + activeItem + '"]').removeClass('hide').addClass('show');
-            cartSlider.update();
-        } else {
-            $('#cartProductSlider .home-products-nav .item').removeClass('active');
-            $('#cartProductSlider .home-products-item').removeClass('hide');
-            $(this).addClass('active');
-            cartSlider.update();
-        }
+        });
     });
 
-    $(document).ready(function () {
-        $('#popup-consultation').on('submit', function (e) {
-            e.preventDefault()
-            var name = $('#name').val().trim();
-            var phone = $(this).find('input[type="hidden"][name="phone"]').val().trim();
-            var email = $('#email').val().trim();
-            var comment = $('#comment').val().trim();
-            var productId = $('#consult-popup-product-id').val();
+    $('#fast-order-form').on('submit', function (e) {
+        e.preventDefault();
 
-            var formData = {
-                'name': name,
-                'phone': phone,
-                'email': email,
-                'comment': comment,
-                'product_id': productId
-            };
+        let formData = {
+            product_id: $('#fast-order-product-id').val(),
+            quantity: $('#input-quantity').val(),
+            name: $('#fast_order_name').val(),
+            phone: $(this).find('input[name="phone"][type="hidden"]').val(),
+            email: $('#fast_order_email').val(),
+            comment: $('#fast_order_comment').val(),
+            total_price: $('#fast-order-popup .total-price').text(),
+        };
 
-            $.ajax({
-                url: '/consultation',
-                type: 'POST',
-                data: formData,
-                dataType: 'json',
-                success: function (response) {
-                    if (response.status === 'success') {
-                        $('#popup-consultation').hide();
-                        $('.popup-consult-thanks').show();
-                    } else {
-                        $('.error-message-consultation').text(response.message).show();
-                    }
-                },
-                error: function (xhr, status, error) {
-                    $('.error-message-consultation').empty().show();
+        $.ajax({
+            url: '/fast-order',
+            method: 'POST',
+            data: formData,
+            success: function (response) {
+                if (response.status === 'success') {
+                    $('#order-popup').hide();
+                    $('#fast-order-form').hide();
+                    $('.consult-title').hide();
+                    $('.fast-order-success').show();
+                }
+            },
+            error: function (xhr, status, error) {
+                $('.error-message-fast-order').empty().show();
 
-                    if (xhr.status === 422) {
-                        var errors = xhr.responseJSON.errors;
-                        for (var field in errors) {
-                            var errorMessage = errors[field].join('<br>');
-                            var errorElement = '<div class="error-item"><span>' + errorMessage + '</span></div>';
-                            $('.error-message-consultation').append(errorElement);
-                        }
-                    } else {
-                        $('.error-message-consultation').text('Произошла ошибка. Попробуйте снова.').show();
+                if (xhr.status === 422) {
+                    var errors = xhr.responseJSON.errors;
+                    for (var field in errors) {
+                        var errorMessage = errors[field].join('<br>');
+                        var errorElement = '<div class="error-item"><span>' + errorMessage + '</span></div>';
+                        $('.error-message-fast-order').append(errorElement);
                     }
                 }
-            });
+            }
         });
-
-        $('#fast-order-form').on('submit', function (e) {
-            e.preventDefault();
-
-            let formData = {
-                product_id: $('#fast-order-product-id').val(),
-                quantity: $('#input-quantity').val(),
-                name: $('#fast_order_name').val(),
-                phone: $(this).find('input[name="phone"][type="hidden"]').val(),
-                email: $('#fast_order_email').val(),
-                comment: $('#fast_order_comment').val(),
-                total_price: $('#fast-order-popup .total-price').text(),
-            };
-
-            $.ajax({
-                url: '/fast-order',
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    if (response.status === 'success') {
-                        $('#order-popup').hide();
-                        $('#fast-order-form').hide();
-                        $('.consult-title').hide();
-                        $('.fast-order-success').show();
-                    }
-                },
-                error: function (xhr, status, error) {
-                    $('.error-message-fast-order').empty().show();
-
-                    if (xhr.status === 422) {
-                        var errors = xhr.responseJSON.errors;
-                        for (var field in errors) {
-                            var errorMessage = errors[field].join('<br>');
-                            var errorElement = '<div class="error-item"><span>' + errorMessage + '</span></div>';
-                            $('.error-message-fast-order').append(errorElement);
-                        }
-                    }
-                }
-            });
-        });
-
-        $('#report-availability-form').on('submit', function (e) {
-            e.preventDefault();
-
-            let formData = {
-                product_id: $(this).find('#button-submit-report-availability').data('product-id'),
-                name: $('#report_order_name').val(),
-                phone: $(this).find('input[name="phone"][type="hidden"]').val(),
-                email: $('#report_order_email').val(),
-            };
-
-            $.ajax({
-                url: '/report-availability',
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    if (response.status === 'success') {
-                        $('#report-availability-form').hide();
-                        $('.report-availability-success').show();
-                        $('#report_order_name').val('');
-                        $('#report_order_phone').val('');
-                        $('#report_order_email').val('');
-                    }
-                },
-                error: function (xhr, status, error) {
-                    $('.error-message-report-order').empty().show();
-
-                    if (xhr.status === 422) {
-                        var errors = xhr.responseJSON.errors;
-                        for (var field in errors) {
-                            var errorMessage = errors[field].join('<br>');
-                            var errorElement = '<div class="error-item"><span>' + errorMessage + '</span></div>';
-                            $('.error-message-report-order').append(errorElement);
-                        }
-                    }
-                }
-            });
-        });
-
     });
-}
+
+    $('#report-availability-form').on('submit', function (e) {
+        e.preventDefault();
+
+        let formData = {
+            product_id: $(this).find('#button-submit-report-availability').data('product-id'),
+            name: $('#report_order_name').val(),
+            phone: $(this).find('input[name="phone"][type="hidden"]').val(),
+            email: $('#report_order_email').val(),
+        };
+
+        $.ajax({
+            url: '/report-availability',
+            method: 'POST',
+            data: formData,
+            success: function (response) {
+                if (response.status === 'success') {
+                    $('#report-availability-form').hide();
+                    $('.report-availability-success').show();
+                    $('#report_order_name').val('');
+                    $('#report_order_phone').val('');
+                    $('#report_order_email').val('');
+                }
+            },
+            error: function (xhr, status, error) {
+                $('.error-message-report-order').empty().show();
+
+                if (xhr.status === 422) {
+                    var errors = xhr.responseJSON.errors;
+                    for (var field in errors) {
+                        var errorMessage = errors[field].join('<br>');
+                        var errorElement = '<div class="error-item"><span>' + errorMessage + '</span></div>';
+                        $('.error-message-report-order').append(errorElement);
+                    }
+                }
+            }
+        });
+    });
+
+});
+
 
 function showHideSubCategories() {
     let openSubMenu = $('.openSubMenu')
@@ -533,4 +489,82 @@ function showHideSubCategories() {
             }
         })
     })
+}
+
+
+function popupSearchAction(){
+    const searchField = document.querySelector('#search-popup #search input[name="search-popup"]');
+    const searchButton = document.querySelector('#search-popup #search button');
+    const dropdownMenu = document.querySelector('#search-popup #search .dropdown-menu');
+    let searchLink = '/search';
+    if(language !== 'uk'){
+        searchLink = `/${language}/search`;
+    }
+
+    document.addEventListener('click', function (e){
+        if(!e.target.closest('.dropdown-menu') && !e.target.closest('input[name="search-popup"]')){
+            dropdownMenu.style.display = 'none';
+        }
+    })
+
+    searchField.addEventListener('click', function (){
+        if(searchField.value.length>=3){
+            dropdownMenu.style.display = 'block';
+        }
+    })
+
+    searchButton.addEventListener('click', function (){
+        if(searchField.value.trim().length !== 0){
+            searchLink = '/search?search='+searchField.value.trim();
+            if(language !== 'uk'){
+                searchLink = `/${language}/search?search=${searchField.value.trim()}`;
+            }
+        }
+        window.location.href = searchLink;
+    })
+
+    const debouncedSearch = debounce(popupSearchHandler.bind(null, dropdownMenu), 500);
+    searchField.addEventListener('input', debouncedSearch)
+}
+
+function popupSearchHandler(dropdownMenu, event) {
+    const query = event.target.value.trim();
+    let url = '/get-search-items';
+    if(language !== 'uk'){
+        let url = `/${language}/get-search-items`;
+    }
+
+    if(query.length >= 3){
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {search: query},
+            dataType: 'json',
+            success: function (response) {
+                dropdownMenu.innerHTML = response.data.view;
+                if(response.data.total_count === 0){
+                    dropdownMenu.style.display = 'none';
+                }
+                else{
+                    dropdownMenu.style.display = 'block';
+                }
+            },
+            error: function (xhr, status, error) {
+
+            }
+        });
+    }
+    else {
+        dropdownMenu.style.display = 'none';
+    }
+}
+
+function debounce(fn, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            fn.apply(this, args);
+        }, delay);
+    };
 }

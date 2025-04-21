@@ -8,7 +8,7 @@
     <div class="account-products-list flex-wrap">
 
         @foreach($viewedProducts as $viewedProduct)
-          <div class="item product-default" data-ids="{{$viewedProduct->id}}" id="homeSpecialItem{{$viewedProduct->id}}">
+          <div class="item product-default product-default__splide" data-ids="{{$viewedProduct->id}}" id="homeSpecialItem{{$viewedProduct->id}}">
             <div class="product-default-texts-wrapper">
               <div class="top flex-justify">
                 <div class="sku">{{__('general-translate.product_card.code')}} {{$viewedProduct->code}}</div>
@@ -17,24 +17,28 @@
                     title="{{__('general-translate.product_card.add_wishlist')}}"></button>
                 </div>
               </div>
-              <div class="image swiper">
-                <div class="swiper-wrapper">
-                  @foreach($viewedProduct->getMedia('images') as $key => $image)
-                    <a href="{{route('products.show', ['product' => $viewedProduct->slugEn])}}"
-                       data-src="{{$image->getUrl()}}"
-                       class="swiper-slide item flex-center swiper-slide-next" data-fancybox="viewed-products{{$viewedProduct->id}}"
-                       data-caption="{{$viewedProduct->name}}">
-                      <img
-                        src="{{$image->getUrl('preview')}}"
-                        alt="{{$viewedProduct->name}}" title="{{$viewedProduct->name}}"
-                        class="swiper-lazy">
-                    </a>
-                  @endforeach
-
+                <div class="splide default-products-images">
+                    <div class="splide__track">
+                        <ul class="splide__list">
+                            @foreach($viewedProduct->getMedia('images') as $key => $image)
+                                <li class="splide__slide flex-center"
+                                    role="group">
+                                    <a href="{{route('products.show', ['product' => $viewedProduct->slugEn])}}"
+                                       data-src="{{$image->getUrl()}}"
+                                       class="swiper-slide item flex-center swiper-slide-next"
+                                       data-fancybox="gallery{{$viewedProduct->id}}"
+                                       data-caption="{{$viewedProduct->name}}">
+                                        <img loading="lazy"
+                                             src="{{$image->getUrl('preview')}}"
+                                             alt="{{$viewedProduct->name}}"
+                                             title="{{$viewedProduct->name}}"
+                                             width="310" height="310">
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
-                <div class="swiper-button-next button"></div>
-                <div class="swiper-button-prev button"></div>
-                <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
               <div class="review">
                 <i class="fal fa-star"></i>
                 <i class="fal fa-star"></i>
@@ -62,21 +66,6 @@
           </div>
         @endforeach
     </div>
-
-    @push('scripts')
-      <script>
-        $(document).ready(function () {
-          var homeProductsItem = new Swiper(".account-products-list .product-default .image", {
-            navigation: {
-              nextEl: ".account-products-list .product-default .image .swiper-button-next",
-              prevEl: ".account-products-list .product-default .image .swiper-button-prev",
-            },
-            lazy: true,
-          });
-        });
-      </script>
-    @endpush
-
   </div>
 @endsection
 @push('fixed-catalog')

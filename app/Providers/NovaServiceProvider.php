@@ -6,6 +6,7 @@ use App\Nova\Attribute;
 use App\Nova\Banner;
 use App\Nova\Category;
 use App\Nova\Consultation;
+use App\Nova\CustomBlock;
 use App\Nova\FastOrder;
 use App\Nova\Feedback;
 use App\Nova\Implementation;
@@ -67,6 +68,10 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
                 MenuSection::make('Банери', [
                     MenuItem::resource(Banner::class),
+                ])->icon('clipboard')->collapsable(),
+
+                MenuSection::make('Кастомнi Блоки', [
+                    MenuItem::resource(CustomBlock::class),
                 ])->icon('clipboard')->collapsable(),
 
                 MenuSection::make('Блог', [

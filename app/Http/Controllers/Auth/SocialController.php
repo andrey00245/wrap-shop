@@ -19,7 +19,6 @@ class SocialController extends Controller
     {
         $user = Socialite::driver('google')->user();
 
-        // Логика авторизации и регистрации
         $authUser = $this->findOrCreateUser($user, 'google');
         Auth::login($authUser, true);
 

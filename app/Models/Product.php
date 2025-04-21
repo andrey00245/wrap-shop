@@ -74,8 +74,8 @@ class Product extends Model implements HasMedia
 
     protected $casts = [
         'banner_title' => 'json',
-        'slug' => 'json',
-        'name' => 'json',
+        'slug'         => 'json',
+        'name'         => 'json',
         'descriptions' => 'json',
     ];
 
@@ -416,12 +416,8 @@ class Product extends Model implements HasMedia
         if (empty($newUrl)) {
             $newUrl = '';
         }
-//        dd(route('search'), request()->header('referer'));
-
-
 
         if (preg_match('/\b' . preg_quote(route('search'), '/') . '\b/u', request()->header('referer'))) {
-//dd(1);
             if ($request->get('search')) {
                 $search = ['search' => $request->get('search')];
             }
@@ -445,9 +441,6 @@ class Product extends Model implements HasMedia
         }
 
         $merged = array_merge($search, $prices, $selectedFilterValues, $sortParams);
-
-
-//        dd(http_build_query($merged));
         if (http_build_query($merged) !== ""){
             $responseArray['new_url'] = $newUrl . '?' . http_build_query($merged);
         }
@@ -553,6 +546,11 @@ class Product extends Model implements HasMedia
         return round($price / self::getCurrencyRate(), 0);
     }
 
+    public function customBlocks()
+    {
+        return $this->belongsToMany(CustomBlock::class);
+    }
+
     public function getMinOrderCount()
     {
         return $this->attributes()->where('field_name', 'min_order_quantity')->first()?->pivot?->value ?? 1;
@@ -628,6 +626,33 @@ class Product extends Model implements HasMedia
             return $data['rate'] ?? 42;
         }
 
-        return 42;
+       return 42;
+   }
+
+    public function volumeVariants()
+    {
+        return $this->belongsToMany(Product::class, 'product_volume_variants', 'product_id', 'variant_product_id');
+    }
+
+    public function isVolumeVariantOf()
+    {
+        return $this->belongsToMany(Product::class, 'product_volume_variants', 'variant_product_id', 'product_id');
+    }
+
+    public function allVolumeVariants()
+    {
+        return $this->volumeVariants->merge($this->isVolumeVariantOf);
+    }
+
+    public function hasVolumeAttribute()
+    {
+        return $this->attributes()->where('field_name', 'volume')->exists();
+    }
+
+    public function scopeHasVolume($query)
+    {
+        return $query->whereHas('attributes', function ($q) {
+            $q->where('field_name', 'volume');
+        });
     }
 }

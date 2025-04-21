@@ -13,6 +13,7 @@
     @include('base.components.bestseller')
 {{--    @include('base.components.3m-color-wrap')--}}
 {{--    @include('base.components.yellotools')--}}
+    @include('base.components.custom-blocks')
     @include('base.components.latest')
     @include('base.components.examples-of-work')
 

@@ -36,6 +36,57 @@ class Product extends Resource
         'id', 'code', 'external_code',
     ];
 
+    public static function searchableColumns()
+    {
+        return ['name->' . app()->getLocale()];
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->getTranslation('name', app()->getLocale());
+    }
+
+    public static function relatableVolumeVariants(NovaRequest $request, $query)
+    {
+        $currentProductId = $request->resourceId;
+
+        return $query
+            ->whereHas('attributes', function ($q) {
+                $q->where('field_name', 'volume');
+            })
+
+            ->where('id', '!=', $currentProductId)
+
+            ->whereDoesntHave('isVolumeVariantOf', function ($q) use ($currentProductId) {
+                $q->where('product_id', $currentProductId);
+            })
+
+            ->whereDoesntHave('volumeVariants', function ($q) use ($currentProductId) {
+                $q->where('variant_product_id', $currentProductId);
+            })
+
+            ->whereNotIn('id', function ($sub) use ($currentProductId) {
+                $sub->select('variant_product_id')
+                    ->from('product_volume_variants')
+                    ->where('product_id', $currentProductId);
+            })
+            ->whereNotIn('id', function ($sub) use ($currentProductId) {
+                $sub->select('product_id')
+                    ->from('product_volume_variants')
+                    ->where('variant_product_id', $currentProductId);
+            });
+    }
+
+//    public static function searchable(Request $request)
+//    {
+//        $query = parent::searchable($request);
+//
+//        // Фильтруем только те товары, которые имеют атрибут "volume"
+//        return $query->whereHas('attributes', function ($q) {
+//            $q->where('field_name', 'volume');
+//        });
+//    }
+
     public function fields(Request $request)
     {
         return [
@@ -84,6 +135,17 @@ class Product extends Resource
                         ])
                     ];
                 }),
+
+            BelongsToMany::make('Обʼєми (варіанти)', 'volumeVariants', self::class)
+                ->fields(function () {
+                    return [];
+                })
+                ->singularLabel('Обʼєм')
+                ->canSee(function () {
+                    return $this->hasVolumeAttribute();
+                })
+                ->searchable()
+                ->hideFromIndex()
         ];
     }
 

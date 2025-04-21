@@ -5,7 +5,6 @@
         <div class="inner form-horizontal">
             <div class="form-group">
                 <div class="form">
-                    <!-- Имя -->
                     <div class="form-group group-name">
                         <label for="name" class="login-info-text text-center margintop20">{!! __('popup.consult_popup.name') !!}</label>
                         <input type="text" id="report_order_name" name="name" class="form-control form-field"
@@ -13,15 +12,12 @@
                                value="{{ auth()->check() ? auth()->user()->name : '' }}">
                     </div>
 
-                    <!-- Телефон -->
                     <div class="form-group group-telephone">
                         <label for="report_order_phone" class="login-info-text text-center margintop20">{!! __('popup.consult_popup.phone') !!}</label>
                         <input type="tel" id="report_order_phone" name="phone" class="form-control form-field"
                                placeholder="{{__('popup.consult_popup.enter_phone_placeholder')}}"
                                value="{{ auth()->check() ? auth()->user()->phone : '' }}">
                     </div>
-
-                    <!-- Email -->
                     <div class="form-group group-email">
                         <label for="email" class="login-info-text text-center margintop20">{{__('popup.consult_popup.email')}}</label>
                         <input type="email" id="report_order_email" name="email" class="form-control form-field"

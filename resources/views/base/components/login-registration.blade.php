@@ -80,19 +80,21 @@
       <p>{{__('popup.login_register.forgot_password')}}</p>
       <p>{{__('popup.login_register.enter_you_email')}}</p>
       <div class="popup-form">
-        <form id="form-forgot_password" class="form" action="#" novalidate="" method="post"
-              enctype="multipart/form-data">
-          <div class="form-group group-email">
-            <input class="form-control form-field" type="email" name="email" id="input-email-forgot"
-                   placeholder="E-Mail" autocomplete="off">
-            <input type="hidden" name="account" id="account_forgot" class="account_form" value="login">
-          </div>
-          <div class="wrap-send">
-            <button type="submit" class="colord button send_btn btn-social" data-account="forgot_password"
-                    id="button-forgot-popup"><i class="fas fa-chevron-right"
-                                                aria-hidden="true"></i>{{__('popup.login_register.send')}}</button>
-          </div>
-        </form>
+          <form id="form-forgot_password" class="form" action="{{ route('password.email') }}" method="POST">
+              @csrf
+              <div class="form-group group-email">
+                  <input class="form-control form-field" type="email" name="email" id="input-email-forgot"
+                         placeholder="E-Mail" autocomplete="off" required>
+                  <input type="hidden" name="account" value="login">
+              </div>
+              <div class="wrap-send">
+                  <button type="submit" class="colord button send_btn btn-social" id="button-forgot-popup">
+                      <i class="fas fa-chevron-right" aria-hidden="true"></i> Отправить
+                  </button>
+              </div>
+          </form>
+
+          <div id="forgot-response" style="margin-top: 10px; color: green; display: none;"></div>
       </div>
     </div>
   </div>
@@ -168,6 +170,9 @@
             <button class="send_otp_btn otp_btn-s btnverifyloginpopup button colord" id="button-verify-loginpopup" type="submit">
               <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.create_a_profile')}}
             </button>
+            <span class="send_otp_btn otp_btn-s btnverifyloginpopup button colord" id="login-popup-back" type="submit">
+              <i class="fas fa-chevron-left" aria-hidden="true"></i> {{__('popup.login_register.sign_in')}}
+            </span>
           </span>
                             <p class="register-description">{!! __('popup.login_register.register_conditions') !!}</p>
                         </div>

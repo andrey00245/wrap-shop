@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Banner;
 use App\Models\Category;
+use App\Models\CustomBlock;
 use App\Models\Implementation;
 use App\Models\Product;
 use Illuminate\View\View;
@@ -22,6 +23,8 @@ class IndexController extends Controller
             ->where('is_active', true)
             ->orderBy('position')
             ->get();
+
+        $customBlocks = CustomBlock::query()->where('is_active',true)->get();
 
         $products = Product::query()
             ->whereHas('media')
@@ -68,7 +71,8 @@ class IndexController extends Controller
                 'latestCategory',
                 'products',
                 'banners',
-                'exampleWorks'
+                'exampleWorks',
+                'customBlocks'
             )
         );
     }

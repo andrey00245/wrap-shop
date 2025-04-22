@@ -655,4 +655,9 @@ class Product extends Model implements HasMedia
             $q->where('field_name', 'volume');
         });
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

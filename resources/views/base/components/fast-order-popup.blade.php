@@ -108,7 +108,7 @@
         </div>
     </form>
 
-    <div class="popup-consult-thanks flex-center fast-order-success" style="display:none;">
+    <div class="success-form flex-center fast-order-success" style="display:none;">
         <i class="fal fa-smile"></i>
         <span>{!! __('popup.fast_order.thanks_message') !!}</span>
     </div>

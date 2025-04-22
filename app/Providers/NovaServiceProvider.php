@@ -16,6 +16,7 @@ use App\Nova\Order;
 use App\Nova\PriceType;
 use App\Nova\PrivacyPolicy;
 use App\Nova\Product;
+use App\Nova\Review;
 use App\Nova\Setting;
 use App\Nova\User;
 use App\Nova\Video;
@@ -46,7 +47,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                 MenuSection::dashboard(Main::class)->icon('chart-bar'),
                 MenuSection::make('Користувачі', [
                     MenuItem::resource(User::class),
-                    MenuItem::resource(Feedback::class),
+                    MenuItem::resource(Review::class),
                 ])->icon('user')->collapsable(),
 
                 MenuSection::make('Товари', [

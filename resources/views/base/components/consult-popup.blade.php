@@ -8,19 +8,19 @@
                     <!-- Имя -->
                     <div class="form-group group-name">
                         <label for="name" class="login-info-text text-center margintop20">{!! __('popup.consult_popup.name') !!}</label>
-                        <input type="text" id="name" name="name" required class="form-control form-field" placeholder="{{__('popup.consult_popup.enter_name_placeholder')}}">
+                        <input type="text" id="name" name="name" required value="{{ auth()->check() ? auth()->user()->name : ''}}" class="form-control form-field" placeholder="{{__('popup.consult_popup.enter_name_placeholder')}}">
                     </div>
 
                     <!-- Телефон -->
                     <div class="form-group group-telephone">
                         <label for="phone" class="login-info-text text-center margintop20">{!! __('popup.consult_popup.phone') !!}</label>
-                        <input type="tel" id="phone_consultation" name="phone" required class="form-control form-field" placeholder="{{__('popup.consult_popup.enter_phone_placeholder')}}">
+                        <input type="tel" id="phone_consultation" name="phone" value="{{ auth()->check() ? auth()->user()->phone : ''}}" required class="form-control form-field" placeholder="{{__('popup.consult_popup.enter_phone_placeholder')}}">
                     </div>
 
                     <!-- Email -->
                     <div class="form-group group-email">
                         <label for="email" class="login-info-text text-center margintop20">{{__('popup.consult_popup.email')}}</label>
-                        <input type="email" id="email" name="email" class="form-control form-field" placeholder="{{__('popup.consult_popup.enter_email_placeholder')}}">
+                        <input type="email" id="email" name="email" value="{{ auth()->check() ? auth()->user()->email : ''}}" class="form-control form-field" placeholder="{{__('popup.consult_popup.enter_email_placeholder')}}">
                     </div>
 
                     <!-- Комментарий -->
@@ -47,7 +47,7 @@
         </div>
     </form>
 
-    <div class="popup-consult-thanks flex-center" style="display:none;">
+    <div class="popup-consult-thanks success-form flex-center" style="display:none;">
         <i class="fal fa-smile"></i>
         <span>{!! __('popup.consult_popup.thanks_message') !!}</span>
     </div>

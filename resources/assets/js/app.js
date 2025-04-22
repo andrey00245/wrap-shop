@@ -108,6 +108,17 @@ $(document).ready(function () {
         $('.head-top').removeClass('active');
     }
 
+    function reviewPopup() {
+        $('#review-popup').toggleClass('active');
+        $('#report-availability-popup').removeClass('active');
+        $('#fast-order-popup').removeClass('active');
+        $('#consult-popup').removeClass('active');
+        $('#search-popup').removeClass('active');
+        $('#simple-popup').removeClass('active');
+        $('#cart-popup').removeClass('active');
+        $('.head-top').removeClass('active');
+    }
+
     function menuPopup() {
         $('.head-top').toggleClass('active');
         $('#login-popup').removeClass('active');
@@ -182,6 +193,7 @@ $(document).ready(function () {
 
     $(".fast-order-popup-open").on("click", function () {
         fastOrderPopup()
+        // $('.fast-order-success').hide();
     })
 
     $(".fast-order-popup-close").on("click", function () {
@@ -200,6 +212,26 @@ $(document).ready(function () {
         $('#report-availability-form').show();
 
         reportAvailabilityPopup()
+    })
+
+    $(".reviews-open").on("click", function () {
+        $('#button-submit-review').attr('data-product-id', $(this).data('product-id'));
+
+        reviewPopup()
+    })
+
+    $(".close-review").on("click", function () {
+        $('#button-submit-review').attr('data-product-id', $(this).data('product-id'));
+
+        $('#review-alert').html('');
+
+        $('#form-review')[0].reset();
+        reviewPopup()
+    })
+
+    $('.review-form-open').on("click", function () {
+        $(this).hide();
+        $('#form-review').show();
     })
 
     // $(".login-show").click(function () {

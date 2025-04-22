@@ -127,11 +127,20 @@ class ProductController extends Controller
             session()?->put('viewProducts', $viewProducts);
         }
 
+        $reviews = $product->reviews->where('is_active', true)->sortByDesc('created_at');
+        $average = $reviews->avg('rating') ?? 0;
+        $count = $reviews->count();
+        $averagePercent = ($average / 5) * 100;
+
         return view('base.pages.products.show', [
             'product' => $product,
             'recommends' => $products,
             'exampleWorks' => $exampleWorks,
             'latestCategory' => $latestCategory,
+            'reviews' => $reviews,
+            'average' => $average,
+            'count' => $count,
+            'averagePercent' => $averagePercent,
         ]);
     }
 

@@ -431,17 +431,30 @@
                     <div class="button-sort category-sort-open button"><i
                             class="fal fa-sort-alt"></i>{{__('product-index.sort')}}</div>
                 </div>
+                @php
+                    $blockCount = 0;
+                    $bannerIndex = 0;
+                @endphp
+
                 <div class="category-products flex-wrap">
-                    <a href="javascript:void(0)" title="3m color"
-                       class="category-products-item product-default product-layout banner product-grid">
-                        <img class="vertical"
-                             src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-vert.webp"
-                             alt="3m color" title="3m color">
-                        <img class="gorizont"
-                             src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-gor.webp"
-                             alt="3m color" title="3m color">
-                    </a>
                     @foreach($products as $product)
+                        @php $blockCount++; @endphp
+                        @if($blockCount % 6 == 0 && isset($productBanners[$bannerIndex]))
+                        <a href="{{$productBanners[$bannerIndex]->url}}"
+                               class="category-products-item product-default product-layout banner product-grid">
+                                <img class="vertical"
+                                     src="{{$productBanners[$bannerIndex]->getVerticalPreview()}}"
+                                >
+                                <img class="gorizont"
+                                     src="{{$productBanners[$bannerIndex]->getHorizontalPreview()}}"
+                                >
+                            </a>
+                            @php
+                                $banner = $productBanners[$bannerIndex];
+                                $bannerIndex++;
+                                $blockCount++;
+                            @endphp
+                        @endif
                         <div class="category-products-item product-default product-default__splide product-layout product-grid"
                              id="categoryProductsItem{{$product->id}}">
                             @if($product->is_top_seller)

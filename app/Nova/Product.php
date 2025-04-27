@@ -11,6 +11,7 @@ use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -33,13 +34,18 @@ class Product extends Resource
     }
 
     public static $search = [
-        'id', 'code', 'external_code',
+        'code',
+        'external_code',
+        'article',
+        'name->en',
+        'name->ru',
+        'name->uk',
     ];
 
-    public static function searchableColumns()
-    {
-        return ['name->' . app()->getLocale()];
-    }
+//    public static function searchableColumns()
+//    {
+//        return ['name->' . app()->getLocale()];
+//    }
 
     public function getNameAttribute()
     {
@@ -123,8 +129,12 @@ class Product extends Resource
             Images::make('Фото', 'images')
                 ->conversionOnIndexView('preview'),
 
-            Boolean::make('Лідери продажів','is_top_seller'),
-            Boolean::make('Активний','is_active'),
+            Boolean::make('Лідери продажів','is_top_seller')
+                ->sortable(),
+            Number::make('Кількість','stock')
+                ->sortable(),
+            Boolean::make('Активний','is_active')
+                ->sortable(),
             HasMany::make('Типи Цін','prices',ProductPrices::class),
             BelongsToMany::make('Атрибуты', 'attributes', Attribute::class)
                 ->fields(function () {
@@ -154,7 +164,7 @@ class Product extends Resource
             NovaTabTranslatable::make([
                 Text::make('Назва', 'banner_title'),
             ])->hideFromIndex(),
-            Images::make('Фото', 'banner_images')
+            Images::make('Фото Вигляду', 'banner_images')
                 ->conversionOnIndexView('preview'),
         ];
     }

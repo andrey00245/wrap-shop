@@ -85,7 +85,7 @@ class SearchController extends Controller
             $sortBy = 'id';
             $sortDirection = 'desc';
         }
-        $columns = ['name'];
+        $columns = ['name', 'code'];
         $searchValue = $request->get('search');
         $includeDescription = $request->boolean('description');
         if ($includeDescription) {
@@ -187,10 +187,10 @@ class SearchController extends Controller
 
         $responseArray = Product::getCountProducts($categories, $request, $selectedFilterValues, $attributesArray);
         return view('base.pages.products.search', [
-            'products' => $products,
-            'minPrice' => $minPrice,
-            'maxPrice' => $maxPrice,
-            'attributes' => $attributes->flatten()->unique('field_name') ?? collect(),
+            'products'      => $products,
+            'minPrice'      => $minPrice,
+            'maxPrice'      => $maxPrice,
+            'attributes'    => $attributes->flatten()->unique('field_name') ?? collect(),
             'responseArray' => $responseArray,
         ]);
     }
@@ -198,7 +198,7 @@ class SearchController extends Controller
 
     public function popupSearch(Request $request)
     {
-        $columns = ['name'];
+        $columns = ['name', 'code'];
 
         $products = Product::query()
             ->whereHas('prices', function ($query) {
@@ -214,15 +214,16 @@ class SearchController extends Controller
             ->whereLikeInsensitive($columns, $request->get('search'))
             ->get();
 
-        return response()->json(['data' =>
-            [
-                'view' => view('base.components.search-product-list', [
-                    'products' => $products->take(3),
-                    'count' => $products->count() - 3,
-                ])->render(),
-                'link' => route('search', ['search' => $request->get('search')]),
-                'total_count' => $products->count(),
-            ]
+        return response()->json([
+            'data' =>
+                [
+                    'view'        => view('base.components.search-product-list', [
+                        'products' => $products->take(3),
+                        'count'    => $products->count() - 3,
+                    ])->render(),
+                    'link'        => route('search', ['search' => $request->get('search')]),
+                    'total_count' => $products->count(),
+                ]
         ]);
     }
 }

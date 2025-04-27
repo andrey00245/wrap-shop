@@ -3,20 +3,22 @@
 namespace App\Nova;
 
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
+use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Panel;
 
-class Banner extends Resource
+class ProductBanner extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Banner>
+     * @var class-string<\App\Models\ProductBanner>
      */
-    public static $model = \App\Models\Banner::class;
+    public static $model = \App\Models\ProductBanner::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -24,12 +26,6 @@ class Banner extends Resource
      * @var string
      */
     public static $title = 'id';
-
-
-    public static function label()
-    {
-        return 'Банери';
-    }
 
     /**
      * The columns that should be searched.
@@ -39,6 +35,11 @@ class Banner extends Resource
     public static $search = [
         'id',
     ];
+
+    public static function label()
+    {
+        return 'Банери продуктів';
+    }
 
     /**
      * Get the fields displayed by the resource.
@@ -50,12 +51,24 @@ class Banner extends Resource
     {
         return [
             ID::make()->sortable(),
-            Images::make( 'Фото','main')
-                ->conversionOnIndexView('preview'),
-            Text::make('Силка','url'),
 
-            Number::make('Позиція','position')->sortable(),
-            Boolean::make('Активний','is_active')->sortable(),
+            new Panel('Банер Горизонтальний', [
+                Images::make( 'Фото','horizontal')
+                    ->croppable(true)
+                    ->croppingConfigs(['aspectRatio' => 479 / 93])
+                    ->mustCrop(),
+            ]),
+
+            new Panel('Банер Вертикальний', [
+                Images::make( 'Фото','vertical')
+                    ->croppable(true)
+                    ->croppingConfigs(['aspectRatio' => 283 / 485])
+                    ->mustCrop(),
+
+                Text::make('Посилання','url')->hideFromIndex(),
+                Boolean::make('Активный', 'is_active'),
+                Number::make('Позиция', 'position'),
+            ]),
         ];
     }
 

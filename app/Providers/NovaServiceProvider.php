@@ -16,6 +16,8 @@ use App\Nova\Order;
 use App\Nova\PriceType;
 use App\Nova\PrivacyPolicy;
 use App\Nova\Product;
+use App\Nova\ProductBanner;
+use App\Nova\ReportAvailability;
 use App\Nova\Review;
 use App\Nova\Setting;
 use App\Nova\User;
@@ -57,6 +59,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                     MenuItem::resource(PriceType::class),
                     MenuItem::resource(Order::class),
                     MenuItem::resource(Implementation::class),
+                    MenuItem::resource(ReportAvailability::class),
 
                 ])->icon('collection')->collapsable(),
 
@@ -69,6 +72,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
                 MenuSection::make('Банери', [
                     MenuItem::resource(Banner::class),
+                    MenuItem::resource(ProductBanner::class),
                 ])->icon('clipboard')->collapsable(),
 
                 MenuSection::make('Кастомнi Блоки', [

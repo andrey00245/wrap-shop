@@ -385,13 +385,13 @@
             </div>
 
             <div class="code-wishlist-wrapper mobil">
-                {{--                <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>--}}
+                                <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
                 <div class="wishlist">
                     <button
                         type="button"
                         title="В закладки"
-                        {{--                        class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"--}}
-                        {{--                        data-product-id="{{$product->id}}"--}}
+                                                class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"
+                                                data-product-id="{{$product->id}}"
                     ></button>
                 </div>
             </div>

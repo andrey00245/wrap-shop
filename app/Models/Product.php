@@ -89,17 +89,43 @@ class Product extends Model implements HasMedia
     {
         $keywords = preg_split('/\s+/', mb_strtolower($value), -1, PREG_SPLIT_NO_EMPTY);
 
-        $query->where(function ($outerQuery) use ($columns, $keywords) {
+        $allKeywords = [];
+        foreach ($keywords as $word) {
+            $allKeywords[] = $word;
+            $allKeywords[] = static::toTranslit($word);
+        }
+
+        $query->where(function ($outerQuery) use ($columns, $allKeywords) {
             foreach ($columns as $column) {
-                $outerQuery->orWhere(function ($innerQuery) use ($column, $keywords) {
-                    foreach ($keywords as $word) {
-                        $innerQuery->orWhereRaw("LOWER(products.{$column}) LIKE ?", ['%' . $word . '%']);
+                $outerQuery->orWhere(function ($innerQuery) use ($column, $allKeywords) {
+                    foreach ($allKeywords as $keyword) {
+                        if (!empty($keyword)) {
+                            $innerQuery->orWhereRaw("LOWER(products.{$column}) LIKE ?", ['%' . $keyword . '%'])
+                                ->orWhereRaw("LOWER(products.{$column}) LIKE ?", [$keyword . '%']);
+                        }
                     }
                 });
             }
         });
 
         return $query;
+    }
+
+
+    protected static function toTranslit(string $text): string
+    {
+        $map = [
+            'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'h', 'ґ' => 'g', 'д' => 'd',
+            'е' => 'e', 'є' => 'ye', 'ж' => 'zh', 'з' => 'z', 'и' => 'y', 'і' => 'i',
+            'ї' => 'yi', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n',
+            'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u',
+            'ф' => 'f', 'х' => 'kh', 'ц' => 'ts', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'shch',
+            'ь' => '', 'ю' => 'yu', 'я' => 'ya',
+
+            'ё' => 'yo', 'э' => 'e', 'ъ' => '',
+        ];
+
+        return strtr(mb_strtolower($text), $map);
     }
 
     public function getSlugEnAttribute()

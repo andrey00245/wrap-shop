@@ -11,6 +11,7 @@ return [
         'enter_email_password' => 'Login',
         'sign_in' => 'Sign in',
         'create_a_profile' => 'Create a profile',
+        'back' => 'Back',
         'recover_password' => 'Recover password',
         'forgot_password' => 'Forgot password?',
         'show_password_text' => 'Show password as plain text. Warning: this will display your password on screen.',

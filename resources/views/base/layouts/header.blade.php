@@ -1,5 +1,5 @@
 <header class="header ">
-    <div class="head-top row">
+    <div class="general-popup head-top row" id="menu-popup">
         <div class="head-top-wrap flex-justify wrap">
             <div class="head-lang flex-center" id="form-language">
                 <a href="{{ LaravelLocalization::getLocalizedURL('uk') }}"
@@ -34,7 +34,7 @@
                 <div class="title">{{__('header_footer.phone')}}</div>
                 <a href="tel:{{$settings->phone ?? '#'}}">{!! $settings->phone_view ?? '#' !!}</a>
             </div>
-            <div class="head-top-close button"><i class="fal fa-times"></i></div>
+            <div class="head-top-close button popup-close"><i class="fal fa-times"></i></div>
         </div>
     </div>
 
@@ -76,13 +76,16 @@
                 <a href="tel:+380660003202"><span>+38</span> 066 000 32 02</a>
             </div>
             <div class="head-buttons">
-                <div class="search-popup-open button search far fa-search"></div>
-                <button class="button cart-open far fa-shopping-cart dropdown-toggle"><span
+                <div class="general-popup-btn button search far fa-search"
+                data-popup="search-popup"></div>
+                <button class="button general-popup-btn far fa-shopping-cart dropdown-toggle"
+                        data-popup="cart-popup"><span
                         id="cart-total" class="cart-total flex-center">{{$cartItemsCount}}</span></button>
                 @guest
-                    <div id="wishlist-total" class="button heart login-show far fa-heart login-popup-open"><span
-                            class="wishlist-total flex-center">{{count(session()->get('wishlist', []))}}</span></div>
-                    <div class="button userform-open login-show far fa-user login-popup-open"></div>
+                    <div id="wishlist-total" class="button heart general-popup-btn far fa-heart" data-popup="login-popup">
+                        <span class="wishlist-total flex-center">{{count(session()->get('wishlist', []))}}</span>
+                    </div>
+                    <div class="button general-popup-btn far fa-user" data-popup="login-popup"></div>
                 @endguest
 
                 @auth
@@ -91,7 +94,9 @@
                             class="wishlist-total flex-center">{{auth()->user()->favoriteCount()}}</span></a>
                     <a href="{{route('account')}}" title="Особистий кабінет" class="button user far fa-user-check"></a>
                 @endauth
-                <div class="head-top-open button"><i class="far fa-bars"></i></div>
+                <div class="head-top-open button general-popup-btn" data-popup="menu-popup">
+                    <i class="far fa-bars"></i>
+                </div>
 
             </div>
         </div>

@@ -466,8 +466,6 @@ $(document).ready(function () {
         data.search = search
         data.sub_category = sub_category
         data.description = description
-        console.log(data)
-
 
         $.ajax({
             url: url,

@@ -58,7 +58,7 @@
                  title="{{$viewedProduct->name}}" class="name">{{$viewedProduct->name}}</a>
               <div class="bottom flex-center">
                 <div class="price">{{number_format($viewedProduct->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
-                <button class="button colord remarketing_cart_button" data-product_id="{{$viewedProduct->id}}"><i
+                <button class="button colord remarketing_cart_button" data-popup="report-availability-popup" data-product_id="{{$viewedProduct->id}}"><i
                     class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
                 </button>
               </div>

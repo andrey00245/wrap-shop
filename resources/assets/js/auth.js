@@ -179,11 +179,9 @@ $(document).ready(function () {
         });
     });
 
-
     $('#button-verify-loginpopup').on('click', function () {
         var phoneEmail = $('#name_email').val().trim();
         var password = $('#login_password').val().trim();
-
         $('.input-error').removeClass('input-error');
 
         if (phoneEmail.length === 0) {
@@ -200,11 +198,10 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     if (response.exists) {
-                        $(".password-group").show();
+                        $('#login-popup').attr('data-step', '2')
                         $(".password-group #login_password").attr('readonly', false)
                     } else {
-                        $(".password-group").hide();
-                        return open_pop_up("#popup-registration");
+                        $('#login-popup').attr('data-step', '5')
                     }
                 },
                 error: function () {
@@ -278,34 +275,6 @@ $(document).ready(function () {
         event.preventDefault();
         $('#logout-form').submit();
     });
-
-    function open_pop_up(e) {
-        $("#credential_picker_container").toggle();
-        $(".popup-window").hide()
-
-        $(".popup-window").removeClass('active');
-        $(".popup-overlay").addClass('active');
-        // $(".popup-overlay").fadeIn();
-        $("html").addClass('no-overflow');
-        // $(e).fadeIn().addClass('active');
-        $(e).show().addClass('active');
-
-    }
-
-    function cartPopup(e) {
-        e.preventDefault()
-
-        $('#simple-popup').removeClass('active');
-        $('#search-popup').removeClass('active');
-        $('#login-popup').removeClass('active');
-        $('.head-top').removeClass('active');
-        if ($('#cart-popup').hasClass('active')) {
-            $("html").addClass('no-overflow');
-        } else {
-            $('#cart-popup').toggleClass('active');
-            $("html").removeClass('no-overflow');
-        }
-    }
 });
 
 function decimalAndIntParts(number){

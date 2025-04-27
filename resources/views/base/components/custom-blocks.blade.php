@@ -102,7 +102,8 @@
                                             </button>
                                         @else
                                             <button
-                                                class="button colord remarketing_cart_button report-availability-open"
+                                                class="button colord remarketing_cart_button general-popup-btn"
+                                                data-popup="report-availability-popup"
                                                 data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
                                                     class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
                                         @endif

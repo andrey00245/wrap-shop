@@ -1,4 +1,4 @@
-<div id="report-availability-popup" class="popup-overlay popup-right">
+<div id="report-availability-popup" class="popup-right general-popup">
     <div class="consult-title">Повідомити про наявність</div>
     <br>
     <form class="popup-window active" id="report-availability-form" style="display: block;">
@@ -47,5 +47,5 @@
         <span>Ви отримаєте повідомлення, коли товар з'явиться в наявності.</span>
     </div>
 
-    <div class="close button fal fa-times report-availability-close"></div>
+    <div class="close button fal fa-times popup-close"></div>
 </div>

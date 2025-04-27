@@ -1,4 +1,4 @@
-<div id="search-popup" class="popup-right">
+<div id="search-popup" class="popup-right general-popup">
   <div class="search-popup-title">{{__('popup.search_popup.search_title')}}</div>
   <div class="search-popup-desc">{{__('popup.search_popup.whoever_searches')}}</div>
   <div class="search-popup-body form-horizontal">
@@ -13,5 +13,5 @@
       </button>
     </div>
   </div>
-  <div class="close button search-popup-close fal fa-times"></div>
+  <div class="close button popup-close fal fa-times"></div>
 </div>

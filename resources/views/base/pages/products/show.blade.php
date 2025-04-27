@@ -320,7 +320,7 @@
 
                         @if($count == 0)
                             <div class="stock-in-alert-wrapper">
-                                <button type="button" class="stock-in-alert report-availability-open" data-product-id="{{$product->id}}"><i
+                                <button type="button" class="stock-in-alert general-popup-btn" data-product-id="{{$product->id}}"><i
                                         class="fas fa-chevron-right"></i>{!! __('product-show.stock-in-alert') !!}
                                 </button>
                             </div>

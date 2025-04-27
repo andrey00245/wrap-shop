@@ -10,6 +10,7 @@ return [
         'enter_email_password' => 'Увійти за допомогою email та пароля',
         'sign_in' => 'Увійти',
         'create_a_profile' => 'Створити профіль',
+        'back' => 'Назад',
 
         'forgot_password' => 'Забули пароль?',
         'recover_password' => 'Відновити пароль',

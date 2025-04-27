@@ -1,8 +1,9 @@
-<div id="login-popup" class="popup-overlay popup-right">
+<div id="login-popup" class="popup-overlay popup-right general-popup" data-step="1">
   <input type="hidden" name="account" id="account" value="login">
-  <div class="login-register-title">{{__('popup.login_register.enter_register')}}</div>
+  <div class="login-register-title popup-step-1 popup-step-2 popup-step-3 popup-step-4 popup-step-6">{{__('popup.login_register.enter_register')}}</div>
+  <div class="login-register-title popup-step-5">{{__('popup.login_register.register')}}</div>
 
-  <div class="popup-window active" id="popup-login" style="display: block;">
+  <div class="popup-window popup-step-1" id="popup-login">
     <div class="inner form-horizontal">
       <div id="column-login" class="popup-social">
         <div class="social_block">
@@ -46,7 +47,7 @@
                      class="login-info-text text-center margintop20">{{__('popup.login_register.enter_phone')}}</label>
               <input type="text" id="name_email" name="phone_email" class="form-control form-field login-phone-email"
                      placeholder="{{__('popup.login_register.enter_phone_or_email_placeholder')}}">
-              <div class="password-group">
+              <div class="password-group popup-step-2">
                 <label for="password"
                        class="login-info-text text-center margintop20">{{__('popup.login_register.password')}}</label>
                 <input id="login_password" type="password" name="password" readonly
@@ -63,7 +64,7 @@
                   <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.sign_in')}}
                 </button>
 
-                <button class="send_otp_btn otp_btn-s button-restore-password forgot_password-show"
+                <button class="send_otp_btn otp_btn-s button-restore-password"
                         id="button-restore-password"
                         type="button">
                   <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.recover_password')}}
@@ -75,7 +76,7 @@
       </div>
     </div>
   </div>
-  <div class="popup-window" id="popup-forgot_password" style="display: none;">
+  <div class="popup-window popup-step-3" id="popup-forgot_password">
     <div class="inner form-horizontal">
       <p>{{__('popup.login_register.forgot_password')}}</p>
       <p>{{__('popup.login_register.enter_you_email')}}</p>
@@ -88,17 +89,21 @@
                   <input type="hidden" name="account" value="login">
               </div>
               <div class="wrap-send">
-                  <button type="submit" class="colord button send_btn btn-social" id="button-forgot-popup">
+                  <button type="submit" class="colord button send_otp_btn send_btn btn-social" id="button-forgot-popup">
                       <i class="fas fa-chevron-right" aria-hidden="true"></i> Отправить
                   </button>
               </div>
+
+              <span class="send_otp_btn otp_btn-s button-restore-password" id="restore-popup-back">
+                  <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.enter_with_new_password')}}
+              </span>
           </form>
 
-          <div id="forgot-response" style="margin-top: 10px; color: green; display: none;"></div>
+          <div id="forgot-response" class="clear-text" style="margin-top: 10px; color: green; display: none;"></div>
       </div>
     </div>
   </div>
-  <div class="popup-window" id="popup-forgot_password-sucess">
+  <div class="popup-window popup-step-4" id="popup-forgot_password-sucess">
     <div class="inner form-horizontal">
       <p>{{__('popup.login_register.password_sent_to_email')}}</p>
       <div class="popup-btn">
@@ -108,7 +113,7 @@
       </div>
     </div>
   </div>
-  <div class="popup-window" id="popup-registration" style="display: none;">
+  <div class="popup-window popup-step-5" id="popup-registration">
     <div class="inner form-horizontal">
       <div id="column-login" class="popup-social">
         <div class="social_block">
@@ -170,9 +175,14 @@
             <button class="send_otp_btn otp_btn-s btnverifyloginpopup button colord" id="button-verify-loginpopup" type="submit">
               <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.create_a_profile')}}
             </button>
-            <span class="send_otp_btn otp_btn-s btnverifyloginpopup button colord" id="login-popup-back" type="submit">
-              <i class="fas fa-chevron-left" aria-hidden="true"></i> {{__('popup.login_register.sign_in')}}
-            </span>
+                                <span class="send_otp_btn otp_btn-s button-restore-password" id="login-popup-back">
+                  <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.back')}}
+              </span>
+
+
+{{--            <span class="send_otp_btn otp_btn-s btnverifyloginpopup button colord" id="login-popup-back" type="submit">--}}
+{{--              <i class="fas fa-chevron-left" aria-hidden="true"></i> {{__('popup.login_register.sign_in')}}--}}
+{{--            </span>--}}
           </span>
                             <p class="register-description">{!! __('popup.login_register.register_conditions') !!}</p>
                         </div>
@@ -184,11 +194,11 @@
     </div>
 
   </div>
-  <div class="popup-window" id="popup-registration-sucess">
-    <button type="button" class="close-popup btn-close-popup"><span></span></button>
+  <div class="popup-window popup-step-6" id="popup-registration-sucess">
+    <button type="button" class="popup-close btn-close-popup"><span></span></button>
     <div class="inner form-horizontal">
       <div class="popup-title">{{__('popup.login_register.succes_registration_message')}}</div>
     </div>
   </div>
-  <div class="close button fal fa-times login-popup-close"></div>
+  <div class="close button fal fa-times popup-close"></div>
 </div>

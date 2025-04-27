@@ -277,16 +277,17 @@
                   </div>
 
                   <div class="input-group">
-                    @include('base.components.bestseller.bestseller-checkout')
-                  </div>
-
-                  <div class="input-group">
                       <div id="buttons">
                           <button type="submit" class="button btn-primary button_oc btn" id="submitBtn">
                               <i class="fas fa-chevron-right"></i><span>Підтвердити й оформити покупку</span>
                           </button>
                       </div>
                   </div>
+
+                    <div class="input-group">
+                        @include('base.components.bestseller.bestseller-checkout')
+                    </div>
+
                 </div>
               </div>
 

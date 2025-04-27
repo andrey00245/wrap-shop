@@ -4,7 +4,7 @@
     $count = $reviews->count();
 @endphp
 
-<section class="popup-right" id="review-popup">
+<section class="popup-right general-popup" id="review-popup" data-step="1">
     {{-- Заголовок та середня оцінка --}}
     <div class="popup-review-top flex-justify">
         <div class="left">
@@ -39,7 +39,7 @@
     </div>
 
     {{-- Відгуки --}}
-    <div class="popup-review-list" id="review">
+    <div class="popup-review-list popup-step-1" id="review">
         @forelse ($reviews as $review)
             <div class="item flex-justify">
                 <div class="left">
@@ -69,7 +69,7 @@
     </div>
 
     {{-- Форма відгуку --}}
-    <form class="popup-review-form form-horizontal" id="form-review">
+    <form class="popup-review-form form-horizontal popup-step-3" id="form-review">
         <div class="title">Залишити відгук</div>
         <div class="form-group required">
             <label class="control-label" for="input-name">Ваше імʼя:</label>
@@ -99,7 +99,7 @@
             </div>
         </div>
 
-        <div id="review-alert" class="mt-3"></div>
+        <div id="review-alert" class="mt-3 clear-text"></div>
 
         <div class="buttons">
             <button type="button" id="button-review" data-loading-text="Завантаження..." class="button colord">
@@ -108,8 +108,8 @@
         </div>
     </form>
 
-    <div class="review-form-open button colord">Залишити відгук</div>
-    <div class="close close-review button fal fa-times"></div>
+    <div class="review-form-open button colord popup-step-table-1">Залишити відгук</div>
+    <div class="close popup-close button fal fa-times"></div>
 </section>
 
 {{-- AJAX логіка --}}

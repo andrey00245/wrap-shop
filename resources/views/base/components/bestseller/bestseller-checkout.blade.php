@@ -5,17 +5,27 @@
         <div class="line"></div>
 
         <div class="home-slide-buttons flex-justify custom_arrows">
-            <div class="custom_arrow custom__prev-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" focusable="false"><path d="m15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4.4-4.4-14.6-14.6z"></path></svg></div>
-            <div class="custom_arrow custom__next-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" focusable="false"><path d="m15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4.4-4.4-14.6-14.6z"></path></svg></div>
+            <div class="custom_arrow custom__prev-arrow">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" focusable="false">
+                    <path
+                        d="m15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4.4-4.4-14.6-14.6z"></path>
+                </svg>
+            </div>
+            <div class="custom_arrow custom__next-arrow">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" focusable="false">
+                    <path
+                        d="m15.5 0.932-4.3 4.38 14.5 14.6-14.5 14.5 4.3 4.4 14.6-14.6 4.4-4.3-4.4-4.4-14.6-14.6z"></path>
+                </svg>
+            </div>
         </div>
     </div>
 
     <div class="splide home-products-list">
-{{--        <div class="home-slide-button flex-justify">--}}
-{{--            <div class="splide__arrows home-products-slide-buttons">--}}
-{{--                <div class="line"></div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
+        {{--        <div class="home-slide-button flex-justify">--}}
+        {{--            <div class="splide__arrows home-products-slide-buttons">--}}
+        {{--                <div class="line"></div>--}}
+        {{--            </div>--}}
+        {{--        </div>--}}
         <div class="splide__track">
             <ul class="splide__list">
                 @foreach($products->take(5) as $key => $product)
@@ -83,13 +93,15 @@
                                 <div class="price">{{number_format($product->getPrice())}} ₴<span
                                         class="price-unit-xvr"></span></div>
                                 @if($product->getStock() > 0)
-                                    <button class="button button-cart-product colord remarketing_cart_button"
+                                    <button class="button colord button-cart-product general-popup-btn"
+                                            data-popup="cart-popup"
                                             data-product-quantity="{{$product->getDefaultQuantity()}}"
                                             data-product-id="{{$product->id}}">
                                         <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
                                     </button>
                                 @else
-                                    <button class="button colord remarketing_cart_button report-availability-open"
+                                    <button class="button colord notify-available-btn general-popup-btn"
+                                            data-popup="report-availability-popup"
                                             data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
                                             class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
                                 @endif

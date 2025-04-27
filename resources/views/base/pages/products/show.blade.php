@@ -12,7 +12,7 @@
         {{--    <link rel="stylesheet" href="https://wrap.shop/catalog/view/javascript/xvrproductquantities.css">--}}
     @endpush
 
-    <nav class="breadcrumbs breadcrumbs-product wrap row">
+    <nav class="breadcrumbs breadcrumbs-product row">
         <ul class="flex-center">
             <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}"
                    class="button">{{__('header_footer.home')}}</a></li>
@@ -61,7 +61,7 @@
                         <div class="count">{{ '('.$count.')' }}</div>
                     </div>
 
-                    <div class="reviews-open button" data-product-id="{{ $product->id }}">
+                    <div class="reviews-open button general-popup-btn" data-popup="review-popup" data-product-id="{{ $product->id }}">
                         <span>{{ __('product-show.read-reviews') }}</span>
                         <i class="fas fa-chevron-right"></i>
                     </div>
@@ -217,16 +217,16 @@
                                     @endphp
 
                                     @if($isCurrent)
-                                    <a href="void:javascript(0)"
-                                       class="volume-box active">
-                                        {{ $volume }}
-                                    </a>
-                                   @else
+                                        <a href="void:javascript(0)"
+                                           class="volume-box active">
+                                            {{ $volume }}
+                                        </a>
+                                    @else
                                         <a href="{{route('products.show',['product' => $variant->slugEn])}}"
                                            class="volume-box">
                                             {{ $volume }}
                                         </a>
-                                   @endif
+                                    @endif
                                 @endforeach
                             </div>
                         @endif
@@ -274,18 +274,21 @@
                                 </label>
                                 <div class="quantity-input-wrappper">
                                     <div class="input-group quantity-input-group">
-                  <span class="input-group-btn">
-                    <button type="button" class="btn btn-primary" id="minus-btn">-</button>
-                  </span>
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-primary" id="minus-btn">-</button>
+                                        </span>
                                         <input type="text" name="quantity"
                                                data-min="{{$count > 0 ? $product->getMinOrderCount() : 0}}"
                                                data-max="{{$count}}"
                                                data-step="{{$count > 0 ? $product->getOrderStep(): 0}}"
                                                value="{{$count > 0 ?$product->getDefaultQuantity() : 0}}"
-                                               id="input-quantity-{{$product->id}}" class="input-quantity quantity-input-show-page">
+                                               id="input-quantity-{{$product->id}}"
+                                               class="input-quantity fast-order-quantity">
                                         <span class="input-group-btn">
-                    <button type="button" class="btn btn-primary colord" id="plus-btn">+</button>
-                  </span>
+                                            <button type="button"
+                                                    class="btn btn-primary colord"
+                                                    id="plus-btn">+</button>
+                                        </span>
                                     </div>
 
                                     <div class="max-value-group">
@@ -319,23 +322,28 @@
 
                         @if($count == 0)
                             <div class="stock-in-alert-wrapper">
-                                <button type="button" class="stock-in-alert report-availability-open" data-product-id="{{$product->id}}"><i
+                                <button type="button" class="stock-in-alert general-popup-btn"
+                                        data-popup="report-availability-popup"
+                                        data-product-id="{{$product->id}}"><i
                                         class="fas fa-chevron-right"></i>{!! __('product-show.stock-in-alert') !!}
                                 </button>
                             </div>
                         @elseif($count>0)
-                            <button type="button" id="button-cart" class="cart button colord"
+                            <button type="button" id="button-cart" class="cart button colord general-popup-btn"
+                                    data-popup="cart-popup"
                                     data-product-id="{{$product->id}}">
                                 <i class="fas fa-chevron-right"></i>{{__('product-show.add-to-cart')}}
                             </button>
-                            <button class="speed button btn-quick-order btn-lg fast-order-popup-open" type="button"
+                            <button class="speed button btn-quick-order btn-lg general-popup-btn" type="button"
+                                    data-popup="fast-order-popup"
                                     title="{{__('product-show.fast-buy')}}">
                                 <span>{{__('product-show.fast-buy')}}</span>
                             </button>
                         @endif
 
                     </div>
-                    <div class="consult-open consult-popup-open button">
+                    <div class="consult-open button general-popup-btn general-popup-btn"
+                         data-popup="consult-popup">
                         {{__('product-show.want-to-learn-more')}}
                         <span>{{__('product-show.order-a-consultation')}}</span>
                     </div>
@@ -385,13 +393,13 @@
             </div>
 
             <div class="code-wishlist-wrapper mobil">
-                                <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
+                <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
                 <div class="wishlist">
                     <button
                         type="button"
                         title="В закладки"
-                                                class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"
-                                                data-product-id="{{$product->id}}"
+                        class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"
+                        data-product-id="{{$product->id}}"
                     ></button>
                 </div>
             </div>
@@ -496,37 +504,36 @@
         <script src="{{mix('build/js/productShow.js')}}"></script>
         <script src="{{asset('third-party/lazyloadmin.js')}}"></script>
     @endpush
-<style>
-    .volume {
-        display: flex;
-        gap: 10px;
-        margin-top: 1rem;
-        margin-bottom: 20px;
-    }
+    <style>
+        .volume {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+            margin-bottom: 20px;
+        }
 
-    .volume-box {
-        display: inline-block;
-        padding: 10px;
-        text-align: center;
-        border: 2px solid rgb(255, 206, 28);
-        border-radius: 8px;
-        text-decoration: none;
-        color: rgb(255, 206, 28);
-        font-weight: 500;
-        transition: all 0.2s ease;
-        box-sizing: border-box;
-    }
+        .volume-box {
+            display: inline-block;
+            padding: 10px;
+            text-align: center;
+            border: 2px solid rgb(255, 206, 28);
+            border-radius: 8px;
+            text-decoration: none;
+            color: rgb(255, 206, 28);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
 
-    .volume-box:hover {
-        border-color: rgb(255, 206, 28);
-        color: rgb(255, 206, 28);
-    }
+        .volume-box:hover {
+            border-color: rgb(255, 206, 28);
+            color: rgb(255, 206, 28);
+        }
 
-    .volume-box.active {
-        background: rgb(255, 206, 28);
-        color: #fff;
-        border-color: rgb(255, 206, 28);
-    }
-
-</style>
+        .volume-box.active {
+            background: rgb(255, 206, 28);
+            color: #fff;
+            border-color: rgb(255, 206, 28);
+        }
+    </style>
 @endsection

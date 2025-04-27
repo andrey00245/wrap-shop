@@ -40,8 +40,6 @@ $(document).ready(function () {
 
                     const numberParts = decimalAndIntParts(response.sum)
                     $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
-
-                    cartPopup(e)
                 },
                 error: function (xhr, status, error) {
                     alert('Ошибка при добавлении в корзину: ' + error);
@@ -69,8 +67,6 @@ $(document).ready(function () {
 
                     const numberParts = decimalAndIntParts(response.sum)
                     $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
-
-                    cartPopup(e)
                 },
                 error: function (xhr, status, error) {
                     alert('Ошибка при добавлении в корзину: ' + error);
@@ -126,10 +122,8 @@ $(document).ready(function () {
             },
             success: function (response) {
                 $('#cart-total').html(response.cartItemsCount);
-                // $('.cart-shopping-items').html(response.cartItems);
 
                 $('tr[data-id="' + productId + '"] .price-all').html(response.updatedPrice + ' ₴');
-                // $('tr[data-id="' + productId + '"] .total .value').html(response.cartTotal + ' ₴');
 
                 const numberParts = decimalAndIntParts(response.cartTotal)
 
@@ -179,11 +173,9 @@ $(document).ready(function () {
         });
     });
 
-
     $('#button-verify-loginpopup').on('click', function () {
         var phoneEmail = $('#name_email').val().trim();
         var password = $('#login_password').val().trim();
-
         $('.input-error').removeClass('input-error');
 
         if (phoneEmail.length === 0) {
@@ -200,11 +192,10 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     if (response.exists) {
-                        $(".password-group").show();
+                        $('#login-popup').attr('data-step', '2')
                         $(".password-group #login_password").attr('readonly', false)
                     } else {
-                        $(".password-group").hide();
-                        return open_pop_up("#popup-registration");
+                        $('#login-popup').attr('data-step', '5')
                     }
                 },
                 error: function () {
@@ -278,37 +269,9 @@ $(document).ready(function () {
         event.preventDefault();
         $('#logout-form').submit();
     });
-
-    function open_pop_up(e) {
-        $("#credential_picker_container").toggle();
-        $(".popup-window").hide()
-
-        $(".popup-window").removeClass('active');
-        $(".popup-overlay").addClass('active');
-        // $(".popup-overlay").fadeIn();
-        $("html").addClass('no-overflow');
-        // $(e).fadeIn().addClass('active');
-        $(e).show().addClass('active');
-
-    }
-
-    function cartPopup(e) {
-        e.preventDefault()
-
-        $('#simple-popup').removeClass('active');
-        $('#search-popup').removeClass('active');
-        $('#login-popup').removeClass('active');
-        $('.head-top').removeClass('active');
-        if ($('#cart-popup').hasClass('active')) {
-            $("html").addClass('no-overflow');
-        } else {
-            $('#cart-popup').toggleClass('active');
-            $("html").removeClass('no-overflow');
-        }
-    }
 });
 
-function decimalAndIntParts(number){
+function decimalAndIntParts(number) {
     let integerPart = Math.floor(number);
     let decimalPart = number - integerPart;
     let decimalStr = decimalPart.toFixed(2).slice(1);

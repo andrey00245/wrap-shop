@@ -11,7 +11,7 @@ return [
         'enter_email_password' => 'Войти с помощью email и пароля',
         'sign_in' => 'Войти',
         'create_a_profile' => 'Создать профиль',
-
+        'back' => 'Назад',
 
         'forgot_password' => 'Забыли пароль?',
         'recover_password' => 'Восстановить пароль',

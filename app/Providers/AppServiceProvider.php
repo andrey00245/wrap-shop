@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductBanner;
 use App\Models\Setting;
+use App\Observers\ProductObserver;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -16,7 +19,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
     }
 
     /**
@@ -28,7 +30,9 @@ class AppServiceProvider extends ServiceProvider
             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";
         });
 
-       /**
+        Product::observe(ProductObserver::class);
+
+        /**
        * @var Setting $settings
        */
         $settings = Setting::query()->first();
@@ -56,7 +60,7 @@ class AppServiceProvider extends ServiceProvider
             })->whereHas('category', function (\Illuminate\Database\Eloquent\Builder $query) {
                     $query->whereJsonContains('slug->en', 'instrumenti-rozxidniki');
                 })
-            ->get();
+            ->take(10)->get();
 
         $mainCategories = Category::query()
             ->whereNull('parent_id');
@@ -64,12 +68,18 @@ class AppServiceProvider extends ServiceProvider
         $productCategories = $mainCategories
             ->with('children');
 
+        $productBanners = ProductBanner::query()
+            ->where('is_active', true)
+            ->orderBy('position')
+            ->get();
+
         View::share([
             'settings' => $settings,
             'products' => $products,
             'instruments' => $instruments,
             'mainCategories' => $mainCategories->get(),
             'productCategories' => $productCategories->get(),
+            'productBanners' => $productBanners,
         ]);
     }
 }

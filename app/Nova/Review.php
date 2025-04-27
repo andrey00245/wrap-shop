@@ -2,37 +2,34 @@
 
 namespace App\Nova;
 
-use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
+use Illuminate\Http\Request;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Panel;
 
-class Banner extends Resource
+class Review extends Resource
 {
     /**
-     * The model the resource corresponds to.
+     * Модель, до якої прив'язаний ресурс.
      *
-     * @var class-string<\App\Models\Banner>
+     * @var class-string<\App\Models\Review>
      */
-    public static $model = \App\Models\Banner::class;
+    public static $model = \App\Models\Review::class;
 
     /**
-     * The single value that should be used to represent the resource when being displayed.
+     * Поле, яке використовується для представлення ресурсу.
      *
      * @var string
      */
     public static $title = 'id';
 
-
-    public static function label()
-    {
-        return 'Банери';
-    }
-
     /**
-     * The columns that should be searched.
+     * Колонки, які можна шукати.
      *
      * @var array
      */
@@ -40,8 +37,13 @@ class Banner extends Resource
         'id',
     ];
 
+    public static function label()
+    {
+        return 'Відгуки';
+    }
+
     /**
-     * Get the fields displayed by the resource.
+     * Отримати поля, що відображаються в ресурсі.
      *
      * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
@@ -50,17 +52,16 @@ class Banner extends Resource
     {
         return [
             ID::make()->sortable(),
-            Images::make( 'Фото','main')
-                ->conversionOnIndexView('preview'),
-            Text::make('Силка','url'),
-
-            Number::make('Позиція','position')->sortable(),
-            Boolean::make('Активний','is_active')->sortable(),
+            BelongsTo::make('Продукт', 'product', Product::class),
+            Text::make("Ім'я", 'name')->sortable(),
+            Textarea::make('Відгук', 'text')->alwaysShow(),
+            Number::make('Оцінка', 'rating')->min(1)->max(5)->step(1)->sortable(),
+            Boolean::make('Активний', 'is_active')->sortable(),
         ];
     }
 
     /**
-     * Get the cards available for the request.
+     * Отримати карти, доступні для запиту.
      *
      * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
@@ -71,7 +72,7 @@ class Banner extends Resource
     }
 
     /**
-     * Get the filters available for the resource.
+     * Отримати фільтри, доступні для ресурсу.
      *
      * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
@@ -82,7 +83,7 @@ class Banner extends Resource
     }
 
     /**
-     * Get the lenses available for the resource.
+     * Отримати лінзи, доступні для ресурсу.
      *
      * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
@@ -93,7 +94,7 @@ class Banner extends Resource
     }
 
     /**
-     * Get the actions available for the resource.
+     * Отримати дії, доступні для ресурсу.
      *
      * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array

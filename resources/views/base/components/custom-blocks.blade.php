@@ -37,12 +37,6 @@
 
                                 <div class="product-default-texts-wrapper">
                                     <div class="top flex-justify">
-                                        <div class="sale statuses">
-                                            <div class="category-status category-status-1 status-inline text rectangle "
-                                                 style=" color:#ffffff; background-color:#d04b4b;">
-                                                {{__('general-translate.sales_hit')}}
-                                            </div>
-                                        </div>
                                         <div
                                             class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
                                         <div class="wishlist">

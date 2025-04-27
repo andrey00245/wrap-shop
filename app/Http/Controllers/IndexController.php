@@ -19,7 +19,6 @@ class IndexController extends Controller
     public function __invoke(): View
     {
         $banners = Banner::query()
-            ->where('categories', 'LIKE', '%main_page%')
             ->where('is_active', true)
             ->orderBy('position')
             ->get();

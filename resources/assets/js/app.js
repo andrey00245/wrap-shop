@@ -168,7 +168,13 @@ function telInputInitialization() {
                     separateDialCode: true,
                     i18n: i18nFile,
                     loadUtilsOnInit: "/third-party/intlTelInput/js/utils.js"
-                })
+                });
+
+                inputs[key].addEventListener("input", function () {
+                    if (this.value.startsWith("0")) {
+                        this.value = this.value.replace(/^0+/, "");
+                    }
+                });
             }
         }
     }

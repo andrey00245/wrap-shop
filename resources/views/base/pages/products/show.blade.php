@@ -48,24 +48,23 @@
                 <div class="top flex-justify feedback-wrapper">
                     <div class="rating-wrap">
                         <div class="rating">
-                            <i class="fal fa-star"></i>
-                            <i class="fal fa-star"></i>
-                            <i class="fal fa-star"></i>
-                            <i class="fal fa-star"></i>
-                            <i class="fal fa-star"></i>
-                            <div class="rating-result" style="width: 0%">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                            @for ($i = 1; $i <= 5; $i++)
+                                <i class="fal fa-star"></i>
+                            @endfor
+                            <div class="rating-result" style="width: {{ ($average / 5) * 100 }}%">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star"></i>
+                                @endfor
                             </div>
                         </div>
 
-                        <div class="count">(10)</div>
+                        <div class="count">{{ '('.$count.')' }}</div>
                     </div>
-                    <div class="reviews-open button"><span>{{__('product-show.read-reviews')}}</span><i
-                            class="fas fa-chevron-right"></i></div>
+
+                    <div class="reviews-open button" data-product-id="{{ $product->id }}">
+                        <span>{{ __('product-show.read-reviews') }}</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
                 </div>
 
                 <div class="params-title-mobil">{{__('product-show.technical-specifications')}}</div>
@@ -394,13 +393,13 @@
             </div>
 
             <div class="code-wishlist-wrapper mobil">
-                {{--                <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>--}}
+                <div class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
                 <div class="wishlist">
                     <button
                         type="button"
                         title="В закладки"
-                        {{--                        class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"--}}
-                        {{--                        data-product-id="{{$product->id}}"--}}
+                        class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"
+                        data-product-id="{{$product->id}}"
                     ></button>
                 </div>
             </div>
@@ -498,6 +497,7 @@
     @include('base.components.examples-of-work')
     @include('base.components.consult-popup')
     @include('base.components.fast-order-popup')
+    @include('base.components.reviews-popup')
 
     @push('scripts')
         {{--        <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>--}}

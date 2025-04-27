@@ -253,7 +253,7 @@
                                 @endforeach
                                 @foreach($attributes as $attribute)
                                     @if($attribute->field_name !== 'main_shade')
-                                        <div class="ocf-filter ocf-dropdown" id="ocf-filter-86-2-1">
+                                        <div class="ocf-filter ocf-dropdown {{$attribute->field_name === 'brand' ? 'ocf-open' : ''}}" id="ocf-filter-86-2-1">
                                             <div class="ocf-filter-body">
                                                 <div class="ocf-filter-header" data-ocf="expand">
                                                     <span class="ocf-active-label"></span>
@@ -265,7 +265,7 @@
                                   data-ocf-discard="86.2"></span>
                             <span class="ocf-plus-minus"></span></span>
                                                 </div><!-- /.ocf-filter-header -->
-                                                <div class="ocf-filter-collapse ocf-collapse">
+                                                <div class="ocf-filter-collapse ocf-collapse {{$attribute->field_name === 'brand' ? 'ocf-in' : ''}}">
 
 
                                                     <div class="ocf-value-list">

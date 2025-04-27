@@ -21,28 +21,36 @@
                         </div>
 
 
-                        <div class="splide default-products-images">
-                            <div class="splide__arrows"></div>
-                            <div class="splide__track">
-                                <ul class="splide__list">
-                                    @foreach($wishlist->getMedia('images') as $key => $image)
-                                        <li class="splide__slide flex-center"
-                                            role="group">
-                                            <a href="{{route('products.show', ['product' => $wishlist->slugEn])}}"
-                                               data-src="{{$image->getUrl()}}"
-                                               class="swiper-slide item flex-center swiper-slide-next"
-                                               data-fancybox="gallery{{$wishlist->id}}"
-                                               data-caption="{{$wishlist->name}}">
-                                                <img loading="lazy"
-                                                     src="{{$image->getUrl('preview')}}"
-                                                     alt="{{$wishlist->name}}"
-                                                     title="{{$wishlist->name}}"
-                                                     width="310" height="310">
-                                            </a>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                        <div
+                            class="image default-products-images">
+                            <i class="far fa-search-plus colord"
+                               data-src="{{$wishlist->getMedia('images')->first()->getUrl()}}"
+                               data-fancybox="products{{$wishlist->id}}" data-caption="{{$wishlist->name}}"></i>
+                            <a class="image-link" href="{{route('products.show', ['product'=>$wishlist->slugEn])}}"
+                               title="{{$wishlist->name}}">
+                                <div class="splide products-images">
+                                    <div class="splide__track">
+                                        <ul class="splide__list">
+                                            @foreach($wishlist->getMedia('images') as $key => $image)
+                                                <li class="splide__slide">
+                                                    @if($key>0)
+                                                        <div class="hide"
+                                                             data-src="{{$image->getUrl()}}"
+                                                             data-fancybox="products{{$wishlist->id}}"
+                                                             data-caption="{{$wishlist->name}}"></div>
+                                                    @endif
+                                                    <img loading="lazy"
+                                                         src="{{$image->getUrl('preview')}}"
+                                                         alt="{{$wishlist->name}}"
+                                                         title="{{$wishlist->name}}"
+                                                         class="swiper-lazy swiper-lazy-loaded"
+                                                         width="310" height="310">
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                         <div class="review">
                             <i class="fal fa-star"></i>

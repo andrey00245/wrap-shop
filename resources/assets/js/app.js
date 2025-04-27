@@ -8,6 +8,7 @@ $(document).ready(function () {
     showHideSubCategories();
     popupSliderInitialization('cartProductSlider')
     imageSliderInProduct('home-products-item');
+    imageSliderInProduct('account-products-list .product-default');
 
     let scroll = $(window).scrollTop();
     slideHeader(scroll);

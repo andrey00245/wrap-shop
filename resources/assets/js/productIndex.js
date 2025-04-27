@@ -1,6 +1,9 @@
 import {language} from './variables'
+import {imageSliderInProduct} from "./sliderInitialization";
 
 $(document).ready(function () {
+    imageSliderInProduct('category-products-item');
+
 
     function filertsDropdownAction(element) {
         const collapsingElement = $(element.querySelector('.ocf-filter-collapse'))

@@ -95,14 +95,15 @@
                                         <div class="price">{{number_format($product->getPrice())}} ₴<span
                                                 class="price-unit-xvr"></span></div>
                                         @if($product->getStock() > 0)
-                                            <button class="button button-cart-product colord remarketing_cart_button"
+                                            <button class="button colord button-cart-product general-popup-btn"
+                                                    data-popup="cart-popup"
                                                     data-product-quantity="{{$product->getDefaultQuantity()}}"
                                                     data-product-id="{{$product->id}}">
                                                 <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
                                             </button>
                                         @else
                                             <button
-                                                class="button colord remarketing_cart_button general-popup-btn"
+                                                class="button colord general-popup-btn notify-available-btn"
                                                 data-popup="report-availability-popup"
                                                 data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
                                                     class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>

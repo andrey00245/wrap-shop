@@ -58,9 +58,19 @@
                  title="{{$viewedProduct->name}}" class="name">{{$viewedProduct->name}}</a>
               <div class="bottom flex-center">
                 <div class="price">{{number_format($viewedProduct->getPrice())}} ₴<span class="price-unit-xvr"></span></div>
-                <button class="button colord remarketing_cart_button" data-popup="report-availability-popup" data-product_id="{{$viewedProduct->id}}"><i
-                    class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
-                </button>
+                  @if($product->getStock() > 0)
+                      <button class="button colord button-cart-product general-popup-btn"
+                              data-popup="cart-popup"
+                              data-product-quantity="{{$product->getDefaultQuantity()}}"
+                              data-product-id="{{$product->id}}">
+                          <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
+                      </button>
+                  @else
+                      <button class="button colord notify-available-btn general-popup-btn"
+                              data-popup="report-availability-popup"
+                              data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
+                              class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                  @endif
               </div>
             </div>
           </div>

@@ -65,7 +65,8 @@
                             <div class="price">{{number_format($wishlist->getPrice())}} ₴<span
                                     class="price-unit-xvr"></span></div>
                             <button
-                                {{$wishlist->getStock() > 0 ? '' : 'disabled'}} class="button button-cart-product colord remarketing_cart_button"
+                                {{$wishlist->getStock() > 0 ? '' : 'disabled'}} class="button colord button-cart-product general-popup-btn"
+                                data-popup="cart-popup"
                                 data-product-quantity="{{$wishlist->getDefaultQuantity()}}"
                                 data-product-id="{{$wishlist->id}}">
                                 <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}

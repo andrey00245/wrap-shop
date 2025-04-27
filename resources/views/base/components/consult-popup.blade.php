@@ -1,7 +1,7 @@
-<div id="consult-popup" class="popup-overlay popup-right">
+<div id="consult-popup" class="popup-right general-popup" data-step="1">
     <input type="hidden" name="product-id" id="consult-popup-product-id" value="{{$product->id}}">
     <div class="consult-title">{{__('popup.consult_popup.title')}}</div>
-    <form class="popup-window active" id="popup-consultation" style="display: block;">
+    <form class="popup-window popup-step-1" id="popup-consultation">
         <div class="inner form-horizontal">
             <div class="form-group">
                 <div class="form">
@@ -30,7 +30,7 @@
                     </div>
 
                     <!-- Ошибки -->
-                    <div class="error-message-consultation" style="display:none; color:red"></div>
+                    <div class="error-message-consultation clear-text" style="display:none; color:red"></div>
                 </div>
             </div>
 
@@ -47,9 +47,9 @@
         </div>
     </form>
 
-    <div class="popup-consult-thanks flex-center" style="display:none;">
+    <div class="popup-consult-thanks popup-step-flex-3 flex-center">
         <i class="fal fa-smile"></i>
         <span>{!! __('popup.consult_popup.thanks_message') !!}</span>
     </div>
-    <div class="close button fal fa-times consult-popup-close"></div>
+    <div class="close button fal fa-times popup-close"></div>
 </div>

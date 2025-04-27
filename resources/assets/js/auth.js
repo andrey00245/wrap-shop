@@ -40,8 +40,6 @@ $(document).ready(function () {
 
                     const numberParts = decimalAndIntParts(response.sum)
                     $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
-
-                    cartPopup(e)
                 },
                 error: function (xhr, status, error) {
                     alert('Ошибка при добавлении в корзину: ' + error);
@@ -69,8 +67,6 @@ $(document).ready(function () {
 
                     const numberParts = decimalAndIntParts(response.sum)
                     $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
-
-                    cartPopup(e)
                 },
                 error: function (xhr, status, error) {
                     alert('Ошибка при добавлении в корзину: ' + error);
@@ -126,10 +122,8 @@ $(document).ready(function () {
             },
             success: function (response) {
                 $('#cart-total').html(response.cartItemsCount);
-                // $('.cart-shopping-items').html(response.cartItems);
 
                 $('tr[data-id="' + productId + '"] .price-all').html(response.updatedPrice + ' ₴');
-                // $('tr[data-id="' + productId + '"] .total .value').html(response.cartTotal + ' ₴');
 
                 const numberParts = decimalAndIntParts(response.cartTotal)
 
@@ -277,7 +271,7 @@ $(document).ready(function () {
     });
 });
 
-function decimalAndIntParts(number){
+function decimalAndIntParts(number) {
     let integerPart = Math.floor(number);
     let decimalPart = number - integerPart;
     let decimalStr = decimalPart.toFixed(2).slice(1);

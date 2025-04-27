@@ -1,4 +1,4 @@
-import {imageSliderInProduct, productSliderInitialization} from "./sliderInitialization";
+import {productSliderInitialization} from "./sliderInitialization";
 
 $(document).ready(function () {
 
@@ -30,7 +30,7 @@ $(document).ready(function () {
     }
 
 
-    const quantityInput = $('#quantity-block .quantity-input-show-page')
+    const quantityInput = $('#quantity-block .fast-order-quantity')
     const quantityPlus = $('#quantity-block #plus-btn')
     const quantityMinus = $('#quantity-block #minus-btn')
     const discounts = $('.item-price').data('discount')
@@ -254,6 +254,4 @@ $(document).ready(function () {
     })
 
     productSliderInitialization('homeLatest');
-    // imageSliderInProduct('home-products-item');
-
 });

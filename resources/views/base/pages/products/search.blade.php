@@ -377,33 +377,36 @@
                                 </div>
                             </div>
 
-                            <div class="image splide default-products-images">
+                            <div
+                                class="image default-products-images">
                                 <i class="far fa-search-plus colord"
                                    data-src="{{$product->getMedia('images')->first()->getUrl()}}"
-                                   data-fancybox="products{{$product->id}}" data-caption="{{$product->getName()}}"></i>
-                                <div class="splide__arrows"></div>
-                                <div class="splide__track">
-                                    <ul class="splide__list">
-                                        @foreach($product->getMedia('images') as $key => $image)
-                                            @if($key>0)
-                                                <div class="hide"
-                                                     data-src="{{$image->getUrl()}}"
-                                                     data-fancybox="products{{$product->id}}"
-                                                     data-caption="{{$product->getName()}}"></div>
-                                            @endif
-                                                <li class="splide__slide flex-center"
-                                                    role="group">
-                                                    <a href="{{route('products.show', ['product' => $product->slugEn])}}">
+                                   data-fancybox="bestseller{{$product->id}}" data-caption="{{$product->name}}"></i>
+                                <a class="image-link" href="{{route('products.show', ['product'=>$product->slugEn])}}"
+                                   title="{{$product->name}}">
+                                    <div class="splide products-images">
+                                        <div class="splide__track">
+                                            <ul class="splide__list">
+                                                @foreach($product->getMedia('images') as $key => $image)
+                                                    <li class="splide__slide">
+                                                        @if($key>0)
+                                                            <div class="hide"
+                                                                 data-src="{{$image->getUrl()}}"
+                                                                 data-fancybox="bestseller{{$product->id}}"
+                                                                 data-caption="{{$product->name}}"></div>
+                                                        @endif
                                                         <img loading="lazy"
                                                              src="{{$image->getUrl('preview')}}"
                                                              alt="{{$product->name}}"
                                                              title="{{$product->name}}"
+                                                             class="swiper-lazy swiper-lazy-loaded"
                                                              width="310" height="310">
-                                                    </a>
-                                                </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
 
                             <div class="product-default-texts-wrapper list">
@@ -417,13 +420,14 @@
                                     <div class="price">{{number_format($product->getPrice())}} ₴<span
                                             class="price-unit-xvr"></span></div>
                                     @if($product->getStock() > 0)
-                                        <button class="button button-cart-product colord remarketing_cart_button"
+                                        <button class="button colord button-cart-product general-popup-btn"
+                                                data-popup="cart-popup"
                                                 data-product-quantity="{{$product->getDefaultQuantity()}}"
                                                 data-product-id="{{$product->id}}">
                                             <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
                                         </button>
                                     @else
-                                        <button class="button colord remarketing_cart_button general-popup-btn"
+                                        <button class="button colord notify-available-btn general-popup-btn"
                                                 data-popup="report-availability-popup"
                                                 data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
                                                 class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>

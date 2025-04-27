@@ -2716,7 +2716,6 @@ body::-webkit-scrollbar {
 }
 
 #form-review {
-    display: none;
     padding-top: 40px;
 }
 
@@ -3612,6 +3611,7 @@ table .notify-quantity {
 
 .general-popup {
     .popup-step-1,
+    .popup-step-table-1,
     .popup-step-2,
     .popup-step-3,
     .popup-step-flex-3,
@@ -3640,7 +3640,22 @@ table .notify-quantity {
     &[data-step="3"] .popup-step-flex-3{
         display: flex;
     }
+    &[data-step="1"] .popup-step-table-1{
+        display: table;
+    }
 
+}
+
+.popup-consult-thanks {
+    flex-direction: column;
+    i{
+        font-size: 42px;
+        margin-bottom: 11px;
+        color: green;
+    }
+    span {
+        text-align: center;
+    }
 }
 
 

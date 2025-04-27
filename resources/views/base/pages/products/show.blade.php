@@ -61,7 +61,7 @@
                         <div class="count">{{ '('.$count.')' }}</div>
                     </div>
 
-                    <div class="reviews-open button" data-product-id="{{ $product->id }}">
+                    <div class="reviews-open button general-popup-btn" data-popup="review-popup" data-product-id="{{ $product->id }}">
                         <span>{{ __('product-show.read-reviews') }}</span>
                         <i class="fas fa-chevron-right"></i>
                     </div>

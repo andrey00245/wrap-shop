@@ -62,6 +62,10 @@ $(document).ready(function () {
         $('#button-submit-report-availability').attr('data-product-id', $(this).data('product-id'));
     })
 
+    $(".stock-in-alert").on("click", function () {
+        $('#button-submit-report-availability').attr('data-product-id', $(this).data('product-id'));
+    })
+
     $("#button-restore-password").click(function () {
         $(this).closest('#login-popup').attr('data-step', '3')
     })
@@ -106,6 +110,10 @@ $(document).ready(function () {
 
     getUserData(telInputInitialization)
     popupSearchAction()
+
+    $('.review-form-open').click(function (){
+        $(this).closest('.general-popup').attr('data-step', 3)
+    })
 })
 
 function getUserData(callback) {

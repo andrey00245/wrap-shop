@@ -187,7 +187,7 @@ class SearchController extends Controller
         }
 
         $responseArray = Product::getCountProducts($categories, $request, $selectedFilterValues, $attributesArray);
-//dd($products->lastPage());
+
         if(request()->ajax()){
             return [
                 'lastPage' => $products->lastPage(),

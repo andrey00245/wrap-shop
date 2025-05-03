@@ -263,7 +263,7 @@ class ProductController extends Controller
 
         $responseArray = Product::getCountProducts($categories, request(), $selectedFilterValues, $attributesArray);
 
-        if(request()->ajax()){
+        if (request()->ajax()) {
             return [
                 'lastPage' => $products->lastPage(),
                 'html' => view('base.pages.products.ajax-product-list', compact('products'))->render(),
@@ -271,7 +271,7 @@ class ProductController extends Controller
         }
 
         $paginationPages = PaginationPages::getPages(max(1, (int)request()->query('page', 1)), $products->lastPage());
-        
+
         return view('base.pages.products.index', [
             'products' => $products,
             'category' => $category,

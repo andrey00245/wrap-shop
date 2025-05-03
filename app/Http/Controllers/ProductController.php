@@ -144,7 +144,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function category(Category $category, Category $subcategory = null, Category $subsubcategory = null): View
+    public function category(Category $category, Category $subcategory = null, Category $subsubcategory = null): string
     {
         $selectedFilterValues = request()->all();
         unset($selectedFilterValues['page'],
@@ -261,6 +261,10 @@ class ProductController extends Controller
         }
 
         $responseArray = Product::getCountProducts($categories, request(), $selectedFilterValues, $attributesArray);
+
+        if(request()->ajax()){
+            return view('base.pages.products.ajax-product-list', compact('products'))->render();
+        }
 
         return view('base.pages.products.index', [
             'products' => $products,

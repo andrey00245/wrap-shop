@@ -50,33 +50,36 @@ $(document).ready(function () {
         }
     });
 
-    $('.button-cart-product').on('click', function (e) {
-        var productId = $(this).data('product-id');
-        var quantity = $(this).data('product-quantity');
-        if (parseFloat(quantity) > 0) {
-            $.ajax({
-                url: '/cart/add',
-                method: 'POST',
-                data: {
-                    product_id: productId,
-                    quantity: quantity
-                },
-                success: function (response) {
-                    $('#cart-total').html(response.cartItemsCount)
-                    $('.cart-shopping-items').html(response.cartItems);
+    document.querySelector('body').addEventListener('click', function (event) {
+        const addToCartBtns = event.target.closest('.button-cart-product')
+        if (addToCartBtns) {
+            var productId = addToCartBtns.getAttribute('data-product-id');
+            var quantity = addToCartBtns.getAttribute('data-product-quantity');
+            if (parseFloat(quantity) > 0) {
+                $.ajax({
+                    url: '/cart/add',
+                    method: 'POST',
+                    data: {
+                        product_id: productId,
+                        quantity: quantity
+                    },
+                    success: function (response) {
+                        $('#cart-total').html(response.cartItemsCount)
+                        $('.cart-shopping-items').html(response.cartItems);
 
-                    const numberParts = decimalAndIntParts(response.sum)
-                    $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
-                },
-                error: function (xhr, status, error) {
-                    alert('Ошибка при добавлении в корзину: ' + error);
-                }
-            });
-        } else {
-            alert('Пожалуйста, выберите корректное количество товара.');
+                        const numberParts = decimalAndIntParts(response.sum)
+                        $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Ошибка при добавлении в корзину: ' + error);
+                    }
+                });
+            } else {
+                alert('Пожалуйста, выберите корректное количество товара.');
+            }
         }
-    });
 
+    })
 
     $('.cart-quantity-input-wrappper .input-quantity').on('change', function () {
         updateCarts($(this).closest('tr').data('id'), $(this).val());

@@ -445,29 +445,24 @@
                 </div>
 
                 <div class="category-bottom flex-center">
+                    <div id="ss_showmore" class="category-loadmore">
+                        <div class="colord lloading" data-loader="arrow-circle" style="display: block;"></div>
+                        <div type="button" class="button">
+                            Показати наступні<i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
                     <div class="category-pagination">
                         @if ($products->hasPages())
                             <ul class="flex-center pagination">
-                                @if ($products->currentPage() > 3)
-                                    <li><a href="{{ $products->appends((request()->except('page')))->url(1) }}">1</a>
-                                    </li>
-                                    <li class="disabled"><span>&hellip;</span></li>
-                                @endif
-                                @for ($i = max($products->currentPage() - 2, 1); $i <= min($products->currentPage() + 2, $products->lastPage()); $i++)
-                                    @if ($i == $products->currentPage())
-                                        <li class="active"><span>{{$i}}</span></li>
+                                @foreach($pages as $page)
+                                    @if ($page == $products->currentPage())
+                                        <li class="active"><span>{{$page}}</span></li>
                                     @else
                                         <li>
-                                            <a href="{{ $products->appends((request()->except('page')))->url($i) }}">{{ $i }}</a>
+                                            <a href="{{ $products->appends((request()->except('page')))->url($page) }}">{{ $page }}</a>
                                         </li>
                                     @endif
-                                @endfor
-                                @if ($products->currentPage() < $products->lastPage() - 2)
-                                    <li class="disabled"><span>&hellip;</span></li>
-                                    <li><a
-                                            href="{{ $products->appends((request()->except('page')))->url($products->lastPage()) }}">{{ $products->lastPage() }}</a>
-                                    </li>
-                                @endif
+                                @endforeach
                             </ul>
                         @endif
                     </div>

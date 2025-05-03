@@ -459,9 +459,9 @@ $(document).ready(function () {
 
 
         data.filters = filters
-        if(categoryId === undefined){
+        if (categoryId === undefined) {
             data.category_id = category_id
-        }else {
+        } else {
             data.category_id = categoryId
         }
         data.min_price = minPrice
@@ -514,4 +514,101 @@ $(document).ready(function () {
             }
         });
     }
+
+    let loading = false;
+    const productList = document.querySelector('.category-products');
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentPage = parseInt(urlParams.get('page')) || 1;
+    let paginationItems = document.querySelector('.category-pagination .pagination');
+    currentPage += 1;
+
+    window.addEventListener('scroll', () => {
+        if (loading) return;
+
+        const rect = productList.getBoundingClientRect();
+        const isVisible = rect.bottom <= window.innerHeight + 300;
+
+        if (isVisible) {
+            loading = true;
+
+            const newParams = new URLSearchParams(window.location.search);
+            newParams.set('page', currentPage);
+
+            fetch(window.location.pathname + '?' + newParams.toString(), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.html.trim().length === 0) {
+                        window.removeEventListener('scroll', this);
+                        document.getElementById('ss_showmore').style.display = 'none';
+                        return;
+                    }
+
+                    productList.insertAdjacentHTML('beforeend', data.html);
+                    imageSliderInProduct('category-products-item');
+
+                    currentPage++;
+
+                    paginationItems.innerHTML = '';
+                    getPagination(currentPage - 1, data.lastPage).forEach(function (el){
+                        newParams.set('page', String(el));
+                        const pageItem = document.createElement('li');
+                        let innerPage;
+
+                        if (el === currentPage - 1) {
+                            pageItem.className = 'active';
+                            innerPage = document.createElement('span');
+                            innerPage.innerText = String(el)
+                        } else {
+                            innerPage = document.createElement('a');
+                            innerPage.innerText = String(el)
+                            innerPage.setAttribute('href', window.location.pathname + '?' + newParams);
+                        }
+                        pageItem.appendChild(innerPage);
+                        console.log(paginationItems)
+                        paginationItems.appendChild(pageItem)
+                    })
+
+                    loading = false;
+
+                    newParams.set('page', currentPage - 1);
+                    const newUrl = window.location.pathname + '?' + newParams.toString();
+                    window.history.replaceState(null, '', newUrl);
+                });
+        }
+    });
+
+
 })
+
+function getPagination(current, total, maxVisible = 9) {
+    const pages = [];
+
+    if (total <= maxVisible) {
+        for (let i = 1; i <= total; i++) {
+            pages.push(i);
+        }
+    } else {
+        let half = Math.floor(maxVisible / 2);
+        let start = current - half;
+        let end = current + half;
+
+        if (start < 1) {
+            start = 1;
+            end = maxVisible;
+        }
+
+        if (end > total) {
+            end = total;
+            start = total - maxVisible + 1;
+        }
+
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+    }
+    return pages;
+}

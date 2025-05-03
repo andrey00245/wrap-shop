@@ -567,30 +567,143 @@
 
                 </div>
 
+                <style>[data-loader='arrow-circle']
+                    {
+                        position: relative;
+                        width: 25px;
+                        height: 25px;
+                        -webkit-animation: arrow-circle infinite .75s linear;
+                        -moz-animation: arrow-circle infinite .75s linear;
+                        -o-animation: arrow-circle infinite .75s linear;
+                        animation: arrow-circle infinite .75s linear;
+                        border: 2px solid;
+                        border-top-color: transparent;
+                        border-bottom-color: transparent;
+                        border-radius: 100%;
+                        margin: 0 auto 5px;
+                    }
+                    [data-loader='arrow-circle']:before,
+                    [data-loader='arrow-circle']:after
+                    {
+                        position: absolute;
+                        top: 19px;
+                        left: -3px;
+
+                        content: '';
+                        -webkit-transform: rotate(-30deg);
+                        -ms-transform: rotate(-30deg);
+                        -o-transform: rotate(-30deg);
+                        transform: rotate(-30deg);
+
+                        border-top: 5px solid #fff;
+                        border-right: 5px solid transparent;
+                        border-left: 5px solid transparent;
+                    }
+                    [data-loader='arrow-circle']:after
+                    {
+                        top: 0;
+                        left: 17px;
+
+                        -webkit-transform: rotate(150deg);
+                        -ms-transform: rotate(150deg);
+                        -o-transform: rotate(150deg);
+                        transform: rotate(150deg);
+                    }
+
+                    @-webkit-keyframes arrow-circle
+                    {
+                        0%
+                        {
+                            -webkit-transform: rotate(360deg);
+                            -ms-transform: rotate(360deg);
+                            -o-transform: rotate(360deg);
+                            transform: rotate(360deg);
+                        }
+                        100%
+                        {
+                            -webkit-transform: rotate(0);
+                            -ms-transform: rotate(0);
+                            -o-transform: rotate(0);
+                            transform: rotate(0);
+                        }
+                    }
+
+                    @-moz-keyframes arrow-circle
+                    {
+                        0%
+                        {
+                            -webkit-transform: rotate(360deg);
+                            -ms-transform: rotate(360deg);
+                            -o-transform: rotate(360deg);
+                            transform: rotate(360deg);
+                        }
+                        100%
+                        {
+                            -webkit-transform: rotate(0);
+                            -ms-transform: rotate(0);
+                            -o-transform: rotate(0);
+                            transform: rotate(0);
+                        }
+                    }
+
+                    @-o-keyframes arrow-circle
+                    {
+                        0%
+                        {
+                            -webkit-transform: rotate(360deg);
+                            -ms-transform: rotate(360deg);
+                            -o-transform: rotate(360deg);
+                            transform: rotate(360deg);
+                        }
+                        100%
+                        {
+                            -webkit-transform: rotate(0);
+                            -ms-transform: rotate(0);
+                            -o-transform: rotate(0);
+                            transform: rotate(0);
+                        }
+                    }
+
+                    @keyframes arrow-circle
+                    {
+                        0%
+                        {
+                            -webkit-transform: rotate(360deg);
+                            -ms-transform: rotate(360deg);
+                            -o-transform: rotate(360deg);
+                            transform: rotate(360deg);
+                        }
+                        100%
+                        {
+                            -webkit-transform: rotate(0);
+                            -ms-transform: rotate(0);
+                            -o-transform: rotate(0);
+                            transform: rotate(0);
+                        }
+                    }
+
+
+                </style>
+
                 <div class="category-bottom flex-center">
+                    <div id="ss_showmore" class="category-loadmore">
+                        <div class="colord lloading" data-loader="arrow-circle" style="display: block;"></div>
+                        <div type="button" class="button">
+                            Показати наступні<i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
                     <div class="category-pagination">
                         @if ($products->hasPages())
                             <ul class="flex-center pagination">
-                                @if ($products->currentPage() > 3)
-                                    <li><a href="{{ $products->appends((request()->except('page')))->url(1) }}">1</a>
-                                    </li>
-                                    <li class="disabled"><span>&hellip;</span></li>
-                                @endif
-                                @for ($i = max($products->currentPage() - 2, 1); $i <= min($products->currentPage() + 2, $products->lastPage()); $i++)
-                                    @if ($i == $products->currentPage())
-                                        <li class="active"><span>{{$i}}</span></li>
+                                @foreach($pages as $page)
+                                    @if ($page == $products->currentPage())
+                                        <li class="active"><span>{{$page}}</span></li>
                                     @else
                                         <li>
-                                            <a href="{{ $products->appends((request()->except('page')))->url($i) }}">{{ $i }}</a>
+                                            <a href="{{ $products->appends((request()->except('page')))->url($page) }}">{{ $page }}</a>
                                         </li>
                                     @endif
-                                @endfor
-                                @if ($products->currentPage() < $products->lastPage() - 2)
-                                    <li class="disabled"><span>&hellip;</span></li>
-                                    <li><a
-                                            href="{{ $products->appends((request()->except('page')))->url($products->lastPage()) }}">{{ $products->lastPage() }}</a>
-                                    </li>
-                                @endif
+                                @endforeach
                             </ul>
                         @endif
                     </div>

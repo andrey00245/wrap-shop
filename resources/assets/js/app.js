@@ -59,12 +59,15 @@ $(document).ready(function () {
         $(this).closest('#login-popup').attr('data-step', '1')
     })
 
-    $(".notify-available-btn").on("click", function () {
-        $('#button-submit-report-availability').attr('data-product-id', $(this).data('product-id'));
-    })
-
-    $(".stock-in-alert").on("click", function () {
-        $('#button-submit-report-availability').attr('data-product-id', $(this).data('product-id'));
+    document.querySelector('body').addEventListener('click', function (event) {
+        const notifyBtns = event.target.closest('.notify-available-btn')
+        const reportAvailabilytyBtns = event.target.closest('.stock-in-alert')
+        if (notifyBtns) {
+            document.querySelector('#button-submit-report-availability').setAttribute('data-product-id', notifyBtns.getAttribute('data-product-id'));
+        }
+        if (reportAvailabilytyBtns) {
+            document.querySelector('#button-submit-report-availability').setAttribute('data-product-id', reportAvailabilytyBtns.getAttribute('data-product-id'));
+        }
     })
 
     $("#button-restore-password").click(function () {
@@ -410,16 +413,15 @@ function popupSearchHandler(dropdownMenu, event) {
 }
 
 function popupsOpenClose(){
-    const popupsBtns = document.querySelectorAll('.general-popup-btn')
     const closeBtns = document.querySelectorAll('.general-popup .popup-close')
     const popups = document.querySelectorAll('.general-popup');
-
-    popupsBtns.forEach(function (el, index){
-        popupsBtns[index].addEventListener('click', function (){
+    document.querySelector('body').addEventListener('click', function(event) {
+        const button = event.target.closest('.general-popup-btn')
+        if (button) {
             closeAllPopups(popups)
-            const target = popupsBtns[index].getAttribute('data-popup')
+            const target = button.getAttribute('data-popup')
             document.getElementById(target).classList.add('active');
-        })
+        }
     })
 
     closeBtns.forEach(btn => {

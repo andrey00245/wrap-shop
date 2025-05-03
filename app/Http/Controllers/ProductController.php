@@ -271,8 +271,7 @@ class ProductController extends Controller
         }
 
         $paginationPages = PaginationPages::getPages(max(1, (int)request()->query('page', 1)), $products->lastPage());
-
-
+        
         return view('base.pages.products.index', [
             'products' => $products,
             'category' => $category,

@@ -165,7 +165,7 @@ class SearchController extends Controller
             return $product;
         });
 
-        $perPage = 18;
+        $perPage = 30;
         $products = new LengthAwarePaginator($productWithFilters->forPage(request()->get('page'), $perPage), $productWithFilters->count(), $perPage, request()->get('page'), ['path' => url()->current(), 'pageName' => 'page']);
         $attributesArray = [];
 

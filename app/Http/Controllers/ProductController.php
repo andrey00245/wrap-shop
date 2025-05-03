@@ -244,7 +244,7 @@ class ProductController extends Controller
             return $product;
         });
 
-        $perPage = 18;
+        $perPage = 30;
         $attributes = collect();
 
         foreach ($productsAllCollection as $product) {

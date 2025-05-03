@@ -526,7 +526,7 @@ $(document).ready(function () {
         if (loading) return;
 
         const rect = productList.getBoundingClientRect();
-        const isVisible = rect.bottom <= window.innerHeight + 300;
+        const isVisible = rect.bottom <= window.innerHeight + 1500;
 
         if (isVisible) {
             loading = true;
@@ -568,7 +568,6 @@ $(document).ready(function () {
                             innerPage.setAttribute('href', window.location.pathname + '?' + newParams);
                         }
                         pageItem.appendChild(innerPage);
-                        console.log(paginationItems)
                         paginationItems.appendChild(pageItem)
                     })
 

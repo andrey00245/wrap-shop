@@ -17,10 +17,10 @@
       <div class="page-account-wrap flex-justify">
 
           <div id="content" class="page-account-right success-page">
-              <h1>Ваше замовлення прийняте!</h1>
-              <div class="success-text"><p>Ваше замовлення прийняте!</p><p>Історія замовлення знаходиться в <a href="{{route('account')}}">Особистому кабінеті</a>. Для перегляду історії, перейдіть по посиланню <a href="{{route('order')}}">Історія замовлень</a>.</p><p style="display:none">Если ваша покупка связана с загрузкой, вы можете перейти в личный кабинет на страницу <a href="https://wrap.shop/index.php?route=account/download">загрузки</a> для их просмотра.</p><p>Якщо у Вас виникли питання, будь ласка <a href="{{route('contacts')}}">зв'яжіться з нами</a>.</p><p><strong>Дякуємо за покупки в нашому інтернет-магазині!</strong></p></div>
+              <h1>{{__('success.checkout.your_order')}}</h1>
+              <div class="success-text">{!!__('success.checkout.your_order_description')!!}</div>
               <div class="buttons">
-                  <div class="pull-right"><a href="{{route('index')}}" class="btn btn-primary">Продовжити</a></div>
+                  <div class="pull-right"><a href="{{route('index')}}" class="btn btn-primary">{{__('success.checkout.continue')}}</a></div>
               </div>
           </div>
       </div>

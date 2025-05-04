@@ -77,19 +77,6 @@
                             <div class="item flex-justify">{{ $attribute->name }} <span class="label">{{$value}}</span>
                             </div>
                         @endforeach
-                        {{--            <div class="item flex-justify">Матеріал <span class="label">вініл</span></div>--}}
-                        {{--            <div class="item flex-justify">Структура <span class="label">глянцева</span></div>--}}
-                        {{--            <div class="item flex-justify">Основний відтінок <span class="label">коричневий</span></div>--}}
-                        {{--            <div class="item flex-justify">Рулон, м.п. <span class="label">25</span></div>--}}
-                        {{--            <div class="item flex-justify">Ширина, м <span class="label">1,52</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Товщина <span class="label">80 мкр</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Спосіб нанесення <span class="label">сухий</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Температура поверхні <span class="label">від +10°C до +16°C</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Температура експлуатації <span class="label">від -50°C до +110°C</span>--}}
-                        {{--            </div>--}}
-                        {{--            <div class="item flex-justify hide">Строк експлуатації <span class="label">до 5 років</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Технологія виробництва <span class="label">литий вініл</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Країна-виробник <span class="label">США</span></div>--}}
                     </div>
                     <div id="show-all" style="display: none" class="button">{{__('product-show.show-all')}}</div>
                     <div id="show-less" style="display: none" class="button">{{__('product-show.show-less')}}</div>

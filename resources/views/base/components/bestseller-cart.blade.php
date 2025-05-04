@@ -80,7 +80,7 @@
                                 @else
                                     <button data-popup="report-availability-popup" class="button colord notify-available-btn general-popup-btn"
                                             data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
-                                            class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                                            class="hidden-xs hidden-sm hidden-md"> {{__('product-index.notify')}}</span></button>
                                 @endif
                             </div>
                         </div>

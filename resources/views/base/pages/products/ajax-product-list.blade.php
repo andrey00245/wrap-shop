@@ -3,7 +3,12 @@
     $bannerIndex = 0;
 @endphp
 @foreach($products as $product)
-    @php $blockCount++; @endphp
+    @php
+        $blockCount++;
+        if($bannerIndex+1 > $productBanners->count()){
+            $bannerIndex = 0;
+        }
+    @endphp
     @if($blockCount % 6 == 0 && isset($productBanners[$bannerIndex]))
         <a href="{{$productBanners[$bannerIndex]->url}}"
            class="category-products-item product-default product-layout banner product-grid">
@@ -15,7 +20,6 @@
             >
         </a>
         @php
-            $banner = $productBanners[$bannerIndex];
             $bannerIndex++;
             $blockCount++;
         @endphp
@@ -127,5 +131,15 @@
         {{--                <div class="item flex-column">Структура <span class="label">сатинова</span></div>--}}
         {{--              </div>--}}
     </div>
-
+    @if($blockCount === 35)
+        <a href="{{$productBanners[$bannerIndex]->url}}"
+           class="category-products-item product-default product-layout banner product-grid">
+            <img class="vertical"
+                 src="{{$productBanners[$bannerIndex]->getVerticalPreview()}}"
+            >
+            <img class="gorizont"
+                 src="{{$productBanners[$bannerIndex]->getHorizontalPreview()}}"
+            >
+        </a>
+    @endif
 @endforeach

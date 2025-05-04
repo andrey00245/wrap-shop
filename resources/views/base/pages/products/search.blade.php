@@ -319,20 +319,36 @@
                     <div class="button-sort category-sort-open button"><i
                             class="fal fa-sort-alt"></i>{{__('product-index.sort')}}</div>
                 </div>
+                @php
+                    $blockCount = 0;
+                    $bannerIndex = 0;
+                @endphp
                 <div class="category-products flex-wrap">
-                    <a href="javascript:void(0)" title="3m color"
-                       class="category-products-item product-default product-layout banner product-grid">
-                        <img class="vertical"
-                             src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-vert.webp"
-                             alt="3m color" title="3m color">
-                        <img class="gorizont"
-                             src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-gor.webp"
-                             alt="3m color" title="3m color">
-                    </a>
                     @foreach($products as $product)
-                        <div
-                            class="category-products-item product-default product-default__splide product-layout product-grid"
-                            id="categoryProductsItem{{$product->id}}">
+                        @php
+                            $blockCount++;
+                            if($bannerIndex+1 > $productBanners->count()){
+                                $bannerIndex = 0;
+                            }
+                        @endphp
+                        @if($blockCount % 6 == 0 && isset($productBanners[$bannerIndex]))
+                            <a href="{{$productBanners[$bannerIndex]->url}}"
+                               class="category-products-item product-default product-layout banner product-grid">
+                                <img class="vertical"
+                                     src="{{$productBanners[$bannerIndex]->getVerticalPreview()}}"
+                                >
+                                <img class="gorizont"
+                                     src="{{$productBanners[$bannerIndex]->getHorizontalPreview()}}"
+                                >
+                            </a>
+                            @php
+                                $bannerIndex++;
+                                $blockCount++;
+                            @endphp
+                        @endif
+
+                        <div class="category-products-item product-default product-default__splide product-layout product-grid"
+                             id="categoryProductsItem{{$product->id}}">
                             @if($product->is_top_seller)
                                 <div class="sale statuses list">
                                     <div class="category-status category-status-1 status-inline text rectangle "
@@ -376,12 +392,11 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div
                                 class="image default-products-images">
                                 <i class="far fa-search-plus colord"
                                    data-src="{{$product->getMedia('images')->first()->getUrl()}}"
-                                   data-fancybox="bestseller{{$product->id}}" data-caption="{{$product->name}}"></i>
+                                   data-fancybox="products{{$product->id}}" data-caption="{{$product->name}}"></i>
                                 <a class="image-link" href="{{route('products.show', ['product'=>$product->slugEn])}}"
                                    title="{{$product->name}}">
                                     <div class="splide products-images">
@@ -392,7 +407,7 @@
                                                         @if($key>0)
                                                             <div class="hide"
                                                                  data-src="{{$image->getUrl()}}"
-                                                                 data-fancybox="bestseller{{$product->id}}"
+                                                                 data-fancybox="products{{$product->id}}"
                                                                  data-caption="{{$product->name}}"></div>
                                                         @endif
                                                         <img loading="lazy"
@@ -439,7 +454,17 @@
                             {{--                <div class="item flex-column">Структура <span class="label">сатинова</span></div>--}}
                             {{--              </div>--}}
                         </div>
-
+                        @if($blockCount === 35)
+                            <a href="{{$productBanners[$bannerIndex]->url}}"
+                               class="category-products-item product-default product-layout banner product-grid">
+                                <img class="vertical"
+                                     src="{{$productBanners[$bannerIndex]->getVerticalPreview()}}"
+                                >
+                                <img class="gorizont"
+                                     src="{{$productBanners[$bannerIndex]->getHorizontalPreview()}}"
+                                >
+                            </a>
+                        @endif
                     @endforeach
 
                 </div>

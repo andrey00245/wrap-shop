@@ -89,10 +89,10 @@
                 @endguest
 
                 @auth
-                    <a href="{{route('wishlist')}}" id="wishlist-total" title="Закладки (0)"
+                    <a href="{{route('wishlist')}}" id="wishlist-total" title="{{__('checkout.wishlist')}}"
                        class="button heart far fa-heart"><span
                             class="wishlist-total flex-center">{{auth()->user()->favoriteCount()}}</span></a>
-                    <a href="{{route('account')}}" title="Особистий кабінет" class="button user far fa-user-check"></a>
+                    <a href="{{route('account')}}" title="{{__('checkout.personal_account')}}" class="button user far fa-user-check"></a>
                 @endauth
                 <div class="head-top-open button general-popup-btn" data-popup="menu-popup">
                     <i class="far fa-bars"></i>

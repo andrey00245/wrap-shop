@@ -100,7 +100,7 @@
                                                 class="button colord general-popup-btn notify-available-btn"
                                                 data-popup="report-availability-popup"
                                                 data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
-                                                    class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                                                    class="hidden-xs hidden-sm hidden-md">{{__('product-index.notify')}}</span></button>
                                         @endif
                                     </div>
                                 </div>

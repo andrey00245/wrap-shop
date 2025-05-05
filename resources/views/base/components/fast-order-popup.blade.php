@@ -21,7 +21,7 @@
                             <td class="price price-default">
                                 {{$product->getPrice()}} ₴<span class="price-unit-xvr"></span>
                                 <span class="length">
-                @include('base.svg-icons.question'){{$product->getRollSize() ? 'за 1 м.п.' : 'за 1  шт'}}.
+                @include('base.svg-icons.question'){{$product->getRollSize() ? __('product-index.per_lin_m') : __('product-index.per_pc')}}.
               </span>
                             </td>
                             <td class="count flex-justify" data-counter="" id="quantity-block">
@@ -65,7 +65,6 @@
             <div class="inner form-horizontal">
                 <div class="form-group">
                     <div class="form">
-                        <!-- Имя -->
                         <div class="form-group group-name">
                             <label for="name"
                                    class="login-info-text text-center margintop20">{!! __('popup.consult_popup.name') !!}</label>
@@ -74,7 +73,6 @@
                                    value="{{ auth()->check() ? auth()->user()->name : '' }}">
                         </div>
 
-                        <!-- Телефон -->
                         <div class="form-group group-telephone">
                             <label for="phone"
                                    class="login-info-text text-center margintop20">{!! __('popup.consult_popup.phone') !!}</label>
@@ -84,7 +82,6 @@
                                    value="{{ auth()->check() ? auth()->user()->phone : '' }}">
                         </div>
 
-                        <!-- Email -->
                         <div class="form-group group-email">
                             <label for="email"
                                    class="login-info-text text-center margintop20">{{__('popup.consult_popup.email')}}</label>
@@ -93,7 +90,6 @@
                                    value="{{ auth()->check() ? auth()->user()->email : '' }}">
                         </div>
 
-                        <!-- Комментарий -->
                         <div class="form-group group-comment">
                             <label for="comment"
                                    class="login-info-text text-center margintop20">{{__('popup.consult_popup.comment')}}</label>

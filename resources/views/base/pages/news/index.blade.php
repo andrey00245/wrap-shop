@@ -41,8 +41,7 @@
         @endif
       @endforeach
 
-{{--      <a href="https://wrap.shop/novini-ta-akcii/akcii/" class="button ocdw_blog-list-group-item sale" title="Акції %">Акції--}}
-{{--        %</a>--}}
+{{--      <a href="https://wrap.shop/novini-ta-akcii/akcii/" class="button ocdw_blog-list-group-item sale" title=""></a>--}}
     </nav>
 
 

@@ -35,7 +35,7 @@
                     <td class="price-default">
                         {{$item['product']->getPrice()}} ₴<span class="price-unit-xvr"></span>
                         <span class="length">
-                @include('base.svg-icons.question'){{$item['product']->getRollSize() ? 'за 1 м.п.' : 'за 1  шт.'}}
+                @include('base.svg-icons.question'){{$item['product']->getRollSize() ? __('product-index.per_lin_m') : __('product-index.per_pc')}}
               </span>
                     </td>
                     <td class="count flex-justify" data-counter="">
@@ -61,7 +61,7 @@
                         {{$item['product']->getPriceByCount($item['quantity']) ?? $sum}} ₴
                     </td>
                     <td class="delete">
-                        <button type="button" title="Видалити" data-id="{{$item->product->id ?? $item['product']->id}}"
+                        <button type="button" title="{{__('popup.cart_popup.delete')}}" data-id="{{$item->product->id ?? $item['product']->id}}"
                                 class="btn btn-danger btn-xs remove-cart-button"><i
                                 class="fas fa-trash"></i></button>
                     </td>
@@ -76,16 +76,14 @@
             <div class="total">
                 <div class="name_background_wrapper">
                     <div class="background"></div>
-                    <div class="name">Разом</div>
+                    <div class="name">{{__('popup.cart_popup.total')}}</div>
                 </div>
                 <div class="value">{!! $sum_html !!} ₴</div>
             </div>
             <div class="cart-mini-button">
-                <a href="{{route('checkout')}}" title="Перейти до оформлення" class="checkout colord"><i
-                        class="fas fa-chevron-right"></i> Перейти до оформлення</a>
-                <div class="continion close-cart-popup"><i
-                        class="fas fa-chevron-right"></i>Продовжити покупки
-                </div>
+                <a href="{{route('checkout')}}" title="{{__('popup.cart_popup.checkout')}}" class="checkout colord"><i
+                        class="fas fa-chevron-right"></i>{{__('popup.cart_popup.checkout')}}</a>
+                <div class="continion close-cart-popup"><i class="fas fa-chevron-right"></i>{{__('popup.cart_popup.continue_shopping')}}</div>
             </div>
         </div>
     </li>

@@ -15,7 +15,7 @@
       </div>
         @if(Route::currentRouteName() !== 'checkout.success')
             <div class="head-continue">
-                <a href="{{ route('index') }}" title="продовжити покупки" class="button">продовжити покупки</a>
+                <a href="{{ route('index') }}" title="{{__('checkout.continue_shopping')}}" class="button">{{__('checkout.continue_shopping')}}</a>
             </div>
         @endif
       <div class="head-catalog-bg"></div>
@@ -46,9 +46,9 @@
         @endguest
 
         @auth
-          <a href="{{route('wishlist')}}" id="wishlist-total" title="Закладки (0)"
+          <a href="{{route('wishlist')}}" id="wishlist-total" title="{{__('checkout.wishlist')}}"
              class="button heart far fa-heart"><span class="wishlist-total flex-center">0</span></a>
-          <a href="{{route('account')}}" title="Особистий кабінет" class="button user far fa-user-check"></a>
+          <a href="{{route('account')}}" title="{{__('checkout.personal_account')}}" class="button user far fa-user-check"></a>
         @endauth
       </div>
     </div>

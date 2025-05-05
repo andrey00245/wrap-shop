@@ -22,6 +22,10 @@ return [
     'reset' => 'Скасувати',
     'price_from_to' => 'від :min до :max ₴',
     'notify' => 'Повідомити',
+    'recommend' => 'рекомендуємо',
+    'per_lin_m' => 'за 1 м.п.',
+    'per_pc' => 'за 1 шт.',
+    'in_wishlist' => 'В закладки',
+    'lin_m_and_more' => ':count м.п. і більше',
 
 ];
-?>

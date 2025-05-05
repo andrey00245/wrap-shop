@@ -22,5 +22,10 @@ return [
     'reset' => 'Reset',
     'price_from_to' => 'from :min to :max ₴',
     'notify' => 'Notify',
+    'recommend' => 'Recommended',
+    'per_lin_m' => 'per 1 lin. m',
+    'per_pc' => 'per 1 pc.',
+    'in_wishlist' => 'In wishlist',
+    'lin_m_and_more' => ':count lin. m. and more',
+
 ];
-?>

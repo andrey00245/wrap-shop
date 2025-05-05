@@ -558,13 +558,13 @@
                                         <button class="button colord notify-available-btn general-popup-btn"
                                                 data-popup="report-availability-popup"
                                                 data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
-                                                class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                                                class="hidden-xs hidden-sm hidden-md"> {{__('product-index.notify')}}</span></button>
                                     @endif
                                 </div>
                             </div>
                             {{--              <div class="params">--}}
-                            {{--                <div class="item flex-column">Призначення <span class="label">декоративна</span></div>--}}
-                            {{--                <div class="item flex-column">Структура <span class="label">сатинова</span></div>--}}
+                            {{--                <div class="item flex-column"> <span class="label"></span></div>--}}
+                            {{--                <div class="item flex-column"> <span class="label"></span></div>--}}
                             {{--              </div>--}}
                         </div>
                         @if($blockCount === 35)

@@ -319,20 +319,36 @@
                     <div class="button-sort category-sort-open button"><i
                             class="fal fa-sort-alt"></i>{{__('product-index.sort')}}</div>
                 </div>
+                @php
+                    $blockCount = 0;
+                    $bannerIndex = 0;
+                @endphp
                 <div class="category-products flex-wrap">
-                    <a href="javascript:void(0)" title="3m color"
-                       class="category-products-item product-default product-layout banner product-grid">
-                        <img class="vertical"
-                             src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-vert.webp"
-                             alt="3m color" title="3m color">
-                        <img class="gorizont"
-                             src="https://wrap.shop/image/catalog/category/webp/banners%20catalog/1-3m-gor.webp"
-                             alt="3m color" title="3m color">
-                    </a>
                     @foreach($products as $product)
-                        <div
-                            class="category-products-item product-default product-default__splide product-layout product-grid"
-                            id="categoryProductsItem{{$product->id}}">
+                        @php
+                            $blockCount++;
+                            if($bannerIndex+1 > $productBanners->count()){
+                                $bannerIndex = 0;
+                            }
+                        @endphp
+                        @if($blockCount % 6 == 0 && isset($productBanners[$bannerIndex]))
+                            <a href="{{$productBanners[$bannerIndex]->url}}"
+                               class="category-products-item product-default product-layout banner product-grid">
+                                <img class="vertical"
+                                     src="{{$productBanners[$bannerIndex]->getVerticalPreview()}}"
+                                >
+                                <img class="gorizont"
+                                     src="{{$productBanners[$bannerIndex]->getHorizontalPreview()}}"
+                                >
+                            </a>
+                            @php
+                                $bannerIndex++;
+                                $blockCount++;
+                            @endphp
+                        @endif
+
+                        <div class="category-products-item product-default product-default__splide product-layout product-grid"
+                             id="categoryProductsItem{{$product->id}}">
                             @if($product->is_top_seller)
                                 <div class="sale statuses list">
                                     <div class="category-status category-status-1 status-inline text rectangle "
@@ -376,12 +392,11 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div
                                 class="image default-products-images">
                                 <i class="far fa-search-plus colord"
                                    data-src="{{$product->getMedia('images')->first()->getUrl()}}"
-                                   data-fancybox="bestseller{{$product->id}}" data-caption="{{$product->name}}"></i>
+                                   data-fancybox="products{{$product->id}}" data-caption="{{$product->name}}"></i>
                                 <a class="image-link" href="{{route('products.show', ['product'=>$product->slugEn])}}"
                                    title="{{$product->name}}">
                                     <div class="splide products-images">
@@ -392,7 +407,7 @@
                                                         @if($key>0)
                                                             <div class="hide"
                                                                  data-src="{{$image->getUrl()}}"
-                                                                 data-fancybox="bestseller{{$product->id}}"
+                                                                 data-fancybox="products{{$product->id}}"
                                                                  data-caption="{{$product->name}}"></div>
                                                         @endif
                                                         <img loading="lazy"
@@ -430,44 +445,49 @@
                                         <button class="button colord notify-available-btn general-popup-btn"
                                                 data-popup="report-availability-popup"
                                                 data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
-                                                class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                                                class="hidden-xs hidden-sm hidden-md"> {{__('product-index.notify')}}</span></button>
                                     @endif
                                 </div>
                             </div>
                             {{--              <div class="params">--}}
-                            {{--                <div class="item flex-column">Призначення <span class="label">декоративна</span></div>--}}
-                            {{--                <div class="item flex-column">Структура <span class="label">сатинова</span></div>--}}
+                            {{--                <div class="item flex-column"> <span class="label"></span></div>--}}
+                            {{--                <div class="item flex-column"> <span class="label"></span></div>--}}
                             {{--              </div>--}}
                         </div>
-
+                        @if($blockCount === 35)
+                            <a href="{{$productBanners[$bannerIndex]->url}}"
+                               class="category-products-item product-default product-layout banner product-grid">
+                                <img class="vertical"
+                                     src="{{$productBanners[$bannerIndex]->getVerticalPreview()}}"
+                                >
+                                <img class="gorizont"
+                                     src="{{$productBanners[$bannerIndex]->getHorizontalPreview()}}"
+                                >
+                            </a>
+                        @endif
                     @endforeach
 
                 </div>
 
                 <div class="category-bottom flex-center">
+                    <div id="ss_showmore" class="category-loadmore">
+                        <div class="colord lloading" data-loader="arrow-circle" style="display: block;"></div>
+                        <div type="button" class="button">
+                            Показати наступні<i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
                     <div class="category-pagination">
                         @if ($products->hasPages())
                             <ul class="flex-center pagination">
-                                @if ($products->currentPage() > 3)
-                                    <li><a href="{{ $products->appends((request()->except('page')))->url(1) }}">1</a>
-                                    </li>
-                                    <li class="disabled"><span>&hellip;</span></li>
-                                @endif
-                                @for ($i = max($products->currentPage() - 2, 1); $i <= min($products->currentPage() + 2, $products->lastPage()); $i++)
-                                    @if ($i == $products->currentPage())
-                                        <li class="active"><span>{{$i}}</span></li>
+                                @foreach($pages as $page)
+                                    @if ($page == $products->currentPage())
+                                        <li class="active"><span>{{$page}}</span></li>
                                     @else
                                         <li>
-                                            <a href="{{ $products->appends((request()->except('page')))->url($i) }}">{{ $i }}</a>
+                                            <a href="{{ $products->appends((request()->except('page')))->url($page) }}">{{ $page }}</a>
                                         </li>
                                     @endif
-                                @endfor
-                                @if ($products->currentPage() < $products->lastPage() - 2)
-                                    <li class="disabled"><span>&hellip;</span></li>
-                                    <li><a
-                                            href="{{ $products->appends((request()->except('page')))->url($products->lastPage()) }}">{{ $products->lastPage() }}</a>
-                                    </li>
-                                @endif
+                                @endforeach
                             </ul>
                         @endif
                     </div>

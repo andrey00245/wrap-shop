@@ -1,6 +1,6 @@
 <section class="home-products popup-products row" id="cartProductSlider">
     <div class="home-products-top flex-justify">
-        <h2 class="popup-title"><span class="colord">рекомендуємо</span></h2>
+        <h2 class="popup-title"><span class="colord">{{__('product-index.recommend')}}</span></h2>
 
     </div>
 
@@ -80,7 +80,7 @@
                                 @else
                                     <button data-popup="report-availability-popup" class="button colord notify-available-btn general-popup-btn"
                                             data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
-                                            class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                                            class="hidden-xs hidden-sm hidden-md"> {{__('product-index.notify')}}</span></button>
                                 @endif
                             </div>
                         </div>

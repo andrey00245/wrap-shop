@@ -438,7 +438,12 @@
 
                 <div class="category-products flex-wrap">
                     @foreach($products as $product)
-                        @php $blockCount++; @endphp
+                        @php
+                            $blockCount++;
+                            if($bannerIndex+1 > $productBanners->count()){
+                                $bannerIndex = 0;
+                            }
+                        @endphp
                         @if($blockCount % 6 == 0 && isset($productBanners[$bannerIndex]))
                             <a href="{{$productBanners[$bannerIndex]->url}}"
                                class="category-products-item product-default product-layout banner product-grid">
@@ -450,11 +455,11 @@
                                 >
                             </a>
                             @php
-                                $banner = $productBanners[$bannerIndex];
                                 $bannerIndex++;
                                 $blockCount++;
                             @endphp
                         @endif
+
                         <div class="category-products-item product-default product-default__splide product-layout product-grid"
                              id="categoryProductsItem{{$product->id}}">
                             @if($product->is_top_seller)
@@ -553,44 +558,49 @@
                                         <button class="button colord notify-available-btn general-popup-btn"
                                                 data-popup="report-availability-popup"
                                                 data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
-                                                class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                                                class="hidden-xs hidden-sm hidden-md"> {{__('product-index.notify')}}</span></button>
                                     @endif
                                 </div>
                             </div>
                             {{--              <div class="params">--}}
-                            {{--                <div class="item flex-column">Призначення <span class="label">декоративна</span></div>--}}
-                            {{--                <div class="item flex-column">Структура <span class="label">сатинова</span></div>--}}
+                            {{--                <div class="item flex-column"> <span class="label"></span></div>--}}
+                            {{--                <div class="item flex-column"> <span class="label"></span></div>--}}
                             {{--              </div>--}}
                         </div>
-
+                        @if($blockCount === 35)
+                            <a href="{{$productBanners[$bannerIndex]->url}}"
+                               class="category-products-item product-default product-layout banner product-grid">
+                                <img class="vertical"
+                                     src="{{$productBanners[$bannerIndex]->getVerticalPreview()}}"
+                                >
+                                <img class="gorizont"
+                                     src="{{$productBanners[$bannerIndex]->getHorizontalPreview()}}"
+                                >
+                            </a>
+                        @endif
                     @endforeach
 
                 </div>
 
                 <div class="category-bottom flex-center">
+                    <div id="ss_showmore" class="category-loadmore">
+                        <div class="colord lloading" data-loader="arrow-circle" style="display: block;"></div>
+                        <div type="button" class="button">
+                            Показати наступні<i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
                     <div class="category-pagination">
                         @if ($products->hasPages())
                             <ul class="flex-center pagination">
-                                @if ($products->currentPage() > 3)
-                                    <li><a href="{{ $products->appends((request()->except('page')))->url(1) }}">1</a>
-                                    </li>
-                                    <li class="disabled"><span>&hellip;</span></li>
-                                @endif
-                                @for ($i = max($products->currentPage() - 2, 1); $i <= min($products->currentPage() + 2, $products->lastPage()); $i++)
-                                    @if ($i == $products->currentPage())
-                                        <li class="active"><span>{{$i}}</span></li>
+                                @foreach($pages as $page)
+                                    @if ($page == $products->currentPage())
+                                        <li class="active"><span>{{$page}}</span></li>
                                     @else
                                         <li>
-                                            <a href="{{ $products->appends((request()->except('page')))->url($i) }}">{{ $i }}</a>
+                                            <a href="{{ $products->appends((request()->except('page')))->url($page) }}">{{ $page }}</a>
                                         </li>
                                     @endif
-                                @endfor
-                                @if ($products->currentPage() < $products->lastPage() - 2)
-                                    <li class="disabled"><span>&hellip;</span></li>
-                                    <li><a
-                                            href="{{ $products->appends((request()->except('page')))->url($products->lastPage()) }}">{{ $products->lastPage() }}</a>
-                                    </li>
-                                @endif
+                                @endforeach
                             </ul>
                         @endif
                     </div>

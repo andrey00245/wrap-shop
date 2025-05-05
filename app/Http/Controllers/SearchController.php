@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\PaginationPages;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\App;
@@ -24,7 +25,7 @@ class SearchController extends Controller
         'desc',
     ];
 
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request)
     {
         $selectedFilterValues = request()->all();
 
@@ -164,7 +165,7 @@ class SearchController extends Controller
             return $product;
         });
 
-        $perPage = 18;
+        $perPage = 30;
         $products = new LengthAwarePaginator($productWithFilters->forPage(request()->get('page'), $perPage), $productWithFilters->count(), $perPage, request()->get('page'), ['path' => url()->current(), 'pageName' => 'page']);
         $attributesArray = [];
 
@@ -186,8 +187,19 @@ class SearchController extends Controller
         }
 
         $responseArray = Product::getCountProducts($categories, $request, $selectedFilterValues, $attributesArray);
+
+        if(request()->ajax()){
+            return [
+                'lastPage' => $products->lastPage(),
+                'html' => view('base.pages.products.ajax-product-list', compact('products'))->render(),
+            ];
+        }
+
+        $paginationPages = PaginationPages::getPages(max(1, (int)$request->query('page', 1)), $products->lastPage());
+
         return view('base.pages.products.search', [
             'products'      => $products,
+            'pages'         => $paginationPages,
             'minPrice'      => $minPrice,
             'maxPrice'      => $maxPrice,
             'attributes'    => $attributes->flatten()->unique('field_name') ?? collect(),

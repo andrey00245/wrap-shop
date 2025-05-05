@@ -14,7 +14,7 @@
               {{auth()->user()->name . ' ' . auth()->user()->last_name}}<br>
               {{$address->address}}<br>
               {{$address->city}}<br>
-              Україна</td>
+              {{__('personal-account.you-addresses.ukraine')}}</td>
             <td class="text-right">
               <form action="{{route('account.address.delete', ['address'=>$address->id])}}" method="post" enctype="multipart/form-data">
                 @csrf

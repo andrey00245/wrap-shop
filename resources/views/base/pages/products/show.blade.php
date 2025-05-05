@@ -27,7 +27,7 @@
                 $reversedParents = array_reverse($parents);
 
                 foreach ($reversedParents as $parent) {
-                    echo '<li><a href="'.route('products.category', ['category' => $parent->slug]).'" title="12231231" class="button">'.$parent->name.'</a></li>';
+                    echo '<li><a href="'.route('products.category', ['category' => $parent->slug]).'" title="'.$parent->name.'" class="button">'.$parent->name.'</a></li>';
                 }
             @endphp
         </ul>
@@ -39,7 +39,7 @@
                 <div class="code-wishlist-wrapper">
                     <div class="sku deskopt">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
                     <div class="wishlist desktop">
-                        <button type="button" title="В закладки"
+                        <button type="button" title="{{__('product-index.in_wishlist')}}"
                                 class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"
                                 data-product-id="{{$product->id}}"></button>
                     </div>
@@ -77,19 +77,6 @@
                             <div class="item flex-justify">{{ $attribute->name }} <span class="label">{{$value}}</span>
                             </div>
                         @endforeach
-                        {{--            <div class="item flex-justify">Матеріал <span class="label">вініл</span></div>--}}
-                        {{--            <div class="item flex-justify">Структура <span class="label">глянцева</span></div>--}}
-                        {{--            <div class="item flex-justify">Основний відтінок <span class="label">коричневий</span></div>--}}
-                        {{--            <div class="item flex-justify">Рулон, м.п. <span class="label">25</span></div>--}}
-                        {{--            <div class="item flex-justify">Ширина, м <span class="label">1,52</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Товщина <span class="label">80 мкр</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Спосіб нанесення <span class="label">сухий</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Температура поверхні <span class="label">від +10°C до +16°C</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Температура експлуатації <span class="label">від -50°C до +110°C</span>--}}
-                        {{--            </div>--}}
-                        {{--            <div class="item flex-justify hide">Строк експлуатації <span class="label">до 5 років</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Технологія виробництва <span class="label">литий вініл</span></div>--}}
-                        {{--            <div class="item flex-justify hide">Країна-виробник <span class="label">США</span></div>--}}
                     </div>
                     <div id="show-all" style="display: none" class="button">{{__('product-show.show-all')}}</div>
                     <div id="show-less" style="display: none" class="button">{{__('product-show.show-less')}}</div>
@@ -198,7 +185,7 @@
                           class="only-price">{{number_format($product->getPrice(), 2, '.', '')}}</span> ₴</span>
                                     @endif
                                     <span
-                                        class="label-lenght"> {{$product->getRollSize() ? 'за 1 м.п.' : 'за 1  шт'}}</span><span
+                                        class="label-lenght"> {{$product->getRollSize() ? __('product-index.per_lin_m') : __('product-index.per_pc')}}</span><span
                                         class="cur">$ {{$product->getPriceByDollars($product->getPrice())}}</span>
                                 </div>
                             </div>
@@ -236,7 +223,7 @@
                                 @if($product->getSecondStock() && $product->getSecondStock() <= $count)
                                     <li>
                                         <div class="item-text">
-                                            {{$product->getSecondStock()}} м.п. і більше: <span class="colord">{{$product->getSmallPrice()}} ₴</span>
+                                            {{__('product-index.lin_m_and_more', ['count' => $product->getSecondStock()])}}: <span class="colord">{{$product->getSmallPrice()}} ₴</span>
                                             <span class="cur">| {{$product->getPriceByDollars($product->getSmallPrice())}} $</span>
                                         </div>
                                         <div class="item-btn">
@@ -250,7 +237,7 @@
                                 @if($product->getThirdStock() && $product->getThirdStock() <= $count)
                                     <li>
                                         <div class="item-text">
-                                            {{$product->getThirdStock()}} м.п. і більше: <span class="colord">{{$product->getBigPrice()}} ₴</span>
+                                            {{__('product-index.lin_m_and_more', ['count' => $product->getThirdStock()])}}: <span class="colord">{{$product->getBigPrice()}} ₴</span>
                                             <span class="cur">| {{$product->getPriceByDollars($product->getBigPrice())}} $</span>
                                         </div>
                                         <div class="item-btn">
@@ -388,7 +375,7 @@
               @endif
           </span>
                     <span class="title">{{__('product-show.guarantee')}}</span>
-                    <p>{{$product->getWarranty() ?? '12 мiсяцiв' }}</p>
+                    <p>{{$product->getWarranty() ?? __('product-show.12_month') }}</p>
                 </div>
             </div>
 
@@ -397,7 +384,7 @@
                 <div class="wishlist">
                     <button
                         type="button"
-                        title="В закладки"
+                        title="{{__('product-index.in_wishlist')}}"
                         class="button {{$product->isFavorite() ? 'fas in-wishlist' : 'far'}} fa-heart"
                         data-product-id="{{$product->id}}"
                     ></button>
@@ -464,7 +451,7 @@
                         <div class="item">
                             <div class="image"><img
                                     data-src="{{asset('assets/img/icons/Qualification-'.$product->getMasterQualification().'.svg')}}"
-                                    alt="Кваліфікація майстра - Вимоги" title="Кваліфікація майстра - Вимоги"></div>
+                                    alt="{{__('product-show.requirements_content', ['content' => __('product-show.masters-qualification')])}}" title="{{__('product-show.requirements_content', ['content' => __('product-show.masters-qualification')])}}"></div>
                             <div class="value">{{$product->getMasterQualification()}}<sup>/5</sup></div>
                             <div class="name">{{__('product-show.masters-qualification')}}</div>
                         </div>
@@ -472,8 +459,8 @@
                     @if($product->getRoomTemperature())
                         <div class="item">
                             <div class="image"><img data-src="{{asset('assets/img/icons/Temperature.png')}}"
-                                                    alt="Температура приміщення - Вимоги"
-                                                    title="Температура приміщення - Вимоги"></div>
+                                                    alt="{{__('product-show.requirements_content', ['content' => __('product-show.room-temperature')])}}"
+                                                    title="{{__('product-show.requirements_content', ['content' => __('product-show.room-temperature')])}}"></div>
                             <div
                                 class="value">{{__('product-show.room-temperature-val', ['temperature' => $product->getRoomTemperature()])}}</div>
                             <div class="name">{{__('product-show.room-temperature')}}</div>
@@ -482,8 +469,8 @@
                     @if($product->getStoreTerms())
                         <div class="item">
                             <div class="image"><img data-src="{{asset('assets/img/icons/Term.png')}}"
-                                                    alt="Термін зберігання - Вимоги"
-                                                    title="Термін зберігання - Вимоги"></div>
+                                                    alt="{{__('product-show.requirements_content', ['content' => __('product-show.expiration-date')])}}"
+                                                    title="{{__('product-show.requirements_content', ['content' => __('product-show.expiration-date')])}}"></div>
                             <div class="value">{{$product->getStoreTerms()}}</div>
                             <div class="name">{{__('product-show.expiration-date')}}</div>
                         </div>

@@ -15,6 +15,7 @@ use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
+use Mostafaznv\NovaCkEditor\CkEditor;
 
 class Product extends Resource
 {
@@ -101,7 +102,7 @@ class Product extends Resource
         return [
             NovaTabTranslatable::make([
                 Text::make('Назва', 'name'),
-                Textarea::make('Опис', 'descriptions')
+                CkEditor::make('Опис', 'descriptions')
                     ->nullable(),
             ])->hideFromIndex(),
 
@@ -130,7 +131,7 @@ class Product extends Resource
                 ->fields(function () {
                     return [
                         NovaTabTranslatable::make([
-                            Text::make('Значение', 'value')
+                            CkEditor::make('Значение', 'value')
                                 ->rules('required'),
                         ])
                     ];

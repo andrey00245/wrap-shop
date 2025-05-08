@@ -45,15 +45,15 @@ class LoginRequest extends FormRequest
         $credentials = $this->only('phone_email', 'password');
         $identifier = $credentials['phone_email'];
 
-        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
-            $user = User::where('email', $identifier)->orWhere('phone', $identifier)->first();
-        }
+        $user = User::where('email', $identifier)
+            ->orWhere('phone', $identifier)
+            ->first();
 
         if (!$user || !Auth::attempt(['id' => $user->id, 'password' => $this->password])) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'phone_email' => trans('auth.failed'),
             ]);
         }
 

@@ -5,6 +5,7 @@ namespace App\Nova;
 use Illuminate\Http\Request;
 use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -93,6 +94,12 @@ class Setting extends Resource
         ];
     }
 
+    protected function currency(){
+        return[
+            Number::make('Курс $', 'currency')->step(0.01)->sortable(),
+        ];
+    }
+
     /**
      * Get the fields displayed by the resource.
      *
@@ -110,6 +117,7 @@ class Setting extends Resource
             new Panel('Aдреси', $this->addressFields()),
             new Panel('Відеобанер', $this->videoBanerFields()),
             new Panel('Слоган', $this->sloganFields()),
+            new Panel('Валюта', $this->currency()),
         ];
     }
 

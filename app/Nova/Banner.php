@@ -5,7 +5,6 @@ namespace App\Nova;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
-use Outl1ne\MultiselectField\Multiselect;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -54,11 +53,6 @@ class Banner extends Resource
             Images::make( 'Фото','main')
                 ->conversionOnIndexView('preview'),
             Text::make('Силка','url'),
-
-            MultiSelect::make('Категория','categories')->options([
-                'main_page' => 'Головна сторінка',
-                'products' => 'Продукти',
-            ]),
 
             Number::make('Позиція','position')->sortable(),
             Boolean::make('Активний','is_active')->sortable(),

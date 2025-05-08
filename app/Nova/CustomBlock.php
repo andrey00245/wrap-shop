@@ -65,7 +65,8 @@ class CustomBlock extends Resource
         return [
             ID::make()->sortable(),
             NovaTabTranslatable::make([
-                Text::make('Назва', 'name'),
+                Text::make('Назва', 'name')
+                    ->help('Для підсвічування тексту використовуйте тег span з класом "colord", наприклад: &lt;span class=&quot;colord&quot;&gt;3M&lt;/span&gt;')
             ]),
             BelongsToMany::make('Products')->searchable(),
             Text::make('Url')->hideFromIndex(),

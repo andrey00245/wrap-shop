@@ -2,13 +2,13 @@
 <section class="examples-of-work">
   <div class="wrap">
     <div class="home-products-top flex-justify">
-      <h2 class="home-title">Наші реалізації</h2>
-      <a class="show-more-examples" href="javascript:void(0)"><i class="fas fa-chevron-right"></i> Показати більше</a>
+      <h2 class="home-title">{{__('general-translate.our_realizations')}}</h2>
+      <a class="show-more-examples" href="javascript:void(0)"><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</a>
     </div>
     <div class="examples-wrapper">
         @foreach($exampleWorks as $works)
                 <div class="example-of-work">
-                    <img class="image-example" src="{{$works->getImage()}}" alt="Плівка глянцева 3M 2080-G31 Gloss Storm Grey">
+                    <img class="image-example" src="{{$works->getImage()}}" alt="{{$works->title}}">
                     <div class="middle-content-wrapper">
                 <span class="car-name">{{$works->title}}
                     <svg style="margin-left: 5px" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -31,7 +31,7 @@
         @endforeach
       <div class="example-of-work button">
         <a href="javascript:void(0)">
-          <span><i class="fas fa-chevron-right"></i> Показати більше</span>
+          <span><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</span>
         </a>
       </div>
     </div>

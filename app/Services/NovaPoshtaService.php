@@ -76,7 +76,7 @@ class NovaPoshtaService
                 // Если данные есть, продолжаем маппинг
                 if (!empty($data['data'])) {
                     $warehouses = collect($data['data'])->filter(function ($warehouse) {
-                        return $warehouse['CategoryOfWarehouse'] === 'Branch';
+                        return $warehouse['CategoryOfWarehouse'] === 'Branch' || $warehouse['CategoryOfWarehouse'] === 'Store';
                     })->map(function ($warehouse) use($locale) {
                         return [
                             'id' => $warehouse['Ref'], // уникальный идентификатор склада

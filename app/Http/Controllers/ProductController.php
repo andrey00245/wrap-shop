@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Implementation;
 use App\Models\Product;
+use App\Services\PaginationPages;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\App;
@@ -127,15 +128,24 @@ class ProductController extends Controller
             session()?->put('viewProducts', $viewProducts);
         }
 
+        $reviews = $product->reviews->where('is_active', true)->sortByDesc('created_at');
+        $average = $reviews->avg('rating') ?? 0;
+        $count = $reviews->count();
+        $averagePercent = ($average / 5) * 100;
+
         return view('base.pages.products.show', [
             'product' => $product,
             'recommends' => $products,
             'exampleWorks' => $exampleWorks,
             'latestCategory' => $latestCategory,
+            'reviews' => $reviews,
+            'average' => $average,
+            'count' => $count,
+            'averagePercent' => $averagePercent,
         ]);
     }
 
-    public function category(Category $category, Category $subcategory = null, Category $subsubcategory = null): View
+    public function category(Category $category, Category $subcategory = null, Category $subsubcategory = null)
     {
         $selectedFilterValues = request()->all();
         unset($selectedFilterValues['page'],
@@ -234,7 +244,7 @@ class ProductController extends Controller
             return $product;
         });
 
-        $perPage = 18;
+        $perPage = 30;
         $attributes = collect();
 
         foreach ($productsAllCollection as $product) {
@@ -253,9 +263,19 @@ class ProductController extends Controller
 
         $responseArray = Product::getCountProducts($categories, request(), $selectedFilterValues, $attributesArray);
 
+        if (request()->ajax()) {
+            return [
+                'lastPage' => $products->lastPage(),
+                'html' => view('base.pages.products.ajax-product-list', compact('products'))->render(),
+            ];
+        }
+
+        $paginationPages = PaginationPages::getPages(max(1, (int)request()->query('page', 1)), $products->lastPage());
+
         return view('base.pages.products.index', [
             'products' => $products,
             'category' => $category,
+            'pages' => $paginationPages,
             'subcategory' => $subcategory,
             'subsubcategory' => $subsubcategory,
             'childrenCategories' => $childrenCategories,

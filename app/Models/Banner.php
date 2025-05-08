@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -16,16 +17,17 @@ class Banner extends Model implements HasMedia
     protected $with = ['media'];
 
     protected $casts = [
-        'categories' => 'json',
+        'categories' => 'array',
     ];
 
     public function registerMediaConversions(?Media $media = null): void
     {
         $this
             ->addMediaConversion('preview')
-            ->width(310)
-            ->height(310)
-            ->format('png')
+            ->width(748)
+            ->height(257)
+            ->format('webp')
+            ->quality(100)
             ->nonQueued();
     }
 

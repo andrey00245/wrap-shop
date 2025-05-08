@@ -14,6 +14,7 @@ use App\Http\Controllers\NovaPoshtaController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportAvailabilityController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SubscribeController;
 use App\Http\Controllers\SyncProductImagesController;
@@ -66,6 +67,7 @@ Route::post('/report-availability', [ReportAvailabilityController::class, 'store
 Route::post('/fast-order', [FastOrderController::class, 'store'])->name('fast-order.store');
 
 Route::post('/change-theme', ChangeThemeController::class)->name('change-theme');
+Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
 
 Route::group(['prefix' => LaravelLocalization::setLocale(),

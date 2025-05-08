@@ -35,7 +35,8 @@
             <li><a href="{{route('wishlist')}}">{{__('personal-account.account.wishlist')}} <span
                   class="button account-wishlist-count">{{auth()->user()->favoriteCount()}}</span></a></li>
             <li><a href="{{route('viewed-products')}}">{{__('personal-account.account.viewed-products')}}</a></li>
-            <li><a class="cart-open" href="#">{{__('personal-account.account.cart')}} <span
+            <li><a class="general-popup-btn" href="javascript:void(0)"
+                data-popup="cart-popup">{{__('personal-account.account.cart')}} <span
                   class="button account-cart-count">{{$cartItemsCount}}</span></a></li>
           </ul>
         </nav>

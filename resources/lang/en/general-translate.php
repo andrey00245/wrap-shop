@@ -1,20 +1,21 @@
 <?php
 return [
-  'leaders_of_sales' => '<span class="colord">Leaders</span> of sales',
-  'latest' => '<span class="colord">New</span> arrivals',
-  'similar' => '<span class="colord">Similar</span> products',
-  '3m_colors' => '<span class="colord">3M color</span> films',
-  'yellotools' => '<span class="colord">Yellotools</span> instruments',
+    'leaders_of_sales' => '<span class="colord">Leaders</span> of sales',
+    'latest' => '<span class="colord">New</span> arrivals',
+    'similar' => '<span class="colord">Similar</span> products',
+    '3m_colors' => '<span class="colord">3M color</span> films',
+    'yellotools' => '<span class="colord">Yellotools</span> instruments',
+    'our_realizations' => 'Our realizations',
+    'show_more' => 'Show more',
 
-  'sales_hit' => 'The best seller',
-  'all' => 'All',
-  'view' => 'View',
+    'sales_hit' => 'The best seller',
+    'all' => 'All',
+    'view' => 'View',
 
-  'product_card' => [
-    'code' => 'Code: ',
-    'add_to_cart' => 'Add to cart',
-    'remove' => 'Remove',
-    'add_wishlist' => 'Add to Wish List'
-  ]
+    'product_card' => [
+        'code' => 'Code: ',
+        'add_to_cart' => 'Add to cart',
+        'remove' => 'Remove',
+        'add_wishlist' => 'Add to Wish List'
+    ]
 ];
-?>

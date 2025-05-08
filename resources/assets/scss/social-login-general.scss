@@ -112,15 +112,6 @@ div#slagreep {
     color: #000;
 }
 
-.form input[type="email"]::placeholder,
-.form input[type="password"]::placeholder,
-.form input[type="tel"]::placeholder,
-.form input[type="text"]::placeholder,
-.form select::placeholder,
-.form textarea::placeholder {
-    color: #000;
-}
-
 .form input[type="email"]:focus,
 .form input[type="password"]:focus,
 .form input[type="tel"]:focus,
@@ -751,7 +742,7 @@ a.login-button:hover {
     text-align: center;
     color: $mod-text-color;
     text-transform: uppercase;
-
+    padding-top: 12px;
 }
 
 .or-text-wrapp {

@@ -37,12 +37,6 @@
 
                                 <div class="product-default-texts-wrapper">
                                     <div class="top flex-justify">
-                                        <div class="sale statuses">
-                                            <div class="category-status category-status-1 status-inline text rectangle "
-                                                 style=" color:#ffffff; background-color:#d04b4b;">
-                                                {{__('general-translate.sales_hit')}}
-                                            </div>
-                                        </div>
                                         <div
                                             class="sku">{{__('general-translate.product_card.code')}} {{$product->code}}</div>
                                         <div class="wishlist">
@@ -95,16 +89,18 @@
                                         <div class="price">{{number_format($product->getPrice())}} ₴<span
                                                 class="price-unit-xvr"></span></div>
                                         @if($product->getStock() > 0)
-                                            <button class="button button-cart-product colord remarketing_cart_button"
+                                            <button class="button colord button-cart-product general-popup-btn"
+                                                    data-popup="cart-popup"
                                                     data-product-quantity="{{$product->getDefaultQuantity()}}"
                                                     data-product-id="{{$product->id}}">
                                                 <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
                                             </button>
                                         @else
                                             <button
-                                                class="button colord remarketing_cart_button report-availability-open"
+                                                class="button colord general-popup-btn notify-available-btn"
+                                                data-popup="report-availability-popup"
                                                 data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
-                                                    class="hidden-xs hidden-sm hidden-md"> Повідомити</span></button>
+                                                    class="hidden-xs hidden-sm hidden-md">{{__('product-index.notify')}}</span></button>
                                         @endif
                                     </div>
                                 </div>

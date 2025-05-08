@@ -1,7 +1,7 @@
-<div id="report-availability-popup" class="popup-overlay popup-right">
+<div id="report-availability-popup" class="popup-right general-popup" data-step="1">
     <div class="consult-title">Повідомити про наявність</div>
     <br>
-    <form class="popup-window active" id="report-availability-form" style="display: block;">
+    <form class="popup-window popup-step-1" id="report-availability-form">
         <div class="inner form-horizontal">
             <div class="form-group">
                 <div class="form">
@@ -41,11 +41,11 @@
         </div>
     </form>
 
-    <div class="popup-consult-thanks flex-center report-availability-success" style="display:none;">
+    <div class="popup-consult-thanks flex-center report-availability-success popup-step-flex-3">
         <i class="fal fa-smile"></i>
         <span>Ваш запит успішно надіслано.</span>
         <span>Ви отримаєте повідомлення, коли товар з'явиться в наявності.</span>
     </div>
 
-    <div class="close button fal fa-times report-availability-close"></div>
+    <div class="close button fal fa-times popup-close"></div>
 </div>

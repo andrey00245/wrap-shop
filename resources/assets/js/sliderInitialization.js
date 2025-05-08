@@ -164,17 +164,3 @@ export function imageSliderInProduct(item_class) {
         })
     })
 }
-
-export function imageSliderInDefaultProduct(item_class) {
-    let elms = document.querySelectorAll('.' + item_class + ' .default-products-images');
-    let hoverItems = document.querySelectorAll('.' + item_class);
-    let image_splides = []
-
-    for (var i = 0; i < elms.length; i++) {
-        image_splides[i] = new Splide(elms[i], {
-            pagination: false,
-            gap: 5,
-            perPage: 1,
-        }).mount();
-    }
-}

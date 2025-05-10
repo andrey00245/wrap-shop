@@ -1,5 +1,5 @@
 <div id="report-availability-popup" class="popup-right general-popup" data-step="1">
-    <div class="consult-title">Повідомити про наявність</div>
+    <div class="consult-title">{{__('popup.report_availability.title')}}</div>
     <br>
     <form class="popup-window popup-step-1" id="report-availability-form">
         <div class="inner form-horizontal">
@@ -34,7 +34,7 @@
                 <button class="send_otp_btn otp_btn-s btnverifyloginpopup button colord"
                         id="button-submit-report-availability"
                         type="submit">
-                    <i class="fas fa-chevron-right" aria-hidden="true"></i> Відпраавити
+                    <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.report_availability.send')}}
                 </button>
             </span>
             </div>
@@ -43,8 +43,8 @@
 
     <div class="popup-consult-thanks flex-center report-availability-success popup-step-flex-3">
         <i class="fal fa-smile"></i>
-        <span>Ваш запит успішно надіслано.</span>
-        <span>Ви отримаєте повідомлення, коли товар з'явиться в наявності.</span>
+        <span>{{__('popup.report_availability.your_request_send')}}</span>
+        <span>{{__('popup.report_availability.you_get_notify')}}</span>
     </div>
 
     <div class="close button fal fa-times popup-close"></div>

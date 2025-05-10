@@ -27,5 +27,5 @@ return [
     'per_pc' => 'per 1 pc.',
     'in_wishlist' => 'In wishlist',
     'lin_m_and_more' => ':count lin. m. and more',
-
+    'show_next' => 'Show next',
 ];

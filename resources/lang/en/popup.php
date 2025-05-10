@@ -46,6 +46,12 @@ return [
         'checkout' => 'Go to checkout',
         'continue_shopping' => 'Continue shopping',
     ],
+    'report_availability' => [
+        'title' => 'Report availability',
+        'send' => 'Send',
+        'your_request_send' => 'Your request has been successfully sent.',
+        'you_get_notify' => 'You will receive a notification when the item becomes available.',
+    ],
     'search_popup' => [
         'search_title' => 'Search by site',
         'whoever_searches' => 'Whoever searches will find! Enter min. 3 characters.',

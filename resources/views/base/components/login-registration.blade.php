@@ -9,7 +9,7 @@
         <div class="social_block">
           <a href="{{ route('auth.facebook') }}" class="colord button_social soc_ico facebook" rel="noreferrer"
              data-toggle="tooltip" data-auth="Facebook" title="Facebook">
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
                  y="0px" viewBox="0 0 96.1 96.1" xml:space="preserve"><g>
                 <path
                   d="M72.1,0L59.6,0c-14,0-23.1,9.3-23.1,23.7v10.9H24c-1.1,0-2,0.9-2,2v15.8c0,1.1,0.9,2,2,2h12.5v39.9c0,1.1,0.9,2,2,2h16.4 c1.1,0,2-0.9,2-2V54.3h14.7c1.1,0,2-0.9,2-2l0-15.8c0-0.5-0.2-1-0.6-1.4s-0.9-0.6-1.4-0.6H56.8v-9.2c0-4.4,1.1-6.7,6.8-6.7l8.4,0 c1.1,0,2-0.9,2-2V2C74,0.9,73.2,0,72.1,0z"></path>
@@ -90,7 +90,7 @@
               </div>
               <div class="wrap-send">
                   <button type="submit" class="colord button send_otp_btn send_btn btn-social" id="button-forgot-popup">
-                      <i class="fas fa-chevron-right" aria-hidden="true"></i> Отправить
+                      <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.send')}}
                   </button>
               </div>
 
@@ -119,7 +119,7 @@
         <div class="social_block">
           <a href="{{ route('auth.facebook') }}" class="colord button_social soc_ico facebook" rel="noreferrer"
              data-toggle="tooltip" data-auth="Facebook" title="Facebook">
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
                  y="0px" viewBox="0 0 96.1 96.1" xml:space="preserve"><g>
                 <path
                   d="M72.1,0L59.6,0c-14,0-23.1,9.3-23.1,23.7v10.9H24c-1.1,0-2,0.9-2,2v15.8c0,1.1,0.9,2,2,2h12.5v39.9c0,1.1,0.9,2,2,2h16.4 c1.1,0,2-0.9,2-2V54.3h14.7c1.1,0,2-0.9,2-2l0-15.8c0-0.5-0.2-1-0.6-1.4s-0.9-0.6-1.4-0.6H56.8v-9.2c0-4.4,1.1-6.7,6.8-6.7l8.4,0 c1.1,0,2-0.9,2-2V2C74,0.9,73.2,0,72.1,0z"></path>
@@ -157,7 +157,7 @@
                     <div class="form-group group-telephone otpboxloginpopup" id="otpbox">
                         <div class="fields-wrapper">
                             <input type="text" id="register_name_email" name="phone_email" class="form-control form-field" placeholder="Email">
-                            <input id="register_password" type="password" name="password" class="form-control form-field" placeholder="Пароль">
+                            <input id="register_password" type="password" name="password" class="form-control form-field" placeholder="{{__('popup.login_register.password')}}">
 
                             <div class="form-group group-firstname">
                                 <input autocomplete="on" type="text" id="input-name" name="name" maxlength="40" class="form-control form-field" placeholder="{{__('popup.login_register.firstname')}}">

@@ -6,6 +6,15 @@
     box-sizing: border-box;
 }
 
+html {
+    @if $theme == light {
+        background: #fff;
+    } @else {
+        background: #393b3d;
+
+    }
+}
+
 article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary, div, .wrapper, content {
     display: block;
     position: relative;
@@ -2833,13 +2842,13 @@ body::-webkit-scrollbar {
     margin-bottom: 5px;
 }
 
-.form-control.login-phone-email {
-    letter-spacing: 1px;
-    text-transform: none;
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 15px !important;
-}
+//.form-control.login-phone-email {
+//    letter-spacing: 1px;
+//    text-transform: none;
+//    font-size: 16px;
+//    font-weight: 500;
+//    margin-bottom: 15px !important;
+//}
 
 .form-group .fields-wrapper {
     margin-bottom: 30px;

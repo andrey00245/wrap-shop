@@ -177,12 +177,22 @@ $(document).ready(function () {
     });
 
     $('#button-verify-loginpopup').on('click', function () {
-        var phoneEmail = $('#name_email').val().trim();
+        let phoneEmail = '';
+
+        if($("#column-login").attr('data-type-login') === 'email'){
+            phoneEmail = $('#login-email').val().trim();
+        }
+        if($("#column-login").attr('data-type-login') === 'phone'){
+            phoneEmail = window.phoneInputs.instances[6].getNumber();
+        }
+
         var password = $('#login_password').val().trim();
-        $('.input-error').removeClass('input-error');
+        $('#login-email').removeClass('input-error')
+        $('#login_phone').removeClass('input-error')
 
         if (phoneEmail.length === 0) {
-            $('#name_email').addClass('input-error')
+            $('#login-email').addClass('input-error')
+            $('#login_phone').addClass('input-error')
             return;
         }
 

@@ -5,7 +5,7 @@
 
   <div class="popup-window popup-step-1" id="popup-login">
     <div class="inner form-horizontal">
-      <div id="column-login" class="popup-social">
+      <div id="column-login" data-type-login="phone" class="popup-social">
         <div class="social_block">
           <a href="{{ route('auth.facebook') }}" class="colord button_social soc_ico facebook" rel="noreferrer"
              data-toggle="tooltip" data-auth="Facebook" title="Facebook">
@@ -37,16 +37,29 @@
           <div class="text">{{__('popup.login_register.or')}}</div>
           <div class="right-line"></div>
         </div>
+          <div class="social_block auth_variant">
+              <div id="enter_with_phone" class="button_social soc_ico apple onclick fas fa-phone"></div>
+              <div id="enter_with_email" class="button_social soc_ico apple onclick fas fa-envelope"></div>
+          </div>
       </div>
 
       <div class="form-group">
         <div class="form">
           <div class="form-group group-telephone otpboxloginpopup" id="otpbox">
             <div class="fields-wrapper">
-              <label for="name_email"
-                     class="login-info-text text-center margintop20">{{__('popup.login_register.enter_phone')}}</label>
-              <input type="text" id="name_email" name="phone_email" class="form-control form-field login-phone-email"
-                     placeholder="{{__('popup.login_register.enter_phone_or_email_placeholder')}}">
+                <div class="enter-with-phone">
+                    <label for="login_phone"
+                           class="login-info-text text-center margintop20">{{__('popup.login_register.enter_phone')}}</label>
+                    <input type="text" id="login_phone" name="login_phone" class="form-control form-field login-phone-email"
+                           placeholder="{{__('popup.login_register.enter_phone_placeholder')}}">
+                </div>
+                <div class="enter-with-email" style="display: none">
+                    <label for="login-email"
+                           class="login-info-text text-center margintop20">{{__('popup.login_register.enter_email')}}</label>
+                    <input type="text" id="login-email" name="login-email" class="form-control form-field login-phone-email"
+                           placeholder="{{__('popup.login_register.enter_email_placeholder')}}">
+                </div>
+
               <div class="password-group popup-step-2">
                 <label for="password"
                        class="login-info-text text-center margintop20">{{__('popup.login_register.password')}}</label>

@@ -499,6 +499,16 @@ a.login-button:hover {
         padding: 17.5px 0;
 
     }
+    &.auth_variant{
+        div {
+            transition-duration: 0.3s;
+            color: $mod-text-color;
+            font-size: 25px;
+            &:hover{
+                color: white;
+            }
+        }
+    }
 
     .soc_ico {
         svg {

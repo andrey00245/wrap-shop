@@ -4,10 +4,12 @@ return [
         'enter_register' => 'Login to your account here / Sign up',
         'register' => 'Sign up',
         'register_on_website' => 'Register on the site',
-        'enter_phone' => 'Sign in with phone or email',
         'enter_phone_or_email_placeholder' => 'Enter phone number or Email',
-
         'enter_social_network' => 'Login as a social network user',
+        'enter_email' => 'Sign in with email',
+        'enter_phone' => 'Sign in with phone',
+        'enter_phone_placeholder' => 'Enter phone number',
+        'enter_email_placeholder' => 'Enter email',
         'enter_email_password' => 'Login',
         'sign_in' => 'Sign in',
         'create_a_profile' => 'Create a profile',
@@ -45,6 +47,12 @@ return [
         'total' => 'Total',
         'checkout' => 'Go to checkout',
         'continue_shopping' => 'Continue shopping',
+    ],
+    'report_availability' => [
+        'title' => 'Report availability',
+        'send' => 'Send',
+        'your_request_send' => 'Your request has been successfully sent.',
+        'you_get_notify' => 'You will receive a notification when the item becomes available.',
     ],
     'search_popup' => [
         'search_title' => 'Search by site',

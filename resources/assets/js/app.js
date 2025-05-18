@@ -40,6 +40,19 @@ $(document).ready(function () {
         $('.head-catalog').toggleClass("active");
     });
 
+    $("#enter_with_phone").on("click", function (){
+        $(".enter-with-phone").show()
+        $(".enter-with-email").hide()
+        $("#column-login").attr('data-type-login', 'phone')
+    })
+
+    $("#enter_with_email").on("click", function (){
+        $(".enter-with-phone").hide()
+        $(".enter-with-email").show()
+        $("#column-login").attr('data-type-login', 'email')
+
+    })
+
     $(".child-popup-open.open").on("click", function () {
         if($(this).hasClass('active')){
             $(".child-popup-open.open").removeClass('active').siblings(".child-popup").slideUp();
@@ -166,6 +179,7 @@ function telInputInitialization() {
         3: document.querySelector("#phone_consultation"),
         4: document.querySelector("#phone_checkout"),
         5: document.querySelector("#report_order_phone"),
+        6: document.querySelector("#login_phone"),
     }
 
     const iti = {};
@@ -189,6 +203,11 @@ function telInputInitialization() {
                 });
             }
         }
+    }
+
+    window.phoneInputs = {
+        elements: inputs,
+        instances: iti,
     }
 }
 

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ваш тимчасовий пароль</title>
+    <title>{{__('temporary-password.you_temporary_password')}}</title>
 </head>
 <body>
-<h1>Добрий день!</h1>
-<p>Ви успішно зареєстровані на нашому сайті. Ваш тимчасовий пароль:</p>
+<h1>{{__('temporary-password.good_day')}}</h1>
+<p>{{__('temporary-password.success_register')}}</p>
 <p><strong>{{ $password }}</strong></p>
-<p>Будь ласка, використовуйте його для входу в систему і не забудьте змінити його після першого входу.</p>
-<p>Дякуємо за реєстрацію!</p>
+<p>{{__('temporary-password.use_only_one')}}</p>
+<p>{{__('temporary-password.thank_you')}}</p>
 </body>
 </html>

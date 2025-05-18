@@ -3,7 +3,7 @@
   <div class="wrap">
     <div class="home-products-top flex-justify">
       <h2 class="home-title">{{__('general-translate.our_realizations')}}</h2>
-      <a class="show-more-examples" href="javascript:void(0)"><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</a>
+      <a class="show-more-examples desktop" href="javascript:void(0)"><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</a>
     </div>
     <div class="examples-wrapper">
         @foreach($exampleWorks as $works)
@@ -29,12 +29,14 @@
                     </div>
                 </div>
         @endforeach
-      <div class="example-of-work button">
-        <a href="javascript:void(0)">
-          <span><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</span>
-        </a>
-      </div>
+{{--      <div class="example-of-work button">--}}
+{{--        <a href="javascript:void(0)">--}}
+{{--          <span><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</span>--}}
+{{--        </a>--}}
+{{--      </div>--}}
     </div>
+      <a class="show-more-examples mobile" href="javascript:void(0)"><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</a>
+
   </div>
 </section>
 @endif

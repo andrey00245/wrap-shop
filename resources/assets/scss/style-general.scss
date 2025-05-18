@@ -1101,7 +1101,7 @@ body::-webkit-scrollbar {
     -webkit-backdrop-filter: blur(12px);
     border-radius: 3px;
     align-items: center;
-
+    height: 100%;
 
     .right {
         width: calc(100% - 190px);
@@ -3243,6 +3243,9 @@ table .notify-quantity {
     background: $mod-main-color-010;
     border: 1px solid $mod-main-color;
     text-transform: uppercase;
+    &.mobile{
+        display: none;
+    }
 }
 
 .show-more-examples i {
@@ -4622,6 +4625,12 @@ table .notify-quantity {
     .show-more-examples {
         padding: 16px 20px;
         font-size: 14px;
+        &.desktop{
+            display: none;
+        }
+        &.mobile{
+            display: block;
+        }
     }
     .example-of-work {
         &.button {

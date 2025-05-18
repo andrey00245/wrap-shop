@@ -1101,7 +1101,7 @@ body::-webkit-scrollbar {
     -webkit-backdrop-filter: blur(12px);
     border-radius: 3px;
     align-items: center;
-    height: 100%;
+    min-height: 100%;
 
     .right {
         width: calc(100% - 190px);
@@ -3731,7 +3731,6 @@ table .notify-quantity {
     .home-category-item {
         padding: 20px;
         flex-direction: column;
-        height: 100%;
 
         .right {
             width: 100%;

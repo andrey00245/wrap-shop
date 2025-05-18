@@ -36,13 +36,13 @@
       </div>
 
       <div class="head-buttons">
-        <div class="search-popup-open button search far fa-search"></div>
-        <button class="button cart-open far fa-shopping-cart dropdown-toggle"><span
+        <div class="search-popup-open button search far fa-search general-popup-btn" data-popup="search-popup"></div>
+        <button class="button cart-open far fa-shopping-cart dropdown-toggle general-popup-btn" data-popup="cart-popup"><span
             id="cart-total" class="cart-total flex-center">{{$cartItemsCount}}</span></button>
         @guest
-          <div id="wishlist-total" class="button heart login-show far fa-heart login-popup-open"><span
+          <div id="wishlist-total" class="button heart login-show far fa-heart login-popup-open general-popup-btn" data-popup="login-popup"><span
               class="wishlist-total flex-center">{{count(session()->get('wishlist', []))}}</span></div>
-          <div class="button userform-open login-show far fa-user login-popup-open"></div>
+          <div class="button userform-open login-show far fa-user login-popup-open general-popup-btn" data-popup="login-popup"></div>
         @endguest
 
         @auth

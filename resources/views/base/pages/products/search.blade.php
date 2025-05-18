@@ -335,9 +335,11 @@
                             <a href="{{$productBanners[$bannerIndex]->url}}"
                                class="category-products-item product-default product-layout banner product-grid">
                                 <img class="vertical"
+                                     alt="banner vertical"
                                      src="{{$productBanners[$bannerIndex]->getVerticalPreview()}}"
                                 >
                                 <img class="gorizont"
+                                     alt="banner horizontal"
                                      src="{{$productBanners[$bannerIndex]->getHorizontalPreview()}}"
                                 >
                             </a>
@@ -458,9 +460,11 @@
                             <a href="{{$productBanners[$bannerIndex]->url}}"
                                class="category-products-item product-default product-layout banner product-grid">
                                 <img class="vertical"
+                                     alt="banner vertical"
                                      src="{{$productBanners[$bannerIndex]->getVerticalPreview()}}"
                                 >
                                 <img class="gorizont"
+                                     alt="banner horizontal"
                                      src="{{$productBanners[$bannerIndex]->getHorizontalPreview()}}"
                                 >
                             </a>
@@ -473,7 +477,7 @@
                     <div id="ss_showmore" class="category-loadmore">
                         <div class="colord lloading" data-loader="arrow-circle" style="display: block;"></div>
                         <div type="button" class="button">
-                            Показати наступні<i class="fas fa-chevron-down"></i>
+                            {{__('product-index.show_next')}}<i class="fas fa-chevron-down"></i>
                         </div>
                     </div>
                     <div class="category-pagination">

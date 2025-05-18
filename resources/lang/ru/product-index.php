@@ -29,5 +29,5 @@ return [
     'per_pc' => 'за 1 шт.',
     'in_wishlist' => 'В закладки',
     'lin_m_and_more' => ':count м.п. и больше',
-
+    'show_next' => 'Показать следующие',
 ];

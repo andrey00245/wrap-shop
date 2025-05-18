@@ -48,7 +48,7 @@
                                             <div class="container">
                                                 <div class="has-account-background">
                                                     <p><span>{{__('checkout.do_you_have_account')}}</span><span
-                                                            class="login-show login-btn login-popup-open">{{__('checkout.login')}}</span>
+                                                            class="login-show login-btn login-popup-open general-popup-btn" data-popup="login-popup">{{__('checkout.login')}}</span>
                                                     </p>
                                                 </div>
                                             </div>
@@ -109,7 +109,7 @@
                                                             <input type="radio" data-onchange="reloadAll"
                                                                    name="shipping_method" value="pickup"
                                                                    id="pickup" {{ old('shipping_method') == 'pickup' ? 'checked' : '' }}>
-                                                            <span class="radio-label">{{__('checkout.pickup_from_atelier')}}</span>
+                                                            <span class="radio-label">{!! __('checkout.pickup_from_atelier') !!}</span>
                                                         </label>
                                                     </div>
                                                     <div class="radio">
@@ -278,7 +278,7 @@
                                 <div class="simplecheckout-right-column">
                                     <div class="simplecheckout-block" id="simplecheckout_cart">
                                         <div class="checkout-heading panel-heading ">{{__('checkout.you_order')}} <span
-                                                class="checkout-edit cart-open">{{__('checkout.edit')}}</span>
+                                                class="checkout-edit cart-open general-popup-btn" data-popup="cart-popup">{{__('checkout.edit')}}</span>
                                         </div>
                                         <div class="table-responsive">
                                             <table class="simplecheckout-cart">

@@ -424,20 +424,20 @@
             <div class="item">
                 @if($product->descriptions)
                     <div class="title">{{__('product-show.description')}}</div>
-                    <div class="text">{{$product->descriptions}}</div>
+                    <div class="text">{!! $product->descriptions !!}</div>
                 @endif
             </div>
             @if($product->getBenefits())
                 <div class="item width-33">
                     <div class="title">{{__('product-show.advantages')}}</div>
-                    <div class="text">{{$product->getBenefits()}}
+                    <div class="text">{!! $product->getBenefits() !!}
                     </div>
                 </div>
             @endif
             @if($product->getApplication())
                 <div class="item width-33">
                     <div class="title">{{__('product-show.application')}}</div>
-                    <div class="text">{{$product->getApplication()}}
+                    <div class="text">{!! $product->getApplication() !!}
                     </div>
                 </div>
             @endif

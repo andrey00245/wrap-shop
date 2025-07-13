@@ -643,17 +643,9 @@ class Product extends Model implements HasMedia
 
     public static function getCurrencyRate()
     {
-        $filePath = storage_path('app/currency_rate.json');
-
-        if (file_exists($filePath)) {
-            $jsonData = File::get($filePath);
-            $data = json_decode($jsonData, true, 512, JSON_THROW_ON_ERROR);
-
-            return $data['rate'] ?? 42;
-        }
-
-       return 42;
-   }
+        $currency = Setting::query()->value('currency');
+        return $currency ?? 42;
+    }
 
     public function volumeVariants()
     {
@@ -686,4 +678,31 @@ class Product extends Model implements HasMedia
     {
         return $this->hasMany(Review::class);
     }
+
+    public function getIsTranslatedAttribute(): bool
+    {
+        $nameRu = $this->getTranslation('name', 'ru');
+        $nameEn = $this->getTranslation('name', 'en');
+        $descRu = $this->getTranslation('descriptions', 'ru');
+        $descEn = $this->getTranslation('descriptions', 'en');
+
+        if (
+            empty(strip_tags($nameRu)) ||
+            empty(strip_tags($nameEn)) ||
+            empty(strip_tags($descRu)) ||
+            empty(strip_tags($descEn))
+        ) {
+            return false;
+        }
+
+        if (
+            trim(strip_tags($nameRu)) === trim(strip_tags($nameEn)) ||
+            trim(strip_tags($descRu)) === trim(strip_tags($descEn))
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

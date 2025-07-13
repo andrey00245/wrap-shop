@@ -2,6 +2,8 @@
 
 namespace App\Nova;
 
+use App\Nova\Actions\TranslateProductContent;
+use App\Nova\Filters\TranslatedStatusFilter;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -34,6 +36,12 @@ class Product extends Resource
         return 'Продукти';
     }
 
+
+    public function authorizedToReplicate(Request $request)
+    {
+        return false;
+    }
+
     public static $search = [
         'code',
         'external_code',
@@ -42,11 +50,6 @@ class Product extends Resource
         'name->ru',
         'name->uk',
     ];
-
-//    public static function searchableColumns()
-//    {
-//        return ['name->' . app()->getLocale()];
-//    }
 
     public function getNameAttribute()
     {
@@ -136,6 +139,13 @@ class Product extends Resource
                 ->sortable(),
             Boolean::make('Активний','is_active')
                 ->sortable(),
+            Boolean::make('Перекладено', function () {
+                return $this->is_translated;
+            })
+                ->trueValue(true)
+                ->falseValue(false)
+                ->sortable()
+                ->onlyOnIndex(),
             HasMany::make('Типи Цін','prices',ProductPrices::class),
             BelongsToMany::make('Атрибуты', 'attributes', Attribute::class)
                 ->fields(function () {
@@ -166,7 +176,8 @@ class Product extends Resource
                 Text::make('Назва', 'banner_title'),
             ])->hideFromIndex(),
             Images::make('Фото Вигляду', 'banner_images')
-                ->conversionOnIndexView('preview'),
+                ->conversionOnIndexView('preview')
+            ->hideFromIndex(),
         ];
     }
 
@@ -191,7 +202,9 @@ class Product extends Resource
      */
     public function filters(NovaRequest $request)
     {
-        return [];
+        return [
+            new TranslatedStatusFilter(),
+        ];
     }
 
     /**
@@ -215,6 +228,8 @@ class Product extends Resource
      */
     public function actions(NovaRequest $request)
     {
-        return [];
+        return [
+            new TranslateProductContent(),
+        ];
     }
 }

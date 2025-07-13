@@ -19,10 +19,12 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SubscribeController;
 use App\Http\Controllers\SyncProductImagesController;
 use App\Http\Controllers\VideosController;
+use App\Http\Controllers\WayForPayController;
 use App\Http\Controllers\WishlistController;
 use App\Models\Category;
 use App\Models\PrivacyPolicy;
 use App\Models\Product;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
@@ -54,6 +56,9 @@ Route::get('/slug-generate', function(){
   return 'okay';
 });
 
+Route::post('checkout/wayforpay/callback', [WayForPayController::class, 'callback'])->name('wayforpay.callback');
+Route::match(['get', 'post'], 'checkout/wayforpay/success', [WayForPayController::class, 'success'])->name('wayforpay.success')
+    ->withoutMiddleware([VerifyCsrfToken::class]);
 
 Route::post('/add-product-to-wishlist', [WishlistController::class, 'update'])->name('add-product-to-wishlist');
 Route::post('/cart/add', [CartController::class, 'add']);

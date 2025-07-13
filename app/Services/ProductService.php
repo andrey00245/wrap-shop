@@ -46,6 +46,7 @@ class ProductService
             'Accept-Encoding' => 'gzip',
         ])->get($jsonUrl);
 
+        dd($response);
         if ($response->successful()) {
             $data = $response->json()['rate'];
             File::put(storage_path('app/currency_rate.json'), json_encode(['rate' => $data]));

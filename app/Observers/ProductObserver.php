@@ -10,7 +10,6 @@ class ProductObserver
     public function updating(Product $product): void
     {
         if ($this->stockBecameAvailable($product)) {
-
             app(ProductAvailabilityService::class)->notifyUsers($product);
         }
     }

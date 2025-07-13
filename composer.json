@@ -19,10 +19,12 @@
         "mostafaznv/nova-ckeditor": "^7.7",
         "mostafaznv/nova-video": "^6.3",
         "mrmonat/nova-translatable": "^1.0",
+        "openai-php/laravel": "^0.10.2",
         "outl1ne/nova-multiselect-field": "^4.5",
         "spatie/enum": "^3.13",
         "spatie/laravel-medialibrary": "^11.9",
         "tooyz/moysklad": "^0.7.3",
+        "wayforpay/php-sdk": "^1.0",
         "wesselperik/nova-status-field": "^2.1"
     },
     "require-dev": {

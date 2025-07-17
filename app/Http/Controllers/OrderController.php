@@ -115,14 +115,13 @@ class OrderController extends Controller
 
         \App\Services\MoySkladSyncService::sendOrder($order);
 
-        return redirect()->route('checkout.success');
 
-//
-//        if (Auth::check()) {
-//            CartItem::where('user_id', Auth::id())->delete();
-//        } else {
-//            Session::forget('cart');
-//        }
+
+        if (Auth::check()) {
+            CartItem::where('user_id', Auth::id())->delete();
+        } else {
+            Session::forget('cart');
+        }
 
         return redirect()->route('checkout.success');
     }

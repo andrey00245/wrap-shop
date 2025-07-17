@@ -24,10 +24,10 @@ class WayForPayController extends Controller
             $order = Order::where('id', explode('_', $data['orderReference'])[0])->first();
             $order->update(['payment_status' => 'approved']);
 
-            if ($order) {
-                $checkboxService = new \App\Services\CheckboxService();
-                $checkboxService->sendReceipt($order);
-            }
+//            if ($order) {
+//                $checkboxService = new \App\Services\CheckboxService();
+//                $checkboxService->sendReceipt($order);
+//            }
         }
 
         return response('OK');

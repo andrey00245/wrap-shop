@@ -49,9 +49,9 @@ class ProductAvailabilityService
 
     private function shortenUrlWithIsGd(string $url, string $alias = ''): ?string
     {
-        if (app()->environment('local')) {
-            $url = 'https://wrap.shop/plivky/zahysni-plivky/antygravijna-satynova-plivka-kybertane-ppf-deep-satin';
-        }
+//        if (app()->environment('local')) {
+//            $url = 'https://wrap.shop/plivky/zahysni-plivky/antygravijna-satynova-plivka-kybertane-ppf-deep-satin';
+//        }
 
         $params = [
             'format'   => 'simple',

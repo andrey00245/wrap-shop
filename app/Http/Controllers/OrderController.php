@@ -26,6 +26,7 @@ class OrderController extends Controller
             'email' => Auth::check() ? 'nullable' : 'required|string|email|max:255|unique:' . User::class,
             'payment_method' => 'required|in:cash,online,bank_transfer',
             'comment' => 'nullable|string',
+            'shipping_method' => 'string',
         ];
 
         if (in_array($request->input('shipping_method'), ['flat', 'novaposhta', 'novaposhta_doors','my_addresses'])) {
@@ -39,6 +40,7 @@ class OrderController extends Controller
         }
 
         $validated = $request->validate($rules);  // Применение валидации
+
 
         if (Auth::check()) {
             $cartItems = CartItem::where('user_id', Auth::id())->get();
@@ -72,7 +74,7 @@ class OrderController extends Controller
         $order->first_name = Arr::get($validated,'first-name');
         $order->last_name = Arr::get($validated,'last-name');
         $order->email = Auth::check() ? Auth::user()->email : Arr::get($validated,'email');
-        $order->shipping_method = Arr::get($validated,'shipping_method','-');
+        $order->shipping_method = Arr::get($validated,'shipping_method');
         $order->payment_method = Arr::get($validated,'payment_method');
         $order->comment = Arr::get($validated,'comment');
         $order->shipping_address = Arr::get($validated,'shipping_address');

@@ -35,22 +35,21 @@ class ProductService
             'maxResults' => $limit,
         ]))->getList();
 
-        $jsonUrl = "https://api.moysklad.ru/api/remap/1.2/entity/currency/76e1fb94-76b8-11eb-0a80-00ab004bdad2";
+//        $jsonUrl = "https://api.moysklad.ru/api/remap/1.2/entity/currency/76e1fb94-76b8-11eb-0a80-00ab004bdad2";
 
         $username = config('app.my_store.username');
         $password = config('app.my_store.password');
         $encodedCredentials = base64_encode("{$username}:{$password}");
 
-        $response = Http::withHeaders([
-            'Authorization'   => 'Basic ' . $encodedCredentials,
-            'Accept-Encoding' => 'gzip',
-        ])->get($jsonUrl);
+//        $response = Http::withHeaders([
+//            'Authorization'   => 'Basic ' . $encodedCredentials,
+//            'Accept-Encoding' => 'gzip',
+//        ])->get($jsonUrl);
 
-        dd($response);
-        if ($response->successful()) {
-            $data = $response->json()['rate'];
-            File::put(storage_path('app/currency_rate.json'), json_encode(['rate' => $data]));
-         }
+//        if ($response->successful()) {
+//            $data = $response->json()['rate'];
+//            File::put(storage_path('app/currency_rate.json'), json_encode(['rate' => $data]));
+//         }
 
         foreach ($list as $item) {
             try {

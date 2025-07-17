@@ -16,7 +16,8 @@ class Order extends Model
      */
     protected $fillable = [
         'name',
-        'total'
+        'total',
+        'shipping_method'
     ];
 
     public function products()

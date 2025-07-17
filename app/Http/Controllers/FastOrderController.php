@@ -33,6 +33,8 @@ class FastOrderController extends Controller
             'status' => 'new',
         ]);
 
+        \App\Services\MoySkladSyncService::sendOrder($fastOrder);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Ваш заказ принят. Спасибо!',

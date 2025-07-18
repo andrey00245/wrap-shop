@@ -1,4 +1,5 @@
 <?php
+use Firebase\JWT\JWT;
 
 return [
 
@@ -48,13 +49,24 @@ return [
     ],
 
     'apple' => [
-        'client_id' => env('APPLE_CLIENT_ID'),     // Service ID
-        'team_id' => env('APPLE_TEAM_ID'),         // Team ID
-        'key_id' => env('APPLE_KEY_ID'),           // Key ID
-        'private_key'   => storage_path('AuthKey_F9FV3YB4V8.p8'),
-        'redirect' => env('APPLE_REDIRECT_URI'),   // callback URL
-        'client_secret' => '', // важно: нужен, но будет заменён динамически
-    ],
+        'client_id' => env('APPLE_CLIENT_ID'),
+        'team_id' => env('APPLE_TEAM_ID'),
+        'key_id' => env('APPLE_KEY_ID'),
+        'redirect' => env('APPLE_REDIRECT_URI'),
+        'private_key' => file_get_contents(storage_path('AuthKey_' . env('APPLE_KEY_ID') . '.p8')),
+        'client_secret' => function () {
+            $privateKey = file_get_contents(storage_path('AuthKey_' . env('APPLE_KEY_ID') . '.p8'));
+            $payload = [
+                'iss' => env('APPLE_TEAM_ID'),
+                'iat' => time(),
+                'exp' => time() + 86400 * 180, // 180 days
+                'aud' => 'https://appleid.apple.com',
+                'sub' => env('APPLE_CLIENT_ID'),
+            ];
+
+            return JWT::encode($payload, $privateKey, 'ES256', env('APPLE_KEY_ID'));
+        },
+        ],
 
     'novaposhta' => [
         'api_key' => env('NOVA_POSHTA_API_KEY'),

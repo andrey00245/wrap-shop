@@ -14,6 +14,8 @@ use Illuminate\Support\ServiceProvider;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 use Laravel\Socialite\Facades\Socialite;
 use App\Services\Apple\CustomAppleProvider;
+use Illuminate\Support\Facades\Config;
+use Firebase\JWT\JWT;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,10 +31,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Socialite::extend('apple', function ($app) {
-            $config = $app['config']['services.apple'];
-            return Socialite::buildProvider(CustomAppleProvider::class, $config);
-        });
+        $privateKey = file_get_contents(storage_path('AuthKey_' . env('APPLE_KEY_ID') . '.p8'));
+
+        $payload = [
+            'iss' => env('APPLE_TEAM_ID'),
+            'iat' => time(),
+            'exp' => time() + 86400 * 180,
+            'aud' => 'https://appleid.apple.com',
+            'sub' => env('APPLE_CLIENT_ID'),
+        ];
+
+        $clientSecret = JWT::encode($payload, $privateKey, 'ES256', env('APPLE_KEY_ID'));
+
+        Config::set('services.apple.client_secret', $clientSecret);
 
         ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";

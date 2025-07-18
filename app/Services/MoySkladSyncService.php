@@ -87,7 +87,7 @@ class MoySkladSyncService
 
         // Формируем позиции заказа — вытаскиваем продукты по коду через запрос и собираем массив для заказа
         $positions = [];
-        if ($order instanceof Order){
+        if ($order instanceof Order) {
             foreach ($order->products as $orderProduct) {
 
                 $productResponse = Http::withBasicAuth(
@@ -120,8 +120,7 @@ class MoySkladSyncService
                     ],
                 ];
             }
-        }
-        else{
+        } else {
             $productResponse = Http::withBasicAuth(
                 config('app.my_store.username'),
                 config('app.my_store.password')
@@ -157,7 +156,6 @@ class MoySkladSyncService
             return;
         }
 
-        // Атрибуты — пример, подставь свои значения и UUID атрибутов
         $attributes = [];
 
         // Пример подстановки атрибутов (тебе подставить свои)
@@ -185,6 +183,17 @@ class MoySkladSyncService
                     ];
                 }
             }
+        }
+
+        if ($order->comment) {
+            $attributes[] = [
+                'meta' => [
+                    'href' => 'https://api.moysklad.ru/api/remap/1.2/entity/customerorder/metadata/attributes/8be4b192-9276-11e9-9109-f8fc00108f39',
+                    'type' => 'attributemetadata',  // <- здесь обязательно так
+                    'mediaType' => 'application/json',
+                ],
+                'value' => $order->comment,
+            ];
         }
 
         if ($order->payment_method) {

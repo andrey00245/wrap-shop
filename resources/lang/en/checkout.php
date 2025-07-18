@@ -27,7 +27,7 @@ return [
     'input_branch' => 'Enter branch',
     'payment' => 'Payment',
     'cash' => 'Cash on delivery',
-    'online' => 'Online payment (Liqpay)',
+    'online' => 'Online payment (WayForPay)',
     'bank_transfer' => 'Bank transfer / Invoice',
     'want_leave_comment' => 'Want to leave a comment?',
     'comment' => 'Comment',

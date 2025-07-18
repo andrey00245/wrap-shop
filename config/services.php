@@ -51,7 +51,7 @@ return [
         'client_id' => env('APPLE_CLIENT_ID'),     // Service ID
         'team_id' => env('APPLE_TEAM_ID'),         // Team ID
         'key_id' => env('APPLE_KEY_ID'),           // Key ID
-        'private_key' => env('APPLE_PRIVATE_KEY'), // путь к .p8 файлу или сам ключ
+        'private_key'   => storage_path('AuthKey_F9FV3YB4V8.p8'),
         'redirect' => env('APPLE_REDIRECT_URI'),   // callback URL
         'client_secret' => '', // важно: нужен, но будет заменён динамически
     ],

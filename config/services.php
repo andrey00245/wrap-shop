@@ -48,9 +48,12 @@ return [
     ],
 
     'apple' => [
-        'client_id'     => env('APPLE_CLIENT_ID'),
-        'client_secret' => env('APPLE_CLIENT_SECRET'),
-        'redirect'      => env('APPLE_REDIRECT'),
+        'client_id' => env('APPLE_CLIENT_ID'),     // Service ID
+        'team_id' => env('APPLE_TEAM_ID'),         // Team ID
+        'key_id' => env('APPLE_KEY_ID'),           // Key ID
+        'private_key' => env('APPLE_PRIVATE_KEY'), // путь к .p8 файлу или сам ключ
+        'redirect' => env('APPLE_REDIRECT_URI'),   // callback URL
+        'client_secret' => '', // важно: нужен, но будет заменён динамически
     ],
 
     'novaposhta' => [

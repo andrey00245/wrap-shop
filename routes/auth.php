@@ -35,8 +35,8 @@ Route::prefix('auth')->middleware('guest')->group(function () {
 
     Route::get('facebook', [SocialController::class, 'redirectToFacebook'])->name('auth.facebook');
     Route::get('facebook/callback', [SocialController::class, 'handleFacebookCallback']);
-    Route::get('apple', [SocialController::class, 'redirectToApple'])->name('auth.apple');
-    Route::get('apple/callback', [SocialController::class, 'handleAppleCallback']);
+    Route::get('/login/apple', [SocialController::class, 'redirectToApple'])->name('auth.apple');
+    Route::get('/login/apple/callback', [SocialController::class, 'handleAppleCallback']);
 });
 
 Route::get('password-reset/{token}', [NewPasswordController::class, 'create'])

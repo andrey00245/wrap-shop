@@ -222,7 +222,7 @@ class MoySkladSyncService
 
         // Формируем тело запроса
         $payload = [
-            'name'         => 'Wrap #' . $order->id,
+            'name'         => 'Wrap-Shop #' . $order->id,
             'organization' => $organization,
             'agent'        => [
                 'meta' => $counterparty->meta

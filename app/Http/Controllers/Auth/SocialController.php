@@ -76,6 +76,6 @@ class SocialController extends Controller
         $authUser = $this->findOrCreateUser($user, 'apple');
         Auth::login($authUser, true);
 
-        return redirect()->intended('/');
+        return redirect()->intended('account');
     }
 }

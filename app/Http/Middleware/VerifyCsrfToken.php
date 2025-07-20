@@ -15,5 +15,6 @@ class VerifyCsrfToken extends Middleware
         'checkout/wayforpay/success',
         'wayforpay/success',
         'checkout/wayforpay/callback',
+        'login/apple/callback',
     ];
 }

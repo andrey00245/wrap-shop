@@ -4,6 +4,7 @@ use App\Http\Controllers\Account\ChangePasswordController;
 use App\Http\Controllers\Account\PersonalDataController;
 use App\Http\Controllers\Account\UserAddressController;
 use App\Http\Controllers\Account\ViewedProductsController;
+use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ChangeThemeController;
 use App\Http\Controllers\ConsultationController;
@@ -30,6 +31,8 @@ use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\SyncProductController;
 require __DIR__.'/auth.php';
+
+Route::match(['get', 'post'], 'login/apple/callback', [SocialController::class, 'handleAppleCallback']);
 
 Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']);
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);

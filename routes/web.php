@@ -32,7 +32,8 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\SyncProductController;
 require __DIR__.'/auth.php';
 
-Route::match(['get', 'post'], 'login/apple/callback', [SocialController::class, 'handleAppleCallback']);
+Route::match(['get', 'post'], 'login/apple/callback', [SocialController::class, 'handleAppleCallback'])
+    ->withoutMiddleware([VerifyCsrfToken::class]);
 
 Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']);
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);

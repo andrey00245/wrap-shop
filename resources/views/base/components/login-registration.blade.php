@@ -66,6 +66,12 @@
                 <input id="login_password" type="password" name="password" readonly
                        class="form-control form-field login-phone-email"
                        placeholder="{{__('popup.login_register.enter_password')}}">
+                  <!-- Иконка глазка -->
+                  <span role="button"
+                        class="general-popup-btn fas fa-eye toggle-password eye-custom"
+                        data-toggle="#login_password"
+                        style="position:absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #ffce1c;">
+</span>
               </div>
                 <div class="error-message-login" style="display:none; color:red"></div>
             </div>
@@ -215,3 +221,41 @@
   </div>
   <div class="close button fal fa-times popup-close"></div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleBtn = document.querySelector('.toggle-password');
+        const inputSelector = toggleBtn.getAttribute('data-toggle');
+        const passwordInput = document.querySelector(inputSelector);
+
+        toggleBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+
+            this.classList.toggle('eye-crossed');
+        });
+    });
+</script>
+<style>
+    .eye-custom {
+        position: relative;
+        display: inline-block;
+    }
+
+    .eye-custom.eye-crossed::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 12%;
+        width: 75%;
+        height: 2px;
+        background-color: black;
+        transform: rotate(-45deg);
+        transform-origin: center;
+        pointer-events: none;
+        border-radius: 1px;
+    }
+
+</style>

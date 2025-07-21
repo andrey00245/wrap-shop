@@ -148,12 +148,11 @@
                         <div class="info flex-center">
                             <div class="availability">
                                 @if($product->getUnderOrder())
-                                    <i class="fas fa-times nonstock"></i>{{__('product-show.under_order')}}
-                                @endif
-                                @if($count == 0 && !$product->getUnderOrder())
-                                    <i class="fas fa-times nonstock"></i>{{__('product-show.out-of-stock')}}
-                                @elseif($count>0)
-                                    <i class="fas fa-check"></i>{{__('product-show.in-stock')}}
+                                    <i class="fas fa-times nonstock"></i>{{ __('product-show.under_order') }}
+                                @elseif($count == 0)
+                                    <i class="fas fa-times nonstock"></i>{{ __('product-show.out-of-stock') }}
+                                @else
+                                    <i class="fas fa-check"></i>{{ __('product-show.in-stock') }}
                                 @endif
                             </div>
                         </div>

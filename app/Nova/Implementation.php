@@ -3,18 +3,20 @@
 namespace App\Nova;
 
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
-use Illuminate\Http\Request;
 use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Date;
-use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Trix;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Outl1ne\NovaSortable\Traits\HasSortableRows;
 
 class Implementation extends Resource
 {
+    use HasSortableRows;
+
     /**
      * The model the resource corresponds to.
      *
@@ -58,9 +60,15 @@ class Implementation extends Resource
             ])->hideFromIndex(),
             Date::make('Дата','data')->nullable(),
             Images::make('Фото', 'images')
+                ->required()
                 ->conversionOnIndexView('preview'),
             Boolean::make('Активний','is_active'),
-            BelongsTo::make('Продукт','product',Product::class)
+            BelongsTo::make('Продукт','product',Product::class),
+
+
+        Number::make('Порядок сортування', 'sort_order')
+            ->sortable()
+            ->rules('required', 'integer', 'min:0')
         ];
     }
 

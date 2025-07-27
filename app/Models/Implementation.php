@@ -5,33 +5,48 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Nova\Fields\DateTime;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
 
-class Implementation extends Model implements HasMedia
+class Implementation extends Model implements HasMedia, Sortable
 {
     use HasFactory,
         InteractsWithMedia,
+        SortableTrait,
         HasTranslations;
 
     protected $translatable = ['descriptions'];
 
     protected $with = ['media'];
 
+    public $sortable = [
+        'order_column_name' => 'sort_order',
+        'sort_when_creating' => true,
+    ];
+
     protected $fillable = [
         'is_active',
         'title',
         'descriptions',
         'data',
+        'sort_order'
     ];
 
     protected $casts = [
         'descriptions' => 'json',
         'data' => 'date',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope('sortOrder', function ($query) {
+            $query->orderBy('sort_order', 'asc');
+        });
+    }
 
     public function registerMediaConversions(?Media $media = null): void
     {

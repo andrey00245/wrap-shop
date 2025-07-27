@@ -370,7 +370,7 @@ $(document).ready(function () {
     function initializationPriceSlider() {
         const priceSlider = document.getElementById('price-slider');
 
-        const sliderMin = parseInt($('#min_price').attr('min'));
+        let sliderMin = parseInt($('#min_price').attr('min'));
         const sliderMinVal = parseInt($('#min_price').val());
         const sliderMax = parseInt($('#max_price').attr('max'));
         const sliderMaxVal = parseInt($('#max_price').val());
@@ -379,6 +379,9 @@ $(document).ready(function () {
         let maxInput = document.querySelector('#max_price');
         let maxInputJq = $('#max_price');
         if (sliderMin !== 0 && sliderMax !== 0) {
+            if(sliderMin === sliderMax){
+                sliderMin = sliderMax-1;
+            }
             noUiSlider.create(priceSlider, {
                 start: [sliderMinVal, sliderMaxVal],
                 connect: true,

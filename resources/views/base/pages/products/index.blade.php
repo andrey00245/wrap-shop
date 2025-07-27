@@ -587,7 +587,7 @@
                 </div>
 
                 <div class="category-bottom flex-center">
-                    <div id="ss_showmore" class="category-loadmore">
+                    <div id="ss_showmore" class="category-loadmore" style="display: none;">
                         <div class="colord lloading" data-loader="arrow-circle" style="display: block;"></div>
                         <div type="button" class="button">
                             {{__('product-index.show_next')}}<i class="fas fa-chevron-down"></i>

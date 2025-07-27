@@ -83,7 +83,7 @@ class OrderController extends Controller
         $order->status = 'pending';
         $order->user_id = Auth::check() ? Auth::id() : null;
         $order->total = $totalSum;
-        $order->novaposhta_warehouse_ref = $request->input('warehouse_ref');
+        $order->novaposhta_warehouse_ref = $request->input('novaposhta_warehouse_ref');
 
         $order->save();
 

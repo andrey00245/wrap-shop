@@ -17,7 +17,8 @@ class Order extends Model
     protected $fillable = [
         'name',
         'total',
-        'shipping_method'
+        'shipping_method',
+        'novaposhta_warehouse_ref'
     ];
 
     public function products()

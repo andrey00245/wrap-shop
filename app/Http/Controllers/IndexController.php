@@ -23,7 +23,8 @@ class IndexController extends Controller
             ->orderBy('position')
             ->get();
 
-        $customBlocks = CustomBlock::query()->where('is_active',true)->get();
+        $customBlocks = CustomBlock::query()->where('is_active',true)
+            ->orderBy('sort_order','asc')->get();
 
         $products = Product::query()
             ->whereHas('media')

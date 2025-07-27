@@ -133,6 +133,13 @@ class Product extends Model implements HasMedia
         return $this->getTranslation('slug', 'en');
     }
 
+    public function customBlocks()
+    {
+        return $this->belongsToMany(CustomBlock::class)
+            ->using(CustomBlockProduct::class)
+            ->withPivot('sort_order');
+    }
+
     /**
      * Brand.
      */
@@ -572,10 +579,10 @@ class Product extends Model implements HasMedia
         return round($price / self::getCurrencyRate(), 0);
     }
 
-    public function customBlocks()
-    {
-        return $this->belongsToMany(CustomBlock::class);
-    }
+//    public function customBlocks()
+//    {
+//        return $this->belongsToMany(CustomBlock::class);
+//    }
 
     public function getMinOrderCount()
     {

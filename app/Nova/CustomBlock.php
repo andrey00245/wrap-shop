@@ -11,11 +11,13 @@ use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Outl1ne\NovaSortable\Traits\HasSortableManyToManyRows;
 use Outl1ne\NovaSortable\Traits\HasSortableRows;
 
 class CustomBlock extends Resource
 {
     use HasSortableRows;
+    use HasSortableManyToManyRows;
 
     /**
      * The model the resource corresponds to.
@@ -72,7 +74,17 @@ class CustomBlock extends Resource
                 Text::make('Назва', 'name')
                     ->help('Для підсвічування тексту використовуйте тег span з класом "colord", наприклад: &lt;span class=&quot;colord&quot;&gt;3M&lt;/span&gt;')
             ]),
-            BelongsToMany::make('Products')->searchable(),
+            BelongsToMany::make('Продукти','Products', Product::class)
+                ->fields(function () {
+                    return [
+                        Number::make('Порядок', 'sort_order')
+                            ->sortable()
+                            ->rules('required', 'integer', 'min:0'),
+                    ];
+                })
+                ->searchable()
+                ->sortable(),
+
             Text::make('Url')->hideFromIndex(),
             Boolean::make('Active', 'is_active'),
 
@@ -132,4 +144,8 @@ class CustomBlock extends Resource
     {
         return [];
     }
+
+    public $sortable = [
+        'only_sort_on' => \App\Nova\Product::class,
+    ];
 }

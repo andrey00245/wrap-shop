@@ -19,9 +19,12 @@ use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
 use Mostafaznv\NovaCkEditor\CkEditor;
+use Outl1ne\NovaSortable\Traits\HasSortableManyToManyRows;
 
 class Product extends Resource
 {
+    use HasSortableManyToManyRows;
+
     /**
      * The model the resource corresponds to.
      *

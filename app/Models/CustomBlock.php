@@ -36,7 +36,10 @@ class CustomBlock extends Model implements HasMedia, Sortable
 
     public function products()
     {
-        return $this->belongsToMany(Product::class);
+        return $this->belongsToMany(Product::class)
+            ->using(CustomBlockProduct::class)
+            ->withPivot('sort_order')
+            ->orderBy('pivot_sort_order'); // Чтобы сразу выдавать отсортированный список
     }
 
     public function registerMediaConversions(?Media $media = null): void

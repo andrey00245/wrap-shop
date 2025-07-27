@@ -8,11 +8,15 @@ use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Outl1ne\NovaSortable\Traits\HasSortableRows;
 
 class CustomBlock extends Resource
 {
+    use HasSortableRows;
+
     /**
      * The model the resource corresponds to.
      *
@@ -78,6 +82,10 @@ class CustomBlock extends Resource
             Text::make('Кількість товарів', function () {
                 return $this->products()->count();
             })->onlyOnIndex(),
+
+            Number::make('Порядок сортування', 'sort_order')
+                ->sortable()
+                ->rules('required', 'integer', 'min:0')
         ];
     }
 

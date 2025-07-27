@@ -110,7 +110,6 @@ class MoySkladSyncService
                     'attributes' => $attributes
                 ]);
 
-            dd($updateResponse->body());
             if ($updateResponse->failed()) {
                 Log::error('Не удалось обновить атрибуты контрагента', [
                     'response' => $updateResponse->json()

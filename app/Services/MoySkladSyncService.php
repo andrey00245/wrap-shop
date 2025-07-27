@@ -301,8 +301,6 @@ class MoySkladSyncService
             }
         }
 
-
-
         // Формируем тело запроса
         $payload = [
             'name'         => 'Wrap-Shop #' . $order->id,

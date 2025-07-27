@@ -27,12 +27,13 @@
             <div class="category-left">
                 <div class="search-left">
                     <div class="title">{{__('product-index.find-in-catalog')}}</div>
-                    <div id="search" class="flex-justify">
-                        <input type="text" name="search1" value="{{request()->get('search')}}"
+                    <div id="search" class="flex-justify search-block">
+                        <input type="text" disabled id="searchInput" name="search1" value="{{request()->get('search')}}"
                                placeholder="{{__('product-index.i_am_looking_for')}}:"
                                class="form-control input-lg">
-                        <button type="button" class="button colord btn btn-default btn-lg"><i
-                                class="fal fa-search"></i>{{__('product-index.search')}}
+                        <button type="button" id="searchButton" class="button colord btn btn-default btn-lg">
+                            <i id="searchIcon" class="fal {{ request()->filled('search') ? 'fa-times' : 'fa-search' }}"></i>
+                            {{ __('product-index.search') }}
                         </button>
                     </div>
                 </div>
@@ -474,7 +475,7 @@
                 </div>
 
                 <div class="category-bottom flex-center">
-                    <div id="ss_showmore" class="category-loadmore">
+                    <div id="ss_showmore" class="category-loadmore" style="display: none;">
                         <div class="colord lloading" data-loader="arrow-circle" style="display: block;"></div>
                         <div type="button" class="button">
                             {{__('product-index.show_next')}}<i class="fas fa-chevron-down"></i>
@@ -508,3 +509,28 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"/>
     @endpush
 @endsection
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const button = document.querySelector('#search button');
+        const input = document.querySelector('#search input');
+        const icon = button.querySelector('i');
+
+        button.addEventListener('click', () => {
+            if (icon.classList.contains('fa-times')) {
+                history.back();
+            } else {
+                redirectWithParameters(input);
+            }
+        });
+
+        input.addEventListener('input', () => {
+            if (input.value.trim().length > 0) {
+                icon.classList.remove('fa-search');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-search');
+            }
+        });
+    });
+</script>

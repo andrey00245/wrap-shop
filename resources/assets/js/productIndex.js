@@ -521,10 +521,12 @@ $(document).ready(function () {
     let currentPage = parseInt(urlParams.get('page')) || 1;
     let paginationItems = document.querySelector('.category-pagination .pagination');
     currentPage += 1;
+    const showMore = $('#ss_showmore');
 
     window.addEventListener('scroll', () => {
         if (loading) return;
 
+        showMore.show();
         const rect = productList.getBoundingClientRect();
         const isVisible = rect.bottom <= window.innerHeight + 1500;
 
@@ -578,9 +580,23 @@ $(document).ready(function () {
                     window.history.replaceState(null, '', newUrl);
                 });
         }
+
     });
 
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a');
+        if (link && link.href.includes('/products/')) {
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+        }
+    });
 
+    window.addEventListener('pageshow', (event) => {
+        const scrollPos = sessionStorage.getItem('scrollPosition');
+        if (scrollPos !== null) {
+            window.scrollTo(0, parseInt(scrollPos));
+            sessionStorage.removeItem('scrollPosition'); // очистить, чтобы не мешало
+        }
+    });
 })
 
 function getPagination(current, total, maxVisible = 9) {

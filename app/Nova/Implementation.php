@@ -63,7 +63,7 @@ class Implementation extends Resource
                 ->required()
                 ->conversionOnIndexView('preview'),
             Boolean::make('Активний','is_active'),
-            BelongsTo::make('Продукт','product',Product::class),
+            BelongsTo::make('Продукт','product',Product::class)->searchable(),
 
 
         Number::make('Порядок сортування', 'sort_order')

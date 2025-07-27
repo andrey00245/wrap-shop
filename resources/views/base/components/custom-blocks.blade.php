@@ -52,7 +52,7 @@
                                 <div
                                     class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
                                     <i class="far fa-search-plus colord"
-                                       data-src="{{$product->getMedia('images')->first()->getUrl()}}"
+                                       data-src="{{$product->getMedia('images')->first()?->getUrl()}}"
                                        data-fancybox="bestseller{{$product->id}}" data-caption="{{$product->name}}"></i>
                                     <a href="{{route('products.show', ['product'=>$product->slugEn])}}"
                                        title="{{$product->name}}">
@@ -64,12 +64,12 @@
                                                             role="group">
                                                             @if($key>0)
                                                                 <div class="hide"
-                                                                     data-src="{{$image->getUrl()}}"
+                                                                     data-src="{{$image?->getUrl()}}"
                                                                      data-fancybox="bestseller{{$product->id}}"
                                                                      data-caption="{{$product->name}}"></div>
                                                             @endif
                                                             <img loading="lazy"
-                                                                 src="{{$image->getUrl('preview')}}"
+                                                                 src="{{$image?->getUrl('preview')}}"
                                                                  alt="{{$product->name}}"
                                                                  title="{{$product->name}}"
                                                                  class="swiper-lazy swiper-lazy-loaded"

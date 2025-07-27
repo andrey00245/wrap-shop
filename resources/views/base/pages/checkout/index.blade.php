@@ -200,6 +200,8 @@
                                                             <input type="text" id="shipping_address"
                                                                    name="shipping_address" class="form-control"
                                                                    placeholder="{{__('checkout.input_branch')}}" disabled>
+                                                            <input type="hidden" name="novaposhta_warehouse_ref" id="novaposhta_warehouse_ref">
+
                                                             <ul class="dropdown-suggestions" id="address-suggestions"
                                                                 style="display: none;"></ul>
                                                             @error('shipping_address')

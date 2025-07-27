@@ -354,14 +354,18 @@ $(document).ready(function() {
         updateAddressSuggestions(query); // Обновляем предложения в зависимости от введенного текста
     });
 
-    // Обработка клика по отделению из предложений
     $(document).on("click", "#address-suggestions li", function(e) {
         e.preventDefault();
         let selectedAddress = $(this).data("value");
+        let ref = $(this).data("id"); // <--- ВАЖНО
 
         // Заполняем поле с адресом
         $("#shipping_address").val(selectedAddress);
 
+        // Записываем ref в скрытое поле
+        $("#novaposhta_warehouse_ref").val(ref); // <--- ВОТ ЭТО
+
+        console.log(ref);
         // Прячем список предложений
         $("#address-suggestions").hide();
     });

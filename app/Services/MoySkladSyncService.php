@@ -56,6 +56,7 @@ class MoySkladSyncService
             ]);
 
         if ($response->successful() && count($response->json('rows')) > 0) {
+            $cleanPhone = self::sanitizePhoneNumber($order->phone);
             $existing = $response->json('rows')[0];
             $counterpartyMeta = $existing['meta'];
 
@@ -69,11 +70,92 @@ class MoySkladSyncService
                 'href'      => $counterpartyMeta['href'],
                 "mediaType" => "application/json"
             ];
+
+            $attributes = [
+                [
+                    "meta" => [
+                        "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3c75f405-660c-11f0-0a80-03cb002a009d", // phone
+                        "type" => "attributemetadata",
+                        "mediaType" => "application/json"
+                    ],
+                    "value" => $cleanPhone
+                ]
+            ];
+
+            if (!empty($order->novaposhta_warehouse_ref)) {
+                $attributes[] = [
+                    "meta" => [
+                        "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3999ff42-6610-11f0-0a80-0462002ad32f",
+                        "type" => "attributemetadata",
+                        "mediaType" => "application/json"
+                    ],
+                    "value" => [
+                        "meta" => [
+                            "href" => "https://api.moysklad.ru/api/remap/1.2/context/companysettings/metadata/customEntities/710e5a69-63be-11f0-0a80-03cc0016c7e1", // Відділення НП
+                            "type" => "customentitymetadata",
+                            "mediaType" => "application/json"
+                        ],
+                        "name" => $order->shipping_address,
+                        "id" => $order->novaposhta_warehouse_ref,
+                    ]
+                ];
+            }
+
+            $updateResponse = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password'))
+                    ->withHeaders([
+                        'Accept-Encoding' => 'gzip',
+                    ])->put($counterpartyMeta['href'], [
+                    'attributes' => $attributes
+                ]);
+
+            dd($updateResponse->body());
+            if ($updateResponse->failed()) {
+                Log::error('Не удалось обновить атрибуты контрагента', [
+                    'response' => $updateResponse->json()
+                ]);
+            }
+
         } else {
+            $cleanPhone = self::sanitizePhoneNumber($order->phone);
+
             $counterparty = new Counterparty($sklad);
             $counterparty->name = $order->first_name . ' ' . $order->last_name;
             $counterparty->email = $order->email;
-            $counterparty->phone = $order->phone;
+            $counterparty->phone = $cleanPhone;
+
+            $attributes = [
+                [
+                    "meta"  => [
+                        "href"      => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3c75f405-660c-11f0-0a80-03cb002a009d", // Phone
+                        "type"      => "attributemetadata",
+                        "mediaType" => "application/json"
+                    ],
+                    "value" => $cleanPhone
+                ]
+            ];
+
+            if (!empty($order->novaposhta_warehouse_ref)) {
+                $attributes[] = [
+                    "meta" => [
+                        "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3999ff42-6610-11f0-0a80-0462002ad32f",
+                        "type" => "attributemetadata",
+                        "mediaType" => "application/json"
+                    ],
+                    "value" => [
+                        "meta" => [
+                            "href" => "https://api.moysklad.ru/api/remap/1.2/context/companysettings/metadata/customEntities/710e5a69-63be-11f0-0a80-03cc0016c7e1",
+                            "type" => "customentitymetadata",
+                            "mediaType" => "application/json"
+                        ],
+                        "name" => $order->shipping_address,
+                        "id" => $order->novaposhta_warehouse_ref,
+                    ]
+                ];
+            }
+
+            $counterparty->attributes = $attributes;
             $counterparty = $counterparty->create();
 
             // Получаем meta через рефлексию (как в твоём коде)
@@ -220,6 +302,8 @@ class MoySkladSyncService
             }
         }
 
+
+
         // Формируем тело запроса
         $payload = [
             'name'         => 'Wrap-Shop #' . $order->id,
@@ -230,6 +314,16 @@ class MoySkladSyncService
             'positions'    => $positions,
             'moment'       => now()->format('Y-m-d H:i:s'),
         ];
+
+        $comment = '';
+
+        if (in_array($order->shipping_method, ['novaposhta', 'novaposhta_doors', 'my_addresses'])) {
+            $comment .= "\nНаселений пункт: " . $order->city;
+            $comment .= "\nВідділення / Адреса: " . $order->shipping_address;
+
+            $payload['description'] = trim($comment);
+        }
+
 
         if (!empty($attributes)) {
             $payload['attributes'] = $attributes;
@@ -283,4 +377,20 @@ class MoySkladSyncService
 
         return (array)$metaStorage;
     }
+
+    public static function sanitizePhoneNumber($phone)
+    {
+        $digits = preg_replace('/\D/', '', $phone);
+
+        if (strpos($digits, '380') === 0) {
+            return $digits;
+        } elseif (strpos($digits, '80') === 0) {
+            return '3' . $digits;
+        } elseif (strpos($digits, '0') === 0) {
+            return '38' . $digits;
+        }
+
+        return $digits; // на всякий случай
+    }
+
 }

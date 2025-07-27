@@ -27,6 +27,7 @@ class OrderController extends Controller
             'payment_method' => 'required|in:cash,online,bank_transfer',
             'comment' => 'nullable|string',
             'shipping_method' => 'string',
+            'novaposhta_warehouse_ref' => 'string',
         ];
 
         if (in_array($request->input('shipping_method'), ['flat', 'novaposhta', 'novaposhta_doors','my_addresses'])) {
@@ -82,6 +83,8 @@ class OrderController extends Controller
         $order->status = 'pending';
         $order->user_id = Auth::check() ? Auth::id() : null;
         $order->total = $totalSum;
+        $order->novaposhta_warehouse_ref = $request->input('warehouse_ref');
+
         $order->save();
 
         foreach ($cartItems as $cartItem) {

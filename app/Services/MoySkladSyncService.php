@@ -82,7 +82,7 @@ class MoySkladSyncService
                 ]
             ];
 
-            if (!empty($order->novaposhta_warehouse_ref)) {
+            if ($order->novaposhta_warehouse_ref && $order->shipping_address) {
                 $attributes[] = [
                     "meta" => [
                         "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3999ff42-6610-11f0-0a80-0462002ad32f",
@@ -91,12 +91,12 @@ class MoySkladSyncService
                     ],
                     "value" => [
                         "meta" => [
-                            "href" => "https://api.moysklad.ru/api/remap/1.2/context/companysettings/metadata/customEntities/710e5a69-63be-11f0-0a80-03cc0016c7e1", // Відділення НП
-                            "type" => "customentitymetadata",
+                            "href" => "https://api.moysklad.ru/api/remap/1.2/entity/customentity/710e5a69-63be-11f0-0a80-03cc0016c7e1/{$order->novaposhta_warehouse_ref}",
+                            "type" => "customentity",
                             "mediaType" => "application/json"
                         ],
-                        "name" => $order->shipping_address,
                         "id" => $order->novaposhta_warehouse_ref,
+                        "name" => $order->shipping_address,
                     ]
                 ];
             }
@@ -135,7 +135,7 @@ class MoySkladSyncService
                 ]
             ];
 
-            if (!empty($order->novaposhta_warehouse_ref)) {
+            if ($order->novaposhta_warehouse_ref && $order->shipping_address) {
                 $attributes[] = [
                     "meta" => [
                         "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3999ff42-6610-11f0-0a80-0462002ad32f",
@@ -144,12 +144,12 @@ class MoySkladSyncService
                     ],
                     "value" => [
                         "meta" => [
-                            "href" => "https://api.moysklad.ru/api/remap/1.2/context/companysettings/metadata/customEntities/710e5a69-63be-11f0-0a80-03cc0016c7e1",
-                            "type" => "customentitymetadata",
+                            "href" => "https://api.moysklad.ru/api/remap/1.2/entity/customentity/710e5a69-63be-11f0-0a80-03cc0016c7e1/{$order->novaposhta_warehouse_ref}",
+                            "type" => "customentity",
                             "mediaType" => "application/json"
                         ],
-                        "name" => $order->shipping_address,
                         "id" => $order->novaposhta_warehouse_ref,
+                        "name" => $order->shipping_address,
                     ]
                 ];
             }

@@ -70,7 +70,7 @@
                   <span role="button"
                         class="general-popup-btn fas fa-eye toggle-password eye-custom"
                         data-toggle="#login_password"
-                        style="position:absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #ffce1c;">
+                        style="position:absolute; top: calc(50% - 2px); right: 15px; cursor: pointer; color: #ffce1c;">
 </span>
               </div>
                 <div class="error-message-login" style="display:none; color:red"></div>

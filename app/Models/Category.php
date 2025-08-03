@@ -55,6 +55,17 @@ class Category extends Model implements HasMedia
         return $allChildren;
     }
 
+    public function allDescendantIds(): array
+    {
+        $ids = [$this->id];
+
+        foreach ($this->children as $child) {
+            $ids = array_merge($ids, $child->allDescendantIds());
+        }
+
+        return $ids;
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('main')->singleFile();

@@ -136,8 +136,6 @@ class Product extends Resource
             Images::make('Фото', 'images')
                 ->conversionOnIndexView('preview'),
 
-            Boolean::make('Лідери продажів','is_top_seller')
-                ->sortable(),
             Number::make('Кількість','stock')
                 ->sortable(),
             Boolean::make('Активний','is_active')

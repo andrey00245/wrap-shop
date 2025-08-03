@@ -251,6 +251,15 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            @if ($errors->any())
+                                                <div class="alert alert-danger">
+                                                    <ul>
+                                                        @foreach ($errors->all() as $error)
+                                                            <li>{{ $error }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
                                             <div class="input-group">
                                                 <label for="comment">{{__('checkout.want_leave_comment')}}</label>
                                                 <input name="comment" id="comment" placeholder="{{__('checkout.comment')}}"

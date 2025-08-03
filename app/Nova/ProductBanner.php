@@ -63,11 +63,12 @@ class ProductBanner extends Resource
                 Images::make( 'Фото','vertical')
                     ->croppable(true)
                     ->croppingConfigs(['aspectRatio' => 283 / 485])
+                    ->required()
                     ->mustCrop(),
 
                 Text::make('Посилання','url')->hideFromIndex(),
                 Boolean::make('Активный', 'is_active'),
-                Number::make('Позиция', 'position'),
+                Number::make('Позиция', 'position')->required(),
             ]),
         ];
     }

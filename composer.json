@@ -26,6 +26,7 @@
         "socialiteproviders/apple": "^5.7",
         "spatie/enum": "^3.13",
         "spatie/laravel-medialibrary": "^11.9",
+        "spatie/laravel-sitemap": "^7.3",
         "tooyz/moysklad": "^0.7.3",
         "wayforpay/php-sdk": "^1.0",
         "wesselperik/nova-status-field": "^2.1"

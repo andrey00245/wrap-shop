@@ -147,24 +147,20 @@ class ProductController extends Controller
 
     public function category(Category $category, Category $subcategory = null, Category $subsubcategory = null)
     {
-        $selectedFilterValues = request()->all();
-        unset($selectedFilterValues['page'],
-            $selectedFilterValues['sort_by'],
-            $selectedFilterValues['sort_direction'],
-            $selectedFilterValues['min_price'],
-            $selectedFilterValues['category_id'],
-            $selectedFilterValues['max_price']);
+        $selectedFilterValues = request()->except([
+            'page', 'sort_by', 'sort_direction', 'min_price',
+            'max_price', 'in_stock', 'category_id',
+        ]);
 
-        if ($subsubcategory) {
-            $categories = $subsubcategory->isParent() ? $subsubcategory->children()->pluck('id') : [$subsubcategory->id];
-            $childrenCategories = $subsubcategory->children;
-        } else if ($subcategory) {
-            $categories = $subcategory->isParent() ? $subcategory->children()->pluck('id') : [$subcategory->id];
-            $childrenCategories = $subcategory->children;
-        } else {
-            $categories = $category->isParent() ? $category->children()->pluck('id') : [$category->id];
-            $childrenCategories = $category->children;
-        }
+        $currentCategory = $subsubcategory ?? $subcategory ?? $category;
+
+        // Получаем вложенные ID
+        $categories = $currentCategory->children()->exists()
+            ? $currentCategory->allDescendantIds()
+            : [$currentCategory->id];
+
+        // Для отображения подкатегорий на странице
+        $childrenCategories = $currentCategory->children;
 
         $sortBy = request()->get('sort_by');
         $sortDirection = request()->get('sort_direction');
@@ -214,6 +210,13 @@ class ProductController extends Controller
                 }
             ]);
 
+        if (request()->get('in_stock')) {
+            $products = $products->where('stock', '>', 0)
+                ->whereDoesntHave('attributes', function ($subQ) {
+                    $subQ->where('field_name', 'under_order');
+                });
+        }
+
         $temp = $products->get();
 
         $maxPrice = $temp->max('price') * Product::getCurrencyRate();
@@ -262,6 +265,7 @@ class ProductController extends Controller
         }
 
         $responseArray = Product::getCountProducts($categories, request(), $selectedFilterValues, $attributesArray);
+
 
         if (request()->ajax()) {
             return [

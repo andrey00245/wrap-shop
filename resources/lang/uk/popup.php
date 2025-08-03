@@ -12,6 +12,7 @@ return [
         'enter_email_placeholder' => 'Введіть Email',
         'sign_in' => 'Увійти',
         'create_a_profile' => 'Створити профіль',
+        'enter_you_email_or_phone' => 'Введіть email або телефон для відновлення',
         'back' => 'Назад',
 
         'forgot_password' => 'Забули пароль?',

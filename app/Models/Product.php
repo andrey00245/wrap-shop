@@ -331,15 +331,23 @@ class Product extends Model implements HasMedia
                 }])
                 ->get();
         } else {
-            $products = self::query()
+            $productsQuery = self::query()
                 ->whereIn('category_id', $categories)
                 ->whereHas('attributes')
                 ->whereHas('media')
                 ->whereHas('prices', $withPrice)
                 ->with(['products_attributes' => function ($query) {
                     $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
-                }])
-                ->get();
+                }]);
+
+            if ($request->filled('in_stock')) {
+                $productsQuery = $productsQuery->where('stock', '>', 0)
+                     ->whereDoesntHave('attributes', function ($subQ) {
+                            $subQ->where('field_name', 'under_order');
+                        });
+            }
+
+            $products = $productsQuery->get();
         }
 
         $selectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
@@ -401,6 +409,9 @@ class Product extends Model implements HasMedia
             $valArr = [];
             foreach ($selectedFilterValues as $keyI => $selectedFilterValue) {
                 $testArr[] = $keyI;
+                if (!is_array($selectedFilterValue)) {
+                    continue;
+                }
                 foreach ($selectedFilterValue as $filterValue) {
                     $valArr[] = $filterValue;
                 }
@@ -474,6 +485,14 @@ class Product extends Model implements HasMedia
         }
 
         $merged = array_merge($search, $prices, $selectedFilterValues, $sortParams);
+
+        if ($request->get('in_stock')) {
+            $inStock = [
+                'in_stock' => $request->get('in_stock'),
+            ];
+            $merged = array_merge($merged,$inStock);
+        }
+
         if (http_build_query($merged) !== ""){
             $responseArray['new_url'] = $newUrl . '?' . http_build_query($merged);
         }

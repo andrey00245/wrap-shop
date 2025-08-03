@@ -27,7 +27,7 @@ class OrderController extends Controller
             'payment_method' => 'required|in:cash,online,bank_transfer',
             'comment' => 'nullable|string',
             'shipping_method' => 'string',
-            'novaposhta_warehouse_ref' => 'string',
+            'novaposhta_warehouse_ref' => 'nullable|string',
         ];
 
         if (in_array($request->input('shipping_method'), ['flat', 'novaposhta', 'novaposhta_doors','my_addresses'])) {
@@ -40,7 +40,7 @@ class OrderController extends Controller
             $rules['shipping_address'] = 'required|string';
         }
 
-        $validated = $request->validate($rules);  // Применение валидации
+        $validated = $request->validate($rules);
 
 
         if (Auth::check()) {

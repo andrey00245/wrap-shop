@@ -180,6 +180,7 @@ function telInputInitialization() {
         4: document.querySelector("#phone_checkout"),
         5: document.querySelector("#report_order_phone"),
         6: document.querySelector("#login_phone"),
+        7: document.querySelector("#input-phone-forgot"),
     }
 
     const iti = {};

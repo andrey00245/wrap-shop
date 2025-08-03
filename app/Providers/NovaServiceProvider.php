@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Nova\Attribute;
 use App\Nova\Banner;
+use App\Nova\BestSeller;
 use App\Nova\Category;
 use App\Nova\Consultation;
 use App\Nova\CustomBlock;
@@ -54,6 +55,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
                 MenuSection::make('Товари', [
                     MenuItem::resource(Product::class),
+                    MenuItem::resource(BestSeller::class),
                     MenuItem::resource(Attribute::class),
                     MenuItem::resource(Category::class),
                     MenuItem::resource(PriceType::class),

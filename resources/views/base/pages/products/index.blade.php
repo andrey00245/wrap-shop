@@ -180,6 +180,8 @@
                                                 <div id="price-slider"></div>
                                             </div>
 
+
+
                                             {{--                      <div class="ocf-value-list">--}}
                                             {{--                        <div class="ocf-value-list-body">--}}
 
@@ -203,6 +205,26 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="ocf-filter ocf-dropdown is-stock-container">
+                                    <div class="ocf-filter-body">
+                                        <div class="ocf-filter-header" data-ocf="expand">
+                                            <span class="ocf-active-label"></span>
+                                            <span class="ocf-filter-name">{{ __('product-index.in_stock' )}}</span>
+                                        </div>
+                                        <div class="ocf-filter-collapse ocf-collapse ocf-in">
+                                            <div class="ocf-value-list">
+                                                <div class="ocf-value-list-body">
+                                                    <label class="switch">
+                                                        <input type="checkbox" id="in-stock-switch" {{ request()->has('in_stock') ? 'checked' : '' }}>
+                                                        <span class="slider round"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 @foreach($attributes as $attribute)
                                     @if($attribute->field_name === 'main_shade')
                                         <div class="ocf-filter ocf-open ocf-dropdown">
@@ -621,3 +643,63 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"/>
     @endpush
 @endsection
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: rgb(255, 206, 28);
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+</style>
+
+<script>
+    document.getElementById('in-stock-switch').addEventListener('change', function () {
+        const url = new URL(window.location.href);
+
+        if (this.checked) {
+            url.searchParams.set('in_stock', '1');
+        } else {
+            url.searchParams.delete('in_stock');
+        }
+
+        window.location.href = url.toString();
+    });
+</script>

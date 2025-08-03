@@ -14,7 +14,7 @@ return [
         'sign_in' => 'Войти',
         'create_a_profile' => 'Создать профиль',
         'back' => 'Назад',
-
+        'enter_you_email_or_phone' => 'Введите email или номер телефона для восстановления',
         'forgot_password' => 'Забыли пароль?',
         'recover_password' => 'Восстановить пароль',
 

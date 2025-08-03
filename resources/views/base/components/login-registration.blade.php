@@ -95,34 +95,52 @@
       </div>
     </div>
   </div>
-  <div class="popup-window popup-step-3" id="popup-forgot_password">
-    <div class="inner form-horizontal">
-      <p>{{__('popup.login_register.forgot_password')}}</p>
-      <p>{{__('popup.login_register.enter_you_email')}}</p>
-      <div class="popup-form">
-          <form id="form-forgot_password" class="form" action="{{ route('password.email') }}" method="POST">
-              @csrf
-              <div class="form-group group-email">
-                  <input class="form-control form-field" type="email" name="email" id="input-email-forgot"
-                         placeholder="E-Mail" autocomplete="off" required>
-                  <input type="hidden" name="account" value="login">
-              </div>
-              <div class="wrap-send">
-                  <button type="submit" class="colord button send_otp_btn send_btn btn-social" id="button-forgot-popup">
-                      <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.send')}}
-                  </button>
-              </div>
+    <div class="popup-window popup-step-3" id="popup-forgot_password">
+        <div class="inner form-horizontal">
+            <p>{{ __('popup.login_register.forgot_password') }}</p>
+            <p>{{ __('popup.login_register.enter_you_email_or_phone') }}</p>
 
-              <span class="send_otp_btn otp_btn-s button-restore-password" id="restore-popup-back">
-                  <i class="fas fa-chevron-right" aria-hidden="true"></i> {{__('popup.login_register.enter_with_new_password')}}
-              </span>
-          </form>
+            <div class="popup-social">
+                <div class="social_block auth_variant mb-3">
+                    <div id="forgot_with_phone" class="button_social soc_ico apple fas fa-phone active"></div>
+                    <div id="forgot_with_email" class="button_social soc_ico apple fas fa-envelope"></div>
+                </div>
+            </div>
 
-          <div id="forgot-response" class="clear-text" style="margin-top: 10px; color: green; display: none;"></div>
-      </div>
+            <div class="popup-form">
+                <form id="form-forgot_password" class="form" action="{{ route('password.email') }}" method="POST">
+                @csrf
+
+                <!-- PHONE INPUT -->
+                    <div class="form-group enter-with-forgot-phone" style="display: block;">
+                        <input class="form-control form-field" type="text" name="phone" id="input-phone-forgot"
+                               placeholder="{{ __('popup.login_register.enter_phone_placeholder') }}" autocomplete="off">
+                    </div>
+
+                    <!-- EMAIL INPUT -->
+                    <div class="form-group enter-with-forgot-email" style="display: none;">
+                        <input class="form-control form-field" type="email" name="email" id="input-email-forgot"
+                               placeholder="E-Mail" autocomplete="off">
+                    </div>
+
+                    <div class="wrap-send">
+                        <button type="submit" class="colord button send_otp_btn send_btn btn-social" id="button-forgot-popup">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i> {{ __('popup.login_register.send') }}
+                        </button>
+                    </div>
+
+                    <span class="send_otp_btn otp_btn-s button-restore-password" id="restore-popup-back">
+          <i class="fas fa-chevron-right" aria-hidden="true"></i> {{ __('popup.login_register.enter_with_new_password') }}
+        </span>
+                </form>
+
+                <div id="forgot-response" class="clear-text" style="margin-top: 10px; color: green; display: none;"></div>
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="popup-window popup-step-4" id="popup-forgot_password-sucess">
+
+
+    <div class="popup-window popup-step-4" id="popup-forgot_password-sucess">
     <div class="inner form-horizontal">
       <p>{{__('popup.login_register.password_sent_to_email')}}</p>
       <div class="popup-btn">
@@ -236,6 +254,39 @@
 
             this.classList.toggle('eye-crossed');
         });
+
+        (function () {
+            const phoneBtn = document.getElementById('forgot_with_phone');
+            const emailBtn = document.getElementById('forgot_with_email');
+
+            const phoneInput = document.querySelector('.enter-with-forgot-phone');
+            const emailInput = document.querySelector('.enter-with-forgot-email');
+
+            if (!phoneBtn || !emailBtn || !phoneInput || !emailInput) {
+                console.warn('Some elements not found for forgot_password modal.');
+                return;
+            }
+
+            phoneBtn.addEventListener('click', function () {
+                phoneInput.style.display = 'block';
+                emailInput.style.display = 'none';
+                phoneBtn.classList.add('active');
+                emailBtn.classList.remove('active');
+
+                const emailField = document.getElementById('input-email-forgot');
+                if (emailField) emailField.value = '';
+            });
+
+            emailBtn.addEventListener('click', function () {
+                phoneInput.style.display = 'none';
+                emailInput.style.display = 'block';
+                emailBtn.classList.add('active');
+                phoneBtn.classList.remove('active');
+
+                const phoneField = document.getElementById('input-phone-forgot');
+                if (phoneField) phoneField.value = '';
+            });
+        })();
     });
 </script>
 <style>

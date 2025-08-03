@@ -13,6 +13,7 @@ return [
         'enter_email_password' => 'Login',
         'sign_in' => 'Sign in',
         'create_a_profile' => 'Create a profile',
+        'enter_you_email_or_phone' => 'Enter your email or phone number to recover access',
         'back' => 'Back',
         'recover_password' => 'Recover password',
         'forgot_password' => 'Forgot password?',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Banner;
+use App\Models\BestSeller;
 use App\Models\Category;
 use App\Models\CustomBlock;
 use App\Models\Implementation;
@@ -41,16 +42,9 @@ class IndexController extends Controller
             ->take(20)
             ->get();
 
-        $topSellersProducts = Product::query()
-            ->where('is_active', true)
-            ->where('is_top_seller', true)
-            ->whereHas('prices', function ($query) {
-                $query->where('type_id', function ($subQuery) {
-                    $subQuery->select('id')
-                        ->from('price_types')
-                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-                })->where('price', '>', 0);
-            })
+        $topSellersProducts = BestSeller::query()
+            ->whereHas('product.category')
+            ->orderBy('sort_order', 'asc')
             ->get();
 
         $latestCategory = Category::query()

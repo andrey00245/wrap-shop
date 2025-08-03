@@ -6,7 +6,7 @@ return [
     '3m_colors' => '<span class="colord">3M color</span> плівки',
     'yellotools' => '<span class="colord">Yellotools</span> інструменти',
 
-    'our_realizations' => 'Наші реалізації',
+    'our_realizations' => 'Плівки на автомобілі',
     'show_more' => 'Показати більше',
 
     'sales_hit' => 'Хіт продажів',

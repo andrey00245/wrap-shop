@@ -441,6 +441,15 @@ $(document).ready(function () {
         maxInput.addEventListener('change', function () {
             getCountAjax(maxInputJq)
         });
+
+        const inStockSwitch = document.getElementById('in-stock-switch');
+
+        if (inStockSwitch) {
+            inStockSwitch.addEventListener('change', function () {
+                let button = $(this);
+                getCountAjax(maxInputJq);
+            });
+        }
     }
 
     function getCountAjax(button = null) {
@@ -449,6 +458,8 @@ $(document).ready(function () {
         if (language !== 'uk') {
             url = '/' + language + url;
         }
+        const inStockCheckbox = document.getElementById('in-stock-switch');
+
         const getParametesUrl = new URL(window.location.href);
         const params = new URLSearchParams(getParametesUrl.search);
         const search = params.get('search');
@@ -464,6 +475,11 @@ $(document).ready(function () {
         } else {
             data.category_id = categoryId
         }
+
+        if (inStockCheckbox && inStockCheckbox.checked) {
+            data.in_stock = 1
+        }
+
         data.min_price = minPrice
         data.max_price = maxPrice
         data.search = search

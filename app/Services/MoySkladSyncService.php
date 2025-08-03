@@ -79,6 +79,14 @@ class MoySkladSyncService
                         "mediaType" => "application/json"
                     ],
                     "value" => $cleanPhone
+                ],
+                [
+                    "meta" => [
+                        "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/ee963740-660b-11f0-0a80-0d890028be5f", //FIO
+                        "type" => "attributemetadata",
+                        "mediaType" => "application/json"
+                    ],
+                    "value" => $order->first_name . ' ' . $order->last_name
                 ]
             ];
 
@@ -132,7 +140,15 @@ class MoySkladSyncService
                         "mediaType" => "application/json"
                     ],
                     "value" => $cleanPhone
-                ]
+                ],
+               [
+                   "meta" => [
+                       "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/ee963740-660b-11f0-0a80-0d890028be5f", //FIO
+                       "type" => "attributemetadata",
+                       "mediaType" => "application/json"
+                   ],
+                   "value" => $order->first_name . ' ' . $order->last_name
+               ]
             ];
 
             if ($order->novaposhta_warehouse_ref && $order->shipping_address) {

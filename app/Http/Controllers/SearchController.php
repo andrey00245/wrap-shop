@@ -211,6 +211,7 @@ class SearchController extends Controller
     public function popupSearch(Request $request)
     {
         $columns = ['name', 'code'];
+        $search = $request->get('search');
 
         $products = Product::query()
             ->whereHas('prices', function ($query) {
@@ -223,19 +224,45 @@ class SearchController extends Controller
             ->whereHas('media')
             ->whereHas('category')
             ->with(['media'])
-            ->whereLikeInsensitive($columns, $request->get('search'))
+            ->where(function ($query) use ($columns, $search) {
+                $query->whereLikeInsensitive($columns, $search)
+                    ->orWhereHas('attributes', function ($attrQuery) use ($search) {
+                        $keywords = preg_split('/\s+/', mb_strtolower($search), -1, PREG_SPLIT_NO_EMPTY);
+                        $allKeywords = [];
+
+                        foreach ($keywords as $word) {
+                            $allKeywords[] = $word;
+                            $allKeywords[] = Product::toTranslit($word);
+                        }
+
+                        $locales = ['uk', 'ru', 'en'];
+
+                        $attrQuery->where(function ($innerQuery) use ($allKeywords, $locales) {
+                            foreach ($locales as $locale) {
+                                foreach ($allKeywords as $keyword) {
+                                    if (!empty($keyword)) {
+                                        $innerQuery->orWhereRaw(
+                                            "LOWER(JSON_UNQUOTE(JSON_EXTRACT(value, '$.\"$locale\"'))) LIKE ?",
+                                            ['%' . $keyword . '%']
+                                        );
+                                    }
+                                }
+                            }
+                        });
+                    });
+            })
             ->get();
 
         return response()->json([
-            'data' =>
-                [
-                    'view'        => view('base.components.search-product-list', [
-                        'products' => $products->take(3),
-                        'count'    => $products->count() - 3,
-                    ])->render(),
-                    'link'        => route('search', ['search' => $request->get('search')]),
-                    'total_count' => $products->count(),
-                ]
+            'data' => [
+                'view' => view('base.components.search-product-list', [
+                    'products' => $products->take(3),
+                    'count' => $products->count() - 3,
+                ])->render(),
+                'link' => route('search', ['search' => $search]),
+                'total_count' => $products->count(),
+            ]
         ]);
     }
+
 }

@@ -126,9 +126,31 @@ $(document).ready(function () {
                 if (searchIcon && searchIcon.classList.contains('fa-times')) {
                     const backUrl = sessionStorage.getItem('searchReturnUrl');
                     if (backUrl) {
-                        sessionStorage.removeItem('searchReturnUrl');
-                        window.location.href = backUrl;
-                        return;
+                        try {
+                            const back = new URL(backUrl, window.location.origin);
+                            const current = new URL(window.location.href);
+
+                            const blocked = new Set(['search', 'category_id', 'description', 'sub_category', 'page']);
+
+                            // Clear page on return
+                            back.searchParams.delete('page');
+
+                            // Overlay current params onto back (preserve filters, sort, price, in_stock)
+                            const currentParams = new URLSearchParams(current.search);
+                            // remove keys to allow multi-value append
+                            for (const [key] of currentParams.entries()) {
+                                if (!blocked.has(key)) back.searchParams.delete(key);
+                            }
+                            currentParams.forEach((value, key) => {
+                                if (!blocked.has(key)) back.searchParams.append(key, value);
+                            });
+
+                            sessionStorage.removeItem('searchReturnUrl');
+                            window.location.href = back.pathname + (back.search ? back.search : '');
+                            return;
+                        } catch (e) {
+                            // fallback to simple clear
+                        }
                     }
                     params.delete('search');
                     params.delete('page');

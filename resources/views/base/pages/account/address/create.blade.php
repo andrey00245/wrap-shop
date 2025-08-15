@@ -31,11 +31,11 @@
             <div class="form-group required row-address_address_1">
               <label class="control-label col-sm-2"
                      for="address">{{__('personal-account.editing-adding-address.branch-address')}}</label>
-              <div class="col-sm-10">
+              <div class="col-sm-10" style="position: relative;">
                 <input class="form-control" type="text" name="address" id="shipping_address" value="{{old('address')}}"
                        placeholder="{{__('personal-account.editing-adding-address.enter-address')}}">
                 <input type="hidden" name="novaposhta_warehouse_ref" id="novaposhta_warehouse_ref" value="">
-                <ul id="address-suggestions" class="dropdown-suggestions" style="display:none; position: absolute; width: calc(100% - 30px);"></ul>
+                <ul id="address-suggestions" class="dropdown-suggestions" style="display:none;"></ul>
                 @error('address')
                 <div class="simplecheckout-rule-group">
                   <div class="simplecheckout-error-text simplecheckout-rule">

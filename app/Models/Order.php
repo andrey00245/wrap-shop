@@ -19,7 +19,16 @@ class Order extends Model
         'name',
         'total',
         'shipping_method',
-        'novaposhta_warehouse_ref'
+        'novaposhta_warehouse_ref',
+        'moysklad_id',
+        'payment_status',
+        'status',
+        'email',
+        'phone',
+        'first_name',
+        'last_name',
+        'shipping_address',
+        'city'
     ];
 
     protected $casts = [

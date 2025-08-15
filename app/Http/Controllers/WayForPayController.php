@@ -22,12 +22,21 @@ class WayForPayController extends Controller
 
         if (($data['transactionStatus'] ?? null) === 'Approved') {
             $order = Order::where('id', explode('_', $data['orderReference'])[0])->first();
-            $order->update(['payment_status' => 'approved']);
-
-//            if ($order) {
-//                $checkboxService = new \App\Services\CheckboxService();
-//                $checkboxService->sendReceipt($order);
-//            }
+            
+            if ($order) {
+                // Обновляем статус оплаты в локальной БД
+                $order->update(['payment_status' => 'approved']);
+                
+                // Обновляем статус заказа в МойСклад
+                try {
+                    \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Ошибка обновления заказа в МойСклад', [
+                        'order_id' => $order->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
         }
 
         return response('OK');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class WayForPayController extends Controller
@@ -20,13 +21,17 @@ class WayForPayController extends Controller
     {
         $data = $request->all();
 
+        Log::error('WayFor pay response', [
+            'response' => $data
+        ]);
+
         if (($data['transactionStatus'] ?? null) === 'Approved') {
             $order = Order::where('id', explode('_', $data['orderReference'])[0])->first();
-            
+
             if ($order) {
                 // Обновляем статус оплаты в локальной БД
                 $order->update(['payment_status' => 'approved']);
-                
+
                 // Обновляем статус заказа в МойСклад
                 try {
                     \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);

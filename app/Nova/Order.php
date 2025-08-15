@@ -83,9 +83,13 @@ class Order extends Resource
 
 			Badge::make('Статус', 'status')->map([
 				'new' => 'info',
+				'pending' => 'info',
 				'processing' => 'warning',
+				'paid' => 'success',
 				'completed' => 'success',
 				'canceled' => 'danger',
+				'failed' => 'danger',
+				'refunded' => 'warning',
 			])->sortable(),
 
 			Currency::make('Сума', 'total')->currency('UAH')->asMinorUnits(false)->sortable(),

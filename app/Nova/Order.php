@@ -107,7 +107,10 @@ class Order extends Resource
                             ->step(1)
                             ->min(1)
                             ->rules('required', 'integer', 'min:1'),
-                        Text::make('Ціна', fn ($value) => number_format((float) $value, 2, '.', ' ') . ' ₴')
+                        Number::make('Ціна', 'price')
+                            ->step(0.01)
+                            ->displayUsing(fn ($value) => number_format((float)$value, 2, '.', ' ') . ' ₴')
+                            ->rules('required', 'numeric', 'min:0')
                     ];
                 })
 		];

@@ -92,10 +92,8 @@ class Order extends Resource
 				'refunded' => 'warning',
 			])->sortable(),
 
-            Currency::make('Сума', 'total')
-                ->currency('UAH')
-                ->asMinorUnits(false)
-                ->resolveUsing(fn ($value) => number_format((float) $value, 2, '.', '')),
+            Text::make('Сума', fn () => number_format((float) $this->total, 2, '.', ' ') . ' ₴')
+                ->sortable(),
 
 			Text::make('Коментар', 'comment')->onlyOnDetail(),
 
@@ -109,11 +107,7 @@ class Order extends Resource
                             ->step(1)
                             ->min(1)
                             ->rules('required', 'integer', 'min:1'),
-                        Currency::make('Ціна', 'price')
-                            ->currency('UAH')
-                            ->asMinorUnits(false)
-                            ->resolveUsing(fn ($value) => number_format((float) $value, 2, '.', ''))
-                            ->rules('required', 'numeric', 'min:0'),
+                        Text::make('Ціна', fn ($value) => number_format((float) $value, 2, '.', ' ') . ' ₴')
                     ];
                 })
 		];

@@ -509,28 +509,3 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"/>
     @endpush
 @endsection
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const button = document.querySelector('#search button');
-        const input = document.querySelector('#search input');
-        const icon = button.querySelector('i');
-
-        button.addEventListener('click', () => {
-            if (icon.classList.contains('fa-times')) {
-                history.back();
-            } else {
-                redirectWithParameters(input);
-            }
-        });
-
-        input.addEventListener('input', () => {
-            if (input.value.trim().length > 0) {
-                icon.classList.remove('fa-search');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-search');
-            }
-        });
-    });
-</script>

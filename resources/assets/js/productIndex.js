@@ -114,24 +114,53 @@ $(document).ready(function () {
     search();
 
     function search() {
-        const searchInput = document.querySelector('#search input')
-        const searchButton = document.querySelector('#search button')
-        searchButton.addEventListener('click', function () {
-            redirectWithParameters(searchInput)
-        })
-        searchInput.addEventListener('keydown', function () {
-            if (event.key === 'Enter') {
-                redirectWithParameters(searchInput)
-            }
-        })
+        const searchInput = document.querySelector('#search input');
+        const searchButton = document.querySelector('#search button');
+        const searchIcon = document.getElementById('searchIcon');
+
+        if (searchButton) {
+            searchButton.addEventListener('click', function () {
+                const url = new URL(window.location.href);
+                const params = url.searchParams;
+
+                if (searchIcon && searchIcon.classList.contains('fa-times')) {
+                    params.delete('search');
+                    params.delete('page');
+                    const qs = params.toString();
+                    window.location.href = url.pathname + (qs ? `?${qs}` : '');
+                    return;
+                }
+
+                redirectWithParameters(searchInput);
+            });
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    redirectWithParameters(searchInput);
+                }
+            });
+
+            searchInput.addEventListener('input', function () {
+                if (!searchIcon) return;
+                if (searchInput.value.trim().length > 0) {
+                    searchIcon.classList.remove('fa-search');
+                    searchIcon.classList.add('fa-times');
+                } else {
+                    searchIcon.classList.remove('fa-times');
+                    searchIcon.classList.add('fa-search');
+                }
+            });
+        }
     }
 
     function redirectWithParameters(searchInput) {
-        const data = {}
+        const data = {};
         const getParametesUrl = new URL(window.location.href);
         const params = new URLSearchParams(getParametesUrl.search);
 
-        data.search = searchInput.value
+        data.search = searchInput ? searchInput.value : '';
         if (params.get('sub_category') !== null) {
             data.sub_category = params.get('sub_category');
         }
@@ -141,6 +170,9 @@ $(document).ready(function () {
         if (params.get('category_id') !== null) {
             data.category_id = params.get('category_id');
         }
+
+        // drop pagination on new search
+        params.delete('page');
 
         const queryString = new URLSearchParams(data).toString();
         if (language !== 'uk') {

@@ -106,6 +106,15 @@ class OrderController extends Controller
                 'quantity' => $quantity,
                 'price' => $productPrice,
             ]);
+
+            // Обновление остатка товара
+            $currentStock = (float) $product->getStock();
+            $newStock = $currentStock - (float) $quantity;
+            if ($newStock < 0) {
+                $newStock = 0.0;
+            }
+            $product->stock = $newStock;
+            $product->save();
         }
 
         if ($order->payment_method === 'online') {

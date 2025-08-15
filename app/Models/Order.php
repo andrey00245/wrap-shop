@@ -22,6 +22,10 @@ class Order extends Model
         'novaposhta_warehouse_ref'
     ];
 
+    protected $casts = [
+        'total' => 'decimal:2',
+    ];
+
     public function products()
     {
         return $this->belongsToMany(Product::class)

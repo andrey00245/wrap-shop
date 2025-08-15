@@ -47,4 +47,5 @@ return [
     'update' => 'Update',
     'summ' => 'Amount',
     'total' => 'Total',
+    'films_cargo_only' => 'Films from 1 linear meter are delivered only to cargo branches (up to 200/1100 kg).',
 ];

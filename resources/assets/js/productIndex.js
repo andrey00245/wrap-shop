@@ -114,24 +114,86 @@ $(document).ready(function () {
     search();
 
     function search() {
-        const searchInput = document.querySelector('#search input')
-        const searchButton = document.querySelector('#search button')
-        searchButton.addEventListener('click', function () {
-            redirectWithParameters(searchInput)
-        })
-        searchInput.addEventListener('keydown', function () {
-            if (event.key === 'Enter') {
-                redirectWithParameters(searchInput)
-            }
-        })
+        const searchInput = document.querySelector('#search input');
+        const searchButton = document.querySelector('#search button');
+        const searchIcon = document.getElementById('searchIcon');
+
+        if (searchButton) {
+            searchButton.addEventListener('click', function () {
+                const url = new URL(window.location.href);
+                const params = url.searchParams;
+
+                if (searchIcon && searchIcon.classList.contains('fa-times')) {
+                    const backUrl = sessionStorage.getItem('searchReturnUrl');
+                    if (backUrl) {
+                        try {
+                            const back = new URL(backUrl, window.location.origin);
+                            const current = new URL(window.location.href);
+
+                            const blocked = new Set(['search', 'category_id', 'description', 'sub_category', 'page']);
+
+                            // Clear page on return
+                            back.searchParams.delete('page');
+
+                            // Overlay current params onto back (preserve filters, sort, price, in_stock)
+                            const currentParams = new URLSearchParams(current.search);
+                            // remove keys to allow multi-value append
+                            for (const [key] of currentParams.entries()) {
+                                if (!blocked.has(key)) back.searchParams.delete(key);
+                            }
+                            currentParams.forEach((value, key) => {
+                                if (!blocked.has(key)) back.searchParams.append(key, value);
+                            });
+
+                            sessionStorage.removeItem('searchReturnUrl');
+                            window.location.href = back.pathname + (back.search ? back.search : '');
+                            return;
+                        } catch (e) {
+                            // fallback to simple clear
+                        }
+                    }
+                    params.delete('search');
+                    params.delete('page');
+                    const qs = params.toString();
+                    window.location.href = url.pathname + (qs ? `?${qs}` : '');
+                    return;
+                }
+
+                redirectWithParameters(searchInput);
+            });
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    redirectWithParameters(searchInput);
+                }
+            });
+
+            searchInput.addEventListener('input', function () {
+                if (!searchIcon) return;
+                if (searchInput.value.trim().length > 0) {
+                    searchIcon.classList.remove('fa-search');
+                    searchIcon.classList.add('fa-times');
+                } else {
+                    searchIcon.classList.remove('fa-times');
+                    searchIcon.classList.add('fa-search');
+                }
+            });
+        }
     }
 
     function redirectWithParameters(searchInput) {
-        const data = {}
+        const data = {};
         const getParametesUrl = new URL(window.location.href);
         const params = new URLSearchParams(getParametesUrl.search);
 
-        data.search = searchInput.value
+        // remember where the search started (only when not already on /search)
+        if (!window.location.pathname.includes('/search')) {
+            try { sessionStorage.setItem('searchReturnUrl', window.location.href); } catch (e) {}
+        }
+
+        data.search = searchInput ? searchInput.value : '';
         if (params.get('sub_category') !== null) {
             data.sub_category = params.get('sub_category');
         }
@@ -141,6 +203,20 @@ $(document).ready(function () {
         if (params.get('category_id') !== null) {
             data.category_id = params.get('category_id');
         }
+
+        // carry over active filters/sort/min/max/in_stock from current page
+        const carryBlocked = new Set(['search','page']);
+        params.forEach((value, key) => {
+            if (!carryBlocked.has(key) && data[key] === undefined) {
+                // allow arrays by appending multiple entries
+                if (data[key] === undefined) {
+                    data[key] = value;
+                }
+            }
+        });
+
+        // drop pagination on new search
+        params.delete('page');
 
         const queryString = new URLSearchParams(data).toString();
         if (language !== 'uk') {

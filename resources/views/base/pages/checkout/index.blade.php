@@ -38,7 +38,7 @@
         @if($cartItemsCount > 0)
             <div class="simple-content">
                 <div id="simplecheckout_form_0">
-                    <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm">
+                    <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm" data-has-long-film="{{ collect($cartItems)->contains(function($i){ return $i['product']->getRollSize() && $i['quantity'] >= 1; }) ? '1' : '0' }}">
                         @csrf
                         <for class="simplecheckout">
                             <div class="simplecheckout-step" style="display: flex;">
@@ -128,7 +128,7 @@
                                                             <span class="radio-label">{{__('checkout.nova_poshta')}}</span>
                                                         </label>
                                                     </div>
-                                                    <fieldset id="novaposhta_desc" class="radio-description">{{__('checkout.nova_poshta_desc')}}</fieldset>
+                                                    <fieldset id="novaposhta_desc" class="radio-description">{{__('checkout.nova_poshta_desc')}}<br><small>{{ __('checkout.films_cargo_only') }}</small></fieldset>
                                                     <div class="radio">
                                                         <label for="novaposhta_doors" class="custom-radio">
                                                             <input type="radio" data-onchange="reloadAll"

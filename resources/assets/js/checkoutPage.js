@@ -207,7 +207,9 @@ document.addEventListener('DOMContentLoaded', function () {
 $(document).ready(function() {
     let debounceTimer;
     let cityRefSelected = null;
-    let branchesData = []; // Сохраняем данные по отделениям
+    let branchesData = []; // Сохраняем данные по отделениях
+    // Флаг: содержит ли корзина пленки (м.п.) от 1 м
+    const hasLongFilm = document.getElementById('checkoutForm')?.dataset?.hasLongFilm === '1';
 
     // Обработчик изменения радиокнопки
     $("input[name='shipping_method']").on("change", function() {
@@ -309,7 +311,13 @@ $(document).ready(function() {
                 let $addressSuggestionsBox = $("#address-suggestions");
 
                 // Сохраняем данные о полученных отделениях
-                branchesData = response.data;
+                branchesData = (response.data || []).filter(function(wh){
+                    if (!hasLongFilm) return true;
+                    // Простая эвристика: пропускаем только грузовые отделения
+                    // (часто содержат "Вантаж" / "Груз" / Cargo / цифры 200/1100)
+                    const n = (wh.name || '').toLowerCase();
+                    return n.includes('вантаж') || n.includes('груз') || n.includes('cargo') || n.includes('200') || n.includes('1100');
+                });
 
                 // Показываем поле для ввода отделения
                 $shippingAddressInput.prop("disabled", false);

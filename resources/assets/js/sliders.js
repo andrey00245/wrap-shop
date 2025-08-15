@@ -14,6 +14,10 @@ $(document).ready(function () {
 new Splide('#topBannersSlider', {
     autoplay: true,
     interval: 3000,
+    type: 'loop',
+    speed: 600,
+    pauseOnHover: false,
+    pauseOnFocus: false,
     classes: {
         arrows: 'splide__arrows home-slide-buttons',
         prev  : 'splide__arrow--prev home-banner-prev',
@@ -24,7 +28,7 @@ new Splide('#topBannersSlider', {
 
 new Splide('#slideCategory', {
     autoplay: true,
-    interval: 3000,
+    interval: 5000,
     type: 'loop',
     pagination: false,
     classes: {

@@ -137,6 +137,24 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="ocf-filter ocf-dropdown is-stock-container">
+                                    <div class="ocf-filter-body">
+                                        <div class="ocf-filter-header" data-ocf="expand">
+                                            <span class="ocf-active-label"></span>
+                                            <span class="ocf-filter-name">{{ __('product-index.in_stock' )}}</span>
+                                        </div>
+                                        <div class="ocf-filter-collapse ocf-collapse ocf-in">
+                                            <div class="ocf-value-list">
+                                                <div class="ocf-value-list-body">
+                                                    <label class="switch">
+                                                        <input type="checkbox" id="in-stock-switch" {{ request()->has('in_stock') ? 'checked' : '' }}>
+                                                        <span class="slider round"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 @foreach($attributes as $attribute)
                                     @if($attribute->field_name === 'main_shade')
                                         <div class="ocf-filter ocf-open ocf-dropdown">
@@ -509,28 +527,3 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"/>
     @endpush
 @endsection
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const button = document.querySelector('#search button');
-        const input = document.querySelector('#search input');
-        const icon = button.querySelector('i');
-
-        button.addEventListener('click', () => {
-            if (icon.classList.contains('fa-times')) {
-                history.back();
-            } else {
-                redirectWithParameters(input);
-            }
-        });
-
-        input.addEventListener('input', () => {
-            if (input.value.trim().length > 0) {
-                icon.classList.remove('fa-search');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-search');
-            }
-        });
-    });
-</script>

@@ -36,133 +36,135 @@ use Laravel\Nova\NovaApplicationServiceProvider;
 
 class NovaServiceProvider extends NovaApplicationServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        parent::boot();
+	/**
+	 * Bootstrap any application services.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		parent::boot();
 
-        Nova::mainMenu(function (Request $request) {
-            return [
-                MenuSection::dashboard(Main::class)->icon('chart-bar'),
-                MenuSection::make('Користувачі', [
-                    MenuItem::resource(User::class),
-                    MenuItem::resource(Review::class),
-                ])->icon('user')->collapsable(),
+		Nova::name('Wrap Shop');
 
-                MenuSection::make('Товари', [
-                    MenuItem::resource(Product::class),
-                    MenuItem::resource(BestSeller::class),
-                    MenuItem::resource(Attribute::class),
-                    MenuItem::resource(Category::class),
-                    MenuItem::resource(PriceType::class),
-                    MenuItem::resource(Order::class),
-                    MenuItem::resource(Implementation::class),
-                    MenuItem::resource(ReportAvailability::class),
+		Nova::mainMenu(function (Request $request) {
+			return [
+				MenuSection::dashboard(Main::class)->icon('chart-bar'),
+				MenuSection::make('Користувачі', [
+					MenuItem::resource(User::class),
+					MenuItem::resource(Review::class),
+				])->icon('user')->collapsable(),
 
-                ])->icon('collection')->collapsable(),
+				MenuSection::make('Товари', [
+					MenuItem::resource(Product::class),
+					MenuItem::resource(BestSeller::class),
+					MenuItem::resource(Attribute::class),
+					MenuItem::resource(Category::class),
+					MenuItem::resource(PriceType::class),
+					MenuItem::resource(Order::class),
+					MenuItem::resource(Implementation::class),
+					MenuItem::resource(ReportAvailability::class),
 
-                MenuSection::make('Замовлення-Консультації', [
-                    MenuItem::resource(Order::class),
-                    MenuItem::resource(Consultation::class),
-                    MenuItem::resource(FastOrder::class),
+				])->icon('collection')->collapsable(),
 
-                ])->icon('collection')->collapsable(),
+				MenuSection::make('Замовлення-Консультації', [
+					MenuItem::resource(Order::class),
+					MenuItem::resource(Consultation::class),
+					MenuItem::resource(FastOrder::class),
 
-                MenuSection::make('Банери', [
-                    MenuItem::resource(Banner::class),
-                    MenuItem::resource(ProductBanner::class),
-                ])->icon('clipboard')->collapsable(),
+				])->icon('collection')->collapsable(),
 
-                MenuSection::make('Кастомнi Блоки', [
-                    MenuItem::resource(CustomBlock::class),
-                ])->icon('clipboard')->collapsable(),
+				MenuSection::make('Банери', [
+					MenuItem::resource(Banner::class),
+					MenuItem::resource(ProductBanner::class),
+				])->icon('clipboard')->collapsable(),
 
-                MenuSection::make('Блог', [
-                    MenuItem::resource(NewsCategory::class),
-                    MenuItem::resource(News::class),
-                ])->icon('desktop-computer')->collapsable(),
+				MenuSection::make('Кастомнi Блоки', [
+					MenuItem::resource(CustomBlock::class),
+				])->icon('clipboard')->collapsable(),
 
-                MenuSection::make('Відеогляд', [
-                    MenuItem::resource(VideoCategory::class),
-                    MenuItem::resource(VideoReview::class),
-                ])->icon('desktop-computer')->collapsable(),
+				MenuSection::make('Блог', [
+					MenuItem::resource(NewsCategory::class),
+					MenuItem::resource(News::class),
+				])->icon('desktop-computer')->collapsable(),
 
-                MenuSection::resource(PrivacyPolicy::class)->icon('document'),
+				MenuSection::make('Відеогляд', [
+					MenuItem::resource(VideoCategory::class),
+					MenuItem::resource(VideoReview::class),
+				])->icon('desktop-computer')->collapsable(),
 
-                MenuSection::resource(Setting::class)
-                ->icon('cog'),
+				MenuSection::resource(PrivacyPolicy::class)->icon('document'),
 
-            ];
-        });
+				MenuSection::resource(Setting::class)
+				->icon('cog'),
 
-        Nova::footer(function ($request) {
-            return Blade::render('
-                Wrap Shop
-        ');
-        });
-    }
+			];
+		});
 
-    /**
-     * Register the Nova routes.
-     *
-     * @return void
-     */
-    protected function routes()
-    {
-        Nova::routes()
-                ->withAuthenticationRoutes()
-                ->withPasswordResetRoutes()
-                ->register();
-    }
+		Nova::footer(function ($request) {
+			return Blade::render('
+				Wrap Shop
+		');
+		});
+	}
 
-    /**
-     * Register the Nova gate.
-     *
-     * This gate determines who can access Nova in non-local environments.
-     *
-     * @return void
-     */
-    protected function gate()
-    {
-        Gate::define('viewNova', function ($user) {
-            return in_array($user->email, [
-                //
-            ], true);
-        });
-    }
+	/**
+	 * Register the Nova routes.
+	 *
+	 * @return void
+	 */
+	protected function routes()
+	{
+		Nova::routes()
+				->withAuthenticationRoutes()
+				->withPasswordResetRoutes()
+				->register();
+	}
 
-    /**
-     * Get the dashboards that should be listed in the Nova sidebar.
-     *
-     * @return array
-     */
-    protected function dashboards()
-    {
-        return [
-            new \App\Nova\Dashboards\Main,
-        ];
-    }
+	/**
+	 * Register the Nova gate.
+	 *
+	 * This gate determines who can access Nova in non-local environments.
+	 *
+	 * @return void
+	 */
+	protected function gate()
+	{
+		Gate::define('viewNova', function ($user) {
+			return in_array($user->email, [
+				//
+			], true);
+		});
+	}
 
-    /**
-     * Get the tools that should be listed in the Nova sidebar.
-     *
-     * @return array
-     */
-    public function tools()
-    {
-        return [];
-    }
+	/**
+	 * Get the dashboards that should be listed in the Nova sidebar.
+	 *
+	 * @return array
+	 */
+	protected function dashboards()
+	{
+		return [
+			new \App\Nova\Dashboards\Main,
+		];
+	}
 
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-    }
+	/**
+	 * Get the tools that should be listed in the Nova sidebar.
+	 *
+	 * @return array
+	 */
+	public function tools()
+	{
+		return [];
+	}
+
+	/**
+	 * Register any application services.
+	 *
+	 * @return void
+	 */
+	public function register()
+	{
+	}
 }

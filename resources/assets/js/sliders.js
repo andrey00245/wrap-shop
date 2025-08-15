@@ -15,6 +15,9 @@ new Splide('#topBannersSlider', {
     autoplay: true,
     interval: 3000,
     type: 'loop',
+    speed: 600,
+    pauseOnHover: false,
+    pauseOnFocus: false,
     classes: {
         arrows: 'splide__arrows home-slide-buttons',
         prev  : 'splide__arrow--prev home-banner-prev',

@@ -1,8 +1,7 @@
 import {
     productSliderInitialization,
     productSliderInitializationClass,
-    popupSliderInitialization,
-    imageSliderInProduct
+    popupSliderInitialization
 } from "./sliderInitialization";
 
 $(document).ready(function () {
@@ -10,9 +9,6 @@ $(document).ready(function () {
     productSliderInitialization('homeLatest');
     productSliderInitializationClass('customBlocks');
     productSliderInitialization('examplesOfWork');
-    
-    // Инициализация слайдеров изображений в custom blocks
-    imageSliderInProduct('customBlocks');
 });
 
 new Splide('#topBannersSlider', {

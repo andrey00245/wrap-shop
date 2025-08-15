@@ -22,6 +22,16 @@ $(document).ready(function () {
             data.category_id = categorySearch.value
         }
 
+        // preserve active filters from current page when jumping into search
+        const current = new URL(window.location.href);
+        const currentParams = new URLSearchParams(current.search);
+        const blocked = new Set(['search','category_id','description','sub_category','page']);
+        currentParams.forEach((value, key) => {
+            if (!blocked.has(key)) {
+                if (!data[key]) data[key] = [];
+                if (Array.isArray(data[key])) data[key].push(value); else data[key] = value;
+            }
+        });
 
         const queryString = new URLSearchParams(data).toString();
 

@@ -204,6 +204,17 @@ $(document).ready(function () {
             data.category_id = params.get('category_id');
         }
 
+        // carry over active filters/sort/min/max/in_stock from current page
+        const carryBlocked = new Set(['search','page']);
+        params.forEach((value, key) => {
+            if (!carryBlocked.has(key) && data[key] === undefined) {
+                // allow arrays by appending multiple entries
+                if (data[key] === undefined) {
+                    data[key] = value;
+                }
+            }
+        });
+
         // drop pagination on new search
         params.delete('page');
 

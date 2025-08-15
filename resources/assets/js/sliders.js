@@ -14,6 +14,7 @@ $(document).ready(function () {
 new Splide('#topBannersSlider', {
     autoplay: true,
     interval: 3000,
+    type: 'loop',
     classes: {
         arrows: 'splide__arrows home-slide-buttons',
         prev  : 'splide__arrow--prev home-banner-prev',

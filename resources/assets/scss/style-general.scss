@@ -1360,6 +1360,11 @@ body::-webkit-scrollbar {
         margin-top: 12px;
         transition-property: transform;
         margin-bottom: 50px;
+        
+        /* Специальные стили для examples-of-work */
+        .examples-of-work & {
+            margin-bottom: 0;
+        }
 
         &.hide {
             display: none !important;
@@ -1394,6 +1399,12 @@ body::-webkit-scrollbar {
                 padding-bottom: 0;
                 margin-bottom: 50px;
             }
+            
+            /* Специальные стили для examples-of-work */
+            .examples-of-work & {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            }
 
 
             .bottom {
@@ -1403,6 +1414,14 @@ body::-webkit-scrollbar {
 
             .hover-additional-info {
                 display: flex;
+            }
+            
+            /* Специальные стили для examples-of-work */
+            .examples-of-work & {
+                .example-product {
+                    transform: scale(1.05);
+                    transition: transform 0.3s ease;
+                }
             }
         }
 
@@ -3285,6 +3304,100 @@ table .notify-quantity {
 
 .examples-of-work {
     padding-top: 35px;
+    
+    &.home-products {
+        .home-products-list {
+            .splide__list {
+                .splide__slide {
+                    .example-of-work {
+                        margin: 0;
+                        padding: 15px;
+                        
+                        /* Стили для стрелок в examples-of-work */
+                        .splide__arrows {
+                            .splide__arrow {
+                                background-color: rgba(255, 255, 255, 0.9);
+                                border: 1px solid #ddd;
+                                
+                                &:hover {
+                                    background-color: $mod-main-color;
+                                    border-color: $mod-main-color;
+                                    
+                                    &::after {
+                                        border-color: transparent transparent transparent #fff;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        .image-example {
+                            width: 100%;
+                            height: 200px;
+                            object-fit: cover;
+                            border-radius: 3px;
+                            margin-bottom: 15px;
+                        }
+                        
+                        .middle-content-wrapper {
+                            padding: 0;
+                            margin-bottom: 15px;
+                            
+                            .car-name {
+                                font-size: 16px;
+                                font-weight: 600;
+                                margin-bottom: 8px;
+                                display: block;
+                            }
+                            
+                            .date {
+                                font-size: 14px;
+                                color: #666;
+                                margin-bottom: 10px;
+                                display: block;
+                            }
+                        }
+                        
+                                .example-product {
+            margin-top: auto;
+            transition: transform 0.3s ease;
+            
+            .product-link {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                color: inherit;
+                                
+                                .image-product {
+                                    width: 60px;
+                                    height: 60px;
+                                    object-fit: cover;
+                                    border-radius: 3px;
+                                    margin-right: 12px;
+                                }
+                                
+                                .text-wrapper {
+                                    flex: 1;
+                                    
+                                    .title-product {
+                                        font-size: 12px;
+                                        color: #666;
+                                        display: block;
+                                        margin-bottom: 4px;
+                                    }
+                                    
+                                    .name-product {
+                                        font-size: 14px;
+                                        font-weight: 500;
+                                        display: block;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 .example-of-work.button {
@@ -3333,25 +3446,26 @@ table .notify-quantity {
 
 
 .examples-wrapper {
-    -webkit-column-count: 4;
-    -moz-column-count: 4;
-    column-count: 4;
-    margin-right: 10px;
-    padding-top: 20px;
-    margin-bottom: 45px;
+    /* Убираем CSS колонки для слайдера */
+    display: none;
 }
 
 .example-of-work {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     overflow: hidden;
 
     background-color: $mod-product-default-bg;
     border: 1px solid $mod-product-default-border;
     border-radius: 3px;
-    height: fit-content;
-    margin-right: -9px;
-    margin-bottom: 7px;
+    height: 100%;
+    width: 100%;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
 }
 
 
@@ -3359,16 +3473,37 @@ table .notify-quantity {
     width: 100%;
     height: auto;
     margin-bottom: 15px;
+    
+    /* Стили для слайдера */
+    .home-products & {
+        height: 200px;
+        object-fit: cover;
+        border-radius: 3px;
+    }
 }
 
 .example-of-work .image-product {
     width: 77px;
     height: 77px;
     margin-right: 8px;
+    
+    /* Стили для слайдера */
+    .home-products & {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 3px;
+    }
 }
 
 .examples-wrapper .middle-content-wrapper {
     padding: 0 13px;
+}
+
+/* Стили для слайдера */
+.home-products .examples-of-work .middle-content-wrapper {
+    padding: 0;
+    margin-bottom: 15px;
 }
 
 .examples-wrapper .car-name {
@@ -3379,12 +3514,28 @@ table .notify-quantity {
     margin-bottom: 5px;
 }
 
+/* Стили для слайдера */
+.home-products .examples-of-work .car-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+}
+
 .examples-wrapper .date {
     display: block;
     font-size: 14px;
     font-weight: 400;
     margin-bottom: 8px;
     opacity: 0.5;
+}
+
+/* Стили для слайдера */
+.home-products .examples-of-work .date {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+    opacity: 1;
 }
 
 .example-of-work ul {
@@ -3403,9 +3554,23 @@ table .notify-quantity {
     padding: 5px;
 }
 
+/* Стили для слайдера */
+.home-products .examples-of-work .example-product {
+    margin: 0;
+    margin-top: auto;
+    background-color: transparent;
+    padding: 0;
+}
+
 .example-of-work .example-product .product-link {
     display: flex;
     align-items: center;
+}
+
+/* Стили для слайдера */
+.home-products .examples-of-work .example-product .product-link {
+    text-decoration: none;
+    color: inherit;
 }
 
 .example-of-work .example-product .product-link .title-product {
@@ -3415,6 +3580,13 @@ table .notify-quantity {
     text-transform: uppercase;
     margin-bottom: 10px;
     color: #FFFFFF4D;
+}
+
+/* Стили для слайдера */
+.home-products .examples-of-work .example-product .product-link .title-product {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
 }
 
 .example-of-work .example-product .product-link .name-product {
@@ -3428,9 +3600,23 @@ table .notify-quantity {
     overflow: hidden;
 }
 
+/* Стили для слайдера */
+.home-products .examples-of-work .example-product .product-link .name-product {
+    font-size: 14px;
+    font-weight: 500;
+    color: $mod-text-color;
+    text-transform: none;
+    -webkit-line-clamp: 2;
+}
+
 .text-wrapper {
     display: flex;
     flex-direction: column;
+}
+
+/* Стили для слайдера */
+.home-products .examples-of-work .text-wrapper {
+    flex: 1;
 }
 
 #search {

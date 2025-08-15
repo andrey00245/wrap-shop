@@ -103,8 +103,10 @@ class Order extends Resource
 				->fields(function () {
 					return [
 						Number::make('Кількість', 'quantity')->step(1)->min(1)->rules('required', 'integer', 'min:1'),
-						Currency::make('Ціна', 'price')->currency('UAH')->asMinorUnits(false)->rules('required', 'numeric', 'min:0'),
-					];
+                        Currency::make('Ціна', 'price')
+                            ->currency('UAH')
+                            ->asMinorUnits(false)
+                            ->resolveUsing(fn ($value) => round($value, 2))					];
 				})
 		];
 	}

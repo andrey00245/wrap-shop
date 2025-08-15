@@ -124,6 +124,12 @@ $(document).ready(function () {
                 const params = url.searchParams;
 
                 if (searchIcon && searchIcon.classList.contains('fa-times')) {
+                    const backUrl = sessionStorage.getItem('searchReturnUrl');
+                    if (backUrl) {
+                        sessionStorage.removeItem('searchReturnUrl');
+                        window.location.href = backUrl;
+                        return;
+                    }
                     params.delete('search');
                     params.delete('page');
                     const qs = params.toString();
@@ -159,6 +165,11 @@ $(document).ready(function () {
         const data = {};
         const getParametesUrl = new URL(window.location.href);
         const params = new URLSearchParams(getParametesUrl.search);
+
+        // remember where the search started (only when not already on /search)
+        if (!window.location.pathname.includes('/search')) {
+            try { sessionStorage.setItem('searchReturnUrl', window.location.href); } catch (e) {}
+        }
 
         data.search = searchInput ? searchInput.value : '';
         if (params.get('sub_category') !== null) {

@@ -102,16 +102,20 @@ class Order extends Resource
 			DateTime::make('Створено', 'created_at')->onlyOnDetail(),
 			DateTime::make('Оновлено', 'updated_at')->onlyOnDetail(),
 
-			BelongsToMany::make('Товари', 'products', Product::class)
-				->fields(function () {
-					return [
-						Number::make('Кількість', 'quantity')->step(1)->min(1)->rules('required', 'integer', 'min:1'),
+            BelongsToMany::make('Товари', 'products', Product::class)
+                ->fields(function () {
+                    return [
+                        Number::make('Кількість', 'quantity')
+                            ->step(1)
+                            ->min(1)
+                            ->rules('required', 'integer', 'min:1'),
                         Currency::make('Ціна', 'price')
                             ->currency('UAH')
                             ->asMinorUnits(false)
                             ->resolveUsing(fn ($value) => number_format((float) $value, 2, '.', ''))
+                            ->rules('required', 'numeric', 'min:0'),
                     ];
-				})
+                })
 		];
 	}
 

@@ -12,6 +12,10 @@ class OrderProduct extends Model
 
     protected $table = 'order_product';
 
+    protected $casts = [
+        'price' => 'decimal:2',
+    ];
+
     protected $fillable = [
         'order_id',
         'product_id',

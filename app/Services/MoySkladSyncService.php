@@ -358,6 +358,89 @@ class MoySkladSyncService
         }
 
         Log::info("Заказ #{$order->id} успешно отправлен в МойСклад", ['ms_order' => $orderResponse->json()]);
+        
+        // Сохраняем ID заказа в МойСклад для последующего обновления
+        $msOrderId = $orderResponse->json('id');
+        if ($msOrderId) {
+            $order->update(['moysklad_id' => $msOrderId]);
+        }
+    }
+    
+    /**
+     * Обновить статус заказа в МойСклад после оплаты
+     */
+    public static function updateOrderPaymentStatus(Order $order): void
+    {
+        if (!$order->moysklad_id) {
+            Log::warning("Заказ #{$order->id} не имеет ID в МойСклад");
+            return;
+        }
+        
+        try {
+            $sklad = MoySklad::getInstance(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            );
+            
+            // Получаем текущий заказ из МойСклад
+            $response = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            )
+                ->withHeaders([
+                    'Accept-Encoding' => 'gzip',
+                ])
+                ->get("https://api.moysklad.ru/api/remap/1.2/entity/customerorder/{$order->moysklad_id}");
+            
+            if ($response->failed()) {
+                Log::error("Ошибка получения заказа #{$order->id} из МойСклад", ['response' => $response->json()]);
+                return;
+            }
+            
+            $msOrder = $response->json();
+            
+            // Обновляем статус заказа на "Оплачен"
+            $updatePayload = [
+                'state' => [
+                    'meta' => [
+                        'href' => 'https://api.moysklad.ru/api/remap/1.2/entity/customerorder/metadata/states/your_paid_state_id_here', // Замените на реальный ID статуса "Оплачен"
+                        'type' => 'state',
+                        'mediaType' => 'application/json'
+                    ]
+                ]
+            ];
+            
+            // Также можно добавить атрибут для отметки об оплате
+            $updatePayload['attributes'] = [
+                [
+                    'meta' => [
+                        'href' => 'https://api.moysklad.ru/api/remap/1.2/entity/customerorder/metadata/attributes/your_payment_attribute_id_here', // Замените на реальный ID атрибута
+                        'type' => 'attributemetadata',
+                        'mediaType' => 'application/json'
+                    ],
+                    'value' => 'paid'
+                ]
+            ];
+            
+            $updateResponse = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            )
+                ->withHeaders([
+                    'Accept-Encoding' => 'gzip',
+                    'Content-Type' => 'application/json'
+                ])
+                ->put("https://api.moysklad.ru/api/remap/1.2/entity/customerorder/{$order->moysklad_id}", $updatePayload);
+            
+            if ($updateResponse->successful()) {
+                Log::info("Статус заказа #{$order->id} успешно обновлен в МойСклад");
+            } else {
+                Log::error("Ошибка обновления статуса заказа #{$order->id} в МойСклад", ['response' => $updateResponse->json()]);
+            }
+            
+        } catch (\Exception $e) {
+            Log::error("Ошибка обновления статуса заказа #{$order->id} в МойСклад", ['error' => $e->getMessage()]);
+        }
     }
 
     /**

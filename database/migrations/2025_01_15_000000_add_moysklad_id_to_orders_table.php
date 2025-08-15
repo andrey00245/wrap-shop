@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('status')->nullable()->after('id');
-            $table->string('payment_status')->nullable()->after('status');
+            $table->string('moysklad_id')->nullable()->after('status');
         });
     }
 
@@ -23,8 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('payment_status');
-            $table->dropColumn('status');
+            $table->dropColumn('moysklad_id');
         });
     }
 };

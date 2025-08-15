@@ -21,22 +21,21 @@ class WayForPayController extends Controller
     {
         $data = $request->all();
 
-        Log::error('WayFor pay response', [
-            'response' => $data
-        ]);
+        Log::info('WayForPay callback', $data);
 
-        if (($data['transactionStatus'] ?? null) === 'Approved') {
-            $order = Order::where('id', explode('_', $data['orderReference'])[0])->first();
+        $orderId = explode('_', $data['orderReference'])[0];
+        $order = Order::find($orderId);
 
-            if ($order) {
-                // Обновляем статус оплаты в локальной БД
-                $order->update(['payment_status' => 'approved']);
+        if ($order) {
+            $order->update([
+                'payment_status' => strtolower($data['transactionStatus'])
+            ]);
 
-                // Обновляем статус заказа в МойСклад
+            if ($data['transactionStatus'] === 'Approved') {
                 try {
                     \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);
                 } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error('Ошибка обновления заказа в МойСклад', [
+                    Log::error('Ошибка обновления заказа в МойСклад', [
                         'order_id' => $order->id,
                         'error' => $e->getMessage()
                     ]);
@@ -44,6 +43,9 @@ class WayForPayController extends Controller
             }
         }
 
-        return response('OK');
+        return response()->json([
+            'orderReference' => $data['orderReference'],
+            'status' => 'accept'
+        ]);
     }
 }

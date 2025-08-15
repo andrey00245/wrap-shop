@@ -4,7 +4,7 @@
 
 @section('account.content')
   <h1>{{__('personal-account.order-history.title')}}</h1>
-  @foreach(auth()->user()->orders as $order)
+  @foreach(auth()->user()->orders()->orderBy('created_at','desc')->get() as $order)
   <div class="order-list">
 
     <div class="order-list-item">

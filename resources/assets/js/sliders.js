@@ -24,7 +24,7 @@ new Splide('#topBannersSlider', {
 
 new Splide('#slideCategory', {
     autoplay: true,
-    interval: 3000,
+    interval: 5000,
     type: 'loop',
     pagination: false,
     classes: {

@@ -1240,6 +1240,8 @@ body::-webkit-scrollbar {
     border: 1px solid $mod-home-product-nav-border;
     margin-left: 10px;
     white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .home-products-nav .item.all {
@@ -1249,6 +1251,8 @@ body::-webkit-scrollbar {
 .home-products-nav .item:hover, .home-products-nav .item.active {
     color: $mod-main-color;
     border-color: $mod-main-color;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .home-products-list {
@@ -1272,21 +1276,81 @@ body::-webkit-scrollbar {
         }
 
         .splide__arrow {
-            transform: translate(0%, 0%);
+            position: absolute;
+            top: 50%;
+            transform: translate(0%, -50%);
+            z-index: 2;
+            border: $mod-home-slider-btn-border;
+            width: 40px;
+            min-width: 40px;
+            height: 35px;
+            font-size: 12px;
+            background-color: $mod-home-slider-bg;
+            opacity: 1;
+            border-radius: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background-color: $mod-main-color;
+                border-color: $mod-main-color;
+                
+                svg {
+                    fill: #fff;
+                }
+                
+                &::after {
+                    border-color: transparent transparent transparent #fff;
+                }
+            }
+
+            svg {
+                fill: $mod-home-slider-arrow;
+                width: 20px;
+                height: 20px;
+            }
 
             &:disabled {
-                background: transparent;
-                opacity: 1;
-                border: 1px solid $mod-home-slider-btn-border;
+                opacity: 0.35;
+            }
+
+            &::before {
+                color: black;
             }
         }
 
         .splide__arrow--next {
-            position: static;
+            right: 10px;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 0;
+                height: 0;
+                border-style: solid;
+                border-width: 8px 0 8px 12px;
+                border-color: transparent transparent transparent #000;
+            }
         }
 
         .splide__arrow--prev {
-            position: static;
+            left: 10px;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 0;
+                height: 0;
+                border-style: solid;
+                border-width: 8px 12px 8px 0;
+                border-color: transparent #000 transparent transparent;
+            }
         }
     }
 
@@ -1299,6 +1363,10 @@ body::-webkit-scrollbar {
 
         &.hide {
             display: none !important;
+        }
+
+        &.show {
+            display: block !important;
         }
 
         .product-images-arrows {

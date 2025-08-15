@@ -9,6 +9,9 @@ $(document).ready(function () {
     productSliderInitialization('homeBestseller');
     productSliderInitialization('homeLatest');
     productSliderInitializationClass('customBlocks');
+    
+    // Инициализация слайдеров изображений в custom blocks
+    imageSliderInProduct('customBlocks');
 });
 
 new Splide('#topBannersSlider', {

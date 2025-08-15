@@ -1241,7 +1241,6 @@ body::-webkit-scrollbar {
     margin-left: 10px;
     white-space: nowrap;
     cursor: pointer;
-    transition: all 0.3s ease;
 }
 
 .home-products-nav .item.all {
@@ -1251,8 +1250,6 @@ body::-webkit-scrollbar {
 .home-products-nav .item:hover, .home-products-nav .item.active {
     color: $mod-main-color;
     border-color: $mod-main-color;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .home-products-list {
@@ -1298,7 +1295,6 @@ body::-webkit-scrollbar {
     .home-products-item {
 
         margin-top: 12px;
-        transition-property: transform;
         margin-bottom: 50px;
         
         /* Специальные стили для examples-of-work */
@@ -1329,30 +1325,9 @@ body::-webkit-scrollbar {
         }
 
         &:hover {
-            box-shadow: none;
-            transform: translateY(-10px);
-            padding-bottom: 10px;
-            margin-bottom: 0;
-
-            &.banner {
-                transform: translateY(0);
-                padding-bottom: 0;
-                margin-bottom: 50px;
-            }
-            
-
-
-
-            .bottom {
-                margin-bottom: 18px;
-                padding-bottom: 0;
-            }
-
             .hover-additional-info {
                 display: flex;
             }
-            
-
         }
 
 

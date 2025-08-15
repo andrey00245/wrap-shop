@@ -2,12 +2,14 @@ import {
     productSliderInitialization,
     productSliderInitializationClass,
     popupSliderInitialization,
-    imageSliderInProduct
+    imageSliderInProduct,
+    examplesSliderInitialization
 } from "./sliderInitialization";
 
 $(document).ready(function () {
     productSliderInitialization('homeBestseller');
     productSliderInitialization('homeLatest');
+    examplesSliderInitialization('examplesOfWork');
     productSliderInitializationClass('customBlocks');
 });
 

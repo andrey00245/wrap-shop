@@ -6,7 +6,6 @@ use App\Nova\Metrics\NewUsers;
 use App\Nova\Metrics\OrdersPerDay;
 use App\Nova\Metrics\SalesByStatus;
 use App\Nova\Metrics\TotalSales;
-use Laravel\Nova\Cards\Help;
 use Laravel\Nova\Dashboards\Main as Dashboard;
 
 class Main extends Dashboard
@@ -23,7 +22,6 @@ class Main extends Dashboard
 			new NewUsers,
 			new OrdersPerDay,
 			new SalesByStatus,
-			new Help,
 		];
 	}
 }

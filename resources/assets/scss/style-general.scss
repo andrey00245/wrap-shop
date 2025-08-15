@@ -1276,81 +1276,21 @@ body::-webkit-scrollbar {
         }
 
         .splide__arrow {
-            position: absolute;
-            top: 50%;
-            transform: translate(0%, -50%);
-            z-index: 2;
-            border: $mod-home-slider-btn-border;
-            width: 40px;
-            min-width: 40px;
-            height: 35px;
-            font-size: 12px;
-            background-color: $mod-home-slider-bg;
-            opacity: 1;
-            border-radius: 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-
-            &:hover {
-                background-color: $mod-main-color;
-                border-color: $mod-main-color;
-                
-                svg {
-                    fill: #fff;
-                }
-                
-                &::after {
-                    border-color: transparent transparent transparent #fff;
-                }
-            }
-
-            svg {
-                fill: $mod-home-slider-arrow;
-                width: 20px;
-                height: 20px;
-            }
+            transform: translate(0%, 0%);
 
             &:disabled {
-                opacity: 0.35;
-            }
-
-            &::before {
-                color: black;
+                background: transparent;
+                opacity: 1;
+                border: 1px solid $mod-home-slider-btn-border;
             }
         }
 
         .splide__arrow--next {
-            right: 10px;
-
-            &::after {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 0;
-                height: 0;
-                border-style: solid;
-                border-width: 8px 0 8px 12px;
-                border-color: transparent transparent transparent #000;
-            }
+            position: static;
         }
 
         .splide__arrow--prev {
-            left: 10px;
-
-            &::after {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 0;
-                height: 0;
-                border-style: solid;
-                border-width: 8px 12px 8px 0;
-                border-color: transparent #000 transparent transparent;
-            }
+            position: static;
         }
     }
 
@@ -1400,11 +1340,7 @@ body::-webkit-scrollbar {
                 margin-bottom: 50px;
             }
             
-            /* Специальные стили для examples-of-work */
-            .examples-of-work & {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            }
+
 
 
             .bottom {
@@ -1416,13 +1352,7 @@ body::-webkit-scrollbar {
                 display: flex;
             }
             
-            /* Специальные стили для examples-of-work */
-            .examples-of-work & {
-                .example-product {
-                    transform: scale(1.05);
-                    transition: transform 0.3s ease;
-                }
-            }
+
         }
 
 
@@ -3313,22 +3243,7 @@ table .notify-quantity {
                         margin: 0;
                         padding: 15px;
                         
-                        /* Стили для стрелок в examples-of-work */
-                        .splide__arrows {
-                            .splide__arrow {
-                                background-color: rgba(255, 255, 255, 0.9);
-                                border: 1px solid #ddd;
-                                
-                                &:hover {
-                                    background-color: $mod-main-color;
-                                    border-color: $mod-main-color;
-                                    
-                                    &::after {
-                                        border-color: transparent transparent transparent #fff;
-                                    }
-                                }
-                            }
-                        }
+
                         
                         .image-example {
                             width: 100%;
@@ -3359,7 +3274,6 @@ table .notify-quantity {
                         
                                 .example-product {
             margin-top: auto;
-            transition: transform 0.3s ease;
             
             .product-link {
                 display: flex;
@@ -3460,12 +3374,7 @@ table .notify-quantity {
     border-radius: 3px;
     height: 100%;
     width: 100%;
-    transition: all 0.3s ease;
-    
-    &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
+
 }
 
 

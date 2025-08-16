@@ -19,7 +19,7 @@ class WayForPayController extends Controller
 
     public function callback(Request $request)
     {
-        $data = $request->all();
+        $data = $request->json()->all();
 
         Log::info('WayForPay callback получен', [
             'url'    => $request->fullUrl(),
@@ -27,29 +27,34 @@ class WayForPayController extends Controller
             'data'   => $data
         ]);
 
-        $order = Order::where('moysklad_id', $data['orderReference'])->first();
+        if (!isset($data['orderReference'])) {
+            Log::error('orderReference отсутствует в колбеке', ['data' => $data]);
+            return response()->json(['status' => 'error'], 400);
+        }
+
+        $orderId = $data['orderReference'];
+        $order = Order::where('moysklad_id', $orderId)->first();
 
         if ($order) {
-            $status = strtolower($data['transactionStatus']);
-            $order->update(['payment_status' => $status]);
+            $order->update([
+                'payment_status' => strtolower($data['transactionStatus'])
+            ]);
 
-            if ($status === 'approved') {
+            if ($data['transactionStatus'] === 'Approved') {
                 try {
                     \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);
                 } catch (\Exception $e) {
                     Log::error('Ошибка обновления заказа в МойСклад', [
                         'order_id' => $order->id,
-                        'error'    => $e->getMessage(),
+                        'error' => $e->getMessage()
                     ]);
                 }
             }
-        } else {
-            Log::warning("Заказ с moysklad_id {$data['orderReference']} не найден");
         }
 
         return response()->json([
             'orderReference' => $data['orderReference'],
-            'status' => 'accept',
-        ], 200, ['Content-Type' => 'application/json']);
+            'status' => 'accept'
+        ]);
     }
 }

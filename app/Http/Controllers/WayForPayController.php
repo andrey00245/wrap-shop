@@ -21,7 +21,11 @@ class WayForPayController extends Controller
     {
         $data = $request->all();
 
-        Log::info('WayForPay callback', $data);
+        Log::info('WayForPay callback получен', [
+            'url'    => request()->fullUrl(),
+            'method' => request()->method(),
+            'data'   => request()->all()
+        ]);
 
         $orderId = explode('_', $data['orderReference'])[0];
         $order = Order::find($orderId);

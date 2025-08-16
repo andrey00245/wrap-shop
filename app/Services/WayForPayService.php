@@ -56,7 +56,7 @@ class WayForPayService
         }
         $totalAmount = number_format($totalAmount, 2, '.', '');
 
-        $reference = $order->id;
+        $reference = $order->moysklad_id;
         $date = time();
 
         $data = [

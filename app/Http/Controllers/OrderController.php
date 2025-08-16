@@ -127,7 +127,7 @@ class OrderController extends Controller
         }
 
         \App\Services\MoySkladSyncService::sendOrder($order);
-
+        \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);
 
 
         if (Auth::check()) {

@@ -49,7 +49,7 @@ class WayForPayController extends Controller
 
         return response()->json([
             'orderReference' => $data['orderReference'],
-            'status'         => 'accept',
-        ]);
+            'status' => 'accept',
+        ], 200, ['Content-Type' => 'application/json']);
     }
 }

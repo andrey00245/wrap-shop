@@ -22,34 +22,34 @@ class WayForPayController extends Controller
         $data = $request->all();
 
         Log::info('WayForPay callback получен', [
-            'url'    => request()->fullUrl(),
-            'method' => request()->method(),
-            'data'   => request()->all()
+            'url'    => $request->fullUrl(),
+            'method' => $request->method(),
+            'data'   => $data
         ]);
 
-        $orderId = explode('_', $data['orderReference'])[0];
-        $order = Order::find($orderId);
+        $order = Order::where('moysklad_id', $data['orderReference'])->first();
 
         if ($order) {
-            $order->update([
-                'payment_status' => strtolower($data['transactionStatus'])
-            ]);
+            $status = strtolower($data['transactionStatus']);
+            $order->update(['payment_status' => $status]);
 
-            if ($data['transactionStatus'] === 'Approved') {
+            if ($status === 'approved') {
                 try {
                     \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);
                 } catch (\Exception $e) {
                     Log::error('Ошибка обновления заказа в МойСклад', [
                         'order_id' => $order->id,
-                        'error' => $e->getMessage()
+                        'error'    => $e->getMessage(),
                     ]);
                 }
             }
+        } else {
+            Log::warning("Заказ с moysklad_id {$data['orderReference']} не найден");
         }
 
         return response()->json([
             'orderReference' => $data['orderReference'],
-            'status' => 'accept'
+            'status'         => 'accept',
         ]);
     }
 }

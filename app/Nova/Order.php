@@ -100,10 +100,10 @@ class Order extends Resource
             Text::make('МійСклад', function () {
                 if ($this->moysklad_id) {
                     $url = "https://online.moysklad.ru/app/#customerorder/edit?id={$this->moysklad_id}";
-                    return "<a href='{$url}' target='_blank' class='text-primary font-bold'>МійСклад</a>";
+                    return "<a href='{$url}' target='_blank' class='no-underline text-primary-500 hover:underline font-semibold'>Замовлення</a>";
                 }
                 return '—';
-            })->asHtml()->sortable(),
+            })->asHtml()->onlyOnIndex(),
 
 			DateTime::make('Створено', 'created_at')->onlyOnDetail(),
 			DateTime::make('Оновлено', 'updated_at')->onlyOnDetail(),

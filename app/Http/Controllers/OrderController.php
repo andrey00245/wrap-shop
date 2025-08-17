@@ -117,6 +117,12 @@ class OrderController extends Controller
             $product->save();
         }
 
+        if (Auth::check()) {
+            CartItem::where('user_id', Auth::id())->delete();
+        } else {
+            Session::forget('cart');
+        }
+
         if ($order->payment_method === 'online') {
             \App\Services\MoySkladSyncService::sendOrder($order);
             $wfpService = new \App\Services\WayForPayService();
@@ -127,12 +133,6 @@ class OrderController extends Controller
         }
 
         \App\Services\MoySkladSyncService::sendOrder($order);
-
-        if (Auth::check()) {
-            CartItem::where('user_id', Auth::id())->delete();
-        } else {
-            Session::forget('cart');
-        }
 
         return redirect()->route('checkout.success');
     }

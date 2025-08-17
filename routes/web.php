@@ -34,6 +34,9 @@ require __DIR__.'/auth.php';
 
 Route::match(['get', 'post'], 'login/apple/callback', [SocialController::class, 'handleAppleCallback'])
     ->withoutMiddleware([VerifyCsrfToken::class]);
+Route::post('checkout/wayforpay/callback', [WayForPayController::class, 'callback'])
+    ->withoutMiddleware([VerifyCsrfToken::class])
+    ->name('wayforpay.callback');
 
 Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']);
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
@@ -60,7 +63,6 @@ Route::get('/slug-generate', function(){
   return 'okay';
 });
 
-Route::post('checkout/wayforpay/callback', [WayForPayController::class, 'callback'])->name('wayforpay.callback');
 Route::match(['get', 'post'], 'checkout/wayforpay/success', [WayForPayController::class, 'success'])->name('wayforpay.success')
     ->withoutMiddleware([VerifyCsrfToken::class]);
 

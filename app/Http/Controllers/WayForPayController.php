@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class WayForPayController extends Controller
@@ -18,18 +19,42 @@ class WayForPayController extends Controller
 
     public function callback(Request $request)
     {
-        $data = $request->all();
+        $data = $request->json()->all();
 
-        if (($data['transactionStatus'] ?? null) === 'Approved') {
-            $order = Order::where('id', explode('_', $data['orderReference'])[0])->first();
-            $order->update(['payment_status' => 'approved']);
+        Log::info('WayForPay callback получен', [
+            'url'    => $request->fullUrl(),
+            'method' => $request->method(),
+            'data'   => $data
+        ]);
 
-//            if ($order) {
-//                $checkboxService = new \App\Services\CheckboxService();
-//                $checkboxService->sendReceipt($order);
-//            }
+        if (!isset($data['orderReference'])) {
+            Log::error('orderReference отсутствует в колбеке', ['data' => $data]);
+            return response()->json(['status' => 'error'], 400);
         }
 
-        return response('OK');
+        $orderId = $data['orderReference'];
+        $order = Order::where('moysklad_id', $orderId)->first();
+
+        if ($order) {
+            $order->update([
+                'payment_status' => strtolower($data['transactionStatus'])
+            ]);
+
+            if ($data['transactionStatus'] === 'Approved') {
+                try {
+                    \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);
+                } catch (\Exception $e) {
+                    Log::error('Ошибка обновления заказа в МойСклад', [
+                        'order_id' => $order->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+        }
+
+        return response()->json([
+            'orderReference' => $data['orderReference'],
+            'status' => 'accept'
+        ]);
     }
 }

@@ -118,6 +118,7 @@ class OrderController extends Controller
         }
 
         if ($order->payment_method === 'online') {
+            \App\Services\MoySkladSyncService::sendOrder($order);
             $wfpService = new \App\Services\WayForPayService();
             $formData = $wfpService->generatePaymentData($order);
             $order->update(['payment_status' => 'pending']);
@@ -126,8 +127,6 @@ class OrderController extends Controller
         }
 
         \App\Services\MoySkladSyncService::sendOrder($order);
-
-
 
         if (Auth::check()) {
             CartItem::where('user_id', Auth::id())->delete();

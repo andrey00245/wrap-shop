@@ -19,7 +19,9 @@ class Order extends Model
         'name',
         'total',
         'shipping_method',
-        'novaposhta_warehouse_ref'
+        'novaposhta_warehouse_ref',
+        'moysklad_id',
+        'payment_status'
     ];
 
     protected $casts = [

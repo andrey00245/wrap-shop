@@ -19,7 +19,7 @@ class WayForPayController extends Controller
 
     public function callback(Request $request)
     {
-        $data = $request->json()->all();
+        $data = $request->json()?->all();
 
         Log::info('WayForPay callback получен', [
             'url'    => $request->fullUrl(),
@@ -32,8 +32,8 @@ class WayForPayController extends Controller
             return response()->json(['status' => 'error'], 400);
         }
 
-        $orderId = $data['orderReference'];
-        $order = Order::where('moysklad_id', $orderId)->first();
+        list($orderId, $timestamp) = explode('_', $data['orderReference']);
+        $order = Order::where('id', $orderId)->first();
 
         if ($order) {
             $order->update([

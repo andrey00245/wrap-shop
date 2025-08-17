@@ -97,6 +97,14 @@ class Order extends Resource
 
 			Text::make('Коментар', 'comment')->onlyOnDetail(),
 
+            Text::make('МійСклад', function () {
+                if ($this->moysklad_id) {
+                    $url = "https://online.moysklad.ru/app/#customerorder/edit?id={$this->moysklad_id}";
+                    return "<a href='{$url}' target='_blank' class='text-primary font-bold'>МійСклад</a>";
+                }
+                return '—';
+            })->asHtml()->sortable(),
+
 			DateTime::make('Створено', 'created_at')->onlyOnDetail(),
 			DateTime::make('Оновлено', 'updated_at')->onlyOnDetail(),
 

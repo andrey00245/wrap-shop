@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CartItem;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
@@ -43,6 +45,11 @@ class WayForPayController extends Controller
             if ($data['transactionStatus'] === 'Approved') {
                 try {
                     \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);
+                    if (Auth::check()) {
+                        CartItem::where('user_id', Auth::id())->delete();
+                    } else {
+                        Session::forget('cart');
+                    }
                 } catch (\Exception $e) {
                     Log::error('Ошибка обновления заказа в МойСклад', [
                         'order_id' => $order->id,

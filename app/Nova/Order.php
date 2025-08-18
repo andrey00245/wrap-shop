@@ -14,6 +14,7 @@ use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Panel;
 
 class Order extends Resource
 {
@@ -120,9 +121,47 @@ class Order extends Resource
                             ->displayUsing(fn ($value) => number_format((float)$value, 2, '.', ' ') . ' ₴')
                             ->rules('required', 'numeric', 'min:0')
                     ];
-                })
-		];
+                }),
+
+            new Panel('Checkbox (Фіскалізація)', $this->checkboxFields()),
+        ];
 	}
+
+    protected function checkboxFields()
+    {
+        return [
+            Text::make('ID чека', 'checkbox_receipt_id')
+                ->onlyOnDetail(),
+
+            Badge::make('Статус чека', 'checkbox_status')
+                ->map([
+                    'created'     => 'info',
+                    'pending'     => 'warning',
+                    'success'     => 'success',
+                    'failed'      => 'danger',
+                    'not_created' => 'info', // используем info вместо secondary
+                ])
+                ->labels([
+                    'created'     => 'Створений',
+                    'pending'     => 'Очікує підтвердження',
+                    'success'     => 'Фіскалізовано',
+                    'failed'      => 'Помилка',
+                    'not_created' => 'Не створений',
+                ])
+                ->resolveUsing(fn ($value) => $value ?? 'not_created')
+                ->onlyOnDetail(),
+
+            Text::make('Відповідь Checkbox', function () {
+                if (empty($this->checkbox_response)) {
+                    return null; // Nova не будет выводить поле вообще
+                }
+
+                return '<pre style="white-space: pre-wrap; font-size: 12px;">'
+                    . e(json_encode($this->checkbox_response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))
+                    . '</pre>';
+            })->asHtml()->onlyOnDetail()->nullable(),
+        ];
+    }
 
 	public function cards(NovaRequest $request)
 	{

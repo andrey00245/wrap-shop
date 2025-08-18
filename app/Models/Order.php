@@ -25,7 +25,9 @@ class Order extends Model
     ];
 
     protected $casts = [
-        'total' => 'decimal:2',
+        'total'             => 'decimal:2',
+        'checkbox_response' => 'array',
+        'checkbox_status'   => 'string', // всегда строка
     ];
 
     public function products()

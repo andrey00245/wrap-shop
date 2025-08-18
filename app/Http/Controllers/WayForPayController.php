@@ -45,6 +45,8 @@ class WayForPayController extends Controller
             if ($data['transactionStatus'] === 'Approved') {
                 try {
                     \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);
+                    \App\Services\CheckboxService::sendReceipt($order);
+
                     if (Auth::check()) {
                         CartItem::where('user_id', Auth::id())->delete();
                     } else {

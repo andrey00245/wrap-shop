@@ -42,6 +42,9 @@ class CheckboxService
 
         if (!$token) {
             Log::error('Не удалось авторизоваться в Checkbox');
+            $order->update([
+                'checkbox_status' => 'auth_failed',
+            ]);
             return false;
         }
 
@@ -65,14 +68,15 @@ class CheckboxService
             ];
         }
 
-        $phone = preg_replace('/\D/', '', $order->phone); // Убирает все, кроме цифр
-
+        $phone = preg_replace('/\D/', '', $order->phone);
         if (substr($phone, 0, 3) !== '380') {
             $phone = '380' . ltrim($phone, '0');
         }
 
+        $receiptId = (string) Str::uuid();
+
         $receiptData = [
-            'id' => (string) Str::uuid(),
+            'id' => $receiptId,
             'goods' => $goods,
             'payments' => [
                 [
@@ -90,13 +94,30 @@ class CheckboxService
             ->withHeaders(['Content-Type' => 'application/json'])
             ->post($this->baseUrl . '/receipts/sell', $receiptData);
 
-        dd($response->body());
         if ($response->ok()) {
+            $data = $response->json();
+
+            $order->update([
+                'checkbox_receipt_id' => $receiptId,
+                'checkbox_status'     => 'success',
+                'checkbox_response'   => $data,
+            ]);
+
             Log::info('Чек успешно отправлен в Checkbox', ['order_id' => $order->id]);
             return true;
         }
 
-        Log::error('Ошибка отправки чека в Checkbox', ['response' => $response->body()]);
+        $order->update([
+            'checkbox_receipt_id' => $receiptId,
+            'checkbox_status'     => 'failed',
+            'checkbox_response'   => $response->json(),
+        ]);
+
+        Log::error('Ошибка отправки чека в Checkbox', [
+            'order_id' => $order->id,
+            'response' => $response->body(),
+        ]);
+
         return false;
     }
 }

@@ -155,9 +155,10 @@ class Order extends Resource
                 if (empty($this->checkbox_response)) {
                     return null; // Nova не будет выводить поле вообще
                 }
-
                 return '<pre style="white-space: pre-wrap; font-size: 12px;">'
-                    . e(json_encode($this->checkbox_response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))
+                    . (is_array($this->checkbox_response)
+                        ? e(json_encode($this->checkbox_response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))
+                        : e($this->checkbox_response))
                     . '</pre>';
             })->asHtml()->onlyOnDetail()->nullable(),
         ];

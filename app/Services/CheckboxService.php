@@ -89,9 +89,9 @@ class CheckboxService
             $userMessage = 'Чек успішно створено ✅';
 
             $order->update([
-                'checkbox_receipt_id' => $receiptId,
-                'checkbox_status'     => 'success',
-                'checkbox_response'   => $userMessage,
+                'checkbox_receipt_id' => $responseData['id'] ?? $receiptId,
+                'checkbox_status'   => 'success',
+                'checkbox_response' => $userMessage,
             ]);
 
             Log::info('Чек успешно отправлен в Checkbox', ['order_id' => $order->id]);

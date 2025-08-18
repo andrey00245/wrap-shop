@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CartItem;
 use App\Models\Order;
+use App\Services\CheckboxService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -45,7 +46,7 @@ class WayForPayController extends Controller
             if ($data['transactionStatus'] === 'Approved') {
                 try {
                     \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);
-                    \App\Services\CheckboxService::sendReceipt($order);
+                    app(CheckboxService::class)->sendReceipt($order);
 
                     if (Auth::check()) {
                         CartItem::where('user_id', Auth::id())->delete();

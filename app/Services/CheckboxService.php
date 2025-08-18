@@ -72,7 +72,7 @@ class CheckboxService
             $phone = '380' . ltrim($phone, '0');
         }
 
-        $receiptId = $order->id;
+        $receiptId = (string) Str::uuid();
 
         $receiptData = [
             'id'       => $receiptId,
@@ -86,13 +86,12 @@ class CheckboxService
         $response = Http::withToken($token)->withHeaders(['Content-Type' => 'application/json'])->post($this->baseUrl . '/receipts/sell', $receiptData);
 
         if (in_array($response->status(), [200, 201, 202]) && $response['status'] ?? null === 'CREATED') {
-
-            $data = $response->json();
+            $userMessage = 'Чек успішно створено ✅';
 
             $order->update([
                 'checkbox_receipt_id' => $receiptId,
                 'checkbox_status'     => 'success',
-                'checkbox_response'   => $data,
+                'checkbox_response'   => $userMessage,
             ]);
 
             Log::info('Чек успешно отправлен в Checkbox', ['order_id' => $order->id]);
@@ -102,7 +101,7 @@ class CheckboxService
         $order->update([
             'checkbox_receipt_id' => $receiptId,
             'checkbox_status'     => 'failed',
-            'checkbox_response'   => $response->json(),
+            'checkbox_response'   =>  $data['response_error_message'] ?? 'Сталася помилка при створенні чека ❌',
         ]);
 
         Log::error('Ошибка отправки чека в Checkbox', [

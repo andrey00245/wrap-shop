@@ -21,7 +21,10 @@ class Order extends Model
         'shipping_method',
         'novaposhta_warehouse_ref',
         'moysklad_id',
-        'payment_status'
+        'payment_status',
+        'checkbox_receipt_id',
+        'checkbox_status',
+        'checkbox_response'
     ];
 
     protected $casts = [

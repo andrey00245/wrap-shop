@@ -46,7 +46,10 @@ class WayForPayController extends Controller
             if ($data['transactionStatus'] === 'Approved') {
                 try {
                     \App\Services\MoySkladSyncService::updateOrderPaymentStatus($order);
-                    app(CheckboxService::class)->sendReceipt($order);
+                    if (!$order->checkbox_locked && $order->checkbox_status !== 'success') {
+                        $order->update(['checkbox_locked' => true]);
+                        app(CheckboxService::class)->sendReceipt($order);
+                    }
 
                     if (Auth::check()) {
                         CartItem::where('user_id', Auth::id())->delete();
@@ -56,15 +59,12 @@ class WayForPayController extends Controller
                 } catch (\Exception $e) {
                     Log::error('Ошибка обновления заказа в МойСклад', [
                         'order_id' => $order->id,
-                        'error' => $e->getMessage()
+                        'error'    => $e->getMessage()
                     ]);
                 }
             }
         }
 
-        return response()->json([
-            'orderReference' => $data['orderReference'],
-            'status' => 'accept'
-        ]);
+        return response('accept', 200)->header('Content-Type', 'text/plain');
     }
 }

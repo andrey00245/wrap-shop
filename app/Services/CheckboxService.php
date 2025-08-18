@@ -50,51 +50,43 @@ class CheckboxService
 
         $goods = [];
         $totalCents = 0;
-
         foreach ($order->products as $product) {
-            $priceCents = (int) round($product->pivot->price * 100);
-            $quantity = (int) $product->pivot->quantity;
+            $priceCents = (int)round($product->pivot->price * 100);
+            $quantity = (int)$product->pivot->quantity;
             $sumCents = $priceCents * $quantity;
             $totalCents += $sumCents;
-
             $goods[] = [
-                'good' => [
-                    'code' => (string) $product->id,
-                    'name' => $product->name,
+                'good'     => [
+                    'code'  => (string)$product->id,
+                    'name'  => $product->name,
                     'price' => $priceCents,
-                    'tax' => [8],
+                    'tax'   => [8],
                 ],
                 'quantity' => $quantity * 1000,
             ];
         }
 
-        $phone = preg_replace('/\D/', '', $order->phone);
+        $phone = preg_replace('/\D/', '', $order->phone); // Убирает все, кроме цифр
+
         if (substr($phone, 0, 3) !== '380') {
             $phone = '380' . ltrim($phone, '0');
         }
 
-        $receiptId = (string) Str::uuid();
+        $receiptId = $order->id;
 
         $receiptData = [
-            'id' => $receiptId,
-            'goods' => $goods,
+            'id'       => $receiptId,
+            'goods'    => $goods,
             'payments' => [
-                [
-                    'type' => 'CASHLESS',
-                    'value' => $totalCents,
-                ],
+                ['type' => 'CASHLESS', 'value' => $totalCents,],
             ],
-            'delivery' => [
-                'email' => $order->email,
-                'phone' => $phone,
-            ],
+            'delivery' => ['email' => $order->email, 'phone' => $phone,],
         ];
 
-        $response = Http::withToken($token)
-            ->withHeaders(['Content-Type' => 'application/json'])
-            ->post($this->baseUrl . '/receipts/sell', $receiptData);
+        $response = Http::withToken($token)->withHeaders(['Content-Type' => 'application/json'])->post($this->baseUrl . '/receipts/sell', $receiptData);
 
-        if ($response->ok()) {
+        if (in_array($response->status(), [200, 201, 202]) && $response['status'] ?? null === 'CREATED') {
+
             $data = $response->json();
 
             $order->update([

@@ -4,43 +4,38 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
+use Spatie\Translatable\HasTranslations;
 
 class Faq extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     protected $fillable = [
         'order',
         'is_active',
+        'question',
+        'answer',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'order' => 'integer',
+        'question' => 'json',
+        'answer' => 'json',
     ];
 
-    public function translations(): HasMany
-    {
-        return $this->hasMany(FaqTranslation::class);
-    }
+    public array $translatable = [
+        'question',
+        'answer',
+    ];
 
-    public function translation($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = app()->getLocale() === 'uk' ? Language::LANGUAGE_ID_UK : 
-                         (app()->getLocale() === 'en' ? Language::LANGUAGE_ID_EN : Language::LANGUAGE_ID_RU);
-        }
-
-        return $this->translations()->where('language_id', $languageId)->first();
-    }
-
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
-    public function scopeOrdered($query)
+    public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('order');
     }

@@ -27,9 +27,13 @@ class FaqAccordion {
             
             if (data.success) {
                 this.faqs = data.data;
+            } else {
+                console.error('API returned error:', data);
+                this.showError('Ошибка загрузки FAQ. API вернул ошибку.');
             }
         } catch (error) {
             console.error('Error loading FAQ:', error);
+            this.showError('Ошибка загрузки FAQ. Проверьте подключение к серверу.');
         }
     }
     

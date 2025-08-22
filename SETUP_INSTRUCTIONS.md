@@ -109,17 +109,14 @@ npm run dev
 ```
 app/
 ├── Models/
-│   ├── Faq.php                    # Модель FAQ
-│   └── FaqTranslation.php         # Модель переводов
+│   └── Faq.php                    # Модель FAQ с JSON переводами
 ├── Nova/
-│   ├── Faq.php                    # Nova ресурс FAQ
-│   └── FaqTranslation.php         # Nova ресурс переводов
+│   └── Faq.php                    # Nova ресурс FAQ
 └── Http/Controllers/Api/
     └── FaqController.php          # API контроллер
 
 database/migrations/
-├── create_faqs_table.php          # Миграция таблицы FAQ
-└── create_faq_translations_table.php # Миграция переводов
+└── create_faqs_table.php          # Миграция таблицы FAQ с JSON полями
 
 resources/
 ├── assets/js/
@@ -138,9 +135,9 @@ FAQ_README.md                      # Документация по исполь�
 
 После успешной установки:
 
-1. Добавьте Nova ресурсы в `app/Providers/NovaServiceProvider.php`
+1. Добавьте Nova ресурс в `app/Providers/NovaServiceProvider.php`
 2. Подключите стили и скрипты в ваши основные файлы
-3. Создайте несколько FAQ через админку
+3. Создайте несколько FAQ через админку (вопросы и ответы на 3 языках)
 4. Протестируйте API endpoint `/api/faq`
 5. Интегрируйте компонент в ваш фронтенд
 

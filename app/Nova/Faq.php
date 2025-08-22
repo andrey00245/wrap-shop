@@ -5,7 +5,6 @@ namespace App\Nova;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Boolean;
-use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
@@ -45,7 +44,29 @@ class Faq extends Resource
             Boolean::make('Активно', 'is_active')
                 ->default(true),
 
-            HasMany::make('Переводы', 'translations', FaqTranslation::class),
+            Text::make('Вопрос (Українська)', 'question->uk')
+                ->rules('required')
+                ->hideFromIndex(),
+
+            Text::make('Вопрос (English)', 'question->en')
+                ->rules('required')
+                ->hideFromIndex(),
+
+            Text::make('Вопрос (Русский)', 'question->ru')
+                ->rules('required')
+                ->hideFromIndex(),
+
+            Trix::make('Ответ (Українська)', 'answer->uk')
+                ->rules('required')
+                ->hideFromIndex(),
+
+            Trix::make('Ответ (English)', 'answer->en')
+                ->rules('required')
+                ->hideFromIndex(),
+
+            Trix::make('Ответ (Русский)', 'answer->ru')
+                ->rules('required')
+                ->hideFromIndex(),
         ];
     }
 

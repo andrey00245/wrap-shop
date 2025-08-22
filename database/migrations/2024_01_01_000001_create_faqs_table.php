@@ -12,6 +12,8 @@ return new class extends Migration
             $table->id();
             $table->integer('order')->default(0);
             $table->boolean('is_active')->default(true);
+            $table->json('question');
+            $table->json('answer');
             $table->timestamps();
         });
     }

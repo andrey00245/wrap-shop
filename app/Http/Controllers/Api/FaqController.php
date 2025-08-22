@@ -14,25 +14,17 @@ class FaqController extends Controller
     {
         $language = $request->get('lang', 'uk');
         
-        $languageId = match($language) {
-            'uk' => Language::LANGUAGE_ID_UK,
-            'en' => Language::LANGUAGE_ID_EN,
-            'ru' => Language::LANGUAGE_ID_RU,
-            default => Language::LANGUAGE_ID_UK,
-        };
-
+        // Устанавливаем локаль для получения переводов
+        app()->setLocale($language);
+        
         $faqs = Faq::active()
             ->ordered()
-            ->with(['translations' => function($query) use ($languageId) {
-                $query->where('language_id', $languageId);
-            }])
             ->get()
-            ->map(function($faq) {
-                $translation = $faq->translations->first();
+            ->map(function($faq) use ($language) {
                 return [
                     'id' => $faq->id,
-                    'question' => $translation ? $translation->question : '',
-                    'answer' => $translation ? $translation->answer : '',
+                    'question' => $faq->getTranslation('question', $language),
+                    'answer' => $faq->getTranslation('answer', $language),
                     'order' => $faq->order,
                 ];
             })

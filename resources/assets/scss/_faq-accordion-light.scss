@@ -48,7 +48,6 @@
     -webkit-user-drag: none;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     opacity: 1;
-    transform: translateY(-35px);
     
     &:hover {
         background-color: rgba(0, 0, 0, 0.05);
@@ -61,6 +60,10 @@
         color: $text-color-light;
         line-height: 1.4;
         padding-right: 16px;
+        flex: 1;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
     }
 }
 
@@ -93,6 +96,9 @@
         color: $text-color-light;
         line-height: 1.6;
         font-size: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
         
         p {
             margin: 0 0 16px 0;
@@ -159,6 +165,7 @@
         .faq-question-text {
             font-size: 16px;
             padding-right: 12px;
+            min-width: 0;
         }
         
         &:active {

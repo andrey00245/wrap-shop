@@ -81,7 +81,14 @@ php artisan key:generate
 php artisan migrate
 ```
 
-### 6. Сборка фронтенда
+### 6. Заполнение таблицы языков
+```bash
+php artisan languages:seed
+# или
+php artisan db:seed --class=LanguageSeeder
+```
+
+### 7. Сборка фронтенда
 ```bash
 yarn dev
 # или

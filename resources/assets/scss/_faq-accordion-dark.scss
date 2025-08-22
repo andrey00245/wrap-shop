@@ -87,12 +87,13 @@
 }
 
 .faq-answer {
-    padding: 0 24px 24px;
+    padding: 0;
     background: transparent;
-    border-top: 1px solid rgba(255, 206, 28, 0.3);
+    border-top: 1px solid transparent;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease, padding 0.3s ease;
+    transition: max-height 0.3s ease, padding 0.3s ease, border-color 0.3s ease;
+    opacity: 0;
     
     .faq-answer-content {
         color: $text-color-dark;
@@ -153,6 +154,7 @@
 .faq-item.active .faq-answer {
     max-height: 1000px;
     padding: 24px 24px 24px;
+    opacity: 1;
 }
 
 // Адаптивность

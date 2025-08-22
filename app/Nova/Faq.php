@@ -37,36 +37,12 @@ class Faq extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make()->sortable()->hideFromIndex(),
-
-            Number::make('Порядок', 'order')
-                ->sortable()
-                ->rules('required', 'integer', 'min:0')
-                ->hideFromIndex(),
-
-            Boolean::make('Активно', 'is_active')
-                ->default(true)
-                ->sortable()
-                ->hideFromIndex(),
-
+            // Поля для редактирования
             NovaTabTranslatable::make([
                 Text::make('Вопрос', 'question')
                     ->rules('required')
                     ->hideFromIndex(),
             ]),
-
-            // Поля для отображения в индексе
-            Text::make('Вопрос (Українська)', 'question->uk')
-                ->onlyOnIndex()
-                ->hideFromDetail(),
-
-            Text::make('Вопрос (English)', 'question->en')
-                ->onlyOnIndex()
-                ->hideFromDetail(),
-
-            Text::make('Вопрос (Русский)', 'question->ru')
-                ->onlyOnIndex()
-                ->hideFromDetail(),
 
             NovaTabTranslatable::make([
                 Trix::make('Ответ', 'answer')
@@ -74,44 +50,24 @@ class Faq extends Resource
                     ->hideFromIndex(),
             ]),
 
-            // Поля для отображения ответов в индексе
-            Text::make('Ответ (Українська)', 'answer->uk')
-                ->onlyOnIndex()
-                ->hideFromDetail(),
-
-            Text::make('Ответ (English)', 'answer->en')
-                ->onlyOnIndex()
-                ->hideFromDetail(),
-
-            Text::make('Ответ (Русский)', 'answer->ru')
-                ->onlyOnIndex()
-                ->hideFromDetail(),
-
             // Поля для отображения в индексе
-            Text::make('Создано', function () {
-                return $this->created_at ? $this->created_at->format('d.m.Y H:i') : '-';
-            })->onlyOnIndex()
-                ->hideFromDetail(),
-
-            Text::make('Обновлено', function () {
-                return $this->updated_at ? $this->updated_at->format('d.m.Y H:i') : '-';
-            })->onlyOnIndex()
-                ->hideFromDetail(),
-
-            // Поле для отображения статуса активности в индексе
-            Boolean::make('Активно', 'is_active')
-                ->onlyOnIndex()
-                ->hideFromDetail(),
-
-            // Поле для отображения порядка в индексе
             Number::make('Порядок', 'order')
-                ->onlyOnIndex()
-                ->hideFromDetail(),
+                ->sortable()
+                ->rules('required', 'integer', 'min:0')
+                ->onlyOnIndex(),
 
-            // Поле для отображения ID в индексе
-            ID::make('ID')
+            Boolean::make('Активно', 'is_active')
+                ->default(true)
+                ->sortable()
+                ->onlyOnIndex(),
+
+            Text::make('Вопрос (Українська)', function () {
+                $question = $this->question['uk'] ?? '';
+                return mb_strlen($question) > 80 ? mb_substr($question, 0, 80) . '...' : $question;
+            })
                 ->onlyOnIndex()
-                ->hideFromDetail(),
+                ->hideFromDetail()
+                ->sortable(false),
         ];
     }
 

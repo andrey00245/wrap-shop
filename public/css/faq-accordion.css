@@ -1,7 +1,23 @@
+.page-faq {
+    padding: 40px 0;
+}
+
+.page-faq .default-title {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
 .faq-accordion {
     max-width: 800px;
     margin: 0 auto;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.no-faq {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+    font-size: 18px;
 }
 
 .faq-item {

@@ -392,3 +392,12 @@
     }
 }
 ///*.skins*/
+
+// FAQ Accordion
+@if variable-exists(mod-main-color) {
+    @if $mod-main-color == $main-color-dark {
+        @import "faq-accordion-dark";
+    } @else {
+        @import "faq-accordion-light";
+    }
+}

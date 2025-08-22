@@ -7,7 +7,6 @@
       @else
           <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-information-light.css')}}">
       @endif
-      <link rel="stylesheet" type="text/css" href="{{asset('css/faq-accordion.css')}}">
   @endpush
 
   <nav class="breadcrumbs wrap row">

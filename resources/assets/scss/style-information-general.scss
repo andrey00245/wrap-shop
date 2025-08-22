@@ -393,11 +393,4 @@
 }
 ///*.skins*/
 
-// FAQ Accordion
-@if variable-exists(mod-main-color) {
-    @if $mod-main-color == $main-color-dark {
-        @import "faq-accordion-dark";
-    } @else {
-        @import "faq-accordion-light";
-    }
-}
+// FAQ Accordion styles removed - will be imported separately in theme files

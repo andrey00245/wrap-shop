@@ -30,6 +30,10 @@
     align-items: center;
     justify-content: space-between;
     transition: background-color 0.2s ease;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     
     &:hover {
         background-color: #f8f9fa;
@@ -132,6 +136,7 @@
     
     .faq-question {
         padding: 20px 24px;
+        min-height: 60px; // Минимальная высота для удобного тапа
         
         .faq-question-text {
             font-size: 16px;
@@ -147,6 +152,19 @@
     .faq-toggle {
         width: 36px;
         height: 36px;
+        min-width: 36px; // Предотвращает сжатие
+    }
+    
+    // Улучшенные стили для мобильных устройств
+    .faq-item {
+        margin-bottom: 12px;
+        border-radius: 8px;
+    }
+    
+    .faq-question:active {
+        background-color: #e9ecef;
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
     }
 }
 

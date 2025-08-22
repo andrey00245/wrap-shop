@@ -21,27 +21,25 @@
 }
 
 .faq-item {
-    border: 1px solid rgba(255, 206, 28, 0.3);
+    border: 1px solid rgba(128, 128, 128, 0.6);
     border-radius: 8px;
     margin-bottom: 16px;
-    background: rgba(255, 206, 28, 0.05);
-    box-shadow: 0 2px 8px rgba(255, 206, 28, 0.1);
+    background: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     
     &:hover {
-        box-shadow: 0 4px 16px rgba(255, 206, 28, 0.2);
-        border-color: rgba(255, 206, 28, 0.5);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        border-color: rgba(128, 128, 128, 0.8);
         transform: translateY(-2px);
-        background: rgba(255, 206, 28, 0.08);
     }
     
     &.active {
-        border-color: rgba(255, 206, 28, 1);
-        box-shadow: 0 4px 20px rgba(255, 206, 28, 0.3);
-        background: rgba(255, 206, 28, 0.1);
+        border-color: rgba(208, 75, 75, 1);
+        box-shadow: 0 4px 20px rgba(208, 75, 75, 0.2);
         
         .faq-question {
-            background: rgba(255, 206, 28, 0.05);
+            background: rgba(208, 75, 75, 0.05);
         }
     }
 }
@@ -60,7 +58,7 @@
     border-radius: 8px 8px 0 0;
     
     &:hover {
-        background-color: rgba(255, 206, 28, 0.05);
+        background-color: rgba(0, 0, 0, 0.05);
     }
     
     .faq-question-text {
@@ -81,13 +79,13 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: rgba(255, 206, 28, 0.1);
+    background: rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     flex-shrink: 0;
     
     .faq-icon {
         transition: transform 0.3s ease;
-        color: rgba(255, 206, 28, 0.8);
+        color: rgba(172, 172, 172, 1);
     }
 }
 
@@ -126,12 +124,12 @@
         }
         
         a {
-            color: rgba(255, 206, 28, 0.9);
+            color: rgba(208, 75, 75, 1);
             text-decoration: none;
             
             &:hover {
                 text-decoration: underline;
-                color: rgba(255, 206, 28, 1);
+                color: rgba(208, 75, 75, 0.8);
             }
         }
     }
@@ -140,6 +138,51 @@
 // Анимации
 .faq-item.active {
     .faq-toggle {
+        background: rgba(208, 75, 75, 1);
+        
+        .faq-icon {
+            color: #fff;
+        }
+    }
+    
+    .faq-answer {
+        border-top-color: rgba(128, 128, 128, 0.3);
+    }
+}
+
+// Темная тема
+[data-theme="dark"] {
+    .faq-item {
+        border-color: rgba(255, 206, 28, 0.3);
+        background: rgba(255, 206, 28, 0.05);
+        box-shadow: 0 2px 8px rgba(255, 206, 28, 0.1);
+        
+        &:hover {
+            box-shadow: 0 4px 16px rgba(255, 206, 28, 0.2);
+            border-color: rgba(255, 206, 28, 0.5);
+            background: rgba(255, 206, 28, 0.08);
+        }
+        
+        &.active {
+            border-color: rgba(255, 206, 28, 1);
+            box-shadow: 0 4px 20px rgba(255, 206, 28, 0.3);
+            background: rgba(255, 206, 28, 0.1);
+            
+            .faq-question {
+                background: rgba(255, 206, 28, 0.05);
+            }
+        }
+    }
+    
+    .faq-toggle {
+        background: rgba(255, 206, 28, 0.1);
+        
+        .faq-icon {
+            color: rgba(255, 206, 28, 0.8);
+        }
+    }
+    
+    .faq-item.active .faq-toggle {
         background: rgba(255, 206, 28, 1);
         
         .faq-icon {
@@ -147,8 +190,24 @@
         }
     }
     
-    .faq-answer {
+    .faq-item.active .faq-answer {
         border-top-color: rgba(255, 206, 28, 0.3);
+    }
+    
+    .faq-question:hover {
+        background-color: rgba(255, 206, 28, 0.05);
+    }
+    
+    .faq-question:active {
+        background-color: rgba(255, 206, 28, 0.1);
+    }
+    
+    .faq-answer .faq-answer-content a {
+        color: rgba(255, 206, 28, 0.9);
+        
+        &:hover {
+            color: rgba(255, 206, 28, 1);
+        }
     }
 }
 
@@ -187,7 +246,7 @@
     }
     
     .faq-question:active {
-        background-color: rgba(255, 206, 28, 0.1);
+        background-color: rgba(0, 0, 0, 0.1);
         transform: scale(0.98);
         transition: transform 0.1s ease;
     }

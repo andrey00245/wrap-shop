@@ -53,7 +53,7 @@ class IndexController extends Controller
             })
             ->get();
 
-        $exampleWorks = Implementation::query()->where('is_active',true)->get();
+        $exampleWorks = Implementation::query()->where('is_active',true)->take(9)->get();
 
         $topSellerCategories = Category::query()->whereHas('products', function ($qury) {
             $qury->where('products.is_top_seller', true);

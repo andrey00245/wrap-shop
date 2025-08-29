@@ -22,6 +22,7 @@ use App\Http\Controllers\SyncProductImagesController;
 use App\Http\Controllers\VideosController;
 use App\Http\Controllers\WayForPayController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\FaqController;
 use App\Models\Category;
 use App\Models\PrivacyPolicy;
 use App\Models\Product;
@@ -135,6 +136,8 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
   Route::get('/contacts', function () {
     return view('base.pages.contacts');
   })->name('contacts');
+
+  Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 
   Route::group(['prefix' => '/account', 'middleware' => ['redirect_if_not_authenticated']], function(){
     Route::get('/', function () {

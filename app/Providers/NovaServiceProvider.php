@@ -8,6 +8,7 @@ use App\Nova\BestSeller;
 use App\Nova\Category;
 use App\Nova\Consultation;
 use App\Nova\CustomBlock;
+use App\Nova\Faq;
 use App\Nova\FastOrder;
 use App\Nova\Feedback;
 use App\Nova\Implementation;
@@ -86,6 +87,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 				MenuSection::make('Блог', [
 					MenuItem::resource(NewsCategory::class),
 					MenuItem::resource(News::class),
+					MenuItem::resource(Faq::class),
 				])->icon('desktop-computer')->collapsable(),
 
 				MenuSection::make('Відеогляд', [

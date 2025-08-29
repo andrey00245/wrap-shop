@@ -7,6 +7,7 @@ use App\Models\User;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\LanguageSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,6 +17,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Заполняем таблицу языков
+        $this->call([
+            LanguageSeeder::class,
+        ]);
+        
         Setting::create([
             'phone' => '+380660003202',
             'phone_view' => '<span>+38</span> 066 000 32 02',

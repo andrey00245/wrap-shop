@@ -22,7 +22,7 @@
 
   <section class="page-faq wrap">
     <h1 class="default-title">{{ __('faq.title') }}</h1>
-    
+
     @if($faqs->count() > 0)
       <div class="faq-accordion">
         @foreach($faqs as $index => $faq)
@@ -73,7 +73,7 @@
                 const prevToggle = activeItem.querySelector('.faq-toggle');
                 closeItem(activeItem, prevAnswer, prevToggle);
               }
-              
+
               // Открываем новый элемент
               openItem(item, answer, toggle);
               activeItem = item;

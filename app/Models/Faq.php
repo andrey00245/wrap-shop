@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\EloquentSortable\SortableTrait;
 use Spatie\Translatable\HasTranslations;
 
 class Faq extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory, HasTranslations, SortableTrait;
 
     protected $fillable = [
         'order',
@@ -28,6 +29,11 @@ class Faq extends Model
     public array $translatable = [
         'question',
         'answer',
+    ];
+
+    public $sortable = [
+        'order_column_name' => 'order',
+        'sort_when_creating' => true,
     ];
 
     public function scopeActive(Builder $query): Builder

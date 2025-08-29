@@ -4,6 +4,7 @@ namespace App\Nova;
 
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
@@ -11,10 +12,12 @@ use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Trix;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Resource;
-use Spatie\NovaTranslatable\NovaTranslatable;
+use Outl1ne\NovaSortable\Traits\HasSortableRows;
 
 class Faq extends Resource
 {
+    use HasSortableRows;
+
     public static $model = \App\Models\Faq::class;
 
     public static $title = 'id';
@@ -42,32 +45,33 @@ class Faq extends Resource
                 Text::make('Вопрос', 'question')
                     ->rules('required')
                     ->hideFromIndex(),
-            ]),
+            ])->hideFromIndex(),
 
             NovaTabTranslatable::make([
                 Trix::make('Ответ', 'answer')
                     ->rules('required')
                     ->hideFromIndex(),
-            ]),
+            ])->hideFromIndex(),
 
-            // Поля для отображения в индексе
-            Number::make('Порядок', 'order')
-                ->sortable()
-                ->rules('required', 'integer', 'min:0')
-                ->onlyOnIndex(),
+
+            Text::make('Вопрос (Українська)', function () {
+                $question = $this->question ?? '';
+                return mb_strlen($question) > 80 ? mb_substr($question, 0, 80) . '...' : $question;
+            })
+                ->onlyOnIndex()
+                ->hideFromDetail()
+                ->sortable(false),
 
             Boolean::make('Активно', 'is_active')
                 ->default(true)
                 ->sortable()
                 ->onlyOnIndex(),
 
-            Text::make('Вопрос (Українська)', function () {
-                $question = $this->question['uk'] ?? '';
-                return mb_strlen($question) > 80 ? mb_substr($question, 0, 80) . '...' : $question;
-            })
-                ->onlyOnIndex()
-                ->hideFromDetail()
-                ->sortable(false),
+            // Поля для отображения в индексе
+            Number::make('Порядок', 'order')
+                ->sortable()
+                ->rules('required', 'integer', 'min:0')
+                ->onlyOnIndex(),
         ];
     }
 

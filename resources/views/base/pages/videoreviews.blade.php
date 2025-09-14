@@ -1,5 +1,31 @@
 @extends('base.layouts.app')
 
+@php
+    $locale = app()->getLocale();
+    $videoTitle = __('video-reviews.title') . ' | Wrap.Shop';
+    $videoDescription = 'Відеоогляди продуктів Wrap.Shop - плівки для авто, матеріали для детейлінгу, інструменти та аксесуари. Професійні огляди та інструкції.';
+    
+    if ($locale === 'ru') {
+        $videoDescription = 'Видеообзоры продуктов Wrap.Shop - пленки для авто, материалы для детейлинга, инструменты и аксессуары. Профессиональные обзоры и инструкции.';
+    } elseif ($locale === 'en') {
+        $videoDescription = 'Video reviews of Wrap.Shop products - car wraps, detailing materials, tools and accessories. Professional reviews and tutorials.';
+    }
+@endphp
+
+@section('title', $videoTitle)
+@section('description', $videoDescription)
+@section('keywords', 'відеоогляди, плівки для авто, детейлінг, інструменти, wrap shop, огляди продуктів')
+@section('og_type', 'website')
+@section('og_title', $videoTitle)
+@section('og_description', $videoDescription)
+@section('og_image', url('assets/img/og-default.jpg'))
+@section('og_url', url()->current())
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $videoTitle)
+@section('twitter_description', $videoDescription)
+@section('twitter_image', url('assets/img/og-default.jpg'))
+@section('canonical', url()->current())
+
 @push('styles')
     @if($theme ==='dark')
         <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-blog-dark.css')}}">

@@ -1,5 +1,25 @@
 @extends('base.layouts.app')
 
+@php
+    $seoService = app(\App\Services\SeoService::class);
+    $productTitle = $seoService->generateProductTitle($product);
+    $productDescription = $seoService->generateProductDescription($product);
+    $ogImage = $product->getMedia('images')->first()?->getUrl() ?? url('assets/img/og-default.jpg');
+@endphp
+
+@section('title', $productTitle)
+@section('description', $productDescription)
+@section('keywords', $product->category?->name . ', ' . $product->getName() . ', плівки для авто, детейлінг, тюнінг')
+@section('og_type', 'product')
+@section('og_title', $productTitle)
+@section('og_description', $productDescription)
+@section('og_image', $ogImage)
+@section('og_url', url()->current())
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $productTitle)
+@section('twitter_description', $productDescription)
+@section('twitter_image', $ogImage)
+@section('canonical', url()->current())
 
 @section('content')
 

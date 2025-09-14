@@ -1,5 +1,30 @@
 @extends('base.layouts.app')
 
+@php
+    $locale = app()->getLocale();
+    $deliveryTitle = __('shipping_and_payment.title') . ' | Wrap.Shop';
+    $deliveryDescription = 'Доставка та оплата Wrap.Shop - швидка доставка по Україні, зручні способи оплати. Нова Пошта, кур\'єрська доставка, оплата карткою.';
+    
+    if ($locale === 'ru') {
+        $deliveryDescription = 'Доставка и оплата Wrap.Shop - быстрая доставка по Украине, удобные способы оплаты. Новая Почта, курьерская доставка, оплата картой.';
+    } elseif ($locale === 'en') {
+        $deliveryDescription = 'Shipping and payment Wrap.Shop - fast delivery across Ukraine, convenient payment methods. Nova Poshta, courier delivery, card payment.';
+    }
+@endphp
+
+@section('title', $deliveryTitle)
+@section('description', $deliveryDescription)
+@section('keywords', 'доставка, оплата, нова пошта, кур\'єр, wrap shop, плівки для авто')
+@section('og_type', 'website')
+@section('og_title', $deliveryTitle)
+@section('og_description', $deliveryDescription)
+@section('og_image', url('assets/img/og-default.jpg'))
+@section('og_url', url()->current())
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $deliveryTitle)
+@section('twitter_description', $deliveryDescription)
+@section('twitter_image', url('assets/img/og-default.jpg'))
+@section('canonical', url()->current())
 
 @section('content')
 

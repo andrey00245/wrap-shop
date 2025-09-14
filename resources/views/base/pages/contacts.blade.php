@@ -1,5 +1,30 @@
 @extends('base.layouts.app')
 
+@php
+    $locale = app()->getLocale();
+    $contactsTitle = __('contacts.title') . ' | Wrap.Shop';
+    $contactsDescription = 'Контакти Wrap.Shop - телефон, email, адреса. Зв\'яжіться з нами для замовлення плівок для авто, матеріалів для детейлінгу та тюнінгу.';
+    
+    if ($locale === 'ru') {
+        $contactsDescription = 'Контакты Wrap.Shop - телефон, email, адрес. Свяжитесь с нами для заказа пленок для авто, материалов для детейлинга и тюнинга.';
+    } elseif ($locale === 'en') {
+        $contactsDescription = 'Wrap.Shop contacts - phone, email, address. Contact us to order car wraps, detailing materials and tuning.';
+    }
+@endphp
+
+@section('title', $contactsTitle)
+@section('description', $contactsDescription)
+@section('keywords', 'контакти, wrap shop, телефон, email, адреса, плівки для авто, детейлінг')
+@section('og_type', 'website')
+@section('og_title', $contactsTitle)
+@section('og_description', $contactsDescription)
+@section('og_image', url('assets/img/og-default.jpg'))
+@section('og_url', url()->current())
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $contactsTitle)
+@section('twitter_description', $contactsDescription)
+@section('twitter_image', url('assets/img/og-default.jpg'))
+@section('canonical', url()->current())
 
 @section('content')
   @push('styles')

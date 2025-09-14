@@ -14,6 +14,14 @@ class VideoCategory extends Model
     protected $translatable = ['name'];
 
     protected $casts = [
-    'name' => 'json',
+        'name' => 'json',
     ];
+
+    /**
+     * Связь с видео
+     */
+    public function videos()
+    {
+        return $this->hasMany(Video::class, 'category_id');
+    }
 }

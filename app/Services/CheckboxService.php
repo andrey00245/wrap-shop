@@ -87,14 +87,37 @@ class CheckboxService
 
         if (in_array($response->status(), [200, 201, 202]) && $response['status'] ?? null === 'CREATED') {
             $userMessage = 'Чек успішно створено ✅';
+            $data = $response->json();
+
+            // Извлекаем fiscal_code и tax_url
+            $fiscalCode = $data['fiscal_code'] ?? null;
+            $taxUrl = $data['tax_url'] ?? null;
+
+            $mailId = null;
+
+            if ($taxUrl) {
+                // Парсим query-параметры tax_url
+                $query = parse_url($taxUrl, PHP_URL_QUERY);
+                parse_str($query, $params);
+
+                // ID, который приходит на почту, находится в параметре 'id'
+                $mailId = $params['id'] ?? null;
+            }
 
             $order->update([
-                'checkbox_receipt_id' => $responseData['id'] ?? $receiptId,
-                'checkbox_status'   => 'success',
-                'checkbox_response' => $userMessage,
+                'checkbox_receipt_id' => $fiscalCode .' | '. $mailId, // UUID API
+                'checkbox_status'     => 'success',
+                'checkbox_response'   => $userMessage,
             ]);
 
-            Log::info('Чек успешно отправлен в Checkbox', ['order_id' => $order->id]);
+            dd(1);
+
+            Log::info('Чек успешно отправлен в Checkbox', [
+                'order_id' => $order->id,
+                'fiscal_code' => $fiscalCode,
+                'mail_id' => $mailId,
+            ]);
+
             return true;
         }
 

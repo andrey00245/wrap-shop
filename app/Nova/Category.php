@@ -8,6 +8,8 @@ use Kongulov\NovaTabTranslatable\TranslatableTabToRowTrait;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
+use Laravel\Nova\Fields\Trix;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Category extends Resource
@@ -43,7 +45,32 @@ class Category extends Resource
         return [
             NovaTabTranslatable::make([
                 Text::make('Назва','name'),
-            ])->setTitle('Назва'),
+                Text::make('Slug','slug'),
+            ])->setTitle('Основна інформація'),
+
+            NovaTabTranslatable::make([
+                Text::make('Meta Title','meta_title')
+                    ->help('Заголовок для SEO (до 60 символів)')
+                    ->hideFromIndex(),
+                Textarea::make('Meta Description','meta_description')
+                    ->rows(3)
+                    ->help('Опис для SEO (до 160 символів)'),
+                Text::make('Meta Keywords','meta_keywords')
+                    ->help('Ключові слова через кому')
+                    ->hideFromIndex(),
+                Text::make('H1','h1')
+                    ->help('Заголовок H1 на сторінці категорії')
+                    ->hideFromIndex(),
+            ])->setTitle('SEO налаштування'),
+
+            NovaTabTranslatable::make([
+                Trix::make('Контент','content')
+                    ->help('Основний контент категорії')
+                    ->hideFromIndex(),
+                Trix::make('SEO текст','seo_text')
+                    ->help('Додатковий SEO текст внизу сторінки')
+                    ->hideFromIndex(),
+            ])->setTitle('Контент'),
 
             BelongsTo::make('Основна Категорія', 'parent', self::class)
                 ->nullable()

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Banner;
+use App\Models\BestSeller;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductBanner;
@@ -56,17 +57,23 @@ class AppServiceProvider extends ServiceProvider
        */
         $settings = Setting::query()->first();
 
-        $products = Product::query()
-            ->where('is_active', true)
-            ->where('is_top_seller', true)
-            ->whereHas('prices', function ($query) {
-                $query->where('type_id', function ($subQuery) {
-                    $subQuery->select('id')
-                        ->from('price_types')
-                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-                })->where('price', '>', 0);
-            })->has('category')
-            ->get();
+        // Получаем продукты-лидеры продаж из новой таблицы best_sellers
+        $products = BestSeller::query()
+            ->whereHas('product', function ($query) {
+                $query->where('is_active', true)
+                    ->whereHas('prices', function ($priceQuery) {
+                        $priceQuery->where('type_id', function ($subQuery) {
+                            $subQuery->select('id')
+                                ->from('price_types')
+                                ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+                        })->where('price', '>', 0);
+                    })
+                    ->has('category');
+            })
+            ->with('product')
+            ->orderBy('sort_order', 'asc')
+            ->get()
+            ->pluck('product');
 
         $instruments = Product::query()
             ->where('is_active', true)

@@ -1,5 +1,25 @@
 @extends('base.layouts.app')
 
+@php
+    $seoService = app(\App\Services\SeoService::class);
+    $newsTitle = $seoService->generateNewsTitle($news_category ?? null);
+    $newsDescription = $seoService->generateNewsDescription($news_category ?? null);
+@endphp
+
+@section('title', $newsTitle)
+@section('description', $newsDescription)
+@section('keywords', 'новини, акції, wrap shop, плівки для авто, детейлінг, тюнінг')
+@section('og_type', 'website')
+@section('og_title', $newsTitle)
+@section('og_description', $newsDescription)
+@section('og_image', url('assets/img/og-default.jpg'))
+@section('og_url', url()->current())
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $newsTitle)
+@section('twitter_description', $newsDescription)
+@section('twitter_image', url('assets/img/og-default.jpg'))
+@section('canonical', url()->current())
+
 @push('styles')
     @if($theme ==='dark')
         <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-blog-dark.css')}}">

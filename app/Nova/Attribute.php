@@ -4,6 +4,7 @@ namespace App\Nova;
 
 use Illuminate\Http\Request;
 use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -60,8 +61,34 @@ class Attribute extends Resource
     {
         return [
             NovaTabTranslatable::make([
-                Text::make('Назва', 'name')->sortable()
-            ])
+                Text::make('Назва', 'name')
+                    ->displayUsing(function ($value) {
+                        return \Str::limit($value, 50) . (strlen($value) > 50 ? '...' : '');
+                    })
+                    ->onlyOnIndex()
+                    ->sortable(),
+                ]),
+
+            Boolean::make('Перекладено', function () {
+                return $this->is_translated;
+            })
+                ->trueValue(true)
+                ->falseValue(false)
+                ->sortable()
+                ->onlyOnIndex(),
+        ];
+    }
+
+    /**
+     * Get the actions available for the resource.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return array
+     */
+    public function actions(NovaRequest $request)
+    {
+        return [
+            new \App\Nova\Actions\TranslateAttributeContent,
         ];
     }
 }

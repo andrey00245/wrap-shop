@@ -55,9 +55,9 @@ class IndexController extends Controller
 
         $exampleWorks = Implementation::query()->where('is_active',true)->take(9)->get();
 
-        $topSellerCategories = Category::query()->whereHas('products', function ($qury) {
-            $qury->where('products.is_top_seller', true);
-        })->get();
+        $topSellerCategories = $topSellersProducts->map(function ($bestSeller) {
+            return $bestSeller->product->category;
+        })->filter()->unique('id')->values();
 
         return view('base.pages.main', compact(
                 'topSellerCategories',

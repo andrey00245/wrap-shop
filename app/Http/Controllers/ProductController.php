@@ -50,8 +50,8 @@ class ProductController extends Controller
 
         $mainCategories = Category::query()->whereNull('parent_id')->get();
 
-        $categories = $products->take(5)->flatMap(function ($product) {
-            return $product->categories;
+        $categories = $products->take(5)->map(function ($product) {
+            return $product->category;
         })->unique('id');
         return view('base.pages.products.index', compact(
                 'categories',

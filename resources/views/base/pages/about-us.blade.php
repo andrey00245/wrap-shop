@@ -1,5 +1,31 @@
 @extends('base.layouts.app')
 
+@php
+    $locale = app()->getLocale();
+    $aboutTitle = __('about-us.title') . ' | Wrap.Shop';
+    $aboutDescription = 'Про Wrap.Shop - інтернет-магазин плівок для автомобілів, матеріалів для детейлінгу та тюнінгу. Якість, надійність, професійний підхід.';
+    
+    if ($locale === 'ru') {
+        $aboutDescription = 'О Wrap.Shop - интернет-магазин пленок для автомобилей, материалов для детейлинга и тюнинга. Качество, надежность, профессиональный подход.';
+    } elseif ($locale === 'en') {
+        $aboutDescription = 'About Wrap.Shop - online store of car wraps, detailing materials and tuning. Quality, reliability, professional approach.';
+    }
+@endphp
+
+@section('title', $aboutTitle)
+@section('description', $aboutDescription)
+@section('keywords', 'про нас, wrap shop, історія, місія, плівки для авто, детейлінг, тюнінг')
+@section('og_type', 'website')
+@section('og_title', $aboutTitle)
+@section('og_description', $aboutDescription)
+@section('og_image', url('assets/img/og-default.jpg'))
+@section('og_url', url()->current())
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $aboutTitle)
+@section('twitter_description', $aboutDescription)
+@section('twitter_image', url('assets/img/og-default.jpg'))
+@section('canonical', url()->current())
+
 @push('styles')
     @if($theme ==='dark')
         <link rel="stylesheet" type="text/css" href="{{mix('build/css/style-blog-dark.css')}}">

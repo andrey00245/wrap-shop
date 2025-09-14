@@ -143,4 +143,25 @@ class Attribute extends Model
               })->where('price', '>', 0);
           })->count();
     }
+
+    /**
+     * Проверяет, переведен ли атрибут на все языки
+     */
+    public function getIsTranslatedAttribute(): bool
+    {
+        $nameRu = $this->getTranslation('name', 'ru');
+        $nameEn = $this->getTranslation('name', 'en');
+
+        // Проверяем, что переводы существуют
+        if (empty($nameRu) || empty($nameEn)) {
+            return false;
+        }
+
+        // Проверяем, что переводы не одинаковые
+        if (trim($nameRu) === trim($nameEn)) {
+            return false;
+        }
+
+        return true;
+    }
 }

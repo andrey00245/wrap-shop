@@ -1,6 +1,6 @@
 <section class="home-products checkout row" id="checkoutProductSlider">
     <div class="home-products-top flex-justify">
-        <h2 class="home-title">{!! __('general-translate.latest') !!}</h2>
+        <h2 class="home-title">{!! __('general-translate.leaders_of_sales') !!}</h2>
 
         <div class="line"></div>
 

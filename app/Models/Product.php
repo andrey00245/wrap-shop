@@ -712,6 +712,7 @@ class Product extends Model implements HasMedia
         $descRu = $this->getTranslation('descriptions', 'ru');
         $descEn = $this->getTranslation('descriptions', 'en');
 
+        // Проверяем основные поля продукта
         if (
             empty(strip_tags($nameRu)) ||
             empty(strip_tags($nameEn)) ||
@@ -726,6 +727,30 @@ class Product extends Model implements HasMedia
             trim(strip_tags($descRu)) === trim(strip_tags($descEn))
         ) {
             return false;
+        }
+
+        // Проверяем переводы атрибутов
+        $productAttributes = $this->products_attributes()->get();
+        foreach ($productAttributes as $attribute) {
+            $value = $attribute->value;
+            
+            // Если значение не является массивом (не переведено), пропускаем
+            if (!is_array($value)) {
+                continue;
+            }
+
+            $valueRu = $value['ru'] ?? '';
+            $valueEn = $value['en'] ?? '';
+
+            // Если хотя бы один атрибут не переведен, продукт считается не переведенным
+            if (empty($valueRu) || empty($valueEn)) {
+                return false;
+            }
+
+            // Если переводы одинаковые, продукт считается не переведенным
+            if (trim($valueRu) === trim($valueEn)) {
+                return false;
+            }
         }
 
         return true;

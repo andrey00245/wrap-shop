@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\User;
 use App\Notifications\TemporaryPasswordNotification;
+use App\Services\CheckboxService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -117,6 +118,7 @@ class OrderController extends Controller
             $product->save();
         }
 
+        app(CheckboxService::class)->sendReceipt($order);
         if (Auth::check()) {
             CartItem::where('user_id', Auth::id())->delete();
         } else {

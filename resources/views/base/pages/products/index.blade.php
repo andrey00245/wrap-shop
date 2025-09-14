@@ -1,4 +1,26 @@
 @extends('base.layouts.app')
+
+@php
+    $seoService = app(\App\Services\SeoService::class);
+    $categoryTitle = $seoService->generateCategoryTitle($category, $subcategory ?? null, $subsubcategory ?? null);
+    $categoryDescription = $seoService->generateCategoryDescription($category, $subcategory ?? null, $subsubcategory ?? null);
+    $currentCategory = $subsubcategory ?? $subcategory ?? $category;
+@endphp
+
+@section('title', $categoryTitle)
+@section('description', $categoryDescription)
+@section('keywords', $currentCategory->name . ', плівки для авто, детейлінг, тюнінг, шумоізоляція, інструменти, аксесуари')
+@section('og_type', 'website')
+@section('og_title', $categoryTitle)
+@section('og_description', $categoryDescription)
+@section('og_image', url('assets/img/og-default.jpg'))
+@section('og_url', url()->current())
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $categoryTitle)
+@section('twitter_description', $categoryDescription)
+@section('twitter_image', url('assets/img/og-default.jpg'))
+@section('canonical', url()->current())
+
 @section('content')
 
     @push('styles')
@@ -36,12 +58,12 @@
             </nav>
             @if(isset($subsubcategory))
                 <h1 class="title" id="categoryId"
-                    data-category-id="{{$subsubcategory->id}}">{{$subsubcategory->name ?? ''}}</h1>
+                    data-category-id="{{$subsubcategory->id}}">{{$subsubcategory->h1 ?? $subsubcategory->name ?? ''}}</h1>
             @elseif(isset($subcategory))
                 <h1 class="title" id="categoryId"
-                    data-category-id="{{$subcategory->id}}">{{$subcategory->name ?? ''}}</h1>
+                    data-category-id="{{$subcategory->id}}">{{$subcategory->h1 ?? $subcategory->name ?? ''}}</h1>
             @else
-                <h1 class="title" id="categoryId" data-category-id="{{$category->id}}">{{$category->name ?? ''}}</h1>
+                <h1 class="title" id="categoryId" data-category-id="{{$category->id}}">{{$category->h1 ?? $category->name ?? ''}}</h1>
             @endif
             @if(isset($category))
                 <nav class="category-child-nav">
@@ -634,6 +656,24 @@
             </div>
         </div>
     </section>
+
+    @if($currentCategory && ($currentCategory->content || $currentCategory->seo_text))
+        <section class="category-seo-content wrap row">
+            <div class="category-content">
+                @if($currentCategory->content)
+                    <div class="category-main-content">
+                        {!! $currentCategory->content !!}
+                    </div>
+                @endif
+                
+                @if($currentCategory->seo_text)
+                    <div class="category-seo-text">
+                        {!! $currentCategory->seo_text !!}
+                    </div>
+                @endif
+            </div>
+        </section>
+    @endif
 
     @push('scripts')
         <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"></script>

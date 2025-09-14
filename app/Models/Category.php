@@ -15,7 +15,7 @@ class Category extends Model implements HasMedia
         InteractsWithMedia,
         HasTranslations;
 
-    protected $translatable = ['name', 'slug'];
+    protected $translatable = ['name', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'h1', 'content', 'seo_text'];
 
     /**
      * The attributes that are mass assignable.
@@ -26,11 +26,23 @@ class Category extends Model implements HasMedia
         'name',
         'slug',
         'parent_id',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'h1',
+        'content',
+        'seo_text',
     ];
 
     protected $casts = [
         'name' => 'json',
         'slug' => 'json',
+        'meta_title' => 'json',
+        'meta_description' => 'json',
+        'meta_keywords' => 'json',
+        'h1' => 'json',
+        'content' => 'json',
+        'seo_text' => 'json',
     ];
 
     public function registerMediaConversions(?Media $media = null): void

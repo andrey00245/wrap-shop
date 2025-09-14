@@ -18,9 +18,16 @@ class NewsController extends Controller
    */
   public function index(): View
   {
-    $categories = NewsCategory::query()->with(['news' => function ($query) {
-      $query->active();
-    }])->get();
+    // Получаем только категории, которые имеют активные новости
+    $categories = NewsCategory::query()
+      ->whereHas('news', function ($query) {
+        $query->active();
+      })
+      ->with(['news' => function ($query) {
+        $query->active();
+      }])
+      ->get();
+      
     return view('base.pages.news.index', [
       'categories' => $categories
     ]);
@@ -37,9 +44,15 @@ class NewsController extends Controller
       $query->active();
     }]);
 
-    $categories = NewsCategory::query()->with(['news' => function ($query) {
-      $query->active();
-    }])->get();
+    // Получаем только категории, которые имеют активные новости
+    $categories = NewsCategory::query()
+      ->whereHas('news', function ($query) {
+        $query->active();
+      })
+      ->with(['news' => function ($query) {
+        $query->active();
+      }])
+      ->get();
 
     return view('base.pages.news.index', [
       'categories' => $categories,
@@ -55,7 +68,12 @@ class NewsController extends Controller
    */
   public function show(NewsCategory $news_category, News $news): View
   {
-    $categories = NewsCategory::query()->get();
+    // Получаем только категории, которые имеют активные новости
+    $categories = NewsCategory::query()
+      ->whereHas('news', function ($query) {
+        $query->active();
+      })
+      ->get();
 
     return view('base.pages.news.show', [
       'categories' => $categories,

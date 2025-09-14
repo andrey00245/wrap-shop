@@ -17,7 +17,13 @@ class VideosController extends Controller
     public function index(): View
     {
         $videos = VideoReview::query()->where('is_active',true)->latest()->get();
-        $categories = VideoCategory::all();
+        
+        // Получаем только категории, которые имеют активные видео
+        $categories = VideoCategory::query()
+            ->whereHas('videos', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->get();
 
         return view('base.pages.videoreviews', compact(
                 'videos',
@@ -39,7 +45,12 @@ class VideosController extends Controller
             ->latest()
             ->get();
 
-        $categories = VideoCategory::all();
+        // Получаем только категории, которые имеют активные видео
+        $categories = VideoCategory::query()
+            ->whereHas('videos', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->get();
 
         return view('base.pages.videoreviews', compact(
                 'videos',

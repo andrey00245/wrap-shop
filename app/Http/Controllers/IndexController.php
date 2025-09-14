@@ -53,7 +53,7 @@ class IndexController extends Controller
             })
             ->get();
 
-        $exampleWorks = Implementation::query()->where('is_active',true)->take(9)->get();
+        $exampleWorks = Implementation::query()->where('is_active',true)->take(12)->get();
 
         $topSellerCategories = $topSellersProducts->map(function ($bestSeller) {
             return $bestSeller->product->category;

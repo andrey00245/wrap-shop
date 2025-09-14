@@ -115,7 +115,7 @@ class ProductController extends Controller
                 ->paginate(6);
         }
 
-        $exampleWorks = Implementation::query()->where('is_active', true)->get();
+        $exampleWorks = Implementation::query()->where('is_active', true)->take(12)->get();
         $latestCategory = Category::query()
             ->whereHas('products', function ($query) use ($products) {
                 $query->whereIn('products.id', $products->pluck('id')->toArray());

@@ -1102,6 +1102,25 @@ body::-webkit-scrollbar {
     border-radius: 3px;
     align-items: center;
     height: 100%;
+    transition: all 0.35s;
+
+    &:hover {
+        .img img {
+            transform: scale(1.05);
+        }
+
+        .link.button {
+            color: $mod-main-color;
+        }
+
+        .img img {
+            filter: $mod-main-color-filter;
+        }
+    }
+
+    .img img {
+        transition: all 0.35s;
+    }
 
     .right {
         width: calc(100% - 190px);
@@ -2265,7 +2284,7 @@ body::-webkit-scrollbar {
 }
 
 .footer-cat img {
-    height: 100%;
+    height: 90%;
     width: auto;
 }
 
@@ -3747,7 +3766,7 @@ table .notify-quantity {
         flex-direction: column;
 
         .right {
-            width: 100%;
+            width: 90%;
             text-align: center;
         }
     }

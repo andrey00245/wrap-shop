@@ -1,4 +1,5 @@
 $main-color-dark: rgba(255, 206, 28, 1);
+$main-color-dark-filter: brightness(0) saturate(100%) invert(84%) sepia(94%) saturate(749%) hue-rotate(357deg) brightness(101%) contrast(103%);
 $main-color-dark-085: rgba(255, 206, 28, 0.85);
 $main-color-dark-075: rgba(255, 206, 28, 0.75);
 $main-color-dark-050: rgba(255, 206, 28, 0.50);
@@ -59,6 +60,7 @@ $autofill-bg-dark: rgba(76, 79, 82, 0.7);
 
 
 $main-color-light: rgba(208, 75, 75, 1);
+$main-color-light-filter: invert(78%) sepia(81%) saturate(3394%) hue-rotate(355deg) brightness(103%) contrast(104%);
 $main-color-light-085: rgba(208, 75, 75, 0.85);
 $main-color-light-075: rgba(208, 75, 75, 0.75);
 $main-color-light-050: rgba(208, 75, 75, 0.50);

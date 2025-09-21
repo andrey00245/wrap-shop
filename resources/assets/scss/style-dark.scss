@@ -1,6 +1,7 @@
 @import "variables";
 
 $mod-main-color: $main-color-dark;
+$mod-main-color-filter: $main-color-dark-filter;
 $mod-main-color-075: $main-color-dark-075;
 $mod-main-color-010: $main-color-dark-010;
 $mod-text-color: $text-color-dark;
@@ -40,3 +41,6 @@ $mod-autofil-bg: $autofill-bg-dark;
 $theme: dark;
 
 @import "style-general";
+
+// Специфичные стили для темной темы
+// Цвет для hover эффекта берется из $mod-main-color в style-general.scss

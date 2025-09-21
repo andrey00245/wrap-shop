@@ -1,6 +1,7 @@
 @import "variables";
 
 $mod-main-color: $main-color-light;
+$mod-main-color-filter: $main-color-light-filter;
 $mod-main-color-075: $main-color-light-075;
 $mod-main-color-010: $main-color-light-010;
 $mod-text-color: $text-color-light;
@@ -37,3 +38,6 @@ $mod-autofil-bg: $autofill-bg-light;
 $theme: light;
 
 @import "style-general";
+
+// Специфичные стили для светлой темы
+// Цвет для hover эффекта берется из $mod-main-color в style-general.scss

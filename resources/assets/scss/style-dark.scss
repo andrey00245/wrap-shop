@@ -1563,6 +1563,109 @@ body::-webkit-scrollbar {
   margin-top: 4px;
 }
 
+// Hover effects for category images
+.home-category-item {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 206, 28, 0.1), rgba(255, 206, 28, 0.2));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+    border-radius: 3px;
+  }
+  
+  &:hover {
+    transform: translateY(-5px);
+    background: rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 30px rgba(255, 206, 28, 0.2), 0 5px 20px rgba(0, 0, 0, 0.3);
+    
+    &::before {
+      opacity: 1;
+    }
+    
+    .img {
+      transform: scale(1.05);
+      
+      &::after {
+        opacity: 1;
+      }
+      
+      img {
+        filter: brightness(1.1) contrast(1.1);
+      }
+    }
+    
+    .right {
+      z-index: 2;
+      position: relative;
+    }
+    
+    .name {
+      color: #FFCE1C;
+      text-shadow: 0 2px 10px rgba(255, 206, 28, 0.3);
+    }
+    
+    .link {
+      color: #FFCE1C;
+      text-shadow: 2px 3px 25px #FFCE1C, 0 0 20px rgba(255, 206, 28, 0.5);
+      
+      i {
+        transform: translateX(3px);
+      }
+    }
+  }
+}
+
+.home-category-item .img {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 206, 28, 0.1) 50%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  img {
+    transition: all 0.3s ease;
+    filter: brightness(0.95);
+  }
+}
+
+.home-category-item .right {
+  transition: all 0.3s ease;
+}
+
+.home-category-item .name {
+  transition: all 0.3s ease;
+}
+
+.home-category-item .link {
+  transition: all 0.3s ease;
+  
+  i {
+    transition: transform 0.3s ease;
+  }
+}
+
 .home-category .home-category-button {
   position: absolute;
   top: 50%;
@@ -1583,6 +1686,33 @@ body::-webkit-scrollbar {
 .home-category .home-category-button.swiper-button-next {
   left: initial;
   right: 0;
+}
+
+// Mobile touch effects for categories
+@media (max-width: 768px) {
+  .home-category-item {
+    &:active {
+      transform: translateY(-3px) scale(0.98);
+      background: rgba(0, 0, 0, 0.15);
+      
+      .img {
+        transform: scale(1.02);
+        
+        img {
+          filter: brightness(1.05) contrast(1.05);
+        }
+      }
+      
+      .name {
+        color: #FFCE1C;
+      }
+      
+      .link {
+        color: #FFCE1C;
+        text-shadow: 2px 3px 25px #FFCE1C;
+      }
+    }
+  }
 }
 
 @media screen and (max-width: 1331px) {

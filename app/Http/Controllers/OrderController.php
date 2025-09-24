@@ -153,8 +153,6 @@ class OrderController extends Controller
             $product->save();
         }
 
-        app(CheckboxService::class)->sendReceipt($order);
-
         if (Auth::check()) {
             CartItem::where('user_id', Auth::id())->delete();
         } else {

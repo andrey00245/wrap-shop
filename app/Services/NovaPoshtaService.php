@@ -103,9 +103,25 @@ class NovaPoshtaService
     /**
      * Получить почтоматы по городу
      */
-    public function getPostMachines(string $cityRef)
+    public function getPostMachines(string $cityRef, int $retryCount = 0)
     {
         try {
+            // Добавляем задержку между запросами к API Nova Poshta
+            static $lastRequestTime = 0;
+            $currentTime = microtime(true);
+            $timeSinceLastRequest = $currentTime - $lastRequestTime;
+            
+            if ($timeSinceLastRequest < 0.5) {
+                $sleepTime = 0.5 - $timeSinceLastRequest;
+                \Log::info('NovaPoshta API - задержка между запросами', [
+                    'sleep_time' => $sleepTime,
+                    'time_since_last_request' => $timeSinceLastRequest
+                ]);
+                usleep($sleepTime * 1000000); // Конвертируем в микросекунды
+            }
+            
+            $lastRequestTime = microtime(true);
+            
             \Log::info('NovaPoshta API - запрос почтоматов', [
                 'cityRef' => $cityRef,
                 'apiKey' => substr($this->apiKey, 0, 10) . '...',
@@ -141,6 +157,33 @@ class NovaPoshtaService
                     'success' => $data['success'] ?? 'not_set',
                     'errors' => $data['errors'] ?? 'not_set'
                 ]);
+
+                // Проверяем на ошибку "Too many requests"
+                if (isset($data['success']) && $data['success'] === false && 
+                    isset($data['errors']) && in_array('To many requests', $data['errors'])) {
+                    
+                    if ($retryCount < 3) {
+                        \Log::warning('NovaPoshta API - превышен лимит запросов, повторная попытка', [
+                            'cityRef' => $cityRef,
+                            'retry_count' => $retryCount + 1,
+                            'max_retries' => 3,
+                            'errors' => $data['errors'],
+                            'info' => $data['info'] ?? [],
+                            'wait_seconds' => 1
+                        ]);
+                        
+                        // Ждем 1 секунду и повторяем запрос
+                        sleep(1);
+                        return $this->getPostMachines($cityRef, $retryCount + 1);
+                    } else {
+                        \Log::error('NovaPoshta API - превышен лимит запросов, исчерпаны попытки', [
+                            'cityRef' => $cityRef,
+                            'retry_count' => $retryCount,
+                            'errors' => $data['errors']
+                        ]);
+                        return [];
+                    }
+                }
 
                 if (!empty($data['data'])) {
                     $allWarehouses = collect($data['data']);

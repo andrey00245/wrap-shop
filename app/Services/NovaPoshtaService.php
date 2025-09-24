@@ -159,12 +159,20 @@ class NovaPoshtaService
 
                     $result = $postMachines->toArray();
                     
+                    // Преобразуем в объект с числовыми ключами для совместимости с JavaScript
+                    $resultObject = [];
+                    foreach ($result as $index => $item) {
+                        $resultObject[$index] = $item;
+                    }
+                    
                     \Log::info('NovaPoshta API - результат почтоматов', [
-                        'result_count' => count($result),
-                        'first_item' => !empty($result) ? reset($result) : null
+                        'result_count' => count($resultObject),
+                        'is_array' => is_array($resultObject),
+                        'is_object' => is_object($resultObject),
+                        'first_item' => !empty($resultObject) ? reset($resultObject) : null
                     ]);
                     
-                    return $result;
+                    return $resultObject;
                 } else {
                     \Log::warning('NovaPoshta API - пустые данные', ['cityRef' => $cityRef]);
                     return [];

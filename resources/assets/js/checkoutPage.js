@@ -604,14 +604,16 @@ $(document).ready(function() {
         let suggestionsList = "";
 
         // Проверяем, что данные есть
-        if (!postMachinesData || Object.keys(postMachinesData).length === 0) {
+        if (!postMachinesData || (Array.isArray(postMachinesData) ? postMachinesData.length === 0 : Object.keys(postMachinesData).length === 0)) {
             console.log('No post machines data available');
             $lockerSuggestionsBox.hide();
             return;
         }
 
-        // Преобразуем объект в массив и фильтруем предложения по введенному запросу
-        Object.values(postMachinesData).forEach(function(postMachine) {
+        // Преобразуем данные в массив (работает как с объектом, так и с массивом)
+        let postMachinesArray = Array.isArray(postMachinesData) ? postMachinesData : Object.values(postMachinesData);
+        
+        postMachinesArray.forEach(function(postMachine) {
             console.log('Checking post machine:', postMachine.name, 'against query:', query);
             // Если запрос пустой, показываем все почтоматы
             if (query === "" || postMachine.name.toLowerCase().indexOf(query.toLowerCase()) !== -1) {

@@ -96,10 +96,51 @@ class NovaPoshtaService
                 return [];
             }
         } catch (\Exception $e) {
-            // Логирование исключения
             return [];
         }
     }
 
+    /**
+     * Получить почтоматы по городу
+     */
+    public function getPostMachines(string $cityRef)
+    {
+        try {
+            $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
+                'apiKey'           => $this->apiKey,
+                'modelName'        => 'Address',
+                'calledMethod'     => 'getWarehouses',
+                'methodProperties' => [
+                    'CityRef' => $cityRef,
+                ]
+            ]);
 
+            if ($response->successful()) {
+                $data = $response->json();
+                $locale = app()->getLocale();
+
+                if (!empty($data['data'])) {
+                    $postMachines = collect($data['data'])->filter(function ($warehouse) {
+                        return $warehouse['CategoryOfWarehouse'] === 'Postomat';
+                    })->map(function ($warehouse) use ($locale) {
+                        return [
+                            'id'      => $warehouse['Ref'],
+                            'name'    => $locale === 'ru' ? $warehouse['DescriptionRu'] : $warehouse['Description'],
+                            'address' => $warehouse['ShortAddress'],
+                            'city'    => $warehouse['CityDescription'],
+                            'region'  => $locale === 'ru' ? $warehouse['SettlementAreaDescriptionRu'] : $warehouse['SettlementAreaDescription'],
+                        ];
+                    });
+
+                    return $postMachines->toArray();
+                } else {
+                    return [];
+                }
+            } else {
+                return [];
+            }
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
 }

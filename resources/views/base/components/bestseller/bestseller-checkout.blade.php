@@ -93,14 +93,14 @@
                                 <div class="price">{{number_format($product->getPrice())}} ₴<span
                                         class="price-unit-xvr"></span></div>
                                 @if($product->getStock() > 0)
-                                    <button class="button colord button-cart-product general-popup-btn"
+                                    <button type="button" class="button colord button-cart-product general-popup-btn"
                                             data-popup="cart-popup"
                                             data-product-quantity="{{$product->getDefaultQuantity()}}"
                                             data-product-id="{{$product->id}}">
                                         <i class="fas fa-chevron-right"></i>{{__('general-translate.product_card.add_to_cart')}}
                                     </button>
                                 @else
-                                    <button class="button colord notify-available-btn general-popup-btn"
+                                    <button type="button" class="button colord notify-available-btn general-popup-btn"
                                             data-popup="report-availability-popup"
                                             data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
                                             class="hidden-xs hidden-sm hidden-md"> {{__('product-index.notify')}}</span></button>

@@ -5,6 +5,7 @@ return [
     'similar' => '<span class="colord">Similar</span> products',
     '3m_colors' => '<span class="colord">3M color</span> films',
     'yellotools' => '<span class="colord">Yellotools</span> instruments',
+    'loading' => 'Loading...',
     'our_realizations' => 'Car wraps',
     'show_more' => 'Show more',
 

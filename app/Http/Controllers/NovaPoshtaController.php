@@ -31,4 +31,13 @@ class NovaPoshtaController extends Controller
 
         return response()->json(['data' => $branches]);
     }
+
+    public function getPostMachines(Request $request)
+    {
+        $cityRef = $request->input('cityRef');
+
+        $postMachines = $this->novaPoshtaService->getPostMachines($cityRef);
+
+        return response()->json(['data' => $postMachines]);
+    }
 }

@@ -70,16 +70,17 @@ class Order extends Resource
 
 			Select::make('Доставка', 'shipping_method')->options([
 				'novaposhta' => 'Нова Пошта',
-				'courier' => 'Курʼєр',
+				'flat' => 'Доставка по Києву',
 				'pickup' => 'Самовивіз',
+				'my_addresses' => 'Мої адреси',
 			])->displayUsingLabels()->sortable(),
 			Text::make('Адреса доставки', 'shipping_address')->hideFromIndex(),
 			Text::make('Місто', 'city')->hideFromIndex(),
 
 			Select::make('Оплата', 'payment_method')->options([
-				'card' => 'Карта',
-				'cod' => 'Накладений платіж',
-				'bank' => 'Банківський переказ',
+				'cash' => 'Готівка',
+				'online' => 'Онлайн',
+				'bank_transfer' => 'Банківський переказ',
 			])->displayUsingLabels()->sortable(),
 
 			Badge::make('Статус', 'status')->map([
@@ -139,6 +140,8 @@ class Order extends Resource
                     'pending'     => 'warning',
                     'success'     => 'success',
                     'failed'      => 'danger',
+                    'shift_failed' => 'danger',
+                    'auth_failed'  => 'danger',
                     'not_created' => 'info', // используем info вместо secondary
                 ])
                 ->labels([
@@ -146,6 +149,8 @@ class Order extends Resource
                     'pending'     => 'Очікує підтвердження',
                     'success'     => 'Фіскалізовано',
                     'failed'      => 'Помилка',
+                    'shift_failed' => 'Помилка відкриття зміни',
+                    'auth_failed'  => 'Помилка авторизації',
                     'not_created' => 'Не створений',
                 ])
                 ->resolveUsing(fn ($value) => $value ?? 'not_created')

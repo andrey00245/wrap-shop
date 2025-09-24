@@ -16,6 +16,15 @@ $(document).ready(function () {
 
                 const numberParts = decimalAndIntParts(response.sum)
                 $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
+                
+                // Генерируем событие обновления корзины
+                window.dispatchEvent(new CustomEvent('cartUpdated', {
+                    detail: {
+                        cartItemsCount: response.cartItemsCount,
+                        sum: response.sum,
+                        cartItems: response.cartItems
+                    }
+                }));
             },
             error: function () {
                 alert('Произошла ошибка при удалении товара.');
@@ -69,6 +78,15 @@ $(document).ready(function () {
 
                         const numberParts = decimalAndIntParts(response.sum)
                         $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
+                        
+                        // Генерируем событие обновления корзины
+                        window.dispatchEvent(new CustomEvent('cartUpdated', {
+                            detail: {
+                                cartItemsCount: response.cartItemsCount,
+                                sum: response.sum,
+                                cartItems: response.cartItems
+                            }
+                        }));
                     },
                     error: function (xhr, status, error) {
                         alert('Ошибка при добавлении в корзину: ' + error);
@@ -131,6 +149,15 @@ $(document).ready(function () {
                 const numberParts = decimalAndIntParts(response.cartTotal)
 
                 $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
+                
+                // Генерируем событие обновления корзины
+                window.dispatchEvent(new CustomEvent('cartUpdated', {
+                    detail: {
+                        cartItemsCount: response.cartItemsCount,
+                        sum: response.cartTotal,
+                        cartItems: response.cartItems
+                    }
+                }));
             },
             error: function () {
                 alert('Произошла ошибка при обновлении товара.');

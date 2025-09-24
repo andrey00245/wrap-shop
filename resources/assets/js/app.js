@@ -4,6 +4,30 @@ import {ru, uk, en} from '/third-party/intlTelInput/js/i18n'
 import {imageSliderInProduct, popupSliderInitialization} from "./sliderInitialization";
 import {language} from './variables'
 
+// Page Loader Management
+function hidePageLoader() {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        loader.classList.add('hidden');
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 300);
+    }
+}
+
+function showPageLoader() {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        loader.style.display = 'flex';
+        loader.classList.remove('hidden');
+    }
+}
+
+// Hide loader when page is fully loaded
+window.addEventListener('load', function() {
+    hidePageLoader();
+});
+
 $(document).ready(function () {
     showHideSubCategories();
     popupSliderInitialization('cartProductSlider')

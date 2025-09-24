@@ -43,4 +43,6 @@ $theme: dark;
 @import "style-general";
 
 // Специфичные стили для темной темы
-// Цвет для hover эффекта берется из $mod-main-color в style-general.scss
+[data-theme="dark"] .home-category .home-category-item:hover .img img {
+    filter: brightness(0) saturate(100%) invert(70%) sepia(100%) saturate(2000%) hue-rotate(45deg) brightness(120%) contrast(100%) !important;
+}

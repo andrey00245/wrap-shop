@@ -87,6 +87,8 @@ Route::group(['prefix' => LaravelLocalization::setLocale(),
 
   Route::get('/api/get-cities', [NovaPoshtaController::class, 'getCities']);
   Route::get('/api/get-branches', [NovaPoshtaController::class, 'getBranches']);
+  Route::get('/api/get-postmachines', [NovaPoshtaController::class, 'getPostMachines']);
+Route::get('/api/get-checkout-cart', [CartController::class, 'getCheckoutCart']);
 
   Route::get('/search', SearchController::class)->name('search');
   Route::post('/get-search-items', [SearchController::class, 'popupSearch'])->name('get-count');

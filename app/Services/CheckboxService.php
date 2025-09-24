@@ -347,10 +347,48 @@ class CheckboxService
         }
 
         $phone = preg_replace('/\D/', '', $order->phone); // Убирает все, кроме цифр
+        
+        \Log::info('Checkbox API - форматирование телефона', [
+            'original_phone' => $order->phone,
+            'cleaned_phone' => $phone,
+            'phone_length' => strlen($phone)
+        ]);
 
-        if (substr($phone, 0, 3) !== '380') {
-            $phone = '380' . ltrim($phone, '0');
+        // Форматируем телефон для Checkbox API (формат: 380XXXXXXXXX)
+        if (strlen($phone) === 0) {
+            \Log::warning('Checkbox API - пустой номер телефона', ['order_id' => $order->id]);
+            $phone = '380000000000'; // Fallback номер
+        } elseif (strlen($phone) === 10 && substr($phone, 0, 1) === '0') {
+            // Формат: 0XXXXXXXXX -> 380XXXXXXXXX
+            $phone = '380' . substr($phone, 1);
+        } elseif (strlen($phone) === 9) {
+            // Формат: XXXXXXXXX -> 380XXXXXXXXX
+            $phone = '380' . $phone;
+        } elseif (strlen($phone) === 12 && substr($phone, 0, 3) === '380') {
+            // Формат уже правильный: 380XXXXXXXXX
+            // Ничего не делаем
+        } else {
+            // Другие форматы - пытаемся исправить
+            if (substr($phone, 0, 3) !== '380') {
+                $phone = '380' . ltrim($phone, '0');
+            }
         }
+        
+        // Проверяем финальный формат
+        if (!preg_match('/^380\d{9}$/', $phone)) {
+            \Log::error('Checkbox API - неправильный формат телефона после обработки', [
+                'phone' => $phone,
+                'pattern_match' => preg_match('/^380\d{9}$/', $phone),
+                'order_id' => $order->id
+            ]);
+            $phone = '380000000000'; // Fallback номер
+        }
+        
+        \Log::info('Checkbox API - финальный номер телефона', [
+            'final_phone' => $phone,
+            'phone_length' => strlen($phone),
+            'pattern_valid' => preg_match('/^380\d{9}$/', $phone)
+        ]);
 
         $receiptId = (string) Str::uuid();
 

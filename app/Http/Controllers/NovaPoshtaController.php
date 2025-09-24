@@ -35,8 +35,20 @@ class NovaPoshtaController extends Controller
     public function getPostMachines(Request $request)
     {
         $cityRef = $request->input('cityRef');
+        
+        \Log::info('NovaPoshta API - получение почтоматов', [
+            'cityRef' => $cityRef,
+            'request_data' => $request->all()
+        ]);
 
         $postMachines = $this->novaPoshtaService->getPostMachines($cityRef);
+        
+        \Log::info('NovaPoshta API - результат почтоматов', [
+            'cityRef' => $cityRef,
+            'count' => is_array($postMachines) ? count($postMachines) : 'not array',
+            'type' => gettype($postMachines),
+            'first_item' => is_array($postMachines) && !empty($postMachines) ? reset($postMachines) : null
+        ]);
 
         return response()->json(['data' => $postMachines]);
     }

@@ -108,7 +108,9 @@ class NovaPoshtaService
         try {
             \Log::info('NovaPoshta API - запрос почтоматов', [
                 'cityRef' => $cityRef,
-                'apiKey' => substr($this->apiKey, 0, 10) . '...'
+                'apiKey' => substr($this->apiKey, 0, 10) . '...',
+                'apiKey_length' => strlen($this->apiKey),
+                'apiKey_empty' => empty($this->apiKey)
             ]);
             
             $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
@@ -123,7 +125,8 @@ class NovaPoshtaService
             \Log::info('NovaPoshta API - ответ почтоматов', [
                 'status' => $response->status(),
                 'successful' => $response->successful(),
-                'body_length' => strlen($response->body())
+                'body_length' => strlen($response->body()),
+                'body_preview' => substr($response->body(), 0, 500)
             ]);
 
             if ($response->successful()) {
@@ -133,18 +136,31 @@ class NovaPoshtaService
                 \Log::info('NovaPoshta API - данные почтоматов', [
                     'has_data' => !empty($data['data']),
                     'data_count' => !empty($data['data']) ? count($data['data']) : 0,
-                    'locale' => $locale
+                    'locale' => $locale,
+                    'response_structure' => array_keys($data),
+                    'success' => $data['success'] ?? 'not_set',
+                    'errors' => $data['errors'] ?? 'not_set'
                 ]);
 
                 if (!empty($data['data'])) {
                     $allWarehouses = collect($data['data']);
+                    
+                    // Логируем все категории складов для отладки
+                    $categories = $allWarehouses->pluck('CategoryOfWarehouse')->unique()->values()->toArray();
+                    \Log::info('NovaPoshta API - категории складов', [
+                        'categories' => $categories,
+                        'total_warehouses' => $allWarehouses->count()
+                    ]);
+                    
                     $postomatWarehouses = $allWarehouses->filter(function ($warehouse) {
                         return $warehouse['CategoryOfWarehouse'] === 'Postomat';
                     });
                     
                     \Log::info('NovaPoshta API - фильтрация почтоматов', [
                         'total_warehouses' => $allWarehouses->count(),
-                        'postomat_warehouses' => $postomatWarehouses->count()
+                        'postomat_warehouses' => $postomatWarehouses->count(),
+                        'first_warehouse' => $allWarehouses->first(),
+                        'postomat_categories' => $postomatWarehouses->pluck('CategoryOfWarehouse')->unique()->values()->toArray()
                     ]);
                     
                     $postMachines = $postomatWarehouses->map(function ($warehouse) use ($locale) {
@@ -174,7 +190,12 @@ class NovaPoshtaService
                     
                     return $resultObject;
                 } else {
-                    \Log::warning('NovaPoshta API - пустые данные', ['cityRef' => $cityRef]);
+                    \Log::warning('NovaPoshta API - пустые данные', [
+                        'cityRef' => $cityRef,
+                        'response_data' => $data,
+                        'has_data_key' => isset($data['data']),
+                        'data_empty' => empty($data['data'])
+                    ]);
                     return [];
                 }
             } else {

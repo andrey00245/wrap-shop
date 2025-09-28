@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Функция для обновления полей в зависимости от типа Nova Poshta
-    function updateNovaPoshtaFields() {
+    window.updateNovaPoshtaFields = function() {
         const selectedType = document.querySelector('input[name="nova_poshta_type"]:checked');
         const cityField = document.querySelector('#city');
         const branchFields = document.querySelector('#branch-fields');
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     break;
             }
         }
-    }
+    };
 
     // Слушаем изменение города в select
     if (citySelectWrapper) {
@@ -731,6 +731,7 @@ $(document).ready(function() {
         $("#address-suggestions").hide();
     });
 
+    // Обработчик клика по почтомату
     $(document).on("click", "#locker-suggestions li", function(e) {
         e.preventDefault();
         let selectedLocker = $(this).data("value");
@@ -747,12 +748,15 @@ $(document).ready(function() {
         $("#novaposhta_locker").prop('checked', true);
         
         // Обновляем поля Nova Poshta
-        updateNovaPoshtaFields();
+        window.updateNovaPoshtaFields();
 
         console.log('Selected locker:', ref, 'Display text:', displayText);
         console.log('Locker warehouse ref field value:', $("#locker_warehouse_ref").val());
-        // Прячем список предложений
-        $("#locker-suggestions").hide();
+        
+        // Прячем список предложений после обновления полей
+        setTimeout(function() {
+            $("#locker-suggestions").hide();
+        }, 100);
     });
 
     // Скрываем список предложений при клике вне поля

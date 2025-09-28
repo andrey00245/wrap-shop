@@ -120,11 +120,24 @@ class WebhookController extends Controller
         $entityType = $event['entityType'] ?? null;
         $action = $event['action'] ?? null;
         $entityId = $event['entityId'] ?? null;
+        
+        // Извлекаем entityType и entityId из meta, если они не заданы напрямую
+        if (isset($event['meta'])) {
+            $meta = $event['meta'];
+            if (isset($meta['type'])) {
+                $entityType = $meta['type'];
+            }
+            if (isset($meta['href'])) {
+                // Извлекаем ID из href (последняя часть после последнего /)
+                $entityId = basename($meta['href']);
+            }
+        }
 
         Log::info('Обработка события МойСклад', [
             'entityType' => $entityType,
             'action' => $action,
-            'entityId' => $entityId
+            'entityId' => $entityId,
+            'original_event' => $event
         ]);
 
         // Обрабатываем только товары

@@ -18,7 +18,7 @@ try {
             'Content-Type' => 'application/json'
         ])
         ->get($apiUrl, [
-            'limit' => 100,
+            'limit' => 500,
             'expand' => 'attributes'
         ]);
 

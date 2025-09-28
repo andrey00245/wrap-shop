@@ -18,22 +18,22 @@ try {
             'Content-Type' => 'application/json'
         ])
         ->get($apiUrl, [
-            'limit' => 10,
+            'limit' => 100,
             'expand' => 'attributes'
         ]);
 
     if ($response->successful()) {
         $data = $response->json();
-        
+
         if (isset($data['rows'])) {
             echo "Найдено товаров: " . count($data['rows']) . "\n\n";
-            
+
             foreach ($data['rows'] as $index => $product) {
                 echo "Товар " . ($index + 1) . ":\n";
                 echo "ID: {$product['id']}\n";
                 echo "Название: {$product['name']}\n";
                 echo "Артикул: " . ($product['article'] ?? 'не указан') . "\n";
-                
+
                 if (isset($product['attributes'])) {
                     $hasSiteAttribute = false;
                     foreach ($product['attributes'] as $attribute) {
@@ -43,14 +43,14 @@ try {
                             break;
                         }
                     }
-                    
+
                     if (!$hasSiteAttribute) {
                         echo "Атрибут 'Сайт': НЕТ\n";
                     }
                 } else {
                     echo "Атрибуты: НЕТ\n";
                 }
-                
+
                 echo "---\n";
             }
         } else {

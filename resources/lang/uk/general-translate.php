@@ -5,6 +5,7 @@ return [
     'similar' => '<span class="colord">Схожі</span> товари',
     '3m_colors' => '<span class="colord">3M color</span> плівки',
     'yellotools' => '<span class="colord">Yellotools</span> інструменти',
+    'loading' => 'Завантаження...',
 
     'our_realizations' => 'Плівки на автомобілі',
     'show_more' => 'Показати більше',

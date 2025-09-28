@@ -21,24 +21,68 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateAddressFields() {
         const selectedMethod = shippingMethod.querySelector('input:checked');
         const addressSuggestionsBox = document.querySelector("#address-suggestions"); // Добавляем эту строку
+        const novaPoshtaOptions = document.querySelector('#nova-poshta-options');
 
         if (selectedMethod && selectedMethod.id === 'pickup') {
             shippingMethodAddress.style.display = 'none';
+            shippingAddressField.required = false;
+        } else if (selectedMethod && selectedMethod.id === 'flat') {
+            // Для доставки по Киеву показываем поле адреса
+            shippingMethodAddress.style.display = '';
+            const kyivFields = document.querySelector('#kyiv-fields');
+            if (kyivFields) {
+                kyivFields.style.display = 'block';
+                const kyivAddressField = document.querySelector('#kyiv_address');
+                if (kyivAddressField) {
+                    kyivAddressField.disabled = false;
+                    kyivAddressField.required = true;
+                }
+            }
+            // Скрываем поля Nova Poshta
+            const novaPoshtaOptions = document.querySelector('#nova-poshta-options');
+            if (novaPoshtaOptions) {
+                novaPoshtaOptions.style.display = 'none';
+            }
             shippingAddressField.required = false;
         } else {
             shippingMethodAddress.style.display = '';
             shippingAddressField.required = true;
         }
 
-        // Для методов "novaposhta" или "novaposhta_doors" отображаем описание Новой Почти
-        if (selectedMethod && (selectedMethod.id === 'novaposhta' || selectedMethod.id === 'novaposhta_doors')) {
-            if (novaPoshtaDesc && selectedMethod) {
-                selectedMethod.parentNode.parentNode.insertAdjacentElement('afterend', novaPoshtaDesc);
+        // Показываем/скрываем опции Nova Poshta
+        if (selectedMethod && selectedMethod.id === 'novaposhta') {
+            if (novaPoshtaOptions) {
+                novaPoshtaOptions.style.display = 'block';
             }
+            if (novaPoshtaDesc && selectedMethod) {
+                selectedMethod.closest('.nova-poshta-group').querySelector('.nova-poshta-main').insertAdjacentElement('afterend', novaPoshtaDesc);
+            }
+            
+            // Скрываем/показываем радио кнопку почтомата в зависимости от длинной пленки
+            const hasLongFilm = document.getElementById('checkoutForm')?.dataset?.hasLongFilm === '1';
+            const lockerRadio = document.querySelector('#locker-radio');
+            if (lockerRadio) {
+                lockerRadio.style.display = hasLongFilm ? 'none' : 'block';
+            }
+            
+            // Выбираем первое радио (отделение) по умолчанию
+            const firstRadio = document.querySelector('input[name="nova_poshta_type"][value="branch"]');
+            if (firstRadio && !document.querySelector('input[name="nova_poshta_type"]:checked')) {
+                firstRadio.checked = true;
+            }
+            // Обновляем поля для Nova Poshta
+            updateNovaPoshtaFields();
         } else {
+            if (novaPoshtaOptions) {
+                novaPoshtaOptions.style.display = 'none';
+            }
             if (novaPoshtaDesc) {
                 novaPoshtaDesc.remove();
             }
+            // Скрываем все поля Nova Poshta
+            document.querySelectorAll('#branch-fields, #locker-fields, #courier-fields, #courier-house-fields').forEach(field => {
+                if (field) field.style.display = 'none';
+            });
         }
 
         // Если выбран метод "my_addresses", показываем select для города и делаем поле адреса неактивным
@@ -88,6 +132,161 @@ document.addEventListener('DOMContentLoaded', function () {
         shippingMethod.addEventListener('change', function () {
             updateAddressFields();
         });
+    }
+
+    // Слушаем изменение типа Nova Poshta
+    const novaPoshtaTypeInputs = document.querySelectorAll('input[name="nova_poshta_type"]');
+    novaPoshtaTypeInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            updateNovaPoshtaFields();
+        });
+    });
+
+    // Функция для обновления полей в зависимости от типа Nova Poshta
+    function updateNovaPoshtaFields() {
+        const selectedType = document.querySelector('input[name="nova_poshta_type"]:checked');
+        const cityField = document.querySelector('#city');
+        const branchFields = document.querySelector('#branch-fields');
+        const lockerFields = document.querySelector('#locker-fields');
+        const courierFields = document.querySelector('#courier-fields');
+        const courierHouseFields = document.querySelector('#courier-house-fields');
+        
+        // Получаем флаг длинной пленки
+        const hasLongFilm = document.getElementById('checkoutForm')?.dataset?.hasLongFilm === '1';
+
+        // Скрываем все поля
+        if (branchFields) branchFields.style.display = 'none';
+        if (lockerFields) lockerFields.style.display = 'none';
+        if (courierFields) courierFields.style.display = 'none';
+        if (courierHouseFields) courierHouseFields.style.display = 'none';
+        
+        // Скрываем поля для Киева
+        const kyivFields = document.querySelector('#kyiv-fields');
+        if (kyivFields) {
+            kyivFields.style.display = 'none';
+            const kyivAddressField = document.querySelector('#kyiv_address');
+            if (kyivAddressField) {
+                kyivAddressField.disabled = true;
+                kyivAddressField.required = false;
+            }
+        }
+
+        // Отключаем все поля и убираем required
+        if (cityField) cityField.disabled = true;
+        document.querySelectorAll('#shipping_address, #locker_address, #courier_street, #courier_house, #kyiv_address').forEach(field => {
+            if (field) {
+                field.disabled = true;
+                field.required = false;
+            }
+        });
+
+        // Скрываем все сообщения об ошибках
+        document.querySelectorAll('.simplecheckout-error-text').forEach(errorMsg => {
+            errorMsg.style.display = 'none';
+        });
+
+        if (selectedType) {
+            switch (selectedType.value) {
+                case 'branch':
+                    // Для отделения - показываем город и отделение
+                    if (cityField) cityField.disabled = false;
+                    if (branchFields) {
+                        branchFields.style.display = 'block';
+                        const shippingAddressField = document.querySelector('#shipping_address');
+                        if (shippingAddressField) {
+                            shippingAddressField.disabled = false;
+                            shippingAddressField.required = true;
+                        }
+                        // Показываем сообщение об ошибке для поля отделения
+                        const branchErrorMsg = document.querySelector('[data-for="shipping_address_address_1"]');
+                        if (branchErrorMsg) {
+                            branchErrorMsg.style.display = 'block';
+                        }
+                        
+                        // Сбрасываем заголовок для отделения
+                        const subtitle = document.querySelector('#nova-poshta-subtitle');
+                        if (subtitle) {
+                            subtitle.textContent = 'Адреса доставки';
+                        }
+                    }
+                    break;
+                case 'locker':
+                    // Для почтомата - показываем город и почтомат (только если нет длинной пленки)
+                    console.log('Locker case selected, hasLongFilm:', hasLongFilm);
+                    if (!hasLongFilm) {
+                        if (cityField) cityField.disabled = false;
+                        if (lockerFields) {
+                            console.log('Showing locker fields');
+                            lockerFields.style.display = 'block';
+                            const lockerAddressField = document.querySelector('#locker_address');
+                            if (lockerAddressField) {
+                                lockerAddressField.disabled = false;
+                                lockerAddressField.required = true;
+                            }
+                            // Показываем сообщение об ошибке для поля почтомата
+                            const lockerErrorMsg = document.querySelector('[data-for="locker_address"]');
+                            if (lockerErrorMsg) {
+                                lockerErrorMsg.style.display = 'block';
+                            }
+                        }
+                        // Убираем required с поля отделения и скрываем его сообщение об ошибке
+                        const shippingAddressField = document.querySelector('#shipping_address');
+                        if (shippingAddressField) {
+                            shippingAddressField.required = false;
+                        }
+                        const branchErrorMsg = document.querySelector('[data-for="shipping_address_address_1"]');
+                        if (branchErrorMsg) {
+                            branchErrorMsg.style.display = 'none';
+                        }
+                        
+                        // Сбрасываем заголовок для почтомата
+                        const subtitle = document.querySelector('#nova-poshta-subtitle');
+                        if (subtitle) {
+                            subtitle.textContent = 'Адреса доставки';
+                        }
+                    } else {
+                        console.log('Long film detected, switching to branch');
+                        // Если есть длинная пленка, переключаемся на отделение
+                        const branchRadio = document.querySelector('input[name="nova_poshta_type"][value="branch"]');
+                        if (branchRadio) {
+                            branchRadio.checked = true;
+                            updateNovaPoshtaFields(); // Рекурсивно вызываем для обновления
+                        }
+                    }
+                    break;
+                case 'courier':
+                    // Для курьера - показываем город и 2 текстовых поля
+                    if (cityField) cityField.disabled = false;
+                    if (courierFields) {
+                        courierFields.style.display = 'block';
+                        const courierStreetField = document.querySelector('#courier_street');
+                        if (courierStreetField) {
+                            courierStreetField.disabled = false;
+                            courierStreetField.required = true;
+                        }
+                    }
+                    if (courierHouseFields) {
+                        courierHouseFields.style.display = 'block';
+                        const courierHouseField = document.querySelector('#courier_house');
+                        if (courierHouseField) {
+                            courierHouseField.disabled = false;
+                            courierHouseField.required = true;
+                        }
+                    }
+                    // Убираем required с других полей
+                    const shippingAddressField = document.querySelector('#shipping_address');
+                    const lockerAddressField = document.querySelector('#locker_address');
+                    if (shippingAddressField) shippingAddressField.required = false;
+                    if (lockerAddressField) lockerAddressField.required = false;
+                    
+                    // Обновляем заголовок для курьера
+                    const subtitle = document.querySelector('#nova-poshta-subtitle');
+                    if (subtitle) {
+                        subtitle.textContent = 'Адреса доставки (Кур\'єром)';
+                    }
+                    break;
+            }
+        }
     }
 
     // Слушаем изменение города в select
@@ -208,19 +407,28 @@ $(document).ready(function() {
     let debounceTimer;
     let cityRefSelected = null;
     let branchesData = []; // Сохраняем данные по отделениях
+    let postMachinesData = []; // Сохраняем данные по почтоматам
     // Флаг: содержит ли корзина пленки (м.п.) от 1 м
     const hasLongFilm = document.getElementById('checkoutForm')?.dataset?.hasLongFilm === '1';
+
+    // Функция для разделения числа на целую и дробную части
+    function decimalAndIntParts(number) {
+        const num = parseFloat(number);
+        const integer = Math.floor(num);
+        const decimal = Math.round((num - integer) * 100).toString().padStart(2, '0');
+        return { integer, decimal };
+    }
 
     // Обработчик изменения радиокнопки
     $("input[name='shipping_method']").on("change", function() {
         $("#city").val('');
         $("#shipping_address").val('');
-        // Проверяем, выбран ли метод "Відділення Нової Пошти"
+        // Проверяем, выбран ли метод "Нова Пошта"
         if ($("#novaposhta").is(":checked")) {
             // Включаем автозаполнение для поля города и адреса
             $("#city").prop("disabled", false); // Разрешаем ввод в поле города
             $("#shipping_address").prop("disabled", false); // Разрешаем ввод в поле адреса
-            // $("#city-suggestions").show(); // Показываем предложения для города
+            // $("#city-suggestions).show(); // Показываем предложения для города
             // $("#address-suggestions").show(); // Показываем предложения для адреса
         } else {
             // Отключаем автозаполнение для других методов
@@ -281,6 +489,7 @@ $(document).ready(function() {
         e.preventDefault();
         $("#address-suggestions").empty();
         $("#shipping_address").val('');
+        $("#locker_address").val('');
         let selectedCity = $(this).data("value");
         let cityRef = $(this).data("id"); // Сохраняем идентификатор города
 
@@ -290,9 +499,10 @@ $(document).ready(function() {
         // Запоминаем выбранный cityRef
         cityRefSelected = cityRef;
 
-        // Теперь запрашиваем отделения для выбранного города
+        // Теперь запрашиваем отделения и почтоматы для выбранного города
         if (cityRefSelected) {
             fetchWarehouses(cityRefSelected);
+            fetchPostMachines(cityRefSelected);
         }
 
         // Прячем предложения
@@ -331,6 +541,38 @@ $(document).ready(function() {
         });
     }
 
+    // Функция для получения почтоматов по выбранному городу
+    function fetchPostMachines(cityRef) {
+        let locale = $("meta[name='locale']").attr("content");
+        console.log('Fetching post machines for cityRef:', cityRef);
+        $.ajax({
+            url: '/'+locale+"/api/get-postmachines", // API для получения почтоматов
+            type: "GET",
+            data: { cityRef: cityRef },
+            success: function(response) {
+                console.log('Post machines response:', response);
+                let $lockerAddressInput = $("#locker_address");
+                let $lockerSuggestionsBox = $("#locker-suggestions");
+
+                // Сохраняем данные о полученных почтоматах
+                postMachinesData = response.data || [];
+                console.log('Post machines data type:', typeof postMachinesData);
+                console.log('Post machines data length:', Object.keys(postMachinesData).length);
+                console.log('First post machine:', Object.values(postMachinesData)[0]);
+
+                // Показываем поле для ввода почтомата
+                $lockerAddressInput.prop("disabled", false);
+
+                // Заполняем список предложений
+                updateLockerSuggestions("");
+            },
+            error: function(xhr, status, error) {
+                console.log('Помилка при отриманні почтоматів:', error);
+                console.log('Response:', xhr.responseText);
+            }
+        });
+    }
+
     // Функция для обновления списка предложений по введенному тексту
     function updateAddressSuggestions(query) {
         let $addressSuggestionsBox = $("#address-suggestions");
@@ -353,6 +595,55 @@ $(document).ready(function() {
         $addressSuggestionsBox.html(suggestionsList).show();
     }
 
+    // Функция для обновления списка предложений почтоматов
+    function updateLockerSuggestions(query) {
+        console.log('updateLockerSuggestions called with query:', query);
+        console.log('postMachinesData:', postMachinesData);
+        let $lockerSuggestionsBox = $("#locker-suggestions");
+        console.log('locker suggestions box found:', $lockerSuggestionsBox.length);
+        let suggestionsList = "";
+
+        // Проверяем, что данные есть
+        if (!postMachinesData || (Array.isArray(postMachinesData) ? postMachinesData.length === 0 : Object.keys(postMachinesData).length === 0)) {
+            console.log('No post machines data available');
+            $lockerSuggestionsBox.hide();
+            return;
+        }
+
+        // Преобразуем данные в массив (работает как с объектом, так и с массивом)
+        let postMachinesArray = Array.isArray(postMachinesData) ? postMachinesData : Object.values(postMachinesData);
+        
+        postMachinesArray.forEach(function(postMachine) {
+            console.log('Checking post machine:', postMachine.name, 'against query:', query);
+            // Если запрос пустой, показываем все почтоматы
+            if (query === "" || postMachine.name.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+                // Создаем более читаемое название
+                let displayName = postMachine.name;
+                if (postMachine.address) {
+                    displayName = `${postMachine.name} (${postMachine.address})`;
+                }
+                
+                // Экранируем HTML и правильно формируем атрибуты
+                let escapedName = postMachine.name.replace(/"/g, '&quot;');
+                let escapedDisplayName = displayName.replace(/"/g, '&quot;');
+                
+                suggestionsList += `<li data-id="${postMachine.id}" data-value="${escapedName}">
+                    ${escapedDisplayName}
+                </li>`;
+            }
+        });
+
+        if (suggestionsList === "") {
+            suggestionsList = "<li class='no-results'>Почтомат не знайдено</li>";
+        }
+
+        console.log('Generated suggestions HTML:', suggestionsList);
+        // Показываем предложения
+        $lockerSuggestionsBox.html(suggestionsList).show();
+        console.log('Suggestions box should be visible now');
+        console.log('Suggestions box display:', $lockerSuggestionsBox.css('display'));
+    }
+
     // Обработка ввода в поле shipping_address (автозаполнение)
     $("#shipping_address").on("input", function() {
         if (!$("#novaposhta").is(":checked")) {
@@ -360,6 +651,19 @@ $(document).ready(function() {
         }
         let query = $(this).val().trim();
         updateAddressSuggestions(query); // Обновляем предложения в зависимости от введенного текста
+    });
+
+    // Обработка ввода в поле locker_address (автозаполнение)
+    $("#locker_address").on("input", function() {
+        console.log('Locker input event triggered');
+        console.log('novaposhta_locker checked:', $("#novaposhta_locker").is(":checked"));
+        if (!$("#novaposhta_locker").is(":checked")) {
+            console.log('Locker input: novaposhta_locker not checked, returning');
+            return;
+        }
+        let query = $(this).val().trim();
+        console.log('Locker input query:', query);
+        updateLockerSuggestions(query); // Обновляем предложения в зависимости от введенного текста
     });
 
     $(document).on("click", "#address-suggestions li", function(e) {
@@ -378,6 +682,20 @@ $(document).ready(function() {
         $("#address-suggestions").hide();
     });
 
+    $(document).on("click", "#locker-suggestions li", function(e) {
+        e.preventDefault();
+        let selectedLocker = $(this).data("value");
+        let ref = $(this).data("id");
+        let displayText = $(this).text().trim(); // Получаем текст для отображения
+
+        // Заполняем поле с почтоматом полным названием
+        $("#locker_address").val(displayText);
+
+        console.log('Selected locker:', ref, 'Display text:', displayText);
+        // Прячем список предложений
+        $("#locker-suggestions").hide();
+    });
+
     // Скрываем список предложений при клике вне поля
     $(document).on("click", function(e) {
         if (!$(e.target).closest("#city-input-wrapper").length) {
@@ -387,6 +705,10 @@ $(document).ready(function() {
         if (!$(e.target).closest("#shipping_address").length) {
             $("#address-suggestions").hide();
         }
+
+        if (!$(e.target).closest("#locker_address").length) {
+            $("#locker-suggestions").hide();
+        }
     });
 
     // Показывать предложения при фокусе на поле shipping_address
@@ -394,5 +716,53 @@ $(document).ready(function() {
         if ($(this).val().length >= 2) {
             $("#address-suggestions").show();
         }
+    });
+
+    // Показывать предложения при фокусе на поле locker_address
+    $("#locker_address").on("focus", function() {
+        if ($("#novaposhta_locker").is(":checked")) {
+            // Показываем все почтоматы при фокусе (как для отделений)
+            updateLockerSuggestions($(this).val());
+        }
+    });
+
+    // Слушаем обновления корзины
+    window.addEventListener('cartUpdated', function(event) {
+        // Обновляем счетчик товаров в корзине (в хедере)
+        if (event.detail.cartItemsCount !== undefined) {
+            $('#cart-total').html(event.detail.cartItemsCount);
+        }
+        
+        // Обновляем сумму в корзине (в хедере)
+        if (event.detail.sum !== undefined) {
+            const numberParts = decimalAndIntParts(event.detail.sum);
+            $('.cart-mini-bott .total .value').html(numberParts.integer + '<span class="coins">' + numberParts.decimal + '</span>' + ' ₴');
+        }
+        
+        // Если корзина пуста, перенаправляем на главную
+        if (event.detail.cartItemsCount === 0) {
+            window.location.href = '/';
+        }
+        
+        // Загружаем обновленную корзину для чекаута
+        $.ajax({
+            url: '/api/get-checkout-cart',
+            method: 'GET',
+            beforeSend: function() {
+                // Показываем небольшой прелоадер только для обновления корзины
+                $('.simplecheckout-cart tbody').html('<tr><td colspan="6" style="text-align: center; padding: 30px; color: ' + (document.body.dataset.theme === 'dark' ? '#FFCE1C' : '#D04B4B') + '; font-weight: 600;">Обновление корзины...</td></tr>');
+            },
+            success: function (response) {
+                // Обновляем таблицу товаров в чекауте
+                $('.simplecheckout-cart tbody').html(response.cartItems);
+                
+                // Обновляем общую сумму в чекауте
+                $('.simplecheckout-cart-total-value').html(response.sum);
+            },
+            error: function () {
+                console.log('Ошибка при загрузке корзины для чекаута');
+                $('.simplecheckout-cart tbody').html('<tr><td colspan="6" style="text-align: center; padding: 20px; color: red;">Ошибка загрузки корзины</td></tr>');
+            }
+        });
     });
 });

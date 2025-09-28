@@ -117,6 +117,60 @@ class CartController extends Controller
         ]);
     }
 
+    public function getCheckoutCart()
+    {
+        $sum = 0;
+        if (Auth::check()) {
+            $user = Auth::user();
+            $cartItems = $user->cartItems;
+
+            // Пересчитываем общую сумму корзины
+            foreach ($cartItems as $item) {
+                $sum += $item->product->getPriceByCount($item->quantity);
+            }
+
+            // Округляем сумму
+            $sum = round($sum, 2);
+
+            // Генерация HTML для корзины на странице чекаута
+            $html = view('base.components.checkout-cart-items', [
+                'cartItems' => $cartItems,
+                'cartItemsCount' => $cartItems->count(),
+                'sum' => $sum,
+            ])->render();
+
+            return response()->json([
+                'cartItems' => $html,
+                'cartItemsCount' => $cartItems->count(),
+                'sum' => $sum,
+            ]);
+        }
+
+        // Для неавторизованных пользователей
+        $cartItems = Session::get('cart', []);
+
+        // Пересчитываем общую сумму корзины
+        foreach ($cartItems as $item) {
+            $sum += $item['product']->getPriceByCount($item['quantity']);
+        }
+
+        // Округляем сумму
+        $sum = round($sum, 2);
+
+        // Генерация HTML для корзины на странице чекаута
+        $html = view('base.components.checkout-cart-items', [
+            'cartItems' => $cartItems,
+            'cartItemsCount' => count($cartItems),
+            'sum' => $sum,
+        ])->render();
+
+        return response()->json([
+            'cartItems' => $html,
+            'cartItemsCount' => count($cartItems),
+            'sum' => $sum,
+        ]);
+    }
+
     public function remove(Request $request, $productId)
     {
         $sum = 0;

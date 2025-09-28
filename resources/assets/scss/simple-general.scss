@@ -1045,6 +1045,57 @@ margin-bottom: 5px;
   font-size: 14px;
 }
 
+// Nova Poshta Group Styles
+.nova-poshta-group {
+  margin-bottom: 15px;
+    padding-top:15px;
+
+  .nova-poshta-main {
+    .radio {
+      margin-bottom: 0;
+    }
+  }
+
+  .nova-poshta-options {
+    margin-left: 25px;
+    margin-top: 15px;
+    padding: 20px 0 10px 20px;
+    border-left: 3px solid $mod-main-color;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 0 8px 8px 0;
+
+    .nova-poshta-subtitle {
+      font-weight: 600;
+      font-size: 14px;
+      color: $mod-text-color;
+      margin-bottom: 15px;
+      padding-left: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nova-poshta-variants {
+      .radio {
+        margin-bottom: 12px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .custom-radio {
+          padding-left: 0;
+
+          .radio-label {
+            font-size: 14px;
+            color: $mod-text-color;
+            font-weight: 400;
+          }
+        }
+      }
+    }
+  }
+}
+
 .line-after-products {
   width: 100%;
   height: 1px;

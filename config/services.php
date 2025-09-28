@@ -71,4 +71,12 @@ return [
     'novaposhta' => [
         'api_key' => env('NOVA_POSHTA_API_KEY'),
     ],
+
+    'checkbox' => [
+        'base_url' => env('CHECKBOX_BASE_URL', 'https://api.checkbox.in.ua/api/v1'),
+        'username' => env('CHECKBOX_USERNAME'),
+        'password' => env('CHECKBOX_PASSWORD'),
+        'license_key' => env('CHECKBOX_LICENSE_KEY'),
+        'webhook_secret' => env('CHECKBOX_WEBHOOK_SECRET'),
+    ],
 ];

@@ -29,11 +29,32 @@ class OrderController extends Controller
             'comment' => 'nullable|string',
             'shipping_method' => 'string',
             'novaposhta_warehouse_ref' => 'nullable|string',
+            'nova_poshta_type' => 'nullable|string|in:branch,locker,courier',
+            'locker_address' => 'nullable|string',
+            'courier_street' => 'nullable|string',
+            'courier_house' => 'nullable|string',
+            'kyiv_address' => 'nullable|string',
         ];
 
         if (in_array($request->input('shipping_method'), ['flat', 'novaposhta', 'novaposhta_doors','my_addresses'])) {
             $rules['city'] = 'required|string';
-            $rules['shipping_address'] = 'required|string';
+
+            // Для Nova Poshta проверяем тип доставки
+            if ($request->input('shipping_method') === 'novaposhta') {
+                $novaPoshtaType = $request->input('nova_poshta_type');
+                if ($novaPoshtaType === 'branch') {
+                    $rules['shipping_address'] = 'required|string';
+                } elseif ($novaPoshtaType === 'locker') {
+                    $rules['locker_address'] = 'required|string';
+                } elseif ($novaPoshtaType === 'courier') {
+                    $rules['courier_street'] = 'required|string';
+                    $rules['courier_house'] = 'required|string';
+                }
+            } elseif ($request->input('shipping_method') === 'flat') {
+                $rules['kyiv_address'] = 'required|string';
+            } else {
+                $rules['shipping_address'] = 'required|string';
+            }
         }
 
         if ($request->input('shipping_method') == 'my_addresses') {
@@ -79,7 +100,21 @@ class OrderController extends Controller
         $order->shipping_method = Arr::get($validated,'shipping_method');
         $order->payment_method = Arr::get($validated,'payment_method');
         $order->comment = Arr::get($validated,'comment');
-        $order->shipping_address = Arr::get($validated,'shipping_address');
+        // Определяем адрес доставки в зависимости от типа
+        if ($request->input('shipping_method') === 'novaposhta') {
+            $novaPoshtaType = $request->input('nova_poshta_type');
+            if ($novaPoshtaType === 'branch') {
+                $order->shipping_address = 'Відділення: ' . Arr::get($validated,'shipping_address');
+            } elseif ($novaPoshtaType === 'locker') {
+                $order->shipping_address = 'Поштомат: ' . Arr::get($validated,'locker_address');
+            } elseif ($novaPoshtaType === 'courier') {
+                $order->shipping_address = 'Кур\'єром: ' . Arr::get($validated,'courier_street') . ', ' . Arr::get($validated,'courier_house');
+            }
+        } elseif ($request->input('shipping_method') === 'flat') {
+            $order->shipping_address = Arr::get($validated,'kyiv_address');
+        } else {
+            $order->shipping_address = Arr::get($validated,'shipping_address');
+        }
         $order->city = Arr::get($validated,'city');
         $order->status = 'pending';
         $order->user_id = Auth::check() ? Auth::id() : null;
@@ -118,7 +153,6 @@ class OrderController extends Controller
             $product->save();
         }
 
-        app(CheckboxService::class)->sendReceipt($order);
         if (Auth::check()) {
             CartItem::where('user_id', Auth::id())->delete();
         } else {

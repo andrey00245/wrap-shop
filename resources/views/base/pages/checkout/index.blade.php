@@ -120,22 +120,50 @@
                                                             <span class="radio-label">{{__('checkout.kyiv_delivery')}}</span>
                                                         </label>
                                                     </div>
-                                                    <div class="radio">
-                                                        <label for="novaposhta" class="custom-radio">
-                                                            <input type="radio" data-onchange="reloadAll"
-                                                                   name="shipping_method" value="novaposhta"
-                                                                   id="novaposhta" {{ old('shipping_method') == 'novaposhta' ? 'checked' : '' }}>
-                                                            <span class="radio-label">{{__('checkout.nova_poshta')}}</span>
-                                                        </label>
-                                                    </div>
-                                                    <fieldset id="novaposhta_desc" class="radio-description">{{__('checkout.nova_poshta_desc')}}<br><small>{{ __('checkout.films_cargo_only') }}</small></fieldset>
-                                                    <div class="radio">
-                                                        <label for="novaposhta_doors" class="custom-radio">
-                                                            <input type="radio" data-onchange="reloadAll"
-                                                                   name="shipping_method" value="novaposhta_doors"
-                                                                   id="novaposhta_doors" {{ old('shipping_method') == 'novaposhta_doors' ? 'checked' : '' }}>
-                                                            <span class="radio-label">{{__('checkout.nova_poshta_delivery')}}</span>
-                                                        </label>
+                                                    <!-- Nova Poshta Group -->
+                                                    <div class="nova-poshta-group">
+                                                        <div class="nova-poshta-main">
+                                                            <div class="radio">
+                                                                <label for="novaposhta" class="custom-radio">
+                                                                    <input type="radio" data-onchange="reloadAll"
+                                                                           name="shipping_method" value="novaposhta"
+                                                                           id="novaposhta" {{ old('shipping_method') == 'novaposhta' ? 'checked' : '' }}>
+                                                                    <span class="radio-label">{{__('checkout.nova_poshta')}}</span>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="nova-poshta-options" id="nova-poshta-options" style="display: none;">
+                                                            <div class="nova-poshta-subtitle" id="nova-poshta-subtitle">Адреса доставки</div>
+                                                            <div class="nova-poshta-variants">
+                                                                <div class="radio">
+                                                                    <label for="novaposhta_branch" class="custom-radio">
+                                                                        <input type="radio" data-onchange="reloadAll"
+                                                                               name="nova_poshta_type" value="branch"
+                                                                               id="novaposhta_branch" {{ old('nova_poshta_type') == 'branch' ? 'checked' : '' }}>
+                                                                        <span class="radio-label">{{__('checkout.nova_poshta_branch')}}</span>
+                                                                    </label>
+                                                                </div>
+                                                                <div class="radio" id="locker-radio" style="{{ collect($cartItems)->contains(function($i){ return $i['product']->getRollSize() && $i['quantity'] >= 1; }) ? 'display: none;' : '' }}">
+                                                                    <label for="novaposhta_locker" class="custom-radio">
+                                                                        <input type="radio" data-onchange="reloadAll"
+                                                                               name="nova_poshta_type" value="locker"
+                                                                               id="novaposhta_locker" {{ old('nova_poshta_type') == 'locker' ? 'checked' : '' }}>
+                                                                        <span class="radio-label">{{__('checkout.nova_poshta_locker')}}</span>
+                                                                    </label>
+                                                                </div>
+                                                                <div class="radio">
+                                                                    <label for="novaposhta_courier" class="custom-radio">
+                                                                        <input type="radio" data-onchange="reloadAll"
+                                                                               name="nova_poshta_type" value="courier"
+                                                                               id="novaposhta_courier" {{ old('nova_poshta_type') == 'courier' ? 'checked' : '' }}>
+                                                                        <span class="radio-label">{{__('checkout.nova_poshta_courier')}}</span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <fieldset id="novaposhta_desc" class="radio-description">{{__('checkout.nova_poshta_desc')}}<br><small>{{ __('checkout.films_cargo_only') }}</small></fieldset>
                                                     </div>
                                                     @if(auth()->check() && auth()->user()->addresses->count() > 0)
                                                         <div class="radio">
@@ -178,7 +206,8 @@
                                                             @endauth
                                                             <div id="city-input-wrapper">
                                                                 <input type="text" id="city" name="city"
-                                                                       value="{{ old('city') }}" class="form-control">
+                                                                       value="{{ old('city') }}" class="form-control"
+                                                                       placeholder="{{__('checkout.city')}}">
                                                                 <ul class="dropdown-suggestions" id="city-suggestions"
                                                                     style="display: none;"></ul>
                                                             </div>
@@ -195,7 +224,26 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="input-group">
+                                                        <!-- Поле для доставки по Киеву -->
+                                                        <div class="input-group" id="kyiv-fields" style="display: none;">
+                                                            <label for="kyiv_address">{{__('checkout.delivery_address')}}</label>
+                                                            <input type="text" id="kyiv_address"
+                                                                   name="kyiv_address" class="form-control"
+                                                                   placeholder="{{__('checkout.input_delivery_address')}}" disabled>
+                                                            @error('kyiv_address')
+                                                            <div class="error">{{ $message }}</div>
+                                                            @enderror
+                                                            <div style="display:none;"
+                                                                 data-for="kyiv_address"
+                                                                 data-for-type="text"
+                                                                 data-rule="notEmpty"
+                                                                 class="simplecheckout-error-text simplecheckout-rule"
+                                                                 data-not-empty="1" data-required="true">{{__('checkout.this_field_required')}}
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Поля для отделения -->
+                                                        <div class="input-group" id="branch-fields">
                                                             <label for="shipping_address">{{__('checkout.branch_address')}}</label>
                                                             <input type="text" id="shipping_address"
                                                                    name="shipping_address" class="form-control"
@@ -214,6 +262,46 @@
                                                                  class="simplecheckout-error-text simplecheckout-rule"
                                                                  data-not-empty="1" data-required="true">{{__('checkout.this_field_required')}}
                                                             </div>
+                                                        </div>
+
+                                                        <!-- Поля для почтомата -->
+                                                        <div class="input-group" id="locker-fields" style="display: none;">
+                                                            <label for="locker_address">{{__('checkout.nova_poshta_locker')}}</label>
+                                                            <input type="text" id="locker_address"
+                                                                   name="locker_address" class="form-control"
+                                                                   placeholder="{{__('checkout.input_locker')}}" disabled>
+                                                            <ul class="dropdown-suggestions" id="locker-suggestions"
+                                                                style="display: none;"></ul>
+                                                            @error('locker_address')
+                                                            <div class="error">{{ $message }}</div>
+                                                            @enderror
+                                                            <div style="display:none;"
+                                                                 data-for="locker_address"
+                                                                 data-for-type="text"
+                                                                 data-rule="notEmpty"
+                                                                 class="simplecheckout-error-text simplecheckout-rule"
+                                                                 data-not-empty="1" data-required="true">{{__('checkout.this_field_required')}}
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Поля для курьера -->
+                                                        <div class="input-group" id="courier-fields" style="display: none;">
+                                                            <label for="courier_street">{{__('checkout.street')}}</label>
+                                                            <input type="text" id="courier_street"
+                                                                   name="courier_street" class="form-control"
+                                                                   placeholder="{{__('checkout.street')}}" disabled>
+                                                            @error('courier_street')
+                                                            <div class="error">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="input-group" id="courier-house-fields" style="display: none;">
+                                                            <label for="courier_house">{{__('checkout.house_apartment')}}</label>
+                                                            <input type="text" id="courier_house"
+                                                                   name="courier_house" class="form-control"
+                                                                   placeholder="{{__('checkout.house_apartment')}}" disabled>
+                                                            @error('courier_house')
+                                                            <div class="error">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </fieldset>
                                                 </div>

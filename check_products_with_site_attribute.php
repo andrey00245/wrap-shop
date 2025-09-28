@@ -18,7 +18,7 @@ try {
             'Content-Type' => 'application/json'
         ])
         ->get($apiUrl, [
-            'limit' => 500,
+            'limit' => 20,
             'expand' => 'attributes'
         ]);
 
@@ -36,9 +36,9 @@ try {
 
                 if (isset($product['attributes'])) {
                     $hasSiteAttribute = false;
-                    dd($product['attributes']);
                     foreach ($product['attributes'] as $attribute) {
-                        if (isset($attribute['id']) && $attribute['id'] === '10726') {
+                        // Проверяем атрибут "Сайт" по названию
+                        if (isset($attribute['name']) && $attribute['name'] === 'Сайт') {
                             $hasSiteAttribute = true;
                             echo "Атрибут 'Сайт': " . ($attribute['value']['name'] ?? 'не указан') . "\n";
                             break;

@@ -433,8 +433,8 @@ class MoySkladSyncService
                 } elseif (strpos($order->shipping_address, 'Доставка по Києву:') === 0) {
                     $deliveryType = 'Доставка по Києву';
                     $deliveryAddress = str_replace('Доставка по Києву: ', '', $order->shipping_address);
-                } elseif ($order->novaposhta_warehouse_ref) {
-                    // Если есть warehouse_ref, это почтомат
+                } elseif ($order->novaposhta_warehouse_ref && strpos($order->shipping_address, 'Поштомат') !== false) {
+                    // Если есть warehouse_ref и в адресе есть "Поштомат", это почтомат
                     $deliveryType = 'Поштомат';
                     $deliveryAddress = $order->shipping_address;
                 }

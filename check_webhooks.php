@@ -30,7 +30,15 @@ try {
     echo "HTTP код: $httpCode\n";
     echo "Ошибка cURL: " . ($error ?: 'Нет') . "\n";
     echo "Размер ответа: " . strlen($response) . " байт\n";
-    echo "Ответ: " . substr($response, 0, 500) . "\n\n";
+    
+    // Распаковываем gzip ответ
+    $decodedResponse = gzdecode($response);
+    if ($decodedResponse === false) {
+        $decodedResponse = $response; // Если не gzip, используем как есть
+    }
+    
+    echo "Размер после распаковки: " . strlen($decodedResponse) . " байт\n";
+    echo "Ответ: " . substr($decodedResponse, 0, 500) . "\n\n";
     
     if ($error) {
         echo "❌ Ошибка cURL: $error\n";
@@ -38,7 +46,7 @@ try {
     }
     
     if ($httpCode >= 200 && $httpCode < 300) {
-        $data = json_decode($response, true);
+        $data = json_decode($decodedResponse, true);
         if (isset($data['rows'])) {
             echo "✅ Вебхуки найдены: " . count($data['rows']) . " шт.\n\n";
             

@@ -103,12 +103,25 @@ class OrderController extends Controller
         // Определяем адрес доставки в зависимости от типа
         if ($request->input('shipping_method') === 'novaposhta') {
             $novaPoshtaType = $request->input('nova_poshta_type');
+            
+            \Log::info('Nova Poshta заказ', [
+                'shipping_method' => $request->input('shipping_method'),
+                'nova_poshta_type' => $novaPoshtaType,
+                'all_request_data' => $request->all()
+            ]);
             if ($novaPoshtaType === 'branch') {
                 $order->shipping_address = Arr::get($validated,'shipping_address');
             } elseif ($novaPoshtaType === 'locker') {
                 $order->shipping_address = Arr::get($validated,'locker_address');
                 // Для почтоматов нужно сохранить ID почтомата
                 $order->novaposhta_warehouse_ref = $request->input('locker_warehouse_ref');
+                
+                \Log::info('Сохранение почтомата', [
+                    'nova_poshta_type' => $novaPoshtaType,
+                    'locker_address' => Arr::get($validated,'locker_address'),
+                    'locker_warehouse_ref' => $request->input('locker_warehouse_ref'),
+                    'novaposhta_warehouse_ref' => $order->novaposhta_warehouse_ref
+                ]);
             } elseif ($novaPoshtaType === 'courier') {
                 $order->shipping_address = 'Кур\'єром: ' . Arr::get($validated,'courier_street') . ', ' . Arr::get($validated,'courier_house');
             }

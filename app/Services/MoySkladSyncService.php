@@ -460,9 +460,12 @@ class MoySkladSyncService
                 }
 
                 Log::info("Обновление контрагента для заказа #{$order->id}", [
+                    'shipping_method' => $order->shipping_method,
+                    'shipping_address' => $order->shipping_address,
                     'delivery_type' => $deliveryType,
                     'delivery_address' => $deliveryAddress,
-                    'warehouse_ref' => $order->novaposhta_warehouse_ref
+                    'warehouse_ref' => $order->novaposhta_warehouse_ref,
+                    'has_warehouse_ref' => !empty($order->novaposhta_warehouse_ref)
                 ]);
             }
 

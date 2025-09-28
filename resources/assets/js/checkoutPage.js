@@ -742,8 +742,15 @@ $(document).ready(function() {
         
         // Сохраняем ID почтомата в скрытое поле
         $("#locker_warehouse_ref").val(ref);
+        
+        // Выбираем радио кнопку "locker"
+        $("#novaposhta_locker").prop('checked', true);
+        
+        // Обновляем поля Nova Poshta
+        updateNovaPoshtaFields();
 
         console.log('Selected locker:', ref, 'Display text:', displayText);
+        console.log('Locker warehouse ref field value:', $("#locker_warehouse_ref").val());
         // Прячем список предложений
         $("#locker-suggestions").hide();
     });

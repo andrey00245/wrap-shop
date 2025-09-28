@@ -59,7 +59,7 @@ class OrderController extends Controller
 
         if ($request->input('shipping_method') == 'my_addresses') {
             $rules['city_select'] = 'required|string';
-            $rules['shipping_address'] = 'required|string';
+            $rules['my_address'] = 'required|string';
         }
 
         $validated = $request->validate($rules);
@@ -104,14 +104,16 @@ class OrderController extends Controller
         if ($request->input('shipping_method') === 'novaposhta') {
             $novaPoshtaType = $request->input('nova_poshta_type');
             if ($novaPoshtaType === 'branch') {
-                $order->shipping_address = 'Відділення: ' . Arr::get($validated,'shipping_address');
+                $order->shipping_address = Arr::get($validated,'shipping_address');
             } elseif ($novaPoshtaType === 'locker') {
-                $order->shipping_address = 'Поштомат: ' . Arr::get($validated,'locker_address');
+                $order->shipping_address = Arr::get($validated,'locker_address');
             } elseif ($novaPoshtaType === 'courier') {
                 $order->shipping_address = 'Кур\'єром: ' . Arr::get($validated,'courier_street') . ', ' . Arr::get($validated,'courier_house');
             }
         } elseif ($request->input('shipping_method') === 'flat') {
             $order->shipping_address = Arr::get($validated,'kyiv_address');
+        } elseif ($request->input('shipping_method') === 'my_addresses') {
+            $order->shipping_address = Arr::get($validated,'my_address');
         } else {
             $order->shipping_address = Arr::get($validated,'shipping_address');
         }
@@ -161,6 +163,10 @@ class OrderController extends Controller
 
         if ($order->payment_method === 'online') {
             \App\Services\MoySkladSyncService::sendOrder($order);
+            
+            // Обновляем данные контрагента при изменении типа доставки
+            \App\Services\MoySkladSyncService::updateCounterpartyDelivery($order);
+            
             $wfpService = new \App\Services\WayForPayService();
             $formData = $wfpService->generatePaymentData($order);
             $order->update(['payment_status' => 'pending']);
@@ -169,6 +175,9 @@ class OrderController extends Controller
         }
 
         \App\Services\MoySkladSyncService::sendOrder($order);
+        
+        // Обновляем данные контрагента при изменении типа доставки
+        \App\Services\MoySkladSyncService::updateCounterpartyDelivery($order);
 
         return redirect()->route('checkout.success');
     }

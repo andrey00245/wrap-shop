@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // Если выбран метод "my_addresses", показываем select для города и делаем поле адреса неактивным
+        // Если выбран метод "my_addresses", показываем select для города и поле адреса
         if (selectedMethod && selectedMethod.id === 'my_addresses' && myAddressesOption) {
             // Очищаем значение поля для адреса
             if (shippingAddressField) {
@@ -105,7 +105,23 @@ document.addEventListener('DOMContentLoaded', function () {
             if (citySelectWrapper) {
                 citySelectWrapper.style.display = 'block';
             }
+
+            // Показываем поле адреса для "Мои адреса"
+            const myAddressFields = document.querySelector('#my-address-fields');
+            console.log('My address fields element:', myAddressFields);
+            if (myAddressFields) {
+                myAddressFields.style.display = 'block';
+                console.log('My address fields shown');
+            } else {
+                console.log('My address fields not found!');
+            }
         } else {
+            // Скрываем поле адреса для "Мои адреса" если выбран другой метод
+            const myAddressFields = document.querySelector('#my-address-fields');
+            if (myAddressFields) {
+                myAddressFields.style.display = 'none';
+            }
+
             // Очистка значений полей (как для адреса, так и для города)
             if (shippingAddressField) {
                 shippingAddressField.value = ''; // Очищаем поле для адреса
@@ -364,6 +380,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     checkoutSlider.mount();
     updateAddressFields();  // Инициализация состояния
+    
+    // Отладка элементов "Мои адреса"
+    console.log('City select element:', $("select[name='city_select']").length);
+    console.log('My address field:', $('#my_address').length);
+    console.log('My address fields wrapper:', $('#my-address-fields').length);
 
     let paymentMethods = document.querySelectorAll('input[name="payment_method"]');
 
@@ -436,6 +457,34 @@ $(document).ready(function() {
             $("#shipping_address").prop("disabled", false); // Поле для адреса остается активным для ручного ввода
             $("#city-suggestions").hide(); // Скрываем предложения для города
             $("#address-suggestions").hide(); // Скрываем предложения для адреса
+        }
+    });
+
+    // Обработчик изменения select для "Мои адреса"
+    $(document).on("change", "select[name='city_select']", function() {
+        console.log('Select change event triggered');
+        const selectedOption = $(this).find('option:selected');
+        const city = selectedOption.val();
+        const address = selectedOption.data('address');
+        
+        console.log('Selected option:', selectedOption);
+        console.log('City value:', city);
+        console.log('Address data:', address);
+        console.log('My address field exists:', $('#my_address').length > 0);
+        
+        if (city && address) {
+            // Заполняем поля города и адреса
+            $("#city").val(city);
+            $("#my_address").val(address);
+            
+            console.log('Мои адреса - выбран город:', city, 'адрес:', address);
+            console.log('City field value after setting:', $("#city").val());
+            console.log('My address field value after setting:', $("#my_address").val());
+        } else {
+            // Очищаем поля если ничего не выбрано
+            $("#city").val('');
+            $("#my_address").val('');
+            console.log('Cleared fields - no city or address selected');
         }
     });
 

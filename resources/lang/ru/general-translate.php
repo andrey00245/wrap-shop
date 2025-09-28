@@ -5,7 +5,6 @@ return [
     'similar' => '<span class="colord">Похожие</span> товары',
     '3m_colors' => '<span class="colord">3M color</span> пленки',
     'yellotools' => '<span class="colord">Yellotools</span> инструменты',
-    'loading' => 'Загрузка...',
     'our_realizations' => 'Плёнки на автомобиле',
     'show_more' => 'Показать больше',
 

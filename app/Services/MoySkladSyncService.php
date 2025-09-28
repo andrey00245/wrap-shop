@@ -367,6 +367,133 @@ class MoySkladSyncService
     }
     
     /**
+     * Обновить данные контрагента в МойСклад при изменении типа доставки
+     */
+    public static function updateCounterpartyDelivery(Order $order): void
+    {
+        if (!$order->email) {
+            Log::warning("Не удалось обновить контрагента для заказа #{$order->id} - отсутствует email");
+            return;
+        }
+
+        try {
+            // Получаем контрагента по email
+            $response = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            )
+                ->withHeaders([
+                    'Accept-Encoding' => 'gzip',
+                ])->get('https://api.moysklad.ru/api/remap/1.2/entity/counterparty', [
+                    'filter' => 'email=' . $order->email,
+                ]);
+
+            if (!$response->successful() || count($response->json('rows')) === 0) {
+                Log::warning("Контрагент не найден для заказа #{$order->id} с email: {$order->email}");
+                return;
+            }
+
+            $existing = $response->json('rows')[0];
+            $counterpartyMeta = $existing['meta'];
+
+            if (!isset($counterpartyMeta['href'])) {
+                Log::error('Некорректный meta в ответе контрагента');
+                return;
+            }
+
+            $cleanPhone = self::sanitizePhoneNumber($order->phone);
+            $attributes = [
+                [
+                    "meta" => [
+                        "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3c75f405-660c-11f0-0a80-03cb002a009d", // phone
+                        "type" => "attributemetadata",
+                        "mediaType" => "application/json"
+                    ],
+                    "value" => $cleanPhone
+                ],
+                [
+                    "meta" => [
+                        "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/ee963740-660b-11f0-0a80-0d890028be5f", //FIO
+                        "type" => "attributemetadata",
+                        "mediaType" => "application/json"
+                    ],
+                    "value" => $order->first_name . ' ' . $order->last_name
+                ]
+            ];
+
+            // Обновляем данные доставки в зависимости от типа
+            if (in_array($order->shipping_method, ['novaposhta', 'my_addresses'])) {
+                // Определяем тип доставки по shipping_address
+                $deliveryType = 'Відділення';
+                $deliveryAddress = $order->shipping_address;
+                
+                if (strpos($order->shipping_address, 'Поштомат:') === 0) {
+                    $deliveryType = 'Поштомат';
+                    $deliveryAddress = str_replace('Поштомат: ', '', $order->shipping_address);
+                } elseif (strpos($order->shipping_address, 'Кур\'єром:') === 0) {
+                    $deliveryType = 'Кур\'єром';
+                    $deliveryAddress = str_replace('Кур\'єром: ', '', $order->shipping_address);
+                } elseif (strpos($order->shipping_address, 'Доставка по Києву:') === 0) {
+                    $deliveryType = 'Доставка по Києву';
+                    $deliveryAddress = str_replace('Доставка по Києву: ', '', $order->shipping_address);
+                }
+
+                // Если есть warehouse_ref, обновляем его
+                if ($order->novaposhta_warehouse_ref) {
+                    $attributes[] = [
+                        "meta" => [
+                            "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3999ff42-6610-11f0-0a80-0462002ad32f",
+                            "type" => "attributemetadata",
+                            "mediaType" => "application/json"
+                        ],
+                        "value" => [
+                            "meta" => [
+                                "href" => "https://api.moysklad.ru/api/remap/1.2/entity/customentity/710e5a69-63be-11f0-0a80-03cc0016c7e1/{$order->novaposhta_warehouse_ref}",
+                                "type" => "customentity",
+                                "mediaType" => "application/json"
+                            ],
+                            "id" => $order->novaposhta_warehouse_ref,
+                            "name" => $deliveryAddress,
+                        ]
+                    ];
+                }
+
+                Log::info("Обновление контрагента для заказа #{$order->id}", [
+                    'delivery_type' => $deliveryType,
+                    'delivery_address' => $deliveryAddress,
+                    'warehouse_ref' => $order->novaposhta_warehouse_ref
+                ]);
+            }
+
+            $updateResponse = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            )
+                ->withHeaders([
+                    'Accept-Encoding' => 'gzip',
+                    'Content-Type' => 'application/json'
+                ])
+                ->put($counterpartyMeta['href'], [
+                    'attributes' => $attributes
+                ]);
+
+            if ($updateResponse->successful()) {
+                Log::info("Контрагент успешно обновлен для заказа #{$order->id}");
+            } else {
+                Log::error('Не удалось обновить атрибуты контрагента', [
+                    'order_id' => $order->id,
+                    'response' => $updateResponse->json()
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Ошибка обновления контрагента для заказа #{$order->id}", [
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * Обновить статус заказа в МойСклад после оплаты
      */
     public static function updateOrderPaymentStatus(Order $order): void

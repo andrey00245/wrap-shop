@@ -44,7 +44,7 @@ Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
 
 // Webhook для МойСклад
-Route::post('/webhook/moysklad', [WebhookController::class, 'handle'])
+Route::any('/webhook/moysklad', [WebhookController::class, 'handle'])
     ->withoutMiddleware([VerifyCsrfToken::class])
     ->name('webhook.moysklad');
 Route::get('/slug-generate', function(){

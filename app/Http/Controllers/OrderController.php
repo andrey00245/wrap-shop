@@ -111,6 +111,7 @@ class OrderController extends Controller
             ]);
             if ($novaPoshtaType === 'branch') {
                 $order->shipping_address = Arr::get($validated,'shipping_address');
+                $order->novaposhta_warehouse_ref = $request->input('novaposhta_warehouse_ref');
             } elseif ($novaPoshtaType === 'locker') {
                 $order->shipping_address = Arr::get($validated,'locker_address');
                 // Для почтоматов нужно сохранить ID почтомата
@@ -124,6 +125,7 @@ class OrderController extends Controller
                 ]);
             } elseif ($novaPoshtaType === 'courier') {
                 $order->shipping_address = 'Кур\'єром: ' . Arr::get($validated,'courier_street') . ', ' . Arr::get($validated,'courier_house');
+                $order->novaposhta_warehouse_ref = null; // Для курьера нет warehouse_ref
             }
         } elseif ($request->input('shipping_method') === 'flat') {
             $order->shipping_address = Arr::get($validated,'kyiv_address');
@@ -136,7 +138,6 @@ class OrderController extends Controller
         $order->status = 'pending';
         $order->user_id = Auth::check() ? Auth::id() : null;
         $order->total = $totalSum;
-        $order->novaposhta_warehouse_ref = $request->input('novaposhta_warehouse_ref');
 
         $order->save();
 

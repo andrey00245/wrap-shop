@@ -152,6 +152,37 @@ class ProductService
     }
 
     /**
+     * Публичный метод для синхронизации товара из вебхука
+     */
+    public function syncProductFromWebhook(array $productData): void
+    {
+        try {
+            DB::beginTransaction();
+
+            // Создаем объект в том же формате, что ожидает processProduct
+            $item = new class($productData) {
+                private $data;
+                
+                public function __construct($data) {
+                    $this->data = $data;
+                }
+                
+                public function jsonSerialize() {
+                    return (object) $this->data;
+                }
+            };
+
+            $this->processProduct($item);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Ошибка синхронизации товара из вебхука: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
      * @param $item
      */
     protected function processProduct($item): void

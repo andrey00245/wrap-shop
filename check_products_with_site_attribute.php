@@ -36,6 +36,7 @@ try {
 
                 if (isset($product['attributes'])) {
                     $hasSiteAttribute = false;
+                    dd($product['attributes']);
                     foreach ($product['attributes'] as $attribute) {
                         if (isset($attribute['id']) && $attribute['id'] === '10726') {
                             $hasSiteAttribute = true;

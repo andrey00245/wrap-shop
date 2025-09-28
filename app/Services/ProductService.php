@@ -165,20 +165,8 @@ class ProductService
 
             DB::beginTransaction();
 
-            // Создаем объект в том же формате, что ожидает processProduct
-            $item = new class($productData) {
-                private $data;
-                
-                public function __construct($data) {
-                    $this->data = $data;
-                }
-                
-                public function jsonSerialize() {
-                    return (object) $this->data;
-                }
-            };
-
-            $this->processProduct($item);
+            // Для вебхуков синхронизируем товар напрямую без проверки атрибута "Сайт"
+            $this->processProductFromWebhookData($productData);
 
             DB::commit();
             Log::info('Товар успешно синхронизирован из вебхука', [
@@ -192,6 +180,79 @@ class ProductService
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * Обработка товара из вебхука с проверкой атрибута "Сайт"
+     */
+    private function processProductFromWebhookData(array $productData): void
+    {
+        Log::info('Обработка товара из вебхука с проверкой атрибута', [
+            'product_id' => $productData['id'] ?? 'unknown'
+        ]);
+
+        // Проверяем атрибут "Сайт" как в оригинальном коде
+        if (isset($productData['attributes'])) {
+            $hasSiteAttribute = false;
+            foreach ($productData['attributes'] as $attribute) {
+                if (isset($attribute['id']) && $attribute['id'] === '10726') { // ProductAttributeEnum::SITE
+                    if (isset($attribute['value']['name']) && $attribute['value']['name'] === 'так') {
+                        $hasSiteAttribute = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!$hasSiteAttribute) {
+                Log::info('Товар не имеет атрибута "Сайт" со значением "так" - пропускаем', [
+                    'product_id' => $productData['id'] ?? 'unknown'
+                ]);
+                return;
+            }
+        } else {
+            Log::info('Товар не имеет атрибутов - пропускаем', [
+                'product_id' => $productData['id'] ?? 'unknown'
+            ]);
+            return;
+        }
+
+        // Создаем товар
+        $product = \App\Models\Product::updateOrCreate(
+            ['external_id' => $productData['id']],
+            [
+                'external_code' => $productData['externalCode'] ?? null,
+                'code'          => $productData['code'] ?? null,
+                'article'       => $productData['article'] ?? null,
+                'name'          => [
+                    'ru' => $productData['name'] ?? '',
+                    'uk' => $productData['name'] ?? '',
+                    'en' => $productData['name'] ?? '',
+                ],
+                'descriptions'   => [
+                    'ru' => $productData['description'] ?? '',
+                    'uk' => $productData['description'] ?? '',
+                    'en' => $productData['description'] ?? '',
+                ],
+            ]
+        );
+
+        $product->slug = [
+            'en' => \Illuminate\Support\Str::slug($product->getTranslation('name', 'en')),
+            'uk' => \Illuminate\Support\Str::slug($product->getTranslation('name', 'uk')),
+            'ru' => \Illuminate\Support\Str::slug($product->getTranslation('name', 'ru'))
+        ];
+
+        $product->save();
+
+        // Обрабатываем цены
+        if (isset($productData['salePrices'])) {
+            $this->processPrices($productData['salePrices'], $product);
+        }
+
+        Log::info('Товар обработан из вебхука', [
+            'product_id' => $product->id,
+            'external_id' => $product->external_id
+        ]);
     }
 
     /**

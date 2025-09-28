@@ -61,16 +61,25 @@ class WebhookController extends Controller
     private function isValidMoySkladWebhook(Request $request): bool
     {
         $data = $request->all();
+        $userAgent = $request->header('User-Agent', '');
         
         // Логируем данные для отладки
         Log::info('Проверка валидности вебхука', [
             'data' => $data,
-            'headers' => $request->headers->all(),
-            'method' => $request->method()
+            'user_agent' => $userAgent,
+            'method' => $request->method(),
+            'request_id' => $request->get('requestId')
         ]);
+        
+        // Проверяем User-Agent от МойСклад
+        if (strpos($userAgent, 'MoySklad webhook') !== false) {
+            Log::info('Вебхук от МойСклад подтвержден по User-Agent');
+            return true;
+        }
         
         // Для тестирования принимаем любые POST запросы
         if ($request->method() === 'POST') {
+            Log::info('Принят POST запрос для тестирования');
             return true;
         }
         

@@ -157,6 +157,12 @@ class ProductService
     public function syncProductFromWebhook(array $productData): void
     {
         try {
+            Log::info('Начало синхронизации товара из вебхука', [
+                'product_id' => $productData['id'] ?? 'unknown',
+                'product_name' => $productData['name'] ?? 'unknown',
+                'product_code' => $productData['code'] ?? 'unknown'
+            ]);
+
             DB::beginTransaction();
 
             // Создаем объект в том же формате, что ожидает processProduct
@@ -175,9 +181,15 @@ class ProductService
             $this->processProduct($item);
 
             DB::commit();
+            Log::info('Товар успешно синхронизирован из вебхука', [
+                'product_id' => $productData['id'] ?? 'unknown'
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Ошибка синхронизации товара из вебхука: ' . $e->getMessage());
+            Log::error('Ошибка синхронизации товара из вебхука: ' . $e->getMessage(), [
+                'product_id' => $productData['id'] ?? 'unknown',
+                'trace' => $e->getTraceAsString()
+            ]);
             throw $e;
         }
     }

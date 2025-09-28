@@ -159,13 +159,13 @@
 </script>
 <script id="map-script" defer></script>
 <script src="//code.tidio.co/qzgrxeqydewl3hb2slszufoiu8sb9we7.js" async></script>
-<script type="text/javascript" async>
-  (function (d, w, s) {
-    var widgetHash = 'mayoy83q3bdx7xddnztw', gcw = d.createElement(s);
-    gcw.type = 'text/javascript';
-    gcw.async = true;
-    gcw.src = '//widgets.binotel.com/getcall/widgets/' + widgetHash + '.js';
-    var sn = d.getElementsByTagName(s)[0];
-    sn.parentNode.insertBefore(gcw, sn);
-  })(document, window, 'script');
-</script>
+{{--<script type="text/javascript" async>--}}
+{{--  (function (d, w, s) {--}}
+{{--    var widgetHash = 'mayoy83q3bdx7xddnztw', gcw = d.createElement(s);--}}
+{{--    gcw.type = 'text/javascript';--}}
+{{--    gcw.async = true;--}}
+{{--    gcw.src = '//widgets.binotel.com/getcall/widgets/' + widgetHash + '.js';--}}
+{{--    var sn = d.getElementsByTagName(s)[0];--}}
+{{--    sn.parentNode.insertBefore(gcw, sn);--}}
+{{--  })(document, window, 'script');--}}
+{{--</script>--}}

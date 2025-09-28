@@ -212,6 +212,16 @@
                                                                     style="display: none;"></ul>
                                                             </div>
 
+                                                            <!-- Поле адреса для "Мои адреса" -->
+                                                            <div class="input-group" id="my-address-fields" style="display: none;">
+                                                                <label for="my_address">{{__('checkout.branch_address')}}</label>
+                                                                <input type="text" id="my_address" name="my_address"
+                                                                       class="form-control" readonly>
+                                                                @error('my_address')
+                                                                <div class="error">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+
                                                             @error('city')
                                                             <div class="error">{{ $message }}</div>
                                                             @enderror
@@ -270,6 +280,7 @@
                                                             <input type="text" id="locker_address"
                                                                    name="locker_address" class="form-control"
                                                                    placeholder="{{__('checkout.input_locker')}}" disabled>
+                                                            <input type="hidden" name="locker_warehouse_ref" id="locker_warehouse_ref">
                                                             <ul class="dropdown-suggestions" id="locker-suggestions"
                                                                 style="display: none;"></ul>
                                                             @error('locker_address')

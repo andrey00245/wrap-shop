@@ -739,6 +739,9 @@ $(document).ready(function() {
 
         // Заполняем поле с почтоматом полным названием
         $("#locker_address").val(displayText);
+        
+        // Сохраняем ID почтомата в скрытое поле
+        $("#locker_warehouse_ref").val(ref);
 
         console.log('Selected locker:', ref, 'Display text:', displayText);
         // Прячем список предложений

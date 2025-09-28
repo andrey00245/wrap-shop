@@ -427,15 +427,16 @@ class MoySkladSyncService
                 $deliveryType = 'Відділення';
                 $deliveryAddress = $order->shipping_address;
                 
-                if (strpos($order->shipping_address, 'Поштомат:') === 0) {
-                    $deliveryType = 'Поштомат';
-                    $deliveryAddress = str_replace('Поштомат: ', '', $order->shipping_address);
-                } elseif (strpos($order->shipping_address, 'Кур\'єром:') === 0) {
+                if (strpos($order->shipping_address, 'Кур\'єром:') === 0) {
                     $deliveryType = 'Кур\'єром';
                     $deliveryAddress = str_replace('Кур\'єром: ', '', $order->shipping_address);
                 } elseif (strpos($order->shipping_address, 'Доставка по Києву:') === 0) {
                     $deliveryType = 'Доставка по Києву';
                     $deliveryAddress = str_replace('Доставка по Києву: ', '', $order->shipping_address);
+                } elseif ($order->novaposhta_warehouse_ref) {
+                    // Если есть warehouse_ref, это почтомат
+                    $deliveryType = 'Поштомат';
+                    $deliveryAddress = $order->shipping_address;
                 }
 
                 // Если есть warehouse_ref, обновляем его

@@ -107,6 +107,8 @@ class OrderController extends Controller
                 $order->shipping_address = Arr::get($validated,'shipping_address');
             } elseif ($novaPoshtaType === 'locker') {
                 $order->shipping_address = Arr::get($validated,'locker_address');
+                // Для почтоматов нужно сохранить ID почтомата
+                $order->novaposhta_warehouse_ref = $request->input('locker_warehouse_ref');
             } elseif ($novaPoshtaType === 'courier') {
                 $order->shipping_address = 'Кур\'єром: ' . Arr::get($validated,'courier_street') . ', ' . Arr::get($validated,'courier_house');
             }

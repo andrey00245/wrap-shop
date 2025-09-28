@@ -280,6 +280,7 @@
                                                             <input type="text" id="locker_address"
                                                                    name="locker_address" class="form-control"
                                                                    placeholder="{{__('checkout.input_locker')}}" disabled>
+                                                            <input type="hidden" name="locker_warehouse_ref" id="locker_warehouse_ref">
                                                             <ul class="dropdown-suggestions" id="locker-suggestions"
                                                                 style="display: none;"></ul>
                                                             @error('locker_address')

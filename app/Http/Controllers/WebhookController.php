@@ -85,6 +85,12 @@ class WebhookController extends Controller
     {
         Log::info('Обработка вебхука МойСклад', ['data' => $data]);
 
+        // Проверяем, что это реальный вебхук от МойСклад
+        if (!isset($data['events']) && !isset($data['entityType']) && !isset($data['action'])) {
+            Log::info('Тестовый запрос - пропускаем обработку');
+            return;
+        }
+
         // МойСклад может отправлять данные в разных форматах
         if (isset($data['events'])) {
             // Обрабатываем массив событий

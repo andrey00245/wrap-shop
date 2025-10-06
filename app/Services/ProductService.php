@@ -152,6 +152,110 @@ class ProductService
     }
 
     /**
+     * Публичный метод для синхронизации товара из вебхука
+     */
+    public function syncProductFromWebhook(array $productData): void
+    {
+        try {
+            Log::info('Начало синхронизации товара из вебхука', [
+                'product_id' => $productData['id'] ?? 'unknown',
+                'product_name' => $productData['name'] ?? 'unknown',
+                'product_code' => $productData['code'] ?? 'unknown'
+            ]);
+
+            DB::beginTransaction();
+
+            // Для вебхуков синхронизируем товар напрямую без проверки атрибута "Сайт"
+            $this->processProductFromWebhookData($productData);
+
+            DB::commit();
+            Log::info('Товар успешно синхронизирован из вебхука', [
+                'product_id' => $productData['id'] ?? 'unknown'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Ошибка синхронизации товара из вебхука: ' . $e->getMessage(), [
+                'product_id' => $productData['id'] ?? 'unknown',
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Обработка товара из вебхука с проверкой атрибута "Сайт"
+     */
+    private function processProductFromWebhookData(array $productData): void
+    {
+        Log::info('Обработка товара из вебхука с проверкой атрибута', [
+            'product_id' => $productData['id'] ?? 'unknown'
+        ]);
+
+        // Проверяем атрибут "Сайт" как в оригинальном коде
+        if (isset($productData['attributes'])) {
+            $hasSiteAttribute = false;
+            foreach ($productData['attributes'] as $attribute) {
+                if (isset($attribute['id']) && $attribute['id'] === '10726') { // ProductAttributeEnum::SITE
+                    if (isset($attribute['value']['name']) && $attribute['value']['name'] === 'так') {
+                        $hasSiteAttribute = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!$hasSiteAttribute) {
+                Log::info('Товар не имеет атрибута "Сайт" со значением "так" - пропускаем', [
+                    'product_id' => $productData['id'] ?? 'unknown'
+                ]);
+                return;
+            }
+        } else {
+            Log::info('Товар не имеет атрибутов - пропускаем', [
+                'product_id' => $productData['id'] ?? 'unknown'
+            ]);
+            return;
+        }
+
+        // Создаем товар
+        $product = \App\Models\Product::updateOrCreate(
+            ['external_id' => $productData['id']],
+            [
+                'external_code' => $productData['externalCode'] ?? null,
+                'code'          => $productData['code'] ?? null,
+                'article'       => $productData['article'] ?? null,
+                'name'          => [
+                    'ru' => $productData['name'] ?? '',
+                    'uk' => $productData['name'] ?? '',
+                    'en' => $productData['name'] ?? '',
+                ],
+                'descriptions'   => [
+                    'ru' => $productData['description'] ?? '',
+                    'uk' => $productData['description'] ?? '',
+                    'en' => $productData['description'] ?? '',
+                ],
+            ]
+        );
+
+        $product->slug = [
+            'en' => \Illuminate\Support\Str::slug($product->getTranslation('name', 'en')),
+            'uk' => \Illuminate\Support\Str::slug($product->getTranslation('name', 'uk')),
+            'ru' => \Illuminate\Support\Str::slug($product->getTranslation('name', 'ru'))
+        ];
+
+        $product->save();
+
+        // Обрабатываем цены
+        if (isset($productData['salePrices'])) {
+            $this->processPrices($productData['salePrices'], $product);
+        }
+
+        Log::info('Товар обработан из вебхука', [
+            'product_id' => $product->id,
+            'external_id' => $product->external_id
+        ]);
+    }
+
+    /**
      * @param $item
      */
     protected function processProduct($item): void

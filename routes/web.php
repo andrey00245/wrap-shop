@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\SyncProductController;
+use App\Http\Controllers\WebhookController;
 require __DIR__.'/auth.php';
 
 Route::match(['get', 'post'], 'login/apple/callback', [SocialController::class, 'handleAppleCallback'])
@@ -41,6 +42,11 @@ Route::post('checkout/wayforpay/callback', [WayForPayController::class, 'callbac
 
 Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']);
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
+
+// Webhook для МойСклад
+Route::any('/webhook/moysklad', [WebhookController::class, 'handle'])
+    ->withoutMiddleware([VerifyCsrfToken::class])
+    ->name('webhook.moysklad');
 Route::get('/slug-generate', function(){
   $products = Product::all();
   $categories = Category::all();

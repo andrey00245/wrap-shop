@@ -26,7 +26,7 @@ class NewsCategory extends Resource
 
     public static function label()
     {
-        return 'Категорії';
+        return 'Категорії новин';
     }
 
     /**

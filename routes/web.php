@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\SyncProductController;
+use App\Http\Controllers\CommandRunnerController;
 require __DIR__.'/auth.php';
 
 Route::match(['get', 'post'], 'login/apple/callback', [SocialController::class, 'handleAppleCallback'])
@@ -41,6 +42,18 @@ Route::post('checkout/wayforpay/callback', [WayForPayController::class, 'callbac
 
 Route::get('/syn-images', [SyncProductImagesController::class, 'updateProducts']);
 Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
+
+// Command Runner routes for Nova
+Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(function () {
+    Route::get('/', function () {
+        return view('command-runner');
+    });
+    Route::post('/sitemap', [CommandRunnerController::class, 'generateSitemap']);
+    Route::post('/products', [CommandRunnerController::class, 'updateProducts']);
+    Route::post('/cache', [CommandRunnerController::class, 'clearCache']);
+    Route::post('/media', [CommandRunnerController::class, 'cleanMedia']);
+});
+
 Route::get('/slug-generate', function(){
   $products = Product::all();
   $categories = Category::all();

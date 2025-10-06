@@ -44,7 +44,7 @@ class CustomBlock extends Resource
      * @var array
      */
     public static $search = [
-        'id',
+        'id', 'name',
     ];
 
     public static function relatableProducts(NovaRequest $request, $query)

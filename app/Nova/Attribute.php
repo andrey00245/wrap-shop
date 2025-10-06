@@ -35,7 +35,7 @@ class Attribute extends Resource
      * @var array
      */
     public static $search = [
-        'name',
+        'id', 'name',
     ];
 
     /**

@@ -32,6 +32,8 @@ use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\SyncProductController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\CommandRunnerController;
+
 require __DIR__.'/auth.php';
 
 Route::match(['get', 'post'], 'login/apple/callback', [SocialController::class, 'handleAppleCallback'])
@@ -47,6 +49,15 @@ Route::get('/syn-products', [SyncProductController::class, 'updateProducts']);
 Route::any('/webhook/moysklad', [WebhookController::class, 'handle'])
     ->withoutMiddleware([VerifyCsrfToken::class])
     ->name('webhook.moysklad');
+Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(function () {
+    Route::get('/', function () {
+        return view('command-runner');
+    });
+    Route::post('/sitemap', [CommandRunnerController::class, 'generateSitemap']);
+    Route::post('/products', [CommandRunnerController::class, 'updateProducts']);
+    Route::post('/cache', [CommandRunnerController::class, 'clearCache']);
+    Route::post('/media', [CommandRunnerController::class, 'cleanMedia']);
+});
 Route::get('/slug-generate', function(){
   $products = Product::all();
   $categories = Category::all();

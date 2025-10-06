@@ -48,65 +48,62 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
 		Nova::name('Wrap Shop');
 
-		Nova::mainMenu(function (Request $request) {
-			return [
-				MenuSection::dashboard(Main::class)->icon('chart-bar'),
-				MenuSection::make('Користувачі', [
-					MenuItem::resource(User::class),
-					MenuItem::resource(Review::class),
-				])->icon('user')->collapsable(),
+	Nova::mainMenu(function (Request $request) {
+		return [
+			MenuSection::dashboard(Main::class)->icon('chart-bar'),
 
-				MenuSection::make('Товари', [
-					MenuItem::resource(Product::class),
-					MenuItem::resource(BestSeller::class),
-					MenuItem::resource(Attribute::class),
-					MenuItem::resource(Category::class),
-					MenuItem::resource(PriceType::class),
-					MenuItem::resource(Order::class),
-					MenuItem::resource(Implementation::class),
-					MenuItem::resource(ReportAvailability::class),
+		MenuSection::make('Замовлення', [
+			MenuItem::resource(Order::class),
+			MenuItem::resource(Consultation::class),
+			MenuItem::resource(FastOrder::class),
+		])->icon('shopping-bag')->collapsable(),
 
-				])->icon('collection')->collapsable(),
+			MenuSection::make('Товари', [
+				MenuItem::resource(Product::class),
+				MenuItem::resource(BestSeller::class),
+				MenuItem::resource(Attribute::class),
+				MenuItem::resource(Category::class),
+				MenuItem::resource(PriceType::class),
+				MenuItem::resource(Implementation::class),
+				MenuItem::resource(ReportAvailability::class),
+			])->icon('collection')->collapsable(),
 
-				MenuSection::make('Замовлення-Консультації', [
-					MenuItem::resource(Order::class),
-					MenuItem::resource(Consultation::class),
-					MenuItem::resource(FastOrder::class),
+			MenuSection::make('Користувачі', [
+				MenuItem::resource(User::class),
+				MenuItem::resource(Review::class),
+			])->icon('user')->collapsable(),
 
-				])->icon('collection')->collapsable(),
+			MenuSection::make('Контент', [
+				MenuItem::resource(Banner::class),
+				MenuItem::resource(ProductBanner::class),
+				MenuItem::resource(CustomBlock::class),
+				MenuItem::resource(NewsCategory::class),
+				MenuItem::resource(News::class),
+				MenuItem::resource(Faq::class),
+				MenuItem::resource(VideoCategory::class),
+				MenuItem::resource(VideoReview::class),
+			])->icon('document-text')->collapsable(),
 
-				MenuSection::make('Банери', [
-					MenuItem::resource(Banner::class),
-					MenuItem::resource(ProductBanner::class),
-				])->icon('clipboard')->collapsable(),
+			MenuSection::resource(PrivacyPolicy::class)->icon('shield-check'),
 
-				MenuSection::make('Кастомнi Блоки', [
-					MenuItem::resource(CustomBlock::class),
-				])->icon('clipboard')->collapsable(),
+			MenuSection::resource(Setting::class)->icon('cog'),
 
-				MenuSection::make('Блог', [
-					MenuItem::resource(NewsCategory::class),
-					MenuItem::resource(News::class),
-					MenuItem::resource(Faq::class),
-				])->icon('desktop-computer')->collapsable(),
+			MenuSection::make('Команди', [
+				MenuItem::externalLink('Виконати команди', '/nova-vendor/command-runner'),
+			])->icon('terminal')->collapsable(),
 
-				MenuSection::make('Відеогляд', [
-					MenuItem::resource(VideoCategory::class),
-					MenuItem::resource(VideoReview::class),
-				])->icon('desktop-computer')->collapsable(),
+	];
+});
 
-				MenuSection::resource(PrivacyPolicy::class)->icon('document'),
 
-				MenuSection::resource(Setting::class)
-				->icon('cog'),
 
-			];
-		});
 
+
+		// Кастомный футер
 		Nova::footer(function ($request) {
 			return Blade::render('
 				Wrap Shop
-		');
+			');
 		});
 	}
 
@@ -134,7 +131,8 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 	{
 		Gate::define('viewNova', function ($user) {
 			return in_array($user->email, [
-				//
+				'test@gmail.com',
+				'admin-wrap@gmail.com',
 			], true);
 		});
 	}
@@ -158,7 +156,9 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 	 */
 	public function tools()
 	{
-		return [];
+		return [
+			new \App\Nova\Tools\CommandRunner,
+		];
 	}
 
 	/**

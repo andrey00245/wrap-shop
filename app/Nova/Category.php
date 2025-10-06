@@ -27,7 +27,7 @@ class Category extends Resource
 
     public static function label()
     {
-        return 'Категорії';
+        return 'Категорії товарів';
     }
 
     public static $search = [

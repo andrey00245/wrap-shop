@@ -26,7 +26,7 @@ class VideoCategory extends Resource
 
     public static function label()
     {
-        return 'Категорія';
+        return 'Категорії відео';
     }
 
     public function fields(Request $request)

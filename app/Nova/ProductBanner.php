@@ -33,7 +33,7 @@ class ProductBanner extends Resource
      * @var array
      */
     public static $search = [
-        'id',
+        'id', 'url',
     ];
 
     public static function label()

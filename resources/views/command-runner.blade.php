@@ -174,6 +174,30 @@
         <h1>⚡ Команди</h1>
         
         <div class="command-grid">
+            <!-- Вебхуки (окремий блок) -->
+            <div class="command-card">
+                <h3>🔔 Вебхуки (МойСклад)</h3>
+                <p>Перевірка доступності та відправка тестового вебхука на ваш URL</p>
+
+                <div class="form-group">
+                    <label for="webhook-url">URL вебхука:</label>
+                    <input type="text" id="webhook-url" value="/webhook/moysklad" placeholder="https://example.com/webhook/moysklad">
+                </div>
+
+                <div class="form-group">
+                    <label for="webhook-payload">Тестовий payload (JSON, необовʼязково):</label>
+                    <input type="text" id="webhook-payload" placeholder='{"event":"test"}'>
+                </div>
+
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-primary" onclick="runWebhookCheck(this)">Перевірити доступність</button>
+                    <button class="btn btn-success" onclick="runWebhookTest(this)">Надіслати тестовий</button>
+                    <button class="btn btn-danger" onclick="runWebhookCreate(this)">Створити вебхуки</button>
+                </div>
+
+                <div class="alert alert-success" id="webhook-success"></div>
+                <div class="alert alert-error" id="webhook-error"></div>
+            </div>
             <!-- Генерація sitemap -->
             <div class="command-card">
                 <h3>📄 Генерація Sitemap</h3>
@@ -230,9 +254,14 @@
                 <h3>🖼️ Очищення медіафайлів</h3>
                 <p>Видаляє застарілі медіафайли з storage, які більше не прив'язані до товарів у БД</p>
                 
-                <button class="btn btn-danger" onclick="runCleanMedia(this)">
-                    Очистити медіа
-                </button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-danger" onclick="runCleanMedia(this, true)">
+                        Тестовий запуск (без видалення)
+                    </button>
+                    <button class="btn btn-danger" onclick="runCleanMedia(this, false)">
+                        Видалити непотрібні файли
+                    </button>
+                </div>
                 
                 <div class="alert alert-success" id="media-success"></div>
                 <div class="alert alert-error" id="media-error"></div>
@@ -293,6 +322,81 @@
                 }
             } catch (error) {
                 showAlert('sitemap', 'Помилка з\'єднання: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+        async function runWebhookCheck(btn) {
+            setLoading(btn, true);
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const url = document.getElementById('webhook-url').value || '/webhook/moysklad';
+                const res = await fetch('/nova-vendor/command-runner/webhook/check', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showAlert('webhook', `OK (${data.status}) за ${data.timeMs} мс: ${data.url}`, true);
+                } else {
+                    showAlert('webhook', data.message, false);
+                }
+            } catch (e) {
+                showAlert('webhook', 'Помилка: ' + e.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runWebhookTest(btn) {
+            setLoading(btn, true);
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const url = document.getElementById('webhook-url').value || '/webhook/moysklad';
+                let payloadText = document.getElementById('webhook-payload').value.trim();
+                let payload = {};
+                if (payloadText) {
+                    try { payload = JSON.parse(payloadText); } catch (_) { payload = { raw: payloadText }; }
+                }
+                const res = await fetch('/nova-vendor/command-runner/webhook/test', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, payload })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showAlert('webhook', `Надіслано (${data.status}) за ${data.timeMs} мс`, true);
+                } else {
+                    showAlert('webhook', data.message, false);
+                }
+            } catch (e) {
+                showAlert('webhook', 'Помилка: ' + e.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runWebhookCreate(btn) {
+            if (!confirm('Створити вебхуки в МойСклад?')) return;
+            setLoading(btn, true);
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const url = document.getElementById('webhook-url').value || '/webhook/moysklad';
+                const token = prompt('Введіть токен MOYSKLAD_TOKEN (залиште порожнім для .env):', '');
+                const res = await fetch('/nova-vendor/command-runner/webhook/create', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, token })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showAlert('webhook', 'Вебхуки створено', true);
+                } else {
+                    showAlert('webhook', data.message || 'Помилка створення', false);
+                }
+            } catch (e) {
+                showAlert('webhook', 'Помилка: ' + e.message, false);
             } finally {
                 setLoading(btn, false);
             }
@@ -370,9 +474,11 @@
             }
         }
 
-        async function runCleanMedia(btn) {
-            if (!confirm('Ви впевнені, що хочете видалити непотрібні медіафайли? Це може зайняти деякий час.')) {
-                return;
+        async function runCleanMedia(btn, dryRun = true) {
+            if (!dryRun) {
+                if (!confirm('Підтвердіть видалення медіафайлів, які не прив’язані до БД.')) {
+                    return;
+                }
             }
             
             setLoading(btn, true);
@@ -385,16 +491,14 @@
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({ dryRun })
                 });
                 
                 const data = await response.json();
                 
                 if (data.success) {
-                    let message = data.message;
-                    if (data.details) {
-                        message += '\n' + data.details;
-                    }
+                    const message = `${data.message}: ${data.count}`;
                     showAlert('media', message, true);
                 } else {
                     showAlert('media', data.message, false);

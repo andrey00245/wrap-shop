@@ -22,4 +22,9 @@ class Video extends Model
       }
     });
   }
+
+  public function category()
+  {
+    return $this->belongsTo(VideoCategory::class, 'category_id');
+  }
 }

@@ -57,6 +57,9 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
     Route::post('/products', [CommandRunnerController::class, 'updateProducts']);
     Route::post('/cache', [CommandRunnerController::class, 'clearCache']);
     Route::post('/media', [CommandRunnerController::class, 'cleanMedia']);
+    Route::post('/webhook/check', [CommandRunnerController::class, 'webhookCheck']);
+    Route::post('/webhook/test', [CommandRunnerController::class, 'webhookTest']);
+    Route::post('/webhook/create', [CommandRunnerController::class, 'webhookCreate']);
 });
 Route::get('/slug-generate', function(){
   $products = Product::all();

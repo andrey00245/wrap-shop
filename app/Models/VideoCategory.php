@@ -18,10 +18,10 @@ class VideoCategory extends Model
     ];
 
     /**
-     * Связь с видео
+     * Связь с видеообзорами
      */
-    public function videos()
+    public function videoReviews()
     {
-        return $this->hasMany(Video::class, 'category_id');
+        return $this->hasMany(VideoReview::class, 'category_id');
     }
 }

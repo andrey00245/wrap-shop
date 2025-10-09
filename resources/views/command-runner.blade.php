@@ -198,17 +198,32 @@
                 <div class="alert alert-success" id="webhook-success"></div>
                 <div class="alert alert-error" id="webhook-error"></div>
             </div>
-            <!-- Генерація sitemap -->
-            <div class="command-card">
-                <h3>📄 Генерація Sitemap</h3>
-                <p>Створює файл sitemap.xml з усіма доступними сторінками сайту (товари, категорії, новини тощо)</p>
+            <!-- Оптимізація ресурсів -->
+            <div class="command-card" style="border: 2px solid #28a745; background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e8 100%);">
+                <h3>🚀 Повна оптимізація сайту</h3>
+                <p><strong>Рекомендована команда!</strong> Виконує все одразу:</p>
+                <ul style="text-align: left; margin: 10px 0;">
+                    <li>✅ Збірка та мініфікація CSS/JS</li>
+                    <li>✅ Очищення всіх кешів</li>
+                    <li>✅ Генерація sitemap.xml</li>
+                    <li>✅ Оновлення robots.txt</li>
+                    <li>✅ Оптимізація конфігурації</li>
+                    <li>✅ Підготовка до production</li>
+                </ul>
                 
-                <button class="btn btn-primary" onclick="runSitemap(this)">
-                    Згенерувати sitemap.xml
-                </button>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button class="btn btn-success" onclick="runOptimizeAssets(this)" style="font-size: 16px; padding: 12px 24px;">
+                        🚀 Оптимізувати все
+                    </button>
+                    <button class="btn btn-info" onclick="runUpdateRobots(this)" style="font-size: 14px; padding: 10px 16px;">
+                        🤖 Оновити robots.txt
+                    </button>
+                </div>
                 
-                <div class="alert alert-success" id="sitemap-success"></div>
-                <div class="alert alert-error" id="sitemap-error"></div>
+                <div class="alert alert-success" id="optimize-success"></div>
+                <div class="alert alert-error" id="optimize-error"></div>
+                <div class="alert alert-success" id="robots-success"></div>
+                <div class="alert alert-error" id="robots-error"></div>
             </div>
 
             <!-- Оновлення товарів (закоментовано - потребує queue worker) -->
@@ -236,13 +251,14 @@
             </div>
             -->
 
-            <!-- Очищення кешу -->
-            <div class="command-card">
-                <h3>🗑️ Очищення кешу</h3>
-                <p>Очищує кеш додатку (config, views, optimize). Корисно після змін у коді або конфігурації</p>
+            <!-- Швидке очищення кешу (тільки кеш) -->
+            <div class="command-card" style="opacity: 0.8;">
+                <h3>🗑️ Швидке очищення кешу</h3>
+                <p><small>⚠️ Включено в "Повна оптимізація"</small><br>
+                Тільки очищує кеш без повної оптимізації. Використовуйте для швидкого оновлення після змін</p>
                 
-                <button class="btn btn-danger" onclick="runClearCache(this)">
-                    Очистити кеш
+                <button class="btn btn-warning" onclick="runClearCache(this)">
+                    Очистити тільки кеш
                 </button>
                 
                 <div class="alert alert-success" id="cache-success"></div>
@@ -322,6 +338,62 @@
                 }
             } catch (error) {
                 showAlert('sitemap', 'Помилка з\'єднання: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runOptimizeAssets(btn) {
+            setLoading(btn, true);
+            
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/optimize-assets', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('optimize', data.message, true);
+                } else {
+                    showAlert('optimize', data.message, false);
+                }
+            } catch (error) {
+                showAlert('optimize', 'Помилка з\'єднання: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runUpdateRobots(btn) {
+            setLoading(btn, true);
+            
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/robots', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('robots', data.message, true);
+                } else {
+                    showAlert('robots', data.message, false);
+                }
+            } catch (error) {
+                showAlert('robots', 'Помилка з\'єднання: ' + error.message, false);
             } finally {
                 setLoading(btn, false);
             }

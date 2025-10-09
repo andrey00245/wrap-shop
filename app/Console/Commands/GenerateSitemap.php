@@ -47,14 +47,16 @@ class GenerateSitemap extends Command
             // Продукты
             Product::where('is_active', true)->get()->each(function ($product) use ($sitemap, $localeCode) {
                 $slug = $product->getTranslation('slug', $localeCode);
-                $url = LaravelLocalization::localizeURL(route('products.show', ['product' => $slug], false));
+                if ($slug) {
+                    $url = LaravelLocalization::localizeURL(route('products.show', ['product' => $slug], false));
 
-                $sitemap->add(
-                    Url::create($url)
-                        ->setLastModificationDate($product->updated_at ?? now())
-                        ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
-                        ->setPriority(1.0)
-                );
+                    $sitemap->add(
+                        Url::create($url)
+                            ->setLastModificationDate($product->updated_at ?? now())
+                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                            ->setPriority(0.8)
+                    );
+                }
             });
 
             // Новости

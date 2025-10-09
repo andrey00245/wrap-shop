@@ -38,6 +38,57 @@ class CommandRunnerController extends Controller
     }
 
     /**
+     * Оптимизация всех ресурсов
+     */
+    public function optimizeAssets(): JsonResponse
+    {
+        try {
+            Artisan::call('optimize:assets');
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Ресурси успішно оптимізовано! Перевірте консоль для деталей.'
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Помилка оптимізації ресурсів', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Помилка: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Обновление robots.txt
+     */
+    public function updateRobots(): JsonResponse
+    {
+        try {
+            // Очищаем кэш для robots.txt
+            Artisan::call('cache:forget', ['key' => 'robots.txt']);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Robots.txt оновлено! Тепер доступний за адресою /robots.txt'
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Помилка оновлення robots.txt', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Помилка: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Перевірка доступності вебхука (TCP+TLS+HTTP статус)
      */
     public function webhookCheck(Request $request): JsonResponse

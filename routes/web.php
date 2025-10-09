@@ -54,6 +54,8 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
         return view('command-runner');
     });
     Route::post('/sitemap', [CommandRunnerController::class, 'generateSitemap']);
+    Route::post('/optimize-assets', [CommandRunnerController::class, 'optimizeAssets']);
+    Route::post('/robots', [CommandRunnerController::class, 'updateRobots']);
     Route::post('/products', [CommandRunnerController::class, 'updateProducts']);
     Route::post('/cache', [CommandRunnerController::class, 'clearCache']);
     Route::post('/media', [CommandRunnerController::class, 'cleanMedia']);
@@ -61,6 +63,9 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
     Route::post('/webhook/test', [CommandRunnerController::class, 'webhookTest']);
     Route::post('/webhook/create', [CommandRunnerController::class, 'webhookCreate']);
 });
+// Динамический robots.txt
+Route::get('/robots.txt', [App\Http\Controllers\RobotsController::class, 'index']);
+
 Route::get('/slug-generate', function(){
   $products = Product::all();
   $categories = Category::all();

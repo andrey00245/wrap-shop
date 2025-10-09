@@ -29,6 +29,14 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="@yield('canonical', url()->current())">
 
+    <!-- Hreflang for multilingual support -->
+    @if(config('laravellocalization.supportedLocales'))
+        @foreach(config('laravellocalization.supportedLocales') as $localeCode => $properties)
+            <link rel="alternate" hreflang="{{ $localeCode }}" href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}" />
+        @endforeach
+        <link rel="alternate" hreflang="x-default" href="{{ LaravelLocalization::getLocalizedURL(config('app.fallback_locale'), null, [], true) }}" />
+    @endif
+
     <!-- Additional SEO Meta Tags -->
     <meta name="theme-color" content="@yield('theme_color', __('seo.default_theme_color'))">
     <meta name="msapplication-TileColor" content="@yield('msapplication_tile_color', __('seo.default_theme_color'))">
@@ -45,12 +53,12 @@
     @include('components.json-ld')
 
     @if($theme === 'dark')
-        <link href="{{mix('build/css/style-dark.css')}}" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login-dark.css')}}">
+        <link href="{{mix('build/css/dark.css')}}" rel="stylesheet" type="text/css">
     @else
-        <link href="{{mix('build/css/style-light.css')}}" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login-light.css')}}">
+        <link href="{{mix('build/css/light.css')}}" rel="stylesheet" type="text/css">
     @endif
+    <link href="{{mix('build/css/form.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{mix('build/css/reset.css')}}" rel="stylesheet" type="text/css">
     <!-- Font Preloads -->
     <link rel="preload" href="{{asset('assets/fonts/DINPro-Light.woff2')}}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{asset('assets/fonts/DINPro.woff2')}}" as="font" type="font/woff2" crossorigin>
@@ -58,6 +66,20 @@
     <link rel="preload" href="{{asset('assets/fonts/DINPro-Bold.woff2')}}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{asset('assets/fonts/Gilroy-Regular.woff2')}}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{asset('assets/fonts/Gilroy-Medium.woff2')}}" as="font" type="font/woff2" crossorigin>
+
+    <!-- Additional SEO Meta Tags -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- DNS prefetch for external resources -->
+    <link rel="dns-prefetch" href="//www.google-analytics.com">
+    <link rel="dns-prefetch" href="//www.googletagmanager.com">
     <link rel="preload" href="{{asset('assets/fonts/Gilroy-Semibold.woff2')}}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{asset('assets/fonts/Gilroy-Bold.woff2')}}" as="font" type="font/woff2" crossorigin>
 

@@ -45,6 +45,11 @@ class OptimizeAssets extends Command
         Artisan::call('cache:forget', ['key' => 'robots.txt']);
         $this->info('✅ Robots.txt updated');
 
+        // 6. Optimize images
+        $this->info('🖼️ Optimizing images...');
+        Artisan::call('optimize:images');
+        $this->info('✅ Images optimized');
+
         // 5. Check if we need to install additional packages
         $this->checkOptimizationPackages();
 

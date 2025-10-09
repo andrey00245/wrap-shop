@@ -37,7 +37,7 @@
     @include('base.components.examples-of-work')
 
     @push('scripts')
-      <script src="{{mix('build/js/sliders.js')}}"></script>
+      <script src="{{mix('build/js/sliders.js')}}" defer></script>
     @endpush
   </div>
 @endsection

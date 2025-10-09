@@ -59,13 +59,34 @@
         <link href="{{mix('build/css/style-light.css')}}" rel="stylesheet" type="text/css">
         <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login-light.css')}}">
     @endif
-    <!-- Font Preloads -->
-    <link rel="preload" href="{{asset('assets/fonts/DINPro-Light.woff2')}}" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Critical CSS for above-the-fold content -->
+    <style>
+        /* Critical styles for immediate rendering */
+        body { margin: 0; padding: 0; font-family: 'DINPro', sans-serif; }
+        .header { position: relative; z-index: 1000; }
+        .main-content { min-height: 100vh; }
+        .loading { display: none; }
+        .splide { visibility: hidden; }
+        .splide.is-initialized { visibility: visible; }
+    </style>
+    <!-- Font Preloads - Only critical fonts -->
     <link rel="preload" href="{{asset('assets/fonts/DINPro.woff2')}}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{asset('assets/fonts/DINPro-Medium.woff2')}}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{asset('assets/fonts/DINPro-Bold.woff2')}}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{asset('assets/fonts/Gilroy-Regular.woff2')}}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{{asset('assets/fonts/Gilroy-Medium.woff2')}}" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Font Display Swap for better performance -->
+    <style>
+        @font-face {
+            font-family: 'DINPro';
+            src: url('{{asset('assets/fonts/DINPro.woff2')}}') format('woff2');
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'DINPro-Medium';
+            src: url('{{asset('assets/fonts/DINPro-Medium.woff2')}}') format('woff2');
+            font-display: swap;
+        }
+    </style>
 
     <!-- Additional SEO Meta Tags -->
     <meta name="format-detection" content="telephone=no">

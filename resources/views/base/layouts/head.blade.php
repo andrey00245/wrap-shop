@@ -53,12 +53,12 @@
     @include('components.json-ld')
 
     @if($theme === 'dark')
-        <link href="{{mix('build/css/dark.css')}}" rel="stylesheet" type="text/css">
+        <link href="{{mix('build/css/style-dark.css')}}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login-dark.css')}}">
     @else
-        <link href="{{mix('build/css/light.css')}}" rel="stylesheet" type="text/css">
+        <link href="{{mix('build/css/style-light.css')}}" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login-light.css')}}">
     @endif
-    <link href="{{mix('build/css/form.css')}}" rel="stylesheet" type="text/css">
-    <link href="{{mix('build/css/reset.css')}}" rel="stylesheet" type="text/css">
     <!-- Font Preloads -->
     <link rel="preload" href="{{asset('assets/fonts/DINPro-Light.woff2')}}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{asset('assets/fonts/DINPro.woff2')}}" as="font" type="font/woff2" crossorigin>

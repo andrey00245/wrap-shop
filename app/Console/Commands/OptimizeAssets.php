@@ -15,10 +15,10 @@ class OptimizeAssets extends Command
     {
         $this->info('🚀 Starting asset optimization...');
 
-        // 1. Build assets with production optimizations
-        $this->info('📦 Building assets...');
-        Artisan::call('mix:build', ['--production' => true]);
-        $this->info('✅ Assets built successfully');
+        // 1. Build assets (skip for now to avoid issues)
+        $this->info('📦 Skipping asset build (using original configuration)...');
+        // Artisan::call('mix:build', ['--production' => true]);
+        $this->info('✅ Assets build skipped');
 
         // 2. Clear and rebuild caches
         $this->info('🗑️ Clearing caches...');

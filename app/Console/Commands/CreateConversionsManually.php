@@ -46,6 +46,17 @@ class CreateConversionsManually extends Command
                 }
                 
                 $resized = imagecreatetruecolor(482, 482);
+                
+                // Устанавливаем белый фон
+                $white = imagecolorallocate($resized, 255, 255, 255);
+                imagefill($resized, 0, 0, $white);
+                
+                // Сохраняем прозрачность для PNG
+                if ($media->mime_type === 'image/png') {
+                    imagealphablending($resized, false);
+                    imagesavealpha($resized, true);
+                }
+                
                 imagecopyresampled($resized, $image, 0, 0, 0, 0, 482, 482, imagesx($image), imagesy($image));
                 
                 if (imagewebp($resized, $conversionFile, 100)) {

@@ -134,7 +134,7 @@ class Product extends Resource
                 ->sortable(),
 
             Images::make('Фото', 'images')
-                ->conversionOnIndexView('preview'),
+                ->conversionOnIndexView('preview_webp'),
 
             Number::make('Кількість','stock')
                 ->sortable(),
@@ -177,7 +177,7 @@ class Product extends Resource
                 Text::make('Назва', 'banner_title'),
             ])->hideFromIndex(),
             Images::make('Фото Вигляду', 'banner_images')
-                ->conversionOnIndexView('preview')
+                ->conversionOnIndexView('preview_webp')
             ->hideFromIndex(),
         ];
     }

@@ -160,9 +160,6 @@ class GenerateMediaConversions extends Command
         }
         
         // Выполняем конверсию для конкретного медиа файла
-        $conversion->performOnCollections($media->collection_name);
-        
-        // Создаем конверсию напрямую
         $conversion->performOnMedia($media);
     }
     

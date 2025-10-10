@@ -34,9 +34,6 @@ class CleanupOldConversions extends Command
         
         $this->info("Найдено медиа файлов: {$totalFiles}");
         
-        $bar = $this->output->createProgressBar($totalFiles);
-        $bar->start();
-        
         $deletedFiles = 0;
         $savedSpace = 0;
         $oldConversions = ['preview', 'thumbnail', 'webp']; // Старые конверсии для удаления
@@ -47,7 +44,6 @@ class CleanupOldConversions extends Command
                 $conversionsPath = dirname($mediaPath) . '/conversions/';
                 
                 if (!is_dir($conversionsPath)) {
-                    $bar->advance();
                     continue;
                 }
                 
@@ -83,11 +79,7 @@ class CleanupOldConversions extends Command
             } catch (\Exception $e) {
                 $this->error("\nОшибка обработки {$media->file_name}: " . $e->getMessage());
             }
-            
-            $bar->advance();
         }
-        
-        $bar->finish();
         
         $this->info("\n\n📊 РЕЗУЛЬТАТЫ:");
         $this->info("Файлов для удаления: {$deletedFiles}");

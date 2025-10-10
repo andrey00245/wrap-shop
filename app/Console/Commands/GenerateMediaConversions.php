@@ -35,9 +35,6 @@ class GenerateMediaConversions extends Command
             return 0;
         }
         
-        $bar = $this->output->createProgressBar($mediaFiles->count());
-        $bar->start();
-        
         $processed = 0;
         $errors = 0;
         
@@ -78,11 +75,7 @@ class GenerateMediaConversions extends Command
                 $this->error("\nОшибка обработки {$media->file_name}: " . $e->getMessage());
                 $errors++;
             }
-            
-            $bar->advance();
         }
-        
-        $bar->finish();
         
         $this->info("\n\n✅ Обработка завершена!");
         $this->info("Обработано: {$processed}");

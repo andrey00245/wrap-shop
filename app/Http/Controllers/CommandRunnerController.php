@@ -301,8 +301,7 @@ class CommandRunnerController extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => 'Генерация конверсий завершена',
-                'details' => $output,
+                'message' => $output
             ]);
         } catch (\Throwable $e) {
             Log::error('Ошибка генерации конверсий', [
@@ -355,8 +354,7 @@ class CommandRunnerController extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => 'Анализ неиспользуемых медиа завершен',
-                'details' => $output,
+                'message' => $output
             ]);
         } catch (\Throwable $e) {
             Log::error('Ошибка анализа неиспользуемых медиа', [
@@ -382,8 +380,7 @@ class CommandRunnerController extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => 'Очистка неиспользуемых медиа завершена',
-                'details' => $output,
+                'message' => $output
             ]);
         } catch (\Throwable $e) {
             Log::error('Ошибка очистки неиспользуемых медиа', [

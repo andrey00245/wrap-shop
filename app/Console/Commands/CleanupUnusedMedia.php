@@ -106,9 +106,6 @@ class CleanupUnusedMedia extends Command
         
         $this->info("\n🚀 Начинаем очистку...");
         
-        $bar = $this->output->createProgressBar($totalCount);
-        $bar->start();
-        
         // Обрабатываем по батчам
         $chunks = $unusedMedia->chunk($batchSize);
         
@@ -133,15 +130,11 @@ class CleanupUnusedMedia extends Command
                     $this->error("\nОшибка удаления {$media->file_name}: " . $e->getMessage());
                     $errors++;
                 }
-                
-                $bar->advance();
             }
             
             // Небольшая пауза между батчами
             usleep(100000); // 0.1 секунды
         }
-        
-        $bar->finish();
         
         // Результаты
         $this->info("\n\n✅ ОЧИСТКА ЗАВЕРШЕНА!");

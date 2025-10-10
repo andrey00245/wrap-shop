@@ -249,44 +249,15 @@
                 <div class="alert alert-error" id="cache-error"></div>
             </div>
 
-            <!-- Очищення медіа -->
-            <div class="command-card">
-                <h3>🖼️ Очищення медіафайлів</h3>
-                <p>Видаляє застарілі медіафайли з storage, які більше не прив'язані до товарів у БД</p>
-                
-                <div style="display:flex; gap:8px;">
-                    <button class="btn btn-danger" onclick="runCleanMedia(this, true)">
-                        Тестовий запуск (без видалення)
-                    </button>
-                    <button class="btn btn-danger" onclick="runCleanMedia(this, false)">
-                        Видалити непотрібні файли
-                    </button>
-                </div>
-                
-                <div class="alert alert-success" id="media-success"></div>
-                <div class="alert alert-error" id="media-error"></div>
-            </div>
 
-            <!-- Генерация конверсий медиа -->
+            <!-- Оптимизация медиа -->
             <div class="command-card" style="border: 2px solid #17a2b8; background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);">
                 <h3>🖼️ Оптимизация медиа файлов</h3>
-                <p>Генерация оптимизированных версий изображений для улучшения производительности</p>
-                <ul style="text-align: left; margin: 10px 0; font-size: 14px;">
-                    <li>📱 Preview (310x310) - для каталога товаров</li>
-                    <li>🔍 Thumbnail (150x150) - для миниатюр</li>
-                    <li>🖼️ Gallery (800x800) - для галереи товара</li>
-                    <li>⚡ WebP версии - для современной загрузки</li>
-                </ul>
+                <p>Создание оптимизированных версий изображений для ускорения загрузки сайта</p>
                 
                 <div style="display:flex; gap:8px; justify-content: center;">
-                    <button class="btn btn-secondary" onclick="runAnalyzeMedia(this)">
-                        📊 Анализ медиа
-                    </button>
                     <button class="btn btn-info" onclick="runGenerateConversions(this, false)">
-                        🚀 Генерировать конверсии
-                    </button>
-                    <button class="btn btn-warning" onclick="runGenerateConversions(this, true)">
-                        🔄 Принудительно пересоздать
+                        🚀 Создать оптимизированные версии
                     </button>
                 </div>
                 
@@ -297,17 +268,11 @@
             <!-- Очистка неиспользуемых медиа -->
             <div class="command-card" style="border: 2px solid #dc3545; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);">
                 <h3>🗑️ Очистка неиспользуемых медиа</h3>
-                <p><strong>ВНИМАНИЕ!</strong> Удаляет медиа файлы, которые не привязаны к товарам, категориям и другим моделям</p>
-                <ul style="text-align: left; margin: 10px 0; font-size: 14px;">
-                    <li>🔍 Анализ неиспользуемых файлов</li>
-                    <li>📊 Показ потенциальной экономии места</li>
-                    <li>🗑️ Безопасное удаление с подтверждением</li>
-                    <li>💾 Создание бэкапа перед удалением</li>
-                </ul>
+                <p><strong>ВНИМАНИЕ!</strong> Удаляет медиа файлы, которые не привязаны к товарам (экономия ~6 ГБ)</p>
                 
                 <div style="display:flex; gap:8px; justify-content: center;">
                     <button class="btn btn-secondary" onclick="runAnalyzeUnusedMedia(this)">
-                        🔍 Анализ неиспользуемых
+                        🔍 Анализ (безопасно)
                     </button>
                     <button class="btn btn-danger" onclick="runCleanupUnusedMedia(this)">
                         🗑️ Удалить неиспользуемые
@@ -321,6 +286,7 @@
     </div>
 
     <script>
+        // Command Runner v2.0 - Media Optimization
         function showAlert(id, message, isSuccess = true) {
             const successEl = document.getElementById(id + '-success');
             const errorEl = document.getElementById(id + '-error');
@@ -561,36 +527,9 @@
             }
         }
 
-        async function runAnalyzeMedia(btn) {
-            setLoading(btn, true);
-            
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                const response = await fetch('/nova-vendor/command-runner/analyze-media', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showAlert('conversions', data.message, true);
-                } else {
-                    showAlert('conversions', data.message, false);
-                }
-            } catch (error) {
-                showAlert('conversions', 'Ошибка соединения: ' + error.message, false);
-            } finally {
-                setLoading(btn, false);
-            }
-        }
 
         async function runGenerateConversions(btn, force = false) {
-            if (!confirm(`Подтвердите генерацию конверсий${force ? ' (принудительно)' : ''}. Это может занять много времени!`)) {
+            if (!confirm('Создать оптимизированные версии изображений? Это может занять время!')) {
                 return;
             }
             

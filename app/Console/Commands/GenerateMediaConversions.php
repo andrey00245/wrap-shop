@@ -65,8 +65,16 @@ class GenerateMediaConversions extends Command
                 
                 foreach ($conversions as $conversionName) {
                     if ($force || !$media->hasGeneratedConversion($conversionName)) {
-                        // Конверсия уже зарегистрирована в модели, просто генерируем
-                        $media->getUrl($conversionName);
+                        try {
+                            // Генерируем конверсию через MediaLibrary
+                            $conversion = $media->getMediaConversion($conversionName);
+                            if ($conversion) {
+                                $conversion->perform();
+                            }
+                        } catch (\Exception $e) {
+                            // Если конверсия не существует, создаем ее
+                            $this->createConversionForMedia($media, $conversionName);
+                        }
                     }
                 }
                 
@@ -139,6 +147,42 @@ class GenerateMediaConversions extends Command
             'thumbnail' => 5,
             default => 0
         };
+    }
+    
+    private function createConversionForMedia($media, $conversionName)
+    {
+        $config = MediaConversions::getConversionsConfig()[$conversionName] ?? null;
+        
+        if (!$config) {
+            return;
+        }
+        
+        $conversion = $media->addMediaConversion($conversionName);
+        
+        if ($config['width'] && $config['height']) {
+            $conversion->width($config['width'])->height($config['height']);
+        }
+        
+        if ($config['quality']) {
+            $conversion->quality($config['quality']);
+        }
+        
+        if ($config['sharpen']) {
+            $conversion->sharpen($config['sharpen']);
+        }
+        
+        if ($config['format']) {
+            $conversion->format($config['format']);
+        }
+        
+        $conversion->optimize();
+        
+        foreach ($config['collections'] as $collection) {
+            $conversion->performOnCollections($collection);
+        }
+        
+        // Выполняем конверсию
+        $conversion->perform();
     }
     
     private function showSizeStatistics($collection)

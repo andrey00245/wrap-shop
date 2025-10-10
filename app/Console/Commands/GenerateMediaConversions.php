@@ -48,23 +48,17 @@ class GenerateMediaConversions extends Command
                     continue;
                 }
                 
-                // Регистрируем конверсии для модели
-                $model->registerMediaConversions($media);
-                
                 // Генерируем конверсии из конфигурации
                 $conversions = array_keys(MediaConversions::getConversionsConfig());
                 
                 foreach ($conversions as $conversionName) {
                     if ($force || !$media->hasGeneratedConversion($conversionName)) {
                         try {
-                            // Генерируем конверсию через MediaLibrary
-                            $conversion = $media->getMediaConversion($conversionName);
-                            if ($conversion) {
-                                $conversion->perform();
-                            }
-                        } catch (\Exception $e) {
-                            // Если конверсия не существует, создаем ее
+                            // Создаем конверсию напрямую
                             $this->createConversionForMedia($media, $conversionName);
+                        } catch (\Exception $e) {
+                            $this->error("\nОшибка создания конверсии {$conversionName} для {$media->file_name}: " . $e->getMessage());
+                            $errors++;
                         }
                     }
                 }
@@ -125,7 +119,14 @@ class GenerateMediaConversions extends Command
             return;
         }
         
-        $conversion = $media->addMediaConversion($conversionName);
+        // Получаем модель для создания конверсии
+        $model = $media->model;
+        if (!$model) {
+            throw new \Exception("Медиа не привязано к модели");
+        }
+        
+        // Создаем конверсию через модель
+        $conversion = $model->addMediaConversion($conversionName);
         
         if ($config['width'] && $config['height']) {
             $conversion->width($config['width'])->height($config['height']);

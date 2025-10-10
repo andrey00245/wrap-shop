@@ -12,7 +12,7 @@ class MediaConversions
         // Этот метод будет вызываться из модели Product
         // Конверсии регистрируются через addMediaConversion в модели
     }
-    
+
     public static function getConversionsConfig(): array
     {
         return [

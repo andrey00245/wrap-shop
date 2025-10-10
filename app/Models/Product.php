@@ -102,7 +102,10 @@ class Product extends Model implements HasMedia
     ];
 
     /**
-     * @param  $column
+     * @param $query
+     * @param $column
+     * @param $value
+     * @return Builder
      */
     public function scopeWhereLikeInsensitive($query, array $columns, string $value): Builder
     {
@@ -296,6 +299,7 @@ class Product extends Model implements HasMedia
     }
 
     /**
+     * @return bool
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
@@ -307,7 +311,6 @@ class Product extends Model implements HasMedia
         if (session()?->has('wishlist')) {
             return in_array($this->id, session()?->get('wishlist', []), true);
         }
-
         return false;
     }
 
@@ -383,8 +386,6 @@ class Product extends Model implements HasMedia
     {
         $this->addMediaCollection('images');
         $this->addMediaCollection('banner_images');
-        // Видео теперь загружаются через YouTube ссылки (ProductVideo модель)
-        // $this->addMediaCollection('videos')->singleFile();
     }
 
     /**

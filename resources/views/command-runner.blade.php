@@ -172,7 +172,7 @@
 <body>
     <div class="container">
         <h1>⚡ Команди</h1>
-        
+
         <div class="command-grid">
             <!-- Вебхуки (окремий блок) -->
             <div class="command-card">
@@ -202,11 +202,11 @@
             <div class="command-card">
                 <h3>📄 Генерація Sitemap</h3>
                 <p>Створює файл sitemap.xml з усіма доступними сторінками сайту (товари, категорії, новини тощо)</p>
-                
+
                 <button class="btn btn-primary" onclick="runSitemap(this)">
                     Згенерувати sitemap.xml
                 </button>
-                
+
                 <div class="alert alert-success" id="sitemap-success"></div>
                 <div class="alert alert-error" id="sitemap-error"></div>
             </div>
@@ -247,21 +247,21 @@
             <div class="command-card">
                 <h3>🔄 Оновлення товарів</h3>
                 <p>Запускає синхронізацію товарів з МойСклад у фонових джобах (по 500 товарів)</p>
-                
+
                 <div class="form-group">
                     <label for="products-start">Початок (offset):</label>
                     <input type="number" id="products-start" value="0" min="0" step="1">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="products-end">Кінець (offset):</label>
                     <input type="number" id="products-end" value="1000" min="1" step="1">
                 </div>
-                
+
                 <button class="btn btn-success" onclick="runUpdateProducts(this)">
                     Оновити товари
                 </button>
-                
+
                 <div class="alert alert-success" id="products-success"></div>
                 <div class="alert alert-error" id="products-error"></div>
             </div>
@@ -271,11 +271,11 @@
             <div class="command-card">
                 <h3>🗑️ Очищення кешу</h3>
                 <p>Очищує кеш додатку (config, views, optimize). Корисно після змін у коді або конфігурації</p>
-                
+
                 <button class="btn btn-danger" onclick="runClearCache(this)">
                     Очистити кеш
                 </button>
-                
+
                 <div class="alert alert-success" id="cache-success"></div>
                 <div class="alert alert-error" id="cache-error"></div>
             </div>
@@ -284,7 +284,7 @@
             <div class="command-card" style="border: 2px solid #28a745; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);">
                 <h3>🔗 Storage Link</h3>
                 <p>Создание символической ссылки для доступа к файлам из storage/app/public</p>
-                
+
                 <div style="display:flex; gap:8px; justify-content: center; flex-wrap: wrap;">
                     <button class="btn btn-success" onclick="runStorageLink(this, false)">
                         🔗 Создать ссылку
@@ -293,7 +293,7 @@
                         🔄 Пересоздать ссылку
                     </button>
                 </div>
-                
+
                 <div class="alert alert-success" id="storage-link-success"></div>
                 <div class="alert alert-error" id="storage-link-error"></div>
             </div>
@@ -302,18 +302,18 @@
             <div class="command-card" style="border: 2px solid #6f42c1; background: linear-gradient(135deg, #e2d9f3 0%, #d1c4e9 100%);">
                 <h3>⚡ Произвольная Artisan команда</h3>
                 <p>Выполнить любую разрешенную Artisan команду с параметрами</p>
-                
+
                 <div class="form-group">
                     <label for="custom-command">Команда (например: cache:clear, migrate, media:generate-sync --force):</label>
                     <input type="text" id="custom-command" placeholder="cache:clear" style="width: 100%; padding: 8px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px;">
                 </div>
-                
+
                 <div style="display:flex; gap:8px; justify-content: center;">
                     <button class="btn btn-primary" onclick="runCustomCommand(this)">
                         🚀 Выполнить команду
                     </button>
                 </div>
-                
+
                 <div class="alert alert-success" id="custom-command-success"></div>
                 <div class="alert alert-error" id="custom-command-error"></div>
                 <pre id="custom-command-output" style="margin-top:10px; max-height: 400px; overflow: auto; background:#111; color:#0f0; padding:10px; border-radius:6px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; display: none;"></pre>
@@ -327,10 +327,10 @@
         function showAlert(id, message, isSuccess = true) {
             const successEl = document.getElementById(id + '-success');
             const errorEl = document.getElementById(id + '-error');
-            
+
             successEl.classList.remove('show');
             errorEl.classList.remove('show');
-            
+
             if (isSuccess) {
                 successEl.textContent = message;
                 successEl.classList.add('show');
@@ -355,7 +355,7 @@
 
         async function runSitemap(btn) {
             setLoading(btn, true);
-            
+
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 const response = await fetch('/nova-vendor/command-runner/sitemap', {
@@ -366,9 +366,9 @@
                         'Content-Type': 'application/json'
                     }
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     showAlert('sitemap', data.message, true);
                 } else {
@@ -539,14 +539,14 @@
         async function runUpdateProducts(btn) {
             const start = parseInt(document.getElementById('products-start').value);
             const end = parseInt(document.getElementById('products-end').value);
-            
+
             if (start < 0 || end <= start) {
                 showAlert('products', 'Некоректні значення діапазону', false);
                 return;
             }
-            
+
             setLoading(btn, true);
-            
+
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 const response = await fetch('/nova-vendor/command-runner/products', {
@@ -558,9 +558,9 @@
                     },
                     body: JSON.stringify({ start, end })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     showAlert('products', data.message, true);
                 } else {
@@ -578,9 +578,9 @@
             if (!confirm('Ви впевнені, що хочете очистити кеш?')) {
                 return;
             }
-            
+
             setLoading(btn, true);
-            
+
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 const response = await fetch('/nova-vendor/command-runner/cache', {
@@ -591,9 +591,9 @@
                         'Content-Type': 'application/json'
                     }
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     showAlert('cache', data.message, true);
                 } else {
@@ -611,9 +611,9 @@
             if (!confirm(`Вы уверены, что хотите ${action} storage link?`)) {
                 return;
             }
-            
+
             setLoading(btn, true);
-            
+
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 const response = await fetch('/nova-vendor/command-runner/storage-link', {
@@ -628,7 +628,7 @@
                 });
 
                 const result = await response.json();
-                
+
                 if (result.success) {
                     showAlert('storage-link', result.message, true);
                     if (result.details) {
@@ -652,18 +652,18 @@
 
         async function runCustomCommand(btn) {
             const command = document.getElementById('custom-command').value.trim();
-            
+
             if (!command) {
                 showAlert('custom-command', 'Введите команду для выполнения', false);
                 return;
             }
-            
+
             if (!confirm(`Выполнить команду: "${command}"?`)) {
                 return;
             }
-            
+
             setLoading(btn, true);
-            
+
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 const response = await fetch('/nova-vendor/command-runner/custom-command', {
@@ -675,9 +675,9 @@
                     },
                     body: JSON.stringify({ command })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     showAlert('custom-command', data.message, true);
                     if (data.output) {

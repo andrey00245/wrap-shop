@@ -435,31 +435,36 @@ Route::group([
 
     Route::post('/get-count', [ProductController::class, 'getCount'])->name('get-count');
 
-    Route::get('/privacy-policy', function () {
-        $privacy_policy = PrivacyPolicy::first();
 
-        return view('base.pages.privacy-policy', compact('privacy_policy'));
-    })->name('privacy-policy');
+  Route::get('/privacy-policy', function (){
+    $privacy_policy = PrivacyPolicy::first();
+    return view('base.pages.privacy-policy', compact('privacy_policy'));
+  })->name('privacy-policy');
 
-    Route::get('/checkout', function () {
-        return view('base.pages.checkout.index');
-    })->name('checkout');
+  Route::get('/checkout', function () {
+    return view('base.pages.checkout.index');
+  })->name('checkout');
 
     Route::get('/checkout/success', function () {
         return view('base.pages.checkout.success');
     })->name('checkout.success');
 
-    Route::post('/subscribe', [SubscribeController::class, 'store'])->name('subscribe');
+  Route::post('/subscribe', [SubscribeController::class, 'store'])->name('subscribe');
 
-    Route::get('/shipping-and-payment', function () {
-        return view('base.pages.delivery');
-    })->name('delivery');
+  Route::get('/shipping-and-payment', function () {
+    return view('base.pages.delivery');
+  })->name('delivery');
 
-    Route::group(['prefix' => '/news'], function () {
+    Route::get('/videoreviews', [VideosController::class, 'index'])->name('videoreviews');
 
-        Route::get('/', [NewsController::class, 'index'])->name('news.index');
-        Route::get('/{news_category:slug}', [NewsController::class, 'category'])->name('news.category');
-        Route::get('/{news_category:slug}/{news:slug}', [NewsController::class, 'show'])->name('news.show');
+    Route::get('/videoreviews/{category}', [VideosController::class, 'show'])->name('videos.show');
+
+
+    Route::group(['prefix' => '/news'], function(){
+
+      Route::get('/', [NewsController::class, 'index'])->name('news.index');
+      Route::get('/{news_category:slug}', [NewsController::class, 'category'])->name('news.category');
+      Route::get('/{news_category:slug}/{news:slug}', [NewsController::class, 'show'])->name('news.show');
     });
 
     Route::group(['prefix' => '/blog'], function () {
@@ -471,9 +476,9 @@ Route::group([
         Route::get('/{blog_post}', [BlogController::class, 'show'])->name('blog.show');
     });
 
-    Route::get('/about-us', function () {
-        return view('base.pages.about-us');
-    })->name('about-us');
+  Route::get('/about-us', function () {
+    return view('base.pages.about-us');
+  })->name('about-us');
 
     Route::get('/implementations', function () {
         $implementations = \App\Models\Implementation::query()

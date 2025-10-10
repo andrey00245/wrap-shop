@@ -16,12 +16,12 @@ class MediaConversions
     public static function getConversionsConfig(): array
     {
         return [
-            'preview' => [
+            'preview_webp' => [
                 'width' => 310,
                 'height' => 310,
                 'quality' => 85,
                 'sharpen' => 10,
-                'format' => null,
+                'format' => 'webp',
                 'collections' => ['images']
             ],
             'gallery' => [

@@ -397,5 +397,37 @@ class CommandRunnerController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Очистка старых конверсий
+     */
+    public function cleanupOldConversions(Request $request): JsonResponse
+    {
+        try {
+            $dryRun = $request->input('dry_run', true);
+            $dryRunFlag = $dryRun ? '--dry-run' : '';
+            
+            Artisan::call('media:cleanup-old-conversions', [
+                '--dry-run' => $dryRun
+            ]);
+            
+            $output = Artisan::output();
+            
+            return response()->json([
+                'success' => true,
+                'message' => $output
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Ошибка очистки старых конверсий', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
 

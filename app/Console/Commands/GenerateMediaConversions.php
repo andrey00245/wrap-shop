@@ -54,14 +54,8 @@ class GenerateMediaConversions extends Command
                 // Регистрируем конверсии для модели
                 $model->registerMediaConversions($media);
                 
-                // Генерируем конверсии
-                $conversions = [
-                    'preview',
-                    'thumbnail', 
-                    'gallery',
-                    'webp',
-                    'preview_webp'
-                ];
+                // Генерируем конверсии из конфигурации
+                $conversions = array_keys(MediaConversions::getConversionsConfig());
                 
                 foreach ($conversions as $conversionName) {
                     if ($force || !$media->hasGeneratedConversion($conversionName)) {
@@ -102,51 +96,32 @@ class GenerateMediaConversions extends Command
     
     private function getConversionWidth($conversionName)
     {
-        return match($conversionName) {
-            'preview', 'preview_webp' => 310,
-            'thumbnail' => 150,
-            'gallery' => 800,
-            'webp' => null,
-            default => 310
-        };
+        $config = MediaConversions::getConversionsConfig();
+        return $config[$conversionName]['width'] ?? null;
     }
     
     private function getConversionHeight($conversionName)
     {
-        return match($conversionName) {
-            'preview', 'preview_webp' => 310,
-            'thumbnail' => 150,
-            'gallery' => 800,
-            'webp' => null,
-            default => 310
-        };
+        $config = MediaConversions::getConversionsConfig();
+        return $config[$conversionName]['height'] ?? null;
     }
     
     private function getConversionQuality($conversionName)
     {
-        return match($conversionName) {
-            'preview', 'preview_webp', 'webp' => 85,
-            'thumbnail' => 80,
-            'gallery' => 90,
-            default => 85
-        };
+        $config = MediaConversions::getConversionsConfig();
+        return $config[$conversionName]['quality'] ?? 85;
     }
     
     private function getConversionFormat($conversionName)
     {
-        return match($conversionName) {
-            'webp', 'preview_webp' => 'webp',
-            default => null
-        };
+        $config = MediaConversions::getConversionsConfig();
+        return $config[$conversionName]['format'] ?? null;
     }
     
     private function getConversionSharpen($conversionName)
     {
-        return match($conversionName) {
-            'preview', 'preview_webp', 'gallery' => 10,
-            'thumbnail' => 5,
-            default => 0
-        };
+        $config = MediaConversions::getConversionsConfig();
+        return $config[$conversionName]['sharpen'] ?? 0;
     }
     
     private function createConversionForMedia($media, $conversionName)

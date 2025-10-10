@@ -64,6 +64,7 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
     Route::post('/analyze-media', [CommandRunnerController::class, 'analyzeMedia']);
     Route::post('/analyze-unused-media', [CommandRunnerController::class, 'analyzeUnusedMedia']);
     Route::post('/cleanup-unused-media', [CommandRunnerController::class, 'cleanupUnusedMedia']);
+    Route::post('/cleanup-old-conversions', [CommandRunnerController::class, 'cleanupOldConversions']);
 });
 Route::get('/slug-generate', function(){
   $products = Product::all();

@@ -292,6 +292,12 @@
                     <button class="btn btn-warning" onclick="runStorageLink(this, true)">
                         🔄 Пересоздать ссылку
                     </button>
+                    <button class="btn btn-warning" onclick="runCleanupOldConversions(this, true)">
+                        🔍 Анализ старых конверсий
+                    </button>
+                    <button class="btn btn-danger" onclick="runCleanupOldConversions(this, false)">
+                        🗑️ Удалить старые конверсии
+                    </button>
                 </div>
 
                 <div class="alert alert-success" id="storage-link-success"></div>
@@ -693,6 +699,44 @@
                 }
             } catch (error) {
                 showAlert('custom-command', 'Ошибка соединения: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runCleanupOldConversions(btn, dryRun = true) {
+            const action = dryRun ? 'анализ' : 'удаление';
+            const confirmText = dryRun 
+                ? 'Показать старые конверсии для удаления?'
+                : '⚠️ ВНИМАНИЕ! Это удалит старые конверсии навсегда!\n\nВы уверены?';
+                
+            if (!confirm(confirmText)) {
+                return;
+            }
+            
+            setLoading(btn, true);
+            
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/cleanup-old-conversions', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ dry_run: dryRun })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('conversions', data.message, true);
+                } else {
+                    showAlert('conversions', data.message, false);
+                }
+            } catch (error) {
+                showAlert('conversions', 'Ошибка соединения: ' + error.message, false);
             } finally {
                 setLoading(btn, false);
             }

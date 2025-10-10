@@ -54,17 +54,16 @@ class GenerateMediaConversions extends Command
                 // Генерируем конверсии из конфигурации
                 $conversions = array_keys(MediaConversions::getConversionsConfig());
                 
-                // Генерируем конверсии для всех сразу
-                if ($force || !$media->hasGeneratedConversion('preview_webp') || !$media->hasGeneratedConversion('gallery')) {
-                    try {
-                        // Используем правильную команду Spatie
-                        \Artisan::call('media-library:regenerate', [
-                            '--ids' => [$media->id],
-                            '--force' => true
-                        ]);
-                    } catch (\Exception $e) {
-                        $this->error("\nОшибка создания конверсий для {$media->file_name}: " . $e->getMessage());
-                        $errors++;
+                // Генерируем конверсии напрямую
+                foreach ($conversions as $conversionName) {
+                    if ($force || !$media->hasGeneratedConversion($conversionName)) {
+                        try {
+                            // Создаем конверсию через модель
+                            $this->createConversionForMedia($media, $conversionName);
+                        } catch (\Exception $e) {
+                            $this->error("\nОшибка создания конверсии {$conversionName} для {$media->file_name}: " . $e->getMessage());
+                            $errors++;
+                        }
                     }
                 }
                 
@@ -116,6 +115,56 @@ class GenerateMediaConversions extends Command
         return $config[$conversionName]['sharpen'] ?? 0;
     }
     
+    private function createConversionForMedia($media, $conversionName)
+    {
+        $config = MediaConversions::getConversionsConfig()[$conversionName] ?? null;
+        
+        if (!$config) {
+            return;
+        }
+        
+        // Получаем модель для создания конверсии
+        $model = $media->model;
+        if (!$model) {
+            throw new \Exception("Медиа не привязано к модели");
+        }
+        
+        // Создаем конверсию через модель
+        $conversion = $model->addMediaConversion($conversionName);
+        
+        if ($config['width'] && $config['height']) {
+            $conversion->width($config['width'])->height($config['height']);
+        }
+        
+        if ($config['quality']) {
+            $conversion->quality($config['quality']);
+        }
+        
+        if ($config['sharpen']) {
+            $conversion->sharpen($config['sharpen']);
+        }
+        
+        if ($config['format']) {
+            $conversion->format($config['format']);
+        }
+        
+        // Используем contain для правильного масштабирования
+        if (isset($config['fit'])) {
+            $conversion->fit(\Spatie\Image\Enums\Fit::Contain);
+        }
+        
+        $conversion->optimize();
+        
+        foreach ($config['collections'] as $collection) {
+            $conversion->performOnCollections($collection);
+        }
+        
+        // Выполняем конверсию для конкретного медиа файла
+        $conversion->performOnCollections($media->collection_name);
+        
+        // Создаем конверсию напрямую
+        $conversion->performOnMedia($media);
+    }
     
     private function showSizeStatistics($collection)
     {

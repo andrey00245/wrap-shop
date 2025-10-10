@@ -255,7 +255,7 @@
                 <h3>🖼️ Оптимизация медиа файлов</h3>
                 <p>Создание оптимизированных версий изображений для ускорения загрузки сайта</p>
                 
-                <div style="display:flex; gap:8px; justify-content: center;">
+                <div style="display:flex; gap:8px; justify-content: center; flex-wrap: wrap;">
                     <button class="btn btn-info" onclick="runGenerateConversions(this, false)">
                         🚀 Создать оптимизированные версии
                     </button>

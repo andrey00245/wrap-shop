@@ -86,7 +86,7 @@ class GenerateConversionsSync extends Command
     {
         // Используем конфигурацию из MediaConversions
         $conversions = \App\Models\MediaConversions::getConversionsConfig();
-        
+
         // Получаем модель для создания конверсий
         $model = $media->model;
         if (!$model) {
@@ -169,7 +169,7 @@ class GenerateConversionsSync extends Command
 
         $this->info("\n📋 Примеры URL для {$media->file_name}:");
         $this->line("Оригинал: " . $media->getUrl());
-        
+
         // Показываем только существующие конверсии
         if ($media->hasGeneratedConversion('preview')) {
             $this->line("Preview: " . $media->getUrl('preview'));
@@ -185,7 +185,7 @@ class GenerateConversionsSync extends Command
     private function fixStoragePermissions()
     {
         $this->info("🔧 Исправление прав доступа к файловой системе...");
-        
+
         $paths = [
             storage_path(),
             base_path('bootstrap/cache'),

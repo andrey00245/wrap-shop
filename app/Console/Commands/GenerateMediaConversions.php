@@ -54,8 +54,8 @@ class GenerateMediaConversions extends Command
                 foreach ($conversions as $conversionName) {
                     if ($force || !$media->hasGeneratedConversion($conversionName)) {
                         try {
-                            // Создаем конверсию напрямую
-                            $this->createConversionForMedia($media, $conversionName);
+                            // Используем встроенный метод MediaLibrary
+                            $media->performConversions([$conversionName]);
                         } catch (\Exception $e) {
                             $this->error("\nОшибка создания конверсии {$conversionName} для {$media->file_name}: " . $e->getMessage());
                             $errors++;

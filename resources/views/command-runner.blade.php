@@ -497,43 +497,6 @@
             }
         }
 
-        async function runCleanMedia(btn, dryRun = true) {
-            if (!dryRun) {
-                if (!confirm('Підтвердіть видалення медіафайлів, які не прив'язані до БД.')) {
-                    return;
-                }
-            }
-            
-            setLoading(btn, true);
-            
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                const response = await fetch('/nova-vendor/command-runner/media', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ dryRun })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    const message = `${data.message}: ${data.count}`;
-                    showAlert('media', message, true);
-                } else {
-                    showAlert('media', data.message, false);
-                }
-            } catch (error) {
-                showAlert('media', 'Помилка з\'єднання: ' + error.message, false);
-            } finally {
-                setLoading(btn, false);
-            }
-        }
-
-
         async function runGenerateConversions(btn, force = false) {
             if (!confirm('Создать оптимизированные версии изображений? Это может занять время!')) {
                 return;

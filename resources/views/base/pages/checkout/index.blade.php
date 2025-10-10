@@ -139,7 +139,7 @@
                                                                 </label>
                                                             </div>
                                                         </div>
-                                                        
+
                                                         <div class="nova-poshta-options" id="nova-poshta-options" style="display: none;">
                                                             <div class="nova-poshta-subtitle" id="nova-poshta-subtitle">Адреса доставки</div>
                                                             <div class="nova-poshta-variants">
@@ -169,7 +169,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        
+
                                                         <fieldset id="novaposhta_desc" class="radio-description">{{__('checkout.nova_poshta_desc')}}<br><small>{{ __('checkout.films_cargo_only') }}</small></fieldset>
                                                     </div>
                                                     @if(auth()->check() && auth()->user()->addresses->count() > 0)

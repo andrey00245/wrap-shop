@@ -54,18 +54,17 @@ class GenerateMediaConversions extends Command
                 // Генерируем конверсии из конфигурации
                 $conversions = array_keys(MediaConversions::getConversionsConfig());
                 
-                foreach ($conversions as $conversionName) {
-                    if ($force || !$media->hasGeneratedConversion($conversionName)) {
-                        try {
-                            // Используем встроенную команду Spatie для генерации конверсий
-                            \Artisan::call('media:regenerate', [
-                                '--ids' => [$media->id],
-                                '--force' => true
-                            ]);
-                        } catch (\Exception $e) {
-                            $this->error("\nОшибка создания конверсии {$conversionName} для {$media->file_name}: " . $e->getMessage());
-                            $errors++;
-                        }
+                // Генерируем конверсии для всех сразу
+                if ($force || !$media->hasGeneratedConversion('preview_webp') || !$media->hasGeneratedConversion('gallery')) {
+                    try {
+                        // Используем встроенную команду Spatie для генерации конверсий
+                        \Artisan::call('media:regenerate', [
+                            '--ids' => [$media->id],
+                            '--force' => true
+                        ]);
+                    } catch (\Exception $e) {
+                        $this->error("\nОшибка создания конверсий для {$media->file_name}: " . $e->getMessage());
+                        $errors++;
                     }
                 }
                 

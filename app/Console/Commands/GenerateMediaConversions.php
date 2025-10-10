@@ -125,33 +125,16 @@ class GenerateMediaConversions extends Command
             throw new \Exception("Медиа не привязано к модели");
         }
         
-        // Создаем конверсию через модель
-        $conversion = $model->addMediaConversion($conversionName);
+        // Регистрируем конверсии для модели
+        $model->registerMediaConversions($media);
         
-        if ($config['width'] && $config['height']) {
-            $conversion->width($config['width'])->height($config['height']);
+        // Получаем конверсию и выполняем её
+        $conversion = $media->getMediaConversion($conversionName);
+        if ($conversion) {
+            $conversion->perform();
+        } else {
+            throw new \Exception("Конверсия {$conversionName} не найдена");
         }
-        
-        if ($config['quality']) {
-            $conversion->quality($config['quality']);
-        }
-        
-        if ($config['sharpen']) {
-            $conversion->sharpen($config['sharpen']);
-        }
-        
-        if ($config['format']) {
-            $conversion->format($config['format']);
-        }
-        
-        $conversion->optimize();
-        
-        foreach ($config['collections'] as $collection) {
-            $conversion->performOnCollections($collection);
-        }
-        
-        // Выполняем конверсию
-        $conversion->perform();
     }
     
     private function showSizeStatistics($collection)
@@ -165,11 +148,11 @@ class GenerateMediaConversions extends Command
         $this->info("Оригинальные файлы: " . round($totalOriginal / 1024 / 1024, 2) . " MB");
         
         // Подсчитываем размеры конверсий (примерно)
-        $estimatedPreview = $totalOriginal * 0.1; // preview обычно в 10 раз меньше
-        $estimatedThumbnail = $totalOriginal * 0.05; // thumbnail еще меньше
+        $estimatedPreviewWebp = $totalOriginal * 0.08; // preview_webp обычно в 12 раз меньше
+        $estimatedGallery = $totalOriginal * 0.15; // gallery немного меньше оригинала
         
-        $this->info("Ожидаемый размер preview: " . round($estimatedPreview / 1024 / 1024, 2) . " MB");
-        $this->info("Ожидаемый размер thumbnail: " . round($estimatedThumbnail / 1024 / 1024, 2) . " MB");
-        $this->info("Общая экономия: " . round(($totalOriginal - $estimatedPreview) / 1024 / 1024, 2) . " MB");
+        $this->info("Ожидаемый размер preview_webp: " . round($estimatedPreviewWebp / 1024 / 1024, 2) . " MB");
+        $this->info("Ожидаемый размер gallery: " . round($estimatedGallery / 1024 / 1024, 2) . " MB");
+        $this->info("Общая экономия: " . round(($totalOriginal - $estimatedPreviewWebp) / 1024 / 1024, 2) . " MB");
     }
 }

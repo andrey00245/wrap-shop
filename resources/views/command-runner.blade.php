@@ -274,7 +274,7 @@
             <!-- Очистка неиспользуемых медиа -->
             <div class="command-card" style="border: 2px solid #dc3545; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);">
                 <h3>🗑️ Очистка неиспользуемых медиа</h3>
-                <p><strong>ВНИМАНИЕ!</strong> Удаляет медиа файлы, которые не привязаны к товарам (экономия ~6 ГБ)</p>
+                <p><strong>ВНИМАНИЕ!</strong> Удаляет медиа файлы, которые не привязаны к товарам</p>
                 
                 <div style="display:flex; gap:8px; justify-content: center;">
                     <button class="btn btn-secondary" onclick="runAnalyzeUnusedMedia(this)">

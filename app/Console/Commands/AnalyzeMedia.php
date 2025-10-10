@@ -17,7 +17,6 @@ class AnalyzeMedia extends Command
         $collection = $this->option('collection');
         
         $this->info("📊 АНАЛИЗ МЕДИА ФАЙЛОВ - Коллекция: {$collection}");
-        $this->info("=" . str_repeat("=", 50));
         
         // Общая статистика
         $this->analyzeGeneralStats($collection);

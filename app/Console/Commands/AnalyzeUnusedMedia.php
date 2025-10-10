@@ -23,7 +23,6 @@ class AnalyzeUnusedMedia extends Command
         $isDryRun = $this->option('dry-run');
         
         $this->info("🔍 АНАЛИЗ НЕИСПОЛЬЗУЕМЫХ МЕДИА - Коллекция: {$collection}");
-        $this->info("=" . str_repeat("=", 60));
         
         // Получаем все медиа файлы в коллекции
         $allMedia = Media::where('collection_name', $collection)->get();

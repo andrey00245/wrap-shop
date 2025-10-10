@@ -24,7 +24,6 @@ class CleanupUnusedMedia extends Command
         $batchSize = (int) $this->option('batch-size');
         
         $this->info("🧹 ОЧИСТКА НЕИСПОЛЬЗУЕМЫХ МЕДИА - Коллекция: {$collection}");
-        $this->info("=" . str_repeat("=", 60));
         
         // Получаем неиспользуемые медиа
         $unusedMedia = $this->getUnusedMedia($collection);

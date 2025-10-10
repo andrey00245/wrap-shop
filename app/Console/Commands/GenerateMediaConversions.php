@@ -48,14 +48,20 @@ class GenerateMediaConversions extends Command
                     continue;
                 }
                 
+                // Регистрируем конверсии для модели
+                $model->registerMediaConversions($media);
+                
                 // Генерируем конверсии из конфигурации
                 $conversions = array_keys(MediaConversions::getConversionsConfig());
                 
                 foreach ($conversions as $conversionName) {
                     if ($force || !$media->hasGeneratedConversion($conversionName)) {
                         try {
-                            // Используем встроенный метод MediaLibrary
-                            $media->performConversions([$conversionName]);
+                            // Используем встроенную команду Spatie для генерации конверсий
+                            \Artisan::call('media:regenerate', [
+                                '--ids' => [$media->id],
+                                '--force' => true
+                            ]);
                         } catch (\Exception $e) {
                             $this->error("\nОшибка создания конверсии {$conversionName} для {$media->file_name}: " . $e->getMessage());
                             $errors++;
@@ -111,48 +117,6 @@ class GenerateMediaConversions extends Command
         return $config[$conversionName]['sharpen'] ?? 0;
     }
     
-    private function createConversionForMedia($media, $conversionName)
-    {
-        $config = MediaConversions::getConversionsConfig()[$conversionName] ?? null;
-        
-        if (!$config) {
-            return;
-        }
-        
-        // Получаем модель для создания конверсии
-        $model = $media->model;
-        if (!$model) {
-            throw new \Exception("Медиа не привязано к модели");
-        }
-        
-        // Создаем конверсию через модель
-        $conversion = $model->addMediaConversion($conversionName);
-        
-        if ($config['width'] && $config['height']) {
-            $conversion->width($config['width'])->height($config['height']);
-        }
-        
-        if ($config['quality']) {
-            $conversion->quality($config['quality']);
-        }
-        
-        if ($config['sharpen']) {
-            $conversion->sharpen($config['sharpen']);
-        }
-        
-        if ($config['format']) {
-            $conversion->format($config['format']);
-        }
-        
-        $conversion->optimize();
-        
-        foreach ($config['collections'] as $collection) {
-            $conversion->performOnCollections($collection);
-        }
-        
-        // Выполняем конверсию для конкретного медиа файла
-        $conversion->performOnMedia($media);
-    }
     
     private function showSizeStatistics($collection)
     {

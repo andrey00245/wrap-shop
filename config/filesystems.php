@@ -56,6 +56,8 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
+            'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
             'throw' => false,
             'max_file_size' => 50 * 1024 * 1024, // максимальний розмір файлу в байтах (50MB)
         ],

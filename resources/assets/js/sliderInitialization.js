@@ -164,3 +164,35 @@ export function imageSliderInProduct(item_class) {
         })
     })
 }
+
+export function examplesSliderInitialization(id) {
+    let examplesSlider = new Splide('#' + id + ' .splide', {
+        pagination: false,
+        perPage: 3,
+        gap: '20px',
+        padding: {right: '5%'},
+        classes: {
+            arrows: 'splide__arrows home-products-slide-buttons',
+            prev: 'splide__arrow--prev',
+            next: 'splide__arrow--next',
+        },
+        breakpoints: {
+            1331: {
+                perPage: 3,
+                padding: {right: '3%'},
+            },
+            1019: {
+                perPage: 2,
+                padding: {right: '10%'},
+            },
+            767: {
+                perPage: 2,
+                padding: {right: 0},
+            },
+            400: {
+                perPage: 1,
+                padding: {right: '15%'},
+            }
+        }
+    }).mount();
+}

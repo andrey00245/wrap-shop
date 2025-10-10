@@ -266,6 +266,57 @@
                 <div class="alert alert-success" id="media-success"></div>
                 <div class="alert alert-error" id="media-error"></div>
             </div>
+
+            <!-- Генерация конверсий медиа -->
+            <div class="command-card" style="border: 2px solid #17a2b8; background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);">
+                <h3>🖼️ Оптимизация медиа файлов</h3>
+                <p>Генерация оптимизированных версий изображений для улучшения производительности</p>
+                <ul style="text-align: left; margin: 10px 0; font-size: 14px;">
+                    <li>📱 Preview (310x310) - для каталога товаров</li>
+                    <li>🔍 Thumbnail (150x150) - для миниатюр</li>
+                    <li>🖼️ Gallery (800x800) - для галереи товара</li>
+                    <li>⚡ WebP версии - для современной загрузки</li>
+                </ul>
+                
+                <div style="display:flex; gap:8px; justify-content: center;">
+                    <button class="btn btn-secondary" onclick="runAnalyzeMedia(this)">
+                        📊 Анализ медиа
+                    </button>
+                    <button class="btn btn-info" onclick="runGenerateConversions(this, false)">
+                        🚀 Генерировать конверсии
+                    </button>
+                    <button class="btn btn-warning" onclick="runGenerateConversions(this, true)">
+                        🔄 Принудительно пересоздать
+                    </button>
+                </div>
+                
+                <div class="alert alert-success" id="conversions-success"></div>
+                <div class="alert alert-error" id="conversions-error"></div>
+            </div>
+
+            <!-- Очистка неиспользуемых медиа -->
+            <div class="command-card" style="border: 2px solid #dc3545; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);">
+                <h3>🗑️ Очистка неиспользуемых медиа</h3>
+                <p><strong>ВНИМАНИЕ!</strong> Удаляет медиа файлы, которые не привязаны к товарам, категориям и другим моделям</p>
+                <ul style="text-align: left; margin: 10px 0; font-size: 14px;">
+                    <li>🔍 Анализ неиспользуемых файлов</li>
+                    <li>📊 Показ потенциальной экономии места</li>
+                    <li>🗑️ Безопасное удаление с подтверждением</li>
+                    <li>💾 Создание бэкапа перед удалением</li>
+                </ul>
+                
+                <div style="display:flex; gap:8px; justify-content: center;">
+                    <button class="btn btn-secondary" onclick="runAnalyzeUnusedMedia(this)">
+                        🔍 Анализ неиспользуемых
+                    </button>
+                    <button class="btn btn-danger" onclick="runCleanupUnusedMedia(this)">
+                        🗑️ Удалить неиспользуемые
+                    </button>
+                </div>
+                
+                <div class="alert alert-success" id="unused-success"></div>
+                <div class="alert alert-error" id="unused-error"></div>
+            </div>
         </div>
     </div>
 
@@ -476,7 +527,7 @@
 
         async function runCleanMedia(btn, dryRun = true) {
             if (!dryRun) {
-                if (!confirm('Підтвердіть видалення медіафайлів, які не прив’язані до БД.')) {
+                if (!confirm('Підтвердіть видалення медіафайлів, які не прив'язані до БД.')) {
                     return;
                 }
             }
@@ -505,6 +556,131 @@
                 }
             } catch (error) {
                 showAlert('media', 'Помилка з\'єднання: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runAnalyzeMedia(btn) {
+            setLoading(btn, true);
+            
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/analyze-media', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('conversions', data.message, true);
+                } else {
+                    showAlert('conversions', data.message, false);
+                }
+            } catch (error) {
+                showAlert('conversions', 'Ошибка соединения: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runGenerateConversions(btn, force = false) {
+            if (!confirm(`Подтвердите генерацию конверсий${force ? ' (принудительно)' : ''}. Это может занять много времени!`)) {
+                return;
+            }
+            
+            setLoading(btn, true);
+            
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/generate-conversions', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ force })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('conversions', data.message, true);
+                } else {
+                    showAlert('conversions', data.message, false);
+                }
+            } catch (error) {
+                showAlert('conversions', 'Ошибка соединения: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runAnalyzeUnusedMedia(btn) {
+            setLoading(btn, true);
+            
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/analyze-unused-media', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('unused', data.message, true);
+                } else {
+                    showAlert('unused', data.message, false);
+                }
+            } catch (error) {
+                showAlert('unused', 'Ошибка соединения: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runCleanupUnusedMedia(btn) {
+            if (!confirm('⚠️ ВНИМАНИЕ! Это удалит неиспользуемые медиа файлы навсегда!\n\nВы создали бэкап базы данных?')) {
+                return;
+            }
+            
+            if (!confirm('Вы уверены, что хотите продолжить? Это действие необратимо!')) {
+                return;
+            }
+            
+            setLoading(btn, true);
+            
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/cleanup-unused-media', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('unused', data.message, true);
+                } else {
+                    showAlert('unused', data.message, false);
+                }
+            } catch (error) {
+                showAlert('unused', 'Ошибка соединения: ' + error.message, false);
             } finally {
                 setLoading(btn, false);
             }

@@ -287,5 +287,115 @@ class CommandRunnerController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Генерация конверсий медиа файлов
+     */
+    public function generateConversions(Request $request): JsonResponse
+    {
+        try {
+            $force = (bool) $request->input('force', false);
+
+            Artisan::call('media:generate-conversions', [ '--force' => $force ]);
+            $output = Artisan::output();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Генерация конверсий завершена',
+                'details' => $output,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Ошибка генерации конверсий', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Анализ медиа файлов
+     */
+    public function analyzeMedia(Request $request): JsonResponse
+    {
+        try {
+            Artisan::call('media:analyze');
+            $output = Artisan::output();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Анализ медиа завершен',
+                'details' => $output,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Ошибка анализа медиа', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Анализ неиспользуемых медиа файлов
+     */
+    public function analyzeUnusedMedia(Request $request): JsonResponse
+    {
+        try {
+            Artisan::call('media:analyze-unused', ['--dry-run' => true]);
+            $output = Artisan::output();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Анализ неиспользуемых медиа завершен',
+                'details' => $output,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Ошибка анализа неиспользуемых медиа', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Очистка неиспользуемых медиа файлов
+     */
+    public function cleanupUnusedMedia(Request $request): JsonResponse
+    {
+        try {
+            Artisan::call('media:cleanup-unused');
+            $output = Artisan::output();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Очистка неиспользуемых медиа завершена',
+                'details' => $output,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Ошибка очистки неиспользуемых медиа', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
 

@@ -19,6 +19,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 use Spatie\Image\Enums\Fit;
 use Illuminate\Support\Facades\File;
+use App\Models\MediaConversions;
 
 /**
  * @method static Builder whereLikeInsensitive(string $column, string $value)
@@ -185,12 +186,33 @@ class Product extends Model implements HasMedia
      */
     public function registerMediaConversions(?Media $media = null): void
     {
-        $this
-            ->addMediaConversion('preview')
-            ->fit(Fit::Crop, 310, 310) // Указываем корректный enum
-            ->format('png')
-            ->quality(100) // Улучшение качества
-            ->nonQueued();
+        $conversions = MediaConversions::getConversionsConfig();
+        
+        foreach ($conversions as $conversionName => $config) {
+            $conversion = $this->addMediaConversion($conversionName);
+            
+            if ($config['width'] && $config['height']) {
+                $conversion->width($config['width'])->height($config['height']);
+            }
+            
+            if ($config['quality']) {
+                $conversion->quality($config['quality']);
+            }
+            
+            if ($config['sharpen']) {
+                $conversion->sharpen($config['sharpen']);
+            }
+            
+            if ($config['format']) {
+                $conversion->format($config['format']);
+            }
+            
+            $conversion->optimize();
+            
+            foreach ($config['collections'] as $collection) {
+                $conversion->performOnCollections($collection);
+            }
+        }
     }
 
     public function registerMediaCollections(): void

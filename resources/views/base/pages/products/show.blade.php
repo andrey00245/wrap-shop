@@ -124,7 +124,7 @@
                                         href="{{$image->getUrl()}}"
                                         title="{{$product->getName()}}"
                                         role="group">
-                                        <img loading="lazy" src="{{$image->getUrl()}}"
+                                        <img loading="lazy" src="{{App\Helpers\MediaHelper::getGalleryImageUrl($image)}}"
                                              title="{{$product->getName()}}"
                                              alt="{{$product->getName()}}">
                                     </a>
@@ -143,10 +143,10 @@
                         <ul class="splide__list">
                             @foreach($product->getMedia('images') as $key => $image)
                                 <li class="splide__slide">
-                                    <img data-src="{{$image->getUrl('preview')}}"
+                                    <img data-src="{{App\Helpers\MediaHelper::getThumbnailUrl($image)}}"
                                          title="{{$product->getName()}}"
                                          alt="{{$product->getName()}}"
-                                         src="{{$image->getUrl('preview')}}">
+                                         src="{{App\Helpers\MediaHelper::getThumbnailUrl($image)}}">
                                 </li>
                             @endforeach
                         </ul>

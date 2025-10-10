@@ -60,6 +60,10 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
     Route::post('/webhook/check', [CommandRunnerController::class, 'webhookCheck']);
     Route::post('/webhook/test', [CommandRunnerController::class, 'webhookTest']);
     Route::post('/webhook/create', [CommandRunnerController::class, 'webhookCreate']);
+    Route::post('/generate-conversions', [CommandRunnerController::class, 'generateConversions']);
+    Route::post('/analyze-media', [CommandRunnerController::class, 'analyzeMedia']);
+    Route::post('/analyze-unused-media', [CommandRunnerController::class, 'analyzeUnusedMedia']);
+    Route::post('/cleanup-unused-media', [CommandRunnerController::class, 'cleanupUnusedMedia']);
 });
 Route::get('/slug-generate', function(){
   $products = Product::all();

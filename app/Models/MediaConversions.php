@@ -17,19 +17,20 @@ class MediaConversions
     {
         return [
             'preview_webp' => [
-                'width' => 310,
-                'height' => 310,
-                'quality' => 85,
+                'width' => 482,
+                'height' => 482,
+                'quality' => 100,
                 'sharpen' => 10,
                 'format' => 'webp',
-                'collections' => ['images']
+                'collections' => ['images'],
+                'fit' => 'contain'
             ],
             'gallery' => [
                 'width' => 800,
                 'height' => 800,
-                'quality' => 90,
-                'sharpen' => 10,
-                'format' => null,
+                'quality' => 100,
+                'sharpen' => 0,
+                'format' => 'webp',
                 'collections' => ['images']
             ]
         ];

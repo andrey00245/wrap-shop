@@ -207,6 +207,11 @@ class Product extends Model implements HasMedia
                 $conversion->format($config['format']);
             }
             
+            // Используем contain для правильного масштабирования без искажений
+            if (isset($config['fit'])) {
+                $conversion->fit(Fit::Contain);
+            }
+            
             $conversion->optimize();
             
             foreach ($config['collections'] as $collection) {

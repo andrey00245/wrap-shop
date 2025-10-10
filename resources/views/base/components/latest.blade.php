@@ -55,7 +55,7 @@
                                                     <li class="splide__slide"
                                                         role="group">
                                                         <img loading="lazy"
-                                                             src="{{$image->getUrl('preview')}}"
+                                                             src="{{$image->getUrl('preview_webp')}}"
                                                              alt="{{$product->getName()}}"
                                                              title="{{$product->getName()}}"
                                                              width="310" height="310">

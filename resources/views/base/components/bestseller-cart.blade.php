@@ -51,7 +51,7 @@
                                                              data-caption="{{$product->name}}"></div>
                                                     @endif
                                                     <img loading="lazy"
-                                                         src="{{$image->getUrl('preview')}}"
+                                                         src="{{$image->getUrl('preview_webp')}}"
                                                          alt="{{$product->name}}"
                                                          title="{{$product->name}}"
                                                          class="swiper-lazy swiper-lazy-loaded"

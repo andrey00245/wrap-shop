@@ -11,14 +11,9 @@ class MediaHelper
      */
     public static function getCatalogImageUrl(Media $media): string
     {
-        // Пробуем получить WebP версию preview
+        // Используем WebP версию preview
         if ($media->hasGeneratedConversion('preview_webp')) {
             return $media->getUrl('preview_webp');
-        }
-        
-        // Если WebP нет, используем обычный preview
-        if ($media->hasGeneratedConversion('preview')) {
-            return $media->getUrl('preview');
         }
         
         // Fallback на оригинал

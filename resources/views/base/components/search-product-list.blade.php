@@ -10,7 +10,7 @@
             <div class="search-suggestion product">
                 <div class="left">
                     <div class="image"><img
-                            src="{{$product->getImage('preview')}}">
+                            src="{{$product->getImage('preview_webp')}}">
                     </div>
                 </div>
                 <div class="center">

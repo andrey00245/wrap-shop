@@ -411,7 +411,7 @@
                                                             <a
                                                                 href="{{route('products.show', ['product' => $item['product']->slugEn])}}"><img
                                                                     loading="lazy"
-                                                                    src="{{$item['product']->getMedia('images')[0]->getUrl('preview')}}"
+                                                                    src="{{$item['product']->getMedia('images')[0]->getUrl('preview_webp')}}"
                                                                     alt="{{$item['product']->name}}"
                                                                     title="{{$item['product']->name}}"
                                                                     class="img-thumbnail"></a>

@@ -73,7 +73,7 @@
               <a class="item"
                  href="{{route('news.show', ['news_category' => $new->category->slugEn, 'news' => $new->slugEn])}}"
                  title="{{$new->title}}">
-                <img src="{{$new->getMedia('main')[0]->getUrl('preview')}}" title="{{$new->title}}"
+                <img src="{{$new->getMedia('main')[0]->getUrl('preview_webp')}}" title="{{$new->title}}"
                      alt="{{$new->title}}"
                      class="img-responsive">
                 <div class="caption">
@@ -88,7 +88,7 @@
             <a class="item"
                href="{{route('news.show', ['news_category' => $new->category->slugEn, 'news' => $new->slugEn])}}"
                title="{{$new->title}}">
-              <img src="{{$new->getMedia('main')[0]->getUrl('preview')}}" title="{{$new->title}}"
+              <img src="{{$new->getMedia('main')[0]->getUrl('preview_webp')}}" title="{{$new->title}}"
                    alt="{{$new->title}}"
                    class="img-responsive">
               <div class="caption">

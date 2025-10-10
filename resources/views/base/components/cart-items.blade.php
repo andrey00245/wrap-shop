@@ -26,7 +26,7 @@
                 <td class="image"><a
                             href="{{route('products.show', ['product' => $item['product']->slugEn])}}"><img
                                 loading="lazy"
-                                src="{{$item['product']->getMedia('images')[0]->getUrl('preview')}}"
+                                src="{{$item['product']->getMedia('images')[0]->getUrl('preview_webp')}}"
                                 alt="{{$item['product']->getName()}}"
                                 title="{{$item['product']->getName()}}" class="img-thumbnail"></a></td>
                     <td class="name"><span class="cat">{{$item['product']->category->name}}</span><a

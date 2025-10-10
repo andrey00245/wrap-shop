@@ -40,7 +40,7 @@
                                                              data-caption="{{$wishlist->name}}"></div>
                                                     @endif
                                                     <img loading="lazy"
-                                                         src="{{$image->getUrl('preview')}}"
+                                                         src="{{$image->getUrl('preview_webp')}}"
                                                          alt="{{$wishlist->name}}"
                                                          title="{{$wishlist->name}}"
                                                          class="swiper-lazy swiper-lazy-loaded"

@@ -125,16 +125,33 @@ class GenerateMediaConversions extends Command
             throw new \Exception("Медиа не привязано к модели");
         }
         
-        // Регистрируем конверсии для модели
-        $model->registerMediaConversions($media);
+        // Создаем конверсию через модель
+        $conversion = $model->addMediaConversion($conversionName);
         
-        // Получаем конверсию и выполняем её
-        $conversion = $media->getMediaConversion($conversionName);
-        if ($conversion) {
-            $conversion->perform();
-        } else {
-            throw new \Exception("Конверсия {$conversionName} не найдена");
+        if ($config['width'] && $config['height']) {
+            $conversion->width($config['width'])->height($config['height']);
         }
+        
+        if ($config['quality']) {
+            $conversion->quality($config['quality']);
+        }
+        
+        if ($config['sharpen']) {
+            $conversion->sharpen($config['sharpen']);
+        }
+        
+        if ($config['format']) {
+            $conversion->format($config['format']);
+        }
+        
+        $conversion->optimize();
+        
+        foreach ($config['collections'] as $collection) {
+            $conversion->performOnCollections($collection);
+        }
+        
+        // Выполняем конверсию для конкретного медиа файла
+        $conversion->performOnMedia($media);
     }
     
     private function showSizeStatistics($collection)

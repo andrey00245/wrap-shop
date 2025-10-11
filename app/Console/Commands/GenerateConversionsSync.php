@@ -9,13 +9,14 @@ use Spatie\MediaLibrary\Conversions\ImageGenerators\Image;
 
 class GenerateConversionsSync extends Command
 {
-    protected $signature = 'media:generate-sync {--collection=images : Коллекция для обработки} {--force : Принудительно пересоздать конверсии}';
+    protected $signature = 'media:generate-sync {--collection=images : Коллекция для обработки} {--force : Принудительно пересоздать конверсии} {--only-missing : Создавать только отсутствующие конверсии}';
     protected $description = 'Синхронная генерация конверсий (без очереди)';
 
     public function handle()
     {
         $collection = $this->option('collection');
         $force = $this->option('force');
+        $onlyMissing = $this->option('only-missing');
 
         $this->info("🖼️ Синхронная генерация конверсий для коллекции: {$collection}");
 
@@ -53,7 +54,7 @@ class GenerateConversionsSync extends Command
                 }
 
                 // Генерируем конверсии синхронно
-                $this->generateConversionsSync($media, $force);
+                $this->generateConversionsSync($media, $force, $onlyMissing);
 
                 $processed++;
 
@@ -77,7 +78,7 @@ class GenerateConversionsSync extends Command
         return 0;
     }
 
-    private function generateConversionsSync($media, $force = false)
+    private function generateConversionsSync($media, $force = false, $onlyMissing = false)
     {
         // Используем конфигурацию из MediaConversions
         $conversions = \App\Models\MediaConversions::getConversionsConfig();
@@ -99,8 +100,13 @@ class GenerateConversionsSync extends Command
 
                 // Проверяем, существует ли конверсия
                 if (!$force && $media->hasGeneratedConversion($conversionName)) {
-                    $this->line("\n⏭️ Конверсия {$conversionName} уже существует для {$media->file_name}");
-                    continue;
+                    if ($onlyMissing) {
+                        $this->line("\n⏭️ Конверсия {$conversionName} уже существует для {$media->file_name}");
+                        continue;
+                    } else {
+                        $this->line("\n⏭️ Конверсия {$conversionName} уже существует для {$media->file_name}, пропускаем");
+                        continue;
+                    }
                 }
 
                 // Создаем конверсию через модель

@@ -27,7 +27,6 @@ class GenerateConversionsSync extends Command
                 'image/gif',
                 'image/bmp'
             ])
-            ->take(10) // Обрабатываем только первые 10 для теста
             ->get();
 
         $this->info("Найдено изображений: {$mediaFiles->count()}");
@@ -83,52 +82,66 @@ class GenerateConversionsSync extends Command
         // Используем конфигурацию из MediaConversions
         $conversions = \App\Models\MediaConversions::getConversionsConfig();
 
+        // Получаем модель для создания конверсий
+        $model = $media->model;
+        if (!$model) {
+            throw new \Exception("Медиа не привязано к модели");
+        }
+
         foreach ($conversions as $conversionName => $config) {
             try {
-                // Проверяем, существует ли конверсия
-                if (!$force && $media->hasGeneratedConversion($conversionName)) {
+                // Проверяем, существует ли оригинальный файл
+                $originalPath = $media->getPath();
+                if (!file_exists($originalPath)) {
+                    $this->warn("\n⚠️ Оригинальный файл не найден: {$originalPath}");
                     continue;
                 }
 
-                // Создаем конверсию с отключенной очередью
-                $conversion = $media->addMediaConversion($conversionName);
-                
+                // Проверяем, существует ли конверсия
+                if (!$force && $media->hasGeneratedConversion($conversionName)) {
+                    $this->line("\n⏭️ Конверсия {$conversionName} уже существует для {$media->file_name}");
+                    continue;
+                }
+
+                // Создаем конверсию через модель
+                $conversion = $model->addMediaConversion($conversionName);
+
                 if ($config['width'] && $config['height']) {
                     $conversion->width($config['width'])->height($config['height']);
                 }
-                
+
                 if ($config['quality']) {
                     $conversion->quality($config['quality']);
                 }
-                
+
                 if (isset($config['sharpen'])) {
                     $conversion->sharpen($config['sharpen']);
                 }
-                
+
                 if ($config['format']) {
                     $conversion->format($config['format']);
                 }
-                
+
                 // Используем contain для правильного масштабирования
                 if (isset($config['fit'])) {
                     $conversion->fit(\Spatie\Image\Enums\Fit::Contain);
                 }
-                
+
                 $conversion->optimize();
-                
+
                 foreach ($config['collections'] as $collection) {
                     $conversion->performOnCollections($collection);
                 }
-                
+
                 $conversion->nonQueued(); // Отключаем очередь!
 
-                // Выполняем конверсию сразу
-                $conversion->perform();
+                // Выполняем конверсию для конкретного медиа файла
+                $conversion->performOnMedia($media);
 
                 $this->line("\n✅ Создана конверсия {$conversionName} для {$media->file_name}");
 
             } catch (\Exception $e) {
-                $this->warn("\nНе удалось создать конверсию {$conversionName} для {$media->file_name}: " . $e->getMessage());
+                $this->warn("\n❌ Не удалось создать конверсию {$conversionName} для {$media->file_name}: " . $e->getMessage());
             }
         }
     }

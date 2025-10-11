@@ -216,10 +216,14 @@ class ProductService
             return;
         }
 
-        // Создаем товар
-        $product = \App\Models\Product::updateOrCreate(
-            ['external_id' => $productData['id']],
-            [
+        // Проверяем, существует ли продукт
+        $existingProduct = \App\Models\Product::where('external_id', $productData['id'])->first();
+        $isNewProduct = !$existingProduct;
+        
+        if ($isNewProduct) {
+            // Новый продукт - создаем все 3 локализации
+            $product = \App\Models\Product::create([
+                'external_id' => $productData['id'],
                 'external_code' => $productData['externalCode'] ?? null,
                 'code'          => $productData['code'] ?? null,
                 'article'       => $productData['article'] ?? null,
@@ -233,8 +237,32 @@ class ProductService
                     'uk' => $productData['description'] ?? '',
                     'en' => $productData['description'] ?? '',
                 ],
-            ]
-        );
+            ]);
+            
+            Log::info("Создан новый продукт из вебхука", [
+                'external_id' => $productData['id'],
+                'code' => $productData['code'] ?? null
+            ]);
+        } else {
+            // Старый продукт - обновляем только UK локализацию
+            $product = $existingProduct;
+            $product->update([
+                'external_code' => $productData['externalCode'] ?? $product->external_code,
+                'code'          => $productData['code'] ?? $product->code,
+                'article'       => $productData['article'] ?? $product->article,
+                'name'          => [
+                    'uk' => $productData['name'] ?? $product->getTranslation('name', 'uk'),
+                ],
+                'descriptions'   => [
+                    'uk' => $productData['description'] ?? $product->getTranslation('descriptions', 'uk'),
+                ],
+            ]);
+            
+            Log::info("Обновлен существующий продукт из вебхука (только UK)", [
+                'external_id' => $productData['id'],
+                'code' => $productData['code'] ?? null
+            ]);
+        }
 
         $product->slug = [
             'en' => \Illuminate\Support\Str::slug($product->getTranslation('name', 'en')),
@@ -278,9 +306,14 @@ class ProductService
            foreach ($attributes as $attribute) {
                if ($attribute->id === ProductAttributeEnum::SITE) {
                    if ($attribute->value->name === 'так'){
-                       $product = Product::updateOrCreate(
-                           ['external_id' => $parseData->id],
-                           [
+                       // Проверяем, существует ли продукт
+                       $existingProduct = Product::where('external_id', $parseData->id)->first();
+                       $isNewProduct = !$existingProduct;
+                       
+                       if ($isNewProduct) {
+                           // Новый продукт - создаем все 3 локализации
+                           $product = Product::create([
+                               'external_id' => $parseData->id,
                                'external_code' => $parseData->externalCode,
                                'code'          => $parseData->code,
                                'article'       => $parseData->article ?? null,
@@ -294,8 +327,32 @@ class ProductService
                                    'uk' => $parseData->description ?? '',
                                    'en' => $parseData->description ?? '',
                                ],
-                           ]
-                       );
+                           ]);
+                           
+                           Log::info("Создан новый продукт", [
+                               'external_id' => $parseData->id,
+                               'code' => $parseData->code
+                           ]);
+                       } else {
+                           // Старый продукт - обновляем только UK локализацию
+                           $product = $existingProduct;
+                           $product->update([
+                               'external_code' => $parseData->externalCode,
+                               'code'          => $parseData->code,
+                               'article'       => $parseData->article ?? null,
+                               'name'          => [
+                                   'uk' => $parseData->name ?? $product->getTranslation('name', 'uk'),
+                               ],
+                               'descriptions'   => [
+                                   'uk' => $parseData->description ?? $product->getTranslation('descriptions', 'uk'),
+                               ],
+                           ]);
+                           
+                           Log::info("Обновлен существующий продукт (только UK)", [
+                               'external_id' => $parseData->id,
+                               'code' => $parseData->code
+                           ]);
+                       }
 
                        $product->slug = [
                            'en' => Str::slug($product->getTranslation('name', 'en')),

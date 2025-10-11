@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use App\Models\Product;
 use Spatie\MediaLibrary\Conversions\ImageGenerators\Image;
+use Illuminate\Support\Facades\File;
 
 class GenerateConversionsSync extends Command
 {
@@ -19,6 +20,9 @@ class GenerateConversionsSync extends Command
         $onlyMissing = $this->option('only-missing');
 
         $this->info("🖼️ Синхронная генерация конверсий для коллекции: {$collection}");
+
+        // Исправляем права доступа
+        $this->fixStoragePermissions();
 
         // Получаем медиа файлы
         $mediaFiles = Media::where('collection_name', $collection)
@@ -82,7 +86,7 @@ class GenerateConversionsSync extends Command
     {
         // Используем конфигурацию из MediaConversions
         $conversions = \App\Models\MediaConversions::getConversionsConfig();
-
+        
         // Получаем модель для создания конверсий
         $model = $media->model;
         if (!$model) {
@@ -141,8 +145,15 @@ class GenerateConversionsSync extends Command
 
                 $conversion->nonQueued(); // Отключаем очередь!
 
-                // Выполняем конверсию для конкретного медиа файла
-                $conversion->performOnMedia($media);
+                // Создаем папку conversions, если она не существует
+                $conversionsPath = dirname($originalPath) . '/conversions';
+                if (!is_dir($conversionsPath)) {
+                    mkdir($conversionsPath, 0755, true);
+                    $this->line("\n📁 Создана папка conversions: {$conversionsPath}");
+                }
+
+                // Выполняем конверсию напрямую
+                $conversion->perform();
 
                 $this->line("\n✅ Создана конверсия {$conversionName} для {$media->file_name}");
 
@@ -160,5 +171,34 @@ class GenerateConversionsSync extends Command
         $this->line("Оригинал: " . $media->getUrl());
         $this->line("Preview WebP: " . $media->getUrl('preview_webp'));
         $this->line("Gallery: " . $media->getUrl('gallery'));
+    }
+
+    private function fixStoragePermissions()
+    {
+        $this->info("🔧 Исправление прав доступа к файловой системе...");
+        
+        $paths = [
+            storage_path(),
+            base_path('bootstrap/cache'),
+        ];
+
+        foreach ($paths as $path) {
+            if (File::exists($path)) {
+                File::chmod($path, 0775);
+                $this->recurseChmod($path);
+                $this->line("✅ Исправлены права для: {$path}");
+            }
+        }
+    }
+
+    private function recurseChmod($path)
+    {
+        foreach (File::allFiles($path) as $file) {
+            @chmod($file->getRealPath(), 0664);
+        }
+        foreach (File::directories($path) as $dir) {
+            @chmod($dir, 0775);
+            $this->recurseChmod($dir);
+        }
     }
 }

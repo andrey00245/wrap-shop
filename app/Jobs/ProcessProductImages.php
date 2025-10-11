@@ -24,10 +24,10 @@ class ProcessProductImages implements ShouldQueue
 
     public function handle(): void
     {
-        $product = $this->product;
+        // Игнорируем предупреждения libpng о неправильном sRGB профиле
+        error_reporting(E_ERROR | E_PARSE);
         
-        // Проверяем конверсии для существующих изображений
-        $this->checkExistingImagesConversions($product);
+        $product = $this->product;
         
         $username = config('app.my_store.username');
         $password = config('app.my_store.password');
@@ -62,6 +62,7 @@ class ProcessProductImages implements ShouldQueue
 
     protected function handleImageDownload($product, $downloadUrl, $encodedCredentials, $filename): void
     {
+        // Проверяем, существует ли уже такое изображение
         $existingMediaItem = $product->getMedia('images')->first(function ($media) use ($downloadUrl) {
             return $media->getCustomProperty('download_url') === $downloadUrl;
         });
@@ -69,8 +70,8 @@ class ProcessProductImages implements ShouldQueue
         if ($existingMediaItem) {
             Log::info("Image from '{$downloadUrl}' already exists for product ID {$product->external_id}. Checking conversions...");
             
-            // Проверяем конверсии для существующего изображения
-            $this->ensureConversionsExist($existingMediaItem);
+            // Проверяем и создаем конверсии для существующего изображения
+            $this->createConversions($existingMediaItem);
             return;
         }
 
@@ -92,8 +93,8 @@ class ProcessProductImages implements ShouldQueue
                 $mediaItem->setCustomProperty('download_url', $downloadUrl);
                 $mediaItem->save();
 
-                // Проверяем и создаем конверсии если их нет
-                $this->ensureConversionsExist($mediaItem);
+                // Создаем конверсии
+                $this->createConversions($mediaItem);
 
                 Log::info("Image '{$filename}' added for product ID {$product->external_id}.");
             } catch (\Exception $e) {
@@ -132,75 +133,58 @@ class ProcessProductImages implements ShouldQueue
     }
 
     /**
-     * Проверяет конверсии для всех существующих изображений продукта
+     * Создает конверсии для медиа файла (только если их нет)
      */
-    protected function checkExistingImagesConversions($product): void
-    {
-        $existingImages = $product->getMedia('images');
-        
-        if ($existingImages->isNotEmpty()) {
-            Log::info("Проверяем конверсии для {$existingImages->count()} существующих изображений продукта {$product->external_id}");
-            
-            foreach ($existingImages as $mediaItem) {
-                $this->ensureConversionsExist($mediaItem);
-            }
-        }
-    }
-
-    /**
-     * Проверяет и создает конверсии для медиа файла если их нет
-     */
-    protected function ensureConversionsExist($mediaItem): void
+    protected function createConversions($mediaItem): void
     {
         try {
             // Получаем конфигурацию конверсий
             $conversions = \App\Models\MediaConversions::getConversionsConfig();
             
             foreach ($conversions as $conversionName => $config) {
-                // Проверяем, существует ли конверсия
-                if (!$mediaItem->hasGeneratedConversion($conversionName)) {
-                    Log::info("Создаем отсутствующую конверсию {$conversionName} для {$mediaItem->file_name}");
-                    
-                    // Создаем конверсию через модель продукта
-                    $product = $mediaItem->model;
-                    if ($product) {
-                        $conversion = $product->addMediaConversion($conversionName);
-                        
-                        if ($config['width'] && $config['height']) {
-                            $conversion->width($config['width'])->height($config['height']);
-                        }
-                        
-                        if ($config['quality']) {
-                            $conversion->quality($config['quality']);
-                        }
-                        
-                        if (isset($config['sharpen'])) {
-                            $conversion->sharpen($config['sharpen']);
-                        }
-                        
-                        if ($config['format']) {
-                            $conversion->format($config['format']);
-                        }
-                        
-                        if (isset($config['fit'])) {
-                            $conversion->fit(\Spatie\Image\Enums\Fit::Contain);
-                        }
-                        
-                        $conversion->optimize();
-                        
-                        foreach ($config['collections'] as $collection) {
-                            $conversion->performOnCollections($collection);
-                        }
-                        
-                        $conversion->nonQueued();
-                        
-                        // Выполняем конверсию
-                        $conversion->perform();
-                        
-                        Log::info("✅ Создана конверсия {$conversionName} для {$mediaItem->file_name}");
-                    }
-                } else {
+                // Проверяем, существует ли уже конверсия
+                if ($mediaItem->hasGeneratedConversion($conversionName)) {
                     Log::info("Конверсия {$conversionName} уже существует для {$mediaItem->file_name}");
+                    continue;
+                }
+                
+                // Создаем конверсию через модель продукта
+                $product = $mediaItem->model;
+                if ($product) {
+                    $conversion = $product->addMediaConversion($conversionName);
+                    
+                    if ($config['width'] && $config['height']) {
+                        $conversion->width($config['width'])->height($config['height']);
+                    }
+                    
+                    if ($config['quality']) {
+                        $conversion->quality($config['quality']);
+                    }
+                    
+                    if (isset($config['sharpen'])) {
+                        $conversion->sharpen($config['sharpen']);
+                    }
+                    
+                    if ($config['format']) {
+                        $conversion->format($config['format']);
+                    }
+                    
+                    if (isset($config['fit'])) {
+                        $conversion->fit(\Spatie\Image\Enums\Fit::Contain);
+                    }
+                    
+                    $conversion->optimize();
+                    
+                    foreach ($config['collections'] as $collection) {
+                        $conversion->performOnCollections($collection);
+                    }
+                    
+                    $conversion->nonQueued();
+                    
+                    // Выполняем конверсию
+                    $conversion->perform();
+                    
+                    Log::info("✅ Создана конверсия {$conversionName} для {$mediaItem->file_name}");
                 }
             }
         } catch (\Exception $e) {

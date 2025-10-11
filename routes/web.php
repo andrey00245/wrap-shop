@@ -37,7 +37,7 @@ use App\Http\Controllers\CommandRunnerController;
 require __DIR__.'/auth.php';
 
 Route::get('/admin/run-media', function () {
-    \Artisan::call('media:regenerate', [
+    \Artisan::call('media:generate-sync', [
         '--collection' => 'images',
         '--force' => true,
     ]);

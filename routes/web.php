@@ -36,6 +36,15 @@ use App\Http\Controllers\CommandRunnerController;
 
 require __DIR__.'/auth.php';
 
+Route::get('/admin/run-media', function () {
+    \Artisan::call('media:generate-sync', [
+        '--collection' => 'images',
+        '--force' => true,
+    ]);
+
+    return '✅ Конверсии пересозданы';
+});
+
 Route::match(['get', 'post'], 'login/apple/callback', [SocialController::class, 'handleAppleCallback'])
     ->withoutMiddleware([VerifyCsrfToken::class]);
 Route::post('checkout/wayforpay/callback', [WayForPayController::class, 'callback'])

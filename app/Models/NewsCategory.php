@@ -37,7 +37,7 @@ class NewsCategory extends Model
     public function registerMediaConversions(?Media $media = null): void
     {
         $this
-            ->addMediaConversion('preview')
+            ->addMediaConversion('preview_web')
             ->width(310)
             ->height(310)
             ->format('png')

@@ -108,11 +108,8 @@ class MediaHelper
     public static function getConversionsInfo(Media $media): array
     {
         $conversions = [
-            'preview' => $media->hasGeneratedConversion('preview'),
-            'thumbnail' => $media->hasGeneratedConversion('thumbnail'),
-            'gallery' => $media->hasGeneratedConversion('gallery'),
-            'webp' => $media->hasGeneratedConversion('webp'),
             'preview_webp' => $media->hasGeneratedConversion('preview_webp'),
+            'gallery' => $media->hasGeneratedConversion('gallery'),
         ];
 
         return $conversions;

@@ -217,6 +217,8 @@ class Product extends Model implements HasMedia
             foreach ($config['collections'] as $collection) {
                 $conversion->performOnCollections($collection);
             }
+            
+            $conversion->nonQueued();
         }
     }
 
@@ -275,8 +277,15 @@ class Product extends Model implements HasMedia
             })->value('price') * self::getCurrencyRate();
     }
 
-    public function getImage(): string
+    public function getImage(string $conversion = null): string
     {
+        if ($conversion) {
+            $media = $this->getFirstMedia('images');
+            if ($media) {
+                return $media->getUrl($conversion);
+            }
+        }
+        
         return $this->getFirstMediaUrl('images');
     }
 

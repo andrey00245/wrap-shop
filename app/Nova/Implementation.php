@@ -60,8 +60,7 @@ class Implementation extends Resource
             ])->hideFromIndex(),
             Date::make('Дата','data')->nullable(),
             Images::make('Фото', 'images')
-                ->required()
-                ->conversionOnIndexView('preview_webp'),
+                ->required(),
             Boolean::make('Активний','is_active'),
             BelongsTo::make('Продукт','product',Product::class)->searchable(),
 

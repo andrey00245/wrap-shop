@@ -51,10 +51,10 @@ class Implementation extends Model implements HasMedia, Sortable
     public function registerMediaConversions(?Media $media = null): void
     {
         $this
-            ->addMediaConversion('preview')
+            ->addMediaConversion('preview_webp')
             ->width(310)
             ->height(310)
-            ->format('png')
+            ->format('webp')
             ->nonQueued();
     }
 

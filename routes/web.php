@@ -39,17 +39,28 @@ require __DIR__ . '/auth.php';
 
 Route::get('/admin/run-media', function () {
     try {
-        Artisan::call('media:generate-sync', [
+        $output = Artisan::call('media:generate-sync', [
             '--collection'   => 'images',
             '--force'        => true,
             '--only-missing' => true,
         ]);
+        
+        $result = Artisan::output();
+        
+        return response()->json([
+            'success' => true,
+            'message' => '✅ Конверсии пересозданы',
+            'output' => $result,
+            'exit_code' => $output
+        ]);
+        
     } catch (\Exception $e) {
-        dd($e);
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
     }
-
-
-    return '✅ Конверсии пересозданы';
 });
 
 Route::match(['get', 'post'], 'login/apple/callback', [SocialController::class, 'handleAppleCallback'])

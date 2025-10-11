@@ -61,7 +61,7 @@ class Implementation extends Resource
             Date::make('Дата','data')->nullable(),
             Images::make('Фото', 'images')
                 ->required()
-                ->conversionOnIndexView('preview'),
+                ->conversionOnIndexView('preview_webp'),
             Boolean::make('Активний','is_active'),
             BelongsTo::make('Продукт','product',Product::class)->searchable(),
 

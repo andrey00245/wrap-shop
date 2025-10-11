@@ -86,7 +86,7 @@ class GenerateConversionsSync extends Command
     {
         // Используем конфигурацию из MediaConversions
         $conversions = \App\Models\MediaConversions::getConversionsConfig();
-
+        
         // Получаем модель для создания конверсий
         $model = $media->model;
         if (!$model) {
@@ -186,6 +186,35 @@ class GenerateConversionsSync extends Command
     {
         $this->info("🔧 Исправление прав доступа к файловой системе...");
 
+        $paths = [
+            storage_path(),
+            base_path('bootstrap/cache'),
+        ];
+
+        foreach ($paths as $path) {
+            if (File::exists($path)) {
+                File::chmod($path, 0775);
+                $this->recurseChmod($path);
+                $this->line("✅ Исправлены права для: {$path}");
+            }
+        }
+    }
+
+    private function recurseChmod($path)
+    {
+        foreach (File::allFiles($path) as $file) {
+            @chmod($file->getRealPath(), 0664);
+        }
+        foreach (File::directories($path) as $dir) {
+            @chmod($dir, 0775);
+            $this->recurseChmod($dir);
+        }
+    }
+
+    private function fixStoragePermissions()
+    {
+        $this->info("🔧 Исправление прав доступа к файловой системе...");
+        
         $paths = [
             storage_path(),
             base_path('bootstrap/cache'),

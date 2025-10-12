@@ -81,20 +81,7 @@ class Category extends Resource
             HasMany::make('Під Категорія', 'children', self::class),
             HasMany::make('Продукти', 'products', Product::class),
 
-            Images::make('Фото','main')
-                ->hideFromIndex()
-                ->showOnDetail()
-                ->showOnCreating()
-                ->showOnUpdating(),
-
-            Images::make('Превью', function () {
-                $media = $this->getFirstMedia('main');
-                if ($media && $media->hasGeneratedConversion('preview_webp')) {
-                    return $media->getUrl('preview_webp');
-                }
-                return $this->getFirstMediaUrl('main');
-            })
-                ->onlyOnIndex()
+            Images::make('Фото','main'),
         ];
     }
 }

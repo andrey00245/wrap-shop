@@ -34,7 +34,7 @@
 {{--    @include('base.components.yellotools')--}}
     @include('base.components.custom-blocks')
     @include('base.components.latest')
-    @include('base.components.examples-of-work')
+    {{-- @include('base.components.examples-of-work') --}}
 
     @push('scripts')
       <script src="{{mix('build/js/sliders.js')}}"></script>

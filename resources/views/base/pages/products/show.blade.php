@@ -500,7 +500,7 @@
     </section>
 
     @include('base.components.recommendations')
-    @include('base.components.examples-of-work')
+    {{-- @include('base.components.examples-of-work') --}}
     @include('base.components.consult-popup')
     @include('base.components.fast-order-popup')
     @include('base.components.reviews-popup')

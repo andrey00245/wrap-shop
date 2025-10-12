@@ -81,7 +81,8 @@ class Category extends Resource
             HasMany::make('Під Категорія', 'children', self::class),
             HasMany::make('Продукти', 'products', Product::class),
 
-            Images::make('Фото','main'),
+            Images::make('Фото','main')
+                ->conversionOnIndexView('preview_webp'),
         ];
     }
 }

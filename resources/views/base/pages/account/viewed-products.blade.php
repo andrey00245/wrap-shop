@@ -20,7 +20,7 @@
                 <div
                     class="image default-products-images">
                     <i class="far fa-search-plus colord"
-                       data-src="{{$viewedProduct->getMedia('images')->first()->getUrl()}}"
+                       data-src="{{$viewedProduct->getPreviewImage()}}"
                        data-fancybox="products{{$viewedProduct->id}}" data-caption="{{$viewedProduct->name}}"></i>
                     <a class="image-link" href="{{route('products.show', ['product'=>$viewedProduct->slugEn])}}"
                        title="{{$viewedProduct->name}}">

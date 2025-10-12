@@ -8,7 +8,7 @@
     <div class="examples-wrapper">
         @foreach($exampleWorks as $works)
                 <div class="example-of-work">
-                    <img class="image-example" src="{{$works->getImage()}}" alt="{{$works->title}}">
+                    <img class="image-example" src="{{$works->getPreviewImage()}}" alt="{{$works->title}}">
                     <div class="middle-content-wrapper">
                 <span class="car-name">{{$works->title}}
                     <svg style="margin-left: 5px" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -20,7 +20,7 @@
                     </div>
                     <div class="example-product">
                         <a class="product-link" href="{{route('products.show', ['product'=>$works->product->slugEn])}}">
-                            <img class="image-product" src="{{$works->product->getImage()}}" alt="{{$works->product->name}}">
+                            <img class="image-product" src="{{$works->product->getPreviewImage()}}" alt="{{$works->product->name}}">
                             <div class="text-wrapper">
                                 <span class="title-product">{{$works->product->category->name}}</span>
                                 <span class="name-product">{{$works->product->name}}</span>

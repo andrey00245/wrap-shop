@@ -38,7 +38,7 @@
                             <div
                                 class="image">
                                 <i class="far fa-search-plus colord"
-                                   data-src="{{$product->getMedia('images')->first()->getUrl()}}"
+                                   data-src="{{$product->getPreviewImage()}}"
                                    data-fancybox="latest{{$product->id}}" data-caption="{{$product->getName()}}"></i>
                                 <a href="{{route('products.show', ['product'=>$product->slugEn])}}"
                                    title="{{$product->getName()}}">

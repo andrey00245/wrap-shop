@@ -6,7 +6,7 @@
                     <a href="{{$banner->url}}">
                         <img
                             loading="lazy"
-                            src="{{$banner->getImage()}}"
+                            src="{{$banner->getPreviewImage()}}"
                             width="1312"
                             height="450"
                             alt="#"

@@ -72,7 +72,7 @@
         <div
             class="image default-products-images">
             <i class="far fa-search-plus colord"
-               data-src="{{$product->getMedia('images')->first()->getUrl()}}"
+               data-src="{{$product->getPreviewImage()}}"
                data-fancybox="products{{$product->id}}" data-caption="{{$product->name}}"></i>
             <a class="image-link" href="{{route('products.show', ['product'=>$product->slugEn])}}"
                title="{{$product->name}}">

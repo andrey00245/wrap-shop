@@ -113,7 +113,9 @@ class Product extends Resource
     {
         return [
             NovaTabTranslatable::make([
-                Text::make('Назва', 'name'),
+                Text::make('Назва', 'name')
+                    ->rules('required', 'string', 'max:255')
+                    ->help('Обязательное поле'),
                 CkEditor::make('Опис', 'descriptions')
                     ->nullable(),
             ])->hideFromIndex(),
@@ -130,13 +132,24 @@ class Product extends Resource
             Text::make('Арикул', 'article')
                 ->nullable(),
 
-            Text::make('Код', 'code')
-                ->sortable(),
+            Text::make('Внешний код', 'external_code')
+                ->sortable()
+                ->rules('nullable', 'string', 'max:255')
+                ->help('Необязательное поле'),
 
-            Images::make('Фото', 'images'),
+            Text::make('Код', 'code')
+                ->sortable()
+                ->rules('nullable', 'string', 'max:255')
+                ->help('Необязательное поле'),
+
+            Images::make('Фото', 'images')
+                ->conversionOnIndexView('preview_webp'),
 
             Number::make('Кількість','stock')
-                ->sortable(),
+                ->sortable()
+                ->rules('required', 'integer', 'min:0')
+                ->default(0)
+                ->help('Обязательное поле'),
             Boolean::make('Активний','is_active')
                 ->sortable(),
             Boolean::make('Перекладено', function () {
@@ -176,7 +189,8 @@ class Product extends Resource
                 Text::make('Назва', 'banner_title'),
             ])->hideFromIndex(),
             Images::make('Фото Вигляду', 'banner_images')
-            ->hideFromIndex(),
+                ->conversionOnIndexView('preview_webp')
+                ->hideFromIndex(),
         ];
     }
 

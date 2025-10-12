@@ -56,7 +56,7 @@
                         <div
                             class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
                             <i class="far fa-search-plus colord"
-                               data-src="{{$product->getMedia('images')->first()->getUrl()}}"
+                               data-src="{{$product->getPreviewImage()}}"
                                data-fancybox="bestseller{{$product->id}}" data-caption="{{$product->name}}"></i>
                             <a href="{{route('products.show', ['product'=>$product->slugEn])}}"
                                title="{{$product->name}}">

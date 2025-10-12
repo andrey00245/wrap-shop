@@ -24,7 +24,7 @@
                         <div
                             class="image default-products-images">
                             <i class="far fa-search-plus colord"
-                               data-src="{{$wishlist->getMedia('images')->first()->getUrl()}}"
+                               data-src="{{$wishlist->getPreviewImage()}}"
                                data-fancybox="products{{$wishlist->id}}" data-caption="{{$wishlist->name}}"></i>
                             <a class="image-link" href="{{route('products.show', ['product'=>$wishlist->slugEn])}}"
                                title="{{$wishlist->name}}">

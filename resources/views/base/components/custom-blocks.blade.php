@@ -25,8 +25,8 @@
                             <li class="splide__slide home-products-item banner product-default"
                                 role="group">
                                 <a href="{{$customBlock->url ?? '#'}}" title="3m color">
-                                    <img class="vertical" data-src="{{$customBlock->getImage()}}" alt="3m color"
-                                         title="3m color" src="{{$customBlock->getImage()}}">
+                                    <img class="vertical" data-src="{{$customBlock->getPreviewImage()}}" alt="3m color"
+                                         title="3m color" src="{{$customBlock->getPreviewImage()}}">
                                 </a>
                             </li>
                         @endif
@@ -52,7 +52,7 @@
                                 <div
                                     class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
                                     <i class="far fa-search-plus colord"
-                                       data-src="{{$product->getMedia('images')->first()?->getUrl()}}"
+                                       data-src="{{$product->getPreviewImage()}}"
                                        data-fancybox="bestseller{{$product->id}}" data-caption="{{$product->name}}"></i>
                                     <a href="{{route('products.show', ['product'=>$product->slugEn])}}"
                                        title="{{$product->name}}">

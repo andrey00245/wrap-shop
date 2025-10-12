@@ -65,7 +65,8 @@ class News extends Resource
                 ->displayUsing(function ($parent) {
                     return $parent->getNameUkAttribute();
                 }),
-            Images::make('Фото','main'),
+            Images::make('Фото','main')
+                ->conversionOnIndexView('preview_webp'),
             Boolean::make('Активна','is_active'),
 
         ];

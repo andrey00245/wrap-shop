@@ -5,7 +5,7 @@
                 <li class="splide__slide swiper-slide home-banner-item">
                     <a href="{{ route('products.category', ['category' => $mainCategory->slugEn]) }}"
                        class="swiper-slide home-category-item flex-justify" title="">
-                        <figure class="img flex-center"><img loading="lazy" src="{{$mainCategory->getImage()}}"
+                        <figure class="img flex-center"><img loading="lazy" src="{{$mainCategory->getPreviewImage()}}"
                                                              srcset="" alt="" title=""></figure>
                         <div class="right">
                             <div class="name">{{$mainCategory->name}}</div>

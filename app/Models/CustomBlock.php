@@ -34,6 +34,16 @@ class CustomBlock extends Model implements HasMedia, Sortable
         return $this->getFirstMediaUrl('main');
     }
 
+    public function getPreviewImage(): string
+    {
+        $media = $this->getFirstMedia('main');
+        if ($media && $media->hasGeneratedConversion('preview_webp')) {
+            return $media->getUrl('preview_webp');
+        }
+        
+        return $this->getFirstMediaUrl('main');
+    }
+
     public function products()
     {
         return $this->belongsToMany(Product::class)

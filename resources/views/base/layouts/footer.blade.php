@@ -45,7 +45,7 @@
         @foreach($mainCategories as $category)
           <li>
             <a href="{{route('products.category', ['category' => $category->slugEn])}}" title="{{$category->name}}">
-              <figure><img loading="lazy" src="{{$category->getImage()}}" srcset="{{$category->getImage()}}"
+              <figure><img loading="lazy" src="{{$category->getPreviewImage()}}" srcset="{{$category->getPreviewImage()}}"
                            alt="{{$category->name}}" title="{{$category->name}}" width="180" height="140"></figure>
               <div>
                 <div class="name">{{$category->name}}</div>

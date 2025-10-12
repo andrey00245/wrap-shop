@@ -48,6 +48,12 @@ class Category extends Model implements HasMedia
     public function registerMediaConversions(?Media $media = null): void
     {
         $this
+            ->addMediaConversion('preview')
+            ->width(310)
+            ->height(310)
+            ->nonQueued();
+            
+        $this
             ->addMediaConversion('preview_webp')
             ->width(310)
             ->height(310)

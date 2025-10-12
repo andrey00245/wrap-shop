@@ -99,6 +99,16 @@ class Implementation extends Model implements HasMedia, Sortable
         return '';
     }
 
+    public function getPreviewImage(): string
+    {
+        $media = $this->getFirstMedia('images');
+        if ($media && $media->hasGeneratedConversion('preview_webp')) {
+            return $media->getUrl('preview_webp');
+        }
+        
+        return $this->getFirstMediaUrl('images');
+    }
+
     public function getData(): string
     {
         return (new Carbon($this->data))->format('Y-m-d');

@@ -85,7 +85,8 @@ class CustomBlock extends Resource
             Text::make('Url')->hideFromIndex(),
             Boolean::make('Active', 'is_active'),
 
-            Images::make('Баннер','main'),
+            Images::make('Баннер','main')
+                ->conversionOnIndexView('preview_webp'),
 
             Text::make('Кількість товарів', function () {
                 return $this->products()->count();

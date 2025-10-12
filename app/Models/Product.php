@@ -91,6 +91,13 @@ class Product extends Model implements HasMedia
         'meta_description' => '{"en":"","ru":"","uk":""}',
     ];
 
+    protected $attributes = [
+        'stock' => 0,
+        'name' => '{"en":"","ru":"","uk":""}',
+        'descriptions' => '{"en":"","ru":"","uk":""}',
+        'banner_title' => '{"en":"","ru":"","uk":""}',
+    ];
+
     protected $casts = [
         'banner_title' => 'json',
         'slug' => 'json',
@@ -474,6 +481,16 @@ class Product extends Model implements HasMedia
             }
         }
 
+        return $this->getFirstMediaUrl('images');
+    }
+
+    public function getPreviewImage(): string
+    {
+        $media = $this->getFirstMedia('images');
+        if ($media && $media->hasGeneratedConversion('preview_webp')) {
+            return $media->getUrl('preview_webp');
+        }
+        
         return $this->getFirstMediaUrl('images');
     }
 

@@ -405,19 +405,8 @@ class MoySkladSyncService
         // Временный лог для диагностики ошибки формата
         Log::info('MS customerorder payload', $payload);
 
-        $orderResponse = Http::withBasicAuth(
-            config('app.my_store.username'),
-            config('app.my_store.password')
-        )
-            ->withHeaders([
-                'Accept-Encoding' => 'gzip',
-            ])
-            ->post('https://api.moysklad.ru/api/remap/1.2/entity/customerorder', $payload);
-
-        if ($orderResponse->failed()) {
-            Log::error('Ошибка создания заказа в МойСклад', ['response' => $orderResponse->json()]);
-            throw new \Exception('Ошибка при создании заказа в МойСклад');
-        }
+        // Отправка с ретраем при конфликте уникальности имени (3006)
+        $orderResponse = self::postCustomerOrderWithRetry($payload, 3);
 
         Log::info("Заказ #{$order->id} успешно отправлен в МойСклад", ['ms_order' => $orderResponse->json()]);
 
@@ -691,6 +680,7 @@ class MoySkladSyncService
                     'limit' => 1,
                 ]);
 
+            dd($res->json('rows'));
             if ($res->successful() && count($res->json('rows') ?? []) > 0) {
                 $lastName = (string) ($res->json('rows')[0]['name'] ?? '');
                 if (preg_match('/(\d+)(?!.*\d)/', $lastName, $m)) {
@@ -704,5 +694,44 @@ class MoySkladSyncService
 
         // Фоллбек: YYYYMMDD-uniqid suffix
         return date('Ymd').'-'.substr(uniqid('', true), -4);
+    }
+
+    /**
+     * POST customerorder с ретраем при конфликте имени (код 3006)
+     */
+    private static function postCustomerOrderWithRetry(array $payload, int $maxAttempts = 3)
+    {
+        $attempt = 0;
+        do {
+            $attempt++;
+            $response = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            )
+                ->withHeaders(['Accept-Encoding' => 'gzip'])
+                ->post('https://api.moysklad.ru/api/remap/1.2/entity/customerorder', $payload);
+
+            if ($response->successful()) {
+                return $response;
+            }
+
+            $json = $response->json();
+            $code = $json['errors'][0]['code'] ?? null;
+            $param = $json['errors'][0]['parameter'] ?? null;
+
+            if ($code == 3006 && $param === 'name' && $attempt < $maxAttempts) {
+                // генерируем новый номер и повторяем
+                $newNumber = self::generateNextOrderNumber();
+                $payload['name'] = (string) $newNumber;
+                Log::warning('MS order name conflict, retry with new name: '.$newNumber);
+                continue;
+            }
+
+            // Иные ошибки или исчерпаны попытки
+            Log::error('MS customerorder create failed', ['response' => $json]);
+            throw new \Exception('Ошибка при создании заказа в МойСклад');
+        } while ($attempt < $maxAttempts);
+
+        return $response; // недостижимо
     }
 }

@@ -677,15 +677,24 @@ class MoySkladSyncService
             )
                 ->withHeaders(['Accept-Encoding' => 'gzip'])
                 ->get('https://api.moysklad.ru/api/remap/1.2/entity/customerorder', [
-                    'order' => 'moment,desc',
-                    'limit' => 1,
+                    'order' => 'created,desc',
+                    'limit' => 50,
                 ]);
 
-            if ($res->successful() && count($res->json('rows') ?? []) > 0) {
-                $lastName = (string) ($res->json('rows')[0]['name'] ?? '');
-                if (preg_match('/(\d+)(?!.*\d)/', $lastName, $m)) {
-                    $num = (int) $m[1] + 1;
-                    return (string) $num;
+            if ($res->successful()) {
+                $rows = $res->json('rows') ?? [];
+                $maxNum = null;
+                foreach ($rows as $row) {
+                    $name = (string) ($row['name'] ?? '');
+                    if (preg_match('/(\d+)(?!.*\d)/', $name, $m)) {
+                        $n = (int) $m[1];
+                        if ($maxNum === null || $n > $maxNum) {
+                            $maxNum = $n;
+                        }
+                    }
+                }
+                if ($maxNum !== null) {
+                    return (string) ($maxNum + 1);
                 }
             }
         } catch (\Throwable $e) {
@@ -720,10 +729,17 @@ class MoySkladSyncService
             $param = $json['errors'][0]['parameter'] ?? null;
 
             if ($code == 3006 && $param === 'name' && $attempt < $maxAttempts) {
-                // генерируем новый номер и повторяем
-                $newNumber = self::generateNextOrderNumber();
-                $payload['name'] = (string) $newNumber;
-                Log::warning('MS order name conflict, retry with new name: '.$newNumber);
+                // инкрементируем текущий номер name локально
+                $currentName = (string) ($payload['name'] ?? '');
+                $newNumber = null;
+                if (preg_match('/(\d+)(?!.*\d)/', $currentName, $m)) {
+                    $newNumber = (string) ((int)$m[1] + 1);
+                } else {
+                    // если не удалось распарсить — fallback генератор
+                    $newNumber = self::generateNextOrderNumber();
+                }
+                $payload['name'] = $newNumber;
+                Log::warning('MS order name conflict, retry with incremented name: '.$newNumber);
                 continue;
             }
 

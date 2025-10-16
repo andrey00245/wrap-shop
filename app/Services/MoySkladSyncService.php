@@ -223,14 +223,14 @@ class MoySkladSyncService
         }
 
         // Получаем следующий номер заказа из МойСклад и сохраняем локально
-        $nextOrderNumber = self::generateNextOrderNumber();
-        if ($order instanceof Order) {
-            $order->ms_order_number = $nextOrderNumber;
-            $order->save();
-        } else {
-            $order->ms_order_number = $nextOrderNumber;
-            $order->save();
-        }
+//        $nextOrderNumber = self::generateNextOrderNumber();
+//        if ($order instanceof Order) {
+//            $order->ms_order_number = $nextOrderNumber;
+//            $order->save();
+//        } else {
+//            $order->ms_order_number = $nextOrderNumber;
+//            $order->save();
+//        }
 
         // Формируем позиции заказа — вытаскиваем продукты по коду через запрос и собираем массив для заказа
         $positions = [];
@@ -379,7 +379,7 @@ class MoySkladSyncService
 
         // Формируем тело запроса
         $payload = [
-            'name'         => (string) ($order->ms_order_number ?: $order->id),
+//            'name'         => (string) ($order->ms_order_number ?: $order->id),
             'organization' => $organization,
             'agent'        => [
                 'meta' => $counterparty->meta

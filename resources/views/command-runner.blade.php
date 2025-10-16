@@ -271,6 +271,19 @@
                 <div class="alert alert-error" id="conversions-error"></div>
             </div>
 
+            <!-- Конверсии для кастомных блоков -->
+            <div class="command-card" style="border: 2px solid #6f42c1; background: linear-gradient(135deg, #e2d9f3 0%, #d1c4e9 100%);">
+                <h3>🎨 Конверсии кастомных блоков</h3>
+                <p>Создание конверсий preview и preview_webp для кастомных блоков (баннеры)</p>
+                
+                <button class="btn btn-primary" onclick="runCustomBlockConversions(this)">
+                    🖼️ Создать конверсии для блоков
+                </button>
+                
+                <div class="alert alert-success" id="custom-blocks-success"></div>
+                <div class="alert alert-error" id="custom-blocks-error"></div>
+            </div>
+
             <!-- Очистка неиспользуемых медиа -->
             <div class="command-card" style="border: 2px solid #dc3545; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);">
                 <h3>🗑️ Очистка неиспользуемых медиа</h3>
@@ -525,6 +538,38 @@
                 }
             } catch (error) {
                 showAlert('conversions', 'Ошибка соединения: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runCustomBlockConversions(btn) {
+            if (!confirm('Создать конверсии для кастомных блоков?')) {
+                return;
+            }
+            
+            setLoading(btn, true);
+            
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/custom-blocks-conversions', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('custom-blocks', data.message, true);
+                } else {
+                    showAlert('custom-blocks', data.message, false);
+                }
+            } catch (error) {
+                showAlert('custom-blocks', 'Ошибка соединения: ' + error.message, false);
             } finally {
                 setLoading(btn, false);
             }

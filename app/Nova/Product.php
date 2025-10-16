@@ -135,7 +135,8 @@ class Product extends Resource
             Text::make('Внешний код', 'external_code')
                 ->sortable()
                 ->rules('nullable', 'string', 'max:255')
-                ->help('Необязательное поле'),
+                ->help('Необязательное поле')
+                ->hideFromIndex(),
 
             Text::make('Код', 'code')
                 ->sortable()

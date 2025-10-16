@@ -45,18 +45,53 @@ class MoySkladSyncService
             ];
         }
 
-        $response = Http::withBasicAuth(
-            config('app.my_store.username'),
-            config('app.my_store.password')
-        )
-            ->withHeaders([
-                'Accept-Encoding' => 'gzip',
-            ])->get('https://api.moysklad.ru/api/remap/1.2/entity/counterparty', [
-                'filter' => 'email=' . $order->email,
-            ]);
+        $isFast = $order instanceof \App\Models\FastOrder;
+        $clientName = $isFast
+            ? trim((string) ($order->name ?? ''))
+            : trim(((string) ($order->first_name ?? '')) . ' ' . ((string) ($order->last_name ?? '')));
+        $clientEmail = trim((string) ($order->email ?? ''));
+        $cleanPhone = self::sanitizePhoneNumber($order->phone);
+
+        // Ищем контрагента: email -> phone~local(0XXXXXXXXX) -> phone~intl(380XXXXXXXXX) -> phone~+intl(+380XXXXXXXXX) -> phone~last9
+        $response = null;
+        $tryFilters = [];
+        if ($clientEmail !== '') {
+            $tryFilters[] = 'email=' . $clientEmail;
+        }
+
+        // local UA format first: 0XXXXXXXXX (e.g., 0937953126)
+        $localPhone = $cleanPhone;
+        if (strpos($cleanPhone, '380') === 0 && strlen($cleanPhone) >= 12) {
+            $localPhone = '0' . substr($cleanPhone, 3);
+        }
+        $intlPhone = $cleanPhone;              // 380XXXXXXXXX
+        $plusIntlPhone = '+'.$intlPhone;       // +380XXXXXXXXX
+        $last9 = substr($cleanPhone, -9);      // XXXXXXX123 (9 цифр)
+
+        $tryFilters[] = 'phone~' . $localPhone;
+        $tryFilters[] = 'phone~' . $intlPhone;
+        $tryFilters[] = 'phone~' . $plusIntlPhone;
+        if ($last9 && strlen($last9) === 9) {
+            $tryFilters[] = 'phone~' . $last9;
+        }
+
+        foreach ($tryFilters as $filter) {
+            $response = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            )
+                ->withHeaders([
+                    'Accept-Encoding' => 'gzip',
+                ])->get('https://api.moysklad.ru/api/remap/1.2/entity/counterparty', [
+                    'filter' => $filter,
+                ]);
+
+            if ($response->successful() && count($response->json('rows') ?? []) > 0) {
+                break;
+            }
+        }
 
         if ($response->successful() && count($response->json('rows')) > 0) {
-            $cleanPhone = self::sanitizePhoneNumber($order->phone);
             $existing = $response->json('rows')[0];
             $counterpartyMeta = $existing['meta'];
 
@@ -86,7 +121,7 @@ class MoySkladSyncService
                         "type" => "attributemetadata",
                         "mediaType" => "application/json"
                     ],
-                    "value" => $order->first_name . ' ' . $order->last_name
+                    "value" => $clientName
                 ]
             ];
 
@@ -104,7 +139,9 @@ class MoySkladSyncService
                             "mediaType" => "application/json"
                         ],
                         "id" => $order->novaposhta_warehouse_ref,
-                        "name" => $order->shipping_address,
+                        "name" => is_array($order->shipping_address)
+                            ? implode(', ', $order->shipping_address)
+                            : (string) $order->shipping_address,
                     ]
                 ];
             }
@@ -125,11 +162,11 @@ class MoySkladSyncService
             }
 
         } else {
-            $cleanPhone = self::sanitizePhoneNumber($order->phone);
-
             $counterparty = new Counterparty($sklad);
-            $counterparty->name = $order->first_name . ' ' . $order->last_name;
-            $counterparty->email = $order->email;
+            $counterparty->name = $clientName !== '' ? $clientName : $cleanPhone;
+            if ($clientEmail !== '') {
+                $counterparty->email = $clientEmail;
+            }
             $counterparty->phone = $cleanPhone;
 
             $attributes = [
@@ -147,7 +184,7 @@ class MoySkladSyncService
                        "type" => "attributemetadata",
                        "mediaType" => "application/json"
                    ],
-                   "value" => $order->first_name . ' ' . $order->last_name
+                   "value" => $clientName
                ]
             ];
 
@@ -165,7 +202,9 @@ class MoySkladSyncService
                             "mediaType" => "application/json"
                         ],
                         "id" => $order->novaposhta_warehouse_ref,
-                        "name" => $order->shipping_address,
+                        "name" => is_array($order->shipping_address)
+                            ? implode(', ', $order->shipping_address)
+                            : (string) $order->shipping_address,
                     ]
                 ];
             }
@@ -180,6 +219,16 @@ class MoySkladSyncService
                 'href'      => $counterpartyMeta['href'],
                 'mediaType' => 'application/json',
             ];
+        }
+
+        // Получаем следующий номер заказа из МойСклад и сохраняем локально
+        $nextOrderNumber = self::generateNextOrderNumber();
+        if ($order instanceof Order) {
+            $order->ms_order_number = $nextOrderNumber;
+            $order->save();
+        } else {
+            $order->ms_order_number = $nextOrderNumber;
+            $order->save();
         }
 
         // Формируем позиции заказа — вытаскиваем продукты по коду через запрос и собираем массив для заказа
@@ -205,9 +254,15 @@ class MoySkladSyncService
                     continue;
                 }
 
+                // Цена должна быть в долларах (USD) и в минимальных единицах (центах)
+                $unitPriceUah = $orderProduct->pivot->price
+                    ? (float) $orderProduct->pivot->price
+                    : (float) $orderProduct->getUnitPriceForQuantity((int)$orderProduct->pivot->quantity);
+                $unitPriceUsd = (float) $orderProduct->getPriceByDollars($unitPriceUah);
+
                 $positions[] = [
                     'quantity'   => (float)$orderProduct->pivot->quantity,
-                    'price'      => $orderProduct->getPriceByDollars($orderProduct->pivot->price) * 100, // цена в доларах
+                    'price'      => (int) round($unitPriceUsd * 100),
                     'assortment' => [
                         'meta' => [
                             'type'      => $productData['meta']['type'],
@@ -235,9 +290,13 @@ class MoySkladSyncService
                 Log::warning("Не найден товар с кодом {order->product->code}");
             }
 
+            // FastOrder: цена за единицу с учетом количества (порогов) в USD центах
+            $unitPriceUah = (float) $order->product->getUnitPriceForQuantity((int)$order->quantity);
+            $unitPriceUsd = (float) $order->product->getPriceByDollars($unitPriceUah);
+
             $positions[] = [
                 'quantity'   => (float)$order->quantity,
-                'price'      => $order->product->getPriceByDollars($order->product->getPriceByCount($order->quantity)) * 100, // цена в доларах
+                'price'      => (int) round($unitPriceUsd * 100),
                 'assortment' => [
                     'meta' => [
                         'type'      => $productData['meta']['type'],
@@ -319,7 +378,7 @@ class MoySkladSyncService
 
         // Формируем тело запроса
         $payload = [
-            'name'         => 'Wrap-Shop #' . $order->id,
+            'name'         => (string) ($order->ms_order_number ?: $order->id),
             'organization' => $organization,
             'agent'        => [
                 'meta' => $counterparty->meta
@@ -343,6 +402,9 @@ class MoySkladSyncService
         }
 
 
+        // Временный лог для диагностики ошибки формата
+        Log::info('MS customerorder payload', $payload);
+
         $orderResponse = Http::withBasicAuth(
             config('app.my_store.username'),
             config('app.my_store.password')
@@ -358,14 +420,14 @@ class MoySkladSyncService
         }
 
         Log::info("Заказ #{$order->id} успешно отправлен в МойСклад", ['ms_order' => $orderResponse->json()]);
-        
+
         // Сохраняем ID заказа в МойСклад для последующего обновления
         $msOrderId = $orderResponse->json('id');
         if ($msOrderId) {
             $order->update(['moysklad_id' => $msOrderId]);
         }
     }
-    
+
     /**
      * Обновить данные контрагента в МойСклад при изменении типа доставки
      */
@@ -426,7 +488,7 @@ class MoySkladSyncService
                 // Определяем тип доставки по shipping_address
                 $deliveryType = 'Відділення';
                 $deliveryAddress = $order->shipping_address;
-                
+
                 if (strpos($order->shipping_address, 'Кур\'єром:') === 0) {
                     $deliveryType = 'Кур\'єром';
                     $deliveryAddress = str_replace('Кур\'єром: ', '', $order->shipping_address);
@@ -506,13 +568,13 @@ class MoySkladSyncService
             Log::warning("Заказ #{$order->id} не имеет ID в МойСклад");
             return;
         }
-        
+
         try {
             $sklad = MoySklad::getInstance(
                 config('app.my_store.username'),
                 config('app.my_store.password')
             );
-            
+
             // Получаем текущий заказ из МойСклад
             $response = Http::withBasicAuth(
                 config('app.my_store.username'),
@@ -522,14 +584,14 @@ class MoySkladSyncService
                     'Accept-Encoding' => 'gzip',
                 ])
                 ->get("https://api.moysklad.ru/api/remap/1.2/entity/customerorder/{$order->moysklad_id}");
-            
+
             if ($response->failed()) {
                 Log::error("Ошибка получения заказа #{$order->id} из МойСклад", ['response' => $response->json()]);
                 return;
             }
-            
+
             $msOrder = $response->json();
-            
+
             // Обновляем атрибут "Оплачено" на true
             $updatePayload = [
                 'attributes' => [
@@ -543,7 +605,7 @@ class MoySkladSyncService
                     ]
                 ]
             ];
-            
+
             $updateResponse = Http::withBasicAuth(
                 config('app.my_store.username'),
                 config('app.my_store.password')
@@ -553,13 +615,13 @@ class MoySkladSyncService
                     'Content-Type' => 'application/json'
                 ])
                 ->put("https://api.moysklad.ru/api/remap/1.2/entity/customerorder/{$order->moysklad_id}", $updatePayload);
-            
+
             if ($updateResponse->successful()) {
                 Log::info("Статус заказа #{$order->id} успешно обновлен в МойСклад (Оплачено: true)");
             } else {
                 Log::error("Ошибка обновления статуса заказа #{$order->id} в МойСклад", ['response' => $updateResponse->json()]);
             }
-            
+
         } catch (\Exception $e) {
             Log::error("Ошибка обновления статуса заказа #{$order->id} в МойСклад", ['error' => $e->getMessage()]);
         }
@@ -611,4 +673,36 @@ class MoySkladSyncService
         return $digits; // на всякий случай
     }
 
+    /**
+     * Получает следующий номер заказа на основе последнего заказа в МойСклад.
+     * Пытается извлечь числовой суффикс из name и инкрементировать.
+     * Фоллбек: текущая дата и уникальный счётчик.
+     */
+    private static function generateNextOrderNumber(): string
+    {
+        try {
+            $res = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            )
+                ->withHeaders(['Accept-Encoding' => 'gzip'])
+                ->get('https://api.moysklad.ru/api/remap/1.2/entity/customerorder', [
+                    'order' => 'moment,desc',
+                    'limit' => 1,
+                ]);
+
+            if ($res->successful() && count($res->json('rows') ?? []) > 0) {
+                $lastName = (string) ($res->json('rows')[0]['name'] ?? '');
+                if (preg_match('/(\d+)(?!.*\d)/', $lastName, $m)) {
+                    $num = (int) $m[1] + 1;
+                    return (string) $num;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('MS next order number fallback: '.$e->getMessage());
+        }
+
+        // Фоллбек: YYYYMMDD-uniqid suffix
+        return date('Ymd').'-'.substr(uniqid('', true), -4);
+    }
 }

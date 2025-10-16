@@ -426,5 +426,71 @@ class CommandRunnerController extends Controller
             ], 500);
         }
     }
+ 
+    /**
+     * Создать конверсии для кастомных блоков
+     */
+    public function generateCustomBlockConversions(Request $request): JsonResponse
+    {
+        try {
+            Artisan::call('media:generate-sync', [
+                '--collection' => 'main',
+                '--force' => (bool) $request->input('force', false),
+                '--only-missing' => true,
+            ]);
+            
+            $output = Artisan::output();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Конверсии для кастомных блоков созданы',
+                'details' => $output,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Ошибка создания конверсий для кастомных блоков', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Создать (или пересоздать) storage symlink без SSH
+     */
+    public function storageLink(Request $request): JsonResponse
+    {
+        try {
+            $force = (bool) $request->input('force', false);
+
+            // При необходимости удаляем существующую ссылку
+            if ($force) {
+                @unlink(public_path('storage'));
+            }
+
+            \Artisan::call('storage:link');
+            $output = \Artisan::output();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ссылка public/storage успешно '.($force ? 'пересоздана' : 'создана'),
+                'details' => trim($output),
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Ошибка storage:link', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка: '.$e->getMessage(),
+            ], 500);
+        }
+    }
 }
 

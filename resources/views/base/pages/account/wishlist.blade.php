@@ -14,7 +14,7 @@
                         <div class="top flex-justify">
                             <div class="sku">{{__('general-translate.product_card.code')}} {{$wishlist->code}}</div>
                             <div class="wishlist">
-                                <a href="{{route('wishlist.delete', ['product'=>$wishlist->id])}}"
+                                <a href="{{ route('wishlist.delete', ['product' => $wishlist->slugEn]) }}"
                                    title="{{__('general-translate.product_card.remove')}}"
                                    class="fal fa-times"></a>
                             </div>

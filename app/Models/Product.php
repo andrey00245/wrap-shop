@@ -720,6 +720,24 @@ class Product extends Model implements HasMedia
         return $productPrice * $count;
     }
 
+    /**
+     * Возвращает цену за единицу в UAH с учётом количества (ценовые пороги).
+     */
+    public function getUnitPriceForQuantity(int $count): float
+    {
+        $unitPrice = $this->getPrice();
+
+        if ($this->getRollSize()) {
+            if ($count >= $this->getThirdStock()) {
+                $unitPrice = $this->getBigPrice();
+            } elseif ($count >= $this->getSecondStock() && $count <= $this->getThirdStock()) {
+                $unitPrice = $this->getSmallPrice();
+            }
+        }
+
+        return $unitPrice;
+    }
+
     public static function getCurrencyRate()
     {
         $currency = Setting::query()->value('currency');

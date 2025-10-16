@@ -55,6 +55,12 @@ class CustomBlock extends Model implements HasMedia, Sortable
     public function registerMediaConversions(?Media $media = null): void
     {
         $this
+            ->addMediaConversion('preview')
+            ->width(683)
+            ->height(201)
+            ->nonQueued();
+            
+        $this
             ->addMediaConversion('preview_webp')
             ->width(683)
             ->height(201)

@@ -57,3 +57,4 @@ class RegisterMediaConversions extends Command
         return 0;
     }
 }
+

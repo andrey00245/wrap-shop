@@ -11,6 +11,7 @@ use MoySklad\Entities\Organization;
 use MoySklad\MoySklad;
 use MoySklad\Entities\Counterparty;
 use ReflectionClass;
+use function ZipStream\addDirectory;
 
 class MoySkladSyncService
 {
@@ -290,6 +291,7 @@ class MoySkladSyncService
             'moment'       => now()->format('Y-m-d H:i:s'),
         ];
 
+            dd($payload);
         $comment = '';
 
         // Добавляем пометку для быстрого заказа

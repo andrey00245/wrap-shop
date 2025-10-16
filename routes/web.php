@@ -83,6 +83,8 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
     // Storage symlink (safe, behind Nova middleware)
     Route::post('/storage-link', [CommandRunnerController::class, 'storageLink']);
     Route::post('/custom-blocks-conversions', [CommandRunnerController::class, 'generateCustomBlockConversions']);
+    Route::post('/logs/tail', [CommandRunnerController::class, 'tailLogs']);
+    Route::post('/logs/clear', [CommandRunnerController::class, 'clearLogs']);
     Route::post('/sitemap', [CommandRunnerController::class, 'generateSitemap']);
     Route::post('/products', [CommandRunnerController::class, 'updateProducts']);
     Route::post('/cache', [CommandRunnerController::class, 'clearCache']);

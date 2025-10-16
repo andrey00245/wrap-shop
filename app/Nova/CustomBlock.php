@@ -86,7 +86,7 @@ class CustomBlock extends Resource
             Boolean::make('Active', 'is_active'),
 
             Images::make('Баннер','main')
-                ->conversionOnIndexView('preview_webp'),
+                ->conversionOnIndexView('preview'),
 
             Text::make('Кількість товарів', function () {
                 return $this->products()->count();

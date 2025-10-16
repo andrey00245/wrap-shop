@@ -682,7 +682,6 @@ class MoySkladSyncService
                     'limit' => 1,
                 ]);
 
-            dd($res->json('rows'));
             if ($res->successful() && count($res->json('rows') ?? []) > 0) {
                 $lastName = (string) ($res->json('rows')[0]['name'] ?? '');
                 if (preg_match('/(\d+)(?!.*\d)/', $lastName, $m)) {

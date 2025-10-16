@@ -284,6 +284,26 @@
                 <div class="alert alert-error" id="custom-blocks-error"></div>
             </div>
 
+            <!-- Быстрый контроль логов -->
+            <div class="command-card" style="border: 2px solid #495057; background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);">
+                <h3>📜 Логи (быстрый просмотр)</h3>
+                <p>Показать последние строки из storage/logs/laravel.log и при необходимости очистить</p>
+                
+                <div class="form-group">
+                    <label for="log-lines">Строк (по умолчанию 200):</label>
+                    <input type="number" id="log-lines" value="200" min="50" max="3000">
+                </div>
+                
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-primary" onclick="runTailLogs(this)">Показать логи</button>
+                    <button class="btn btn-danger" onclick="runClearLogs(this)">Очистить логи</button>
+                </div>
+                
+                <div class="alert alert-success" id="logs-success"></div>
+                <div class="alert alert-error" id="logs-error"></div>
+                <pre id="logs-output" style="margin-top:10px; max-height: 700px; overflow: auto; background:#111; color:#0f0; padding:10px; border-radius:6px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;"></pre>
+            </div>
+
             <!-- Очистка неиспользуемых медиа -->
             <div class="command-card" style="border: 2px solid #dc3545; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);">
                 <h3>🗑️ Очистка неиспользуемых медиа</h3>
@@ -634,6 +654,53 @@
                 }
             } catch (error) {
                 showAlert('unused', 'Ошибка соединения: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runTailLogs(btn) {
+            setLoading(btn, true);
+            try {
+                const lines = parseInt(document.getElementById('log-lines').value || '200');
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const res = await fetch('/nova-vendor/command-runner/logs/tail', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lines })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('logs-output').textContent = data.data || '';
+                    showAlert('logs', 'Логи загружены', true);
+                } else {
+                    showAlert('logs', data.message || 'Ошибка загрузки логов', false);
+                }
+            } catch (e) {
+                showAlert('logs', 'Ошибка: ' + e.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runClearLogs(btn) {
+            if (!confirm('Очистить все логи в storage/logs?')) return;
+            setLoading(btn, true);
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const res = await fetch('/nova-vendor/command-runner/logs/clear', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('logs-output').textContent = '';
+                    showAlert('logs', data.message, true);
+                } else {
+                    showAlert('logs', data.message || 'Ошибка очистки логов', false);
+                }
+            } catch (e) {
+                showAlert('logs', 'Ошибка: ' + e.message, false);
             } finally {
                 setLoading(btn, false);
             }

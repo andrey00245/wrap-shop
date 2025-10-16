@@ -426,6 +426,84 @@ class CommandRunnerController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Показать хвост логов (laravel.log) для быстрого контроля
+     */
+    public function tailLogs(Request $request): JsonResponse
+    {
+        try {
+            $lines = (int) $request->input('lines', 200);
+            $logFile = storage_path('logs/laravel.log');
+
+            if (!file_exists($logFile)) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Лог-файл отсутствует',
+                    'data'    => ''
+                ]);
+            }
+
+            // Читаем последние N строк эффективно
+            $fp = fopen($logFile, 'r');
+            $buffer = '';
+            $chunkSize = 4096;
+            $pos = -1;
+            $lineCount = 0;
+
+            fseek($fp, 0, SEEK_END);
+            $fileSize = ftell($fp);
+
+            while ($lineCount <= $lines && $fileSize > 0) {
+                $seek = max($fileSize - $chunkSize, 0);
+                $read = $fileSize - $seek;
+                fseek($fp, $seek);
+                $data = fread($fp, $read);
+                $buffer = $data . $buffer;
+                $fileSize = $seek;
+                $lineCount = substr_count($buffer, "\n");
+                if ($seek === 0) break;
+            }
+            fclose($fp);
+
+            $linesArr = explode("\n", trim($buffer));
+            $tail = implode("\n", array_slice($linesArr, -$lines));
+
+            return response()->json([
+                'success' => true,
+                'data'    => $tail,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка чтения логов: '.$e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Очистить логи приложения (storage/logs/*.log)
+     */
+    public function clearLogs(): JsonResponse
+    {
+        try {
+            $dir = storage_path('logs');
+            $removed = 0;
+            foreach (glob($dir.'/*.log') as $file) {
+                @unlink($file);
+                $removed++;
+            }
+            return response()->json([
+                'success' => true,
+                'message' => "Удалено лог-файлов: {$removed}",
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка очистки логов: '.$e->getMessage()
+            ], 500);
+        }
+    }
  
     /**
      * Создать конверсии для кастомных блоков

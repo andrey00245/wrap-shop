@@ -388,7 +388,6 @@ class MoySkladSyncService
             'moment'       => now()->format('Y-m-d H:i:s'),
         ];
 
-            dd($payload);
         $comment = '';
 
         if (in_array($order->shipping_method, ['novaposhta', 'novaposhta_doors', 'my_addresses'])) {

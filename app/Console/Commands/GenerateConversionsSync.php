@@ -169,8 +169,17 @@ class GenerateConversionsSync extends Command
 
         $this->info("\n📋 Примеры URL для {$media->file_name}:");
         $this->line("Оригинал: " . $media->getUrl());
-        $this->line("Preview WebP: " . $media->getUrl('preview_webp'));
-        $this->line("Gallery: " . $media->getUrl('gallery'));
+        
+        // Показываем только существующие конверсии
+        if ($media->hasGeneratedConversion('preview')) {
+            $this->line("Preview: " . $media->getUrl('preview'));
+        }
+        if ($media->hasGeneratedConversion('preview_webp')) {
+            $this->line("Preview WebP: " . $media->getUrl('preview_webp'));
+        }
+        if ($media->hasGeneratedConversion('gallery')) {
+            $this->line("Gallery: " . $media->getUrl('gallery'));
+        }
     }
 
     private function fixStoragePermissions()

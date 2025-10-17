@@ -59,9 +59,9 @@ class Implementation extends Resource
                 Trix::make('Опис','descriptions'),
             ])->hideFromIndex(),
             Date::make('Дата','data')->nullable(),
-            Images::make('Фото', 'images')
+            Images::make('Фото', 'main')
                 ->required()
-                ->conversionOnIndexView('preview_webp'),
+                ->conversionOnIndexView('preview'),
             Boolean::make('Активний','is_active'),
             BelongsTo::make('Продукт','product',Product::class)->searchable(),
 

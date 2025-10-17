@@ -23,6 +23,13 @@ class Banner extends Model implements HasMedia
     public function registerMediaConversions(?Media $media = null): void
     {
         $this
+            ->addMediaConversion('preview')
+            ->width(748)
+            ->height(257)
+            ->quality(100)
+            ->nonQueued();
+            
+        $this
             ->addMediaConversion('preview_webp')
             ->width(748)
             ->height(257)

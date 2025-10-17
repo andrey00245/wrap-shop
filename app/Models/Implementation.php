@@ -51,6 +51,12 @@ class Implementation extends Model implements HasMedia, Sortable
     public function registerMediaConversions(?Media $media = null): void
     {
         $this
+            ->addMediaConversion('preview')
+            ->width(310)
+            ->height(310)
+            ->nonQueued();
+            
+        $this
             ->addMediaConversion('preview_webp')
             ->width(310)
             ->height(310)
@@ -70,17 +76,17 @@ class Implementation extends Model implements HasMedia, Sortable
 
     public function getImage(): string
     {
-        return $this->getFirstMediaUrl('images');
+        return $this->getFirstMediaUrl('main');
     }
 
     public function getPreviewImage(): string
     {
-        $media = $this->getFirstMedia('images');
+        $media = $this->getFirstMedia('main');
         if ($media && $media->hasGeneratedConversion('preview_webp')) {
             return $media->getUrl('preview_webp');
         }
         
-        return $this->getFirstMediaUrl('images');
+        return $this->getFirstMediaUrl('main');
     }
 
     public function getData(): string

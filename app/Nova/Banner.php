@@ -51,7 +51,7 @@ class Banner extends Resource
         return [
             ID::make()->sortable(),
             Images::make( 'Фото','main')
-                ->conversionOnIndexView('preview_webp'),
+                ->conversionOnIndexView('preview'),
             Text::make('Силка','url'),
 
             Number::make('Позиція','position')->sortable(),

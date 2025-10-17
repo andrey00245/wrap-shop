@@ -40,7 +40,11 @@ class CustomBlock extends Model implements HasMedia, Sortable
         if ($media && $media->hasGeneratedConversion('preview_webp')) {
             return $media->getUrl('preview_webp');
         }
-        
+
+        if ($media && $media->hasGeneratedConversion('preview')) {
+            return $media->getUrl('preview');
+        }
+
         return $this->getFirstMediaUrl('main');
     }
 
@@ -59,7 +63,7 @@ class CustomBlock extends Model implements HasMedia, Sortable
             ->width(683)
             ->height(201)
             ->nonQueued();
-            
+
         $this
             ->addMediaConversion('preview_webp')
             ->width(683)

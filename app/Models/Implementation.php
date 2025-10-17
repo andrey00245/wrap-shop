@@ -55,7 +55,7 @@ class Implementation extends Model implements HasMedia, Sortable
             ->width(310)
             ->height(310)
             ->nonQueued();
-            
+
         $this
             ->addMediaConversion('preview_webp')
             ->width(310)
@@ -85,7 +85,11 @@ class Implementation extends Model implements HasMedia, Sortable
         if ($media && $media->hasGeneratedConversion('preview_webp')) {
             return $media->getUrl('preview_webp');
         }
-        
+
+        if ($media && $media->hasGeneratedConversion('preview')) {
+            return $media->getUrl('preview');
+        }
+
         return $this->getFirstMediaUrl('main');
     }
 

@@ -249,6 +249,23 @@
                 <div class="alert alert-error" id="cache-error"></div>
             </div>
 
+            <!-- Storage Link -->
+            <div class="command-card" style="border: 2px solid #28a745; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);">
+                <h3>🔗 Storage Link</h3>
+                <p>Создание символической ссылки для доступа к файлам из storage/app/public</p>
+                
+                <div style="display:flex; gap:8px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-success" onclick="runStorageLink(this, false)">
+                        🔗 Создать ссылку
+                    </button>
+                    <button class="btn btn-warning" onclick="runStorageLink(this, true)">
+                        🔄 Пересоздать ссылку
+                    </button>
+                </div>
+                
+                <div class="alert alert-success" id="storage-link-success"></div>
+                <div class="alert alert-error" id="storage-link-error"></div>
+            </div>
 
             <!-- Оптимизация медиа -->
             <div class="command-card" style="border: 2px solid #17a2b8; background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);">
@@ -525,6 +542,45 @@
                 }
             } catch (error) {
                 showAlert('cache', 'Помилка з\'єднання: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runStorageLink(btn, force = false) {
+            const action = force ? 'пересоздать' : 'создать';
+            if (!confirm(`Вы уверены, что хотите ${action} storage link?`)) {
+                return;
+            }
+            
+            setLoading(btn, true);
+            
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/storage-link', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        force: force
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('storage-link', result.message, true);
+                    if (result.details) {
+                        console.log('Storage Link Details:', result.details);
+                    }
+                } else {
+                    showAlert('storage-link', result.message || 'Ошибка создания storage link', false);
+                }
+            } catch (error) {
+                console.error('Storage Link Error:', error);
+                showAlert('storage-link', 'Ошибка: ' + error.message, false);
             } finally {
                 setLoading(btn, false);
             }

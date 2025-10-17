@@ -28,7 +28,7 @@ class Banner extends Model implements HasMedia
             ->height(257)
             ->quality(100)
             ->nonQueued();
-            
+
         $this
             ->addMediaConversion('preview_webp')
             ->width(748)
@@ -51,10 +51,15 @@ class Banner extends Model implements HasMedia
     public function getPreviewImage(): string
     {
         $media = $this->getFirstMedia('main');
-        if ($media && $media->hasGeneratedConversion('preview_webp')) {
-            return $media->getUrl('preview_webp');
+
+        if ($media && $media->hasGeneratedConversion('preview_web')) {
+            return $media->getUrl('preview_web');
         }
-        
+
+        if ($media && $media->hasGeneratedConversion('preview')) {
+            return $media->getUrl('preview');
+        }
+
         return $this->getFirstMediaUrl('main');
     }
 }

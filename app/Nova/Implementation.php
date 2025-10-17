@@ -65,7 +65,6 @@ class Implementation extends Resource
             Boolean::make('Активний','is_active'),
             BelongsTo::make('Продукт','product',Product::class)->searchable(),
 
-
         Number::make('Порядок сортування', 'sort_order')
             ->sortable()
             ->rules('required', 'integer', 'min:0')

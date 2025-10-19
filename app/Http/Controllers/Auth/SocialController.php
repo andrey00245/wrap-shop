@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialController extends Controller
 {
+    /** -------- GOOGLE ---------- **/
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
@@ -18,35 +19,13 @@ class SocialController extends Controller
     public function handleGoogleCallback()
     {
         $user = Socialite::driver('google')->user();
-
         $authUser = $this->findOrCreateUser($user, 'google');
         Auth::login($authUser, true);
 
         return redirect()->intended('account');
     }
 
-    private function findOrCreateUser($socialUser, $provider)
-    {
-        $user = User::where('email', $socialUser->email)->first();
-
-        if ($user) {
-            return $user;
-        }
-
-
-        $nameParts = explode(' ', $socialUser->name, 2);
-
-        $firstName = $nameParts[0] ?? null;
-        $lastName = $nameParts[1] ?? null;
-
-        return User::create([
-            'name'      => $firstName,
-            'last_name' => $lastName,
-            'email'     => $socialUser->email,
-            'password'  => bcrypt('social_login'),
-        ]);
-    }
-
+    /** -------- FACEBOOK ---------- **/
     public function redirectToFacebook()
     {
         return Socialite::driver('facebook')->redirect();
@@ -55,14 +34,13 @@ class SocialController extends Controller
     public function handleFacebookCallback()
     {
         $user = Socialite::driver('facebook')->user();
-
-        // Логика авторизации и регистрации
         $authUser = $this->findOrCreateUser($user, 'facebook');
         Auth::login($authUser, true);
 
         return redirect()->intended('account');
     }
 
+    /** -------- APPLE ---------- **/
     public function redirectToApple()
     {
         return Socialite::driver('apple')->redirect();
@@ -71,11 +49,47 @@ class SocialController extends Controller
     public function handleAppleCallback()
     {
         $user = Socialite::driver('apple')->user();
-
-        // Логика авторизации и регистрации
         $authUser = $this->findOrCreateUser($user, 'apple');
         Auth::login($authUser, true);
 
+        if (empty($authUser->name)) {
+            return redirect()->route('personal-data.edit');
+        }
+
+        // Иначе — на аккаунт
         return redirect()->intended('account');
+    }
+
+    /** -------- Общий метод ---------- **/
+    private function findOrCreateUser($socialUser, $provider)
+    {
+        $user = User::where('email', $socialUser->getEmail())->first();
+
+        if ($user) {
+            $user->update([
+                'provider'    => $provider,
+                'provider_id' => $socialUser->getId(),
+            ]);
+
+            return $user;
+        }
+
+        $fullName = $socialUser->getName();
+        if (!$fullName && isset($socialUser->user['name'])) {
+            $fullName = $socialUser->user['name'];
+        }
+
+        $nameParts = $fullName ? explode(' ', $fullName, 2) : [null, null];
+        $firstName = $nameParts[0] ?? 'Користувач';
+        $lastName = $nameParts[1] ?? '';
+
+        return User::create([
+            'name'         => $firstName,
+            'last_name'    => $lastName,
+            'email'        => $socialUser->getEmail(),
+            'password'     => bcrypt(Str::random(32)),
+            'provider'     => $provider,
+            'provider_id'  => $socialUser->getId(),
+        ]);
     }
 }

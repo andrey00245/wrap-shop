@@ -80,7 +80,7 @@ class SocialController extends Controller
         }
 
         $nameParts = $fullName ? explode(' ', $fullName, 2) : [null, null];
-        $firstName = $nameParts[0] ?? 'Користувач';
+        $firstName = $nameParts[0] ?? '';
         $lastName = $nameParts[1] ?? '';
 
         return User::create([

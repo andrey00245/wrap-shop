@@ -11,6 +11,7 @@ use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Fields\Trix;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Mostafaznv\NovaCkEditor\CkEditor;
 
 class Category extends Resource
 {
@@ -64,10 +65,10 @@ class Category extends Resource
             ])->setTitle('SEO налаштування'),
 
             NovaTabTranslatable::make([
-                Trix::make('Контент','content')
+                CkEditor::make('Контент','content')
                     ->help('Основний контент категорії')
                     ->hideFromIndex(),
-                Trix::make('SEO текст','seo_text')
+                CkEditor::make('SEO текст','seo_text')
                     ->help('Додатковий SEO текст внизу сторінки')
                     ->hideFromIndex(),
             ])->setTitle('Контент'),

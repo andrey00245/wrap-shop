@@ -268,7 +268,7 @@ $(document).ready(function () {
             product_id: $('#fast-order-product-id').val(),
             quantity: $('#input-quantity').val(),
             name: $('#fast_order_name').val(),
-            phone: $(this).find('input[name="phone"][type="hidden"]').val(),
+            phone: $(this).find('input[name="phone"][type="hidden"]').val() || $('#fast_order_phone').val(),
             email: $('#fast_order_email').val(),
             comment: $('#fast_order_comment').val(),
             total_price: $('#fast-order-popup .total-price').text(),

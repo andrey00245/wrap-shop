@@ -25,10 +25,12 @@ class Attribute extends Model
         'external_id',
         'field_name',
         'name',
+        'is_visible',
     ];
 
     protected $casts = [
         'name' => 'json',
+        'is_visible' => 'boolean',
     ];
 
 

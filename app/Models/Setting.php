@@ -31,6 +31,7 @@ class Setting extends Model
         'video_banner_title',
         'video_banner_desc',
         'slogan_title',
-        'slogan_desc'
+        'slogan_desc',
+        'head_code'
     ];
 }

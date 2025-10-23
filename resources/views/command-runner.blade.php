@@ -267,77 +267,27 @@
                 <div class="alert alert-error" id="storage-link-error"></div>
             </div>
 
-            <!-- Оптимизация медиа -->
-            <div class="command-card" style="border: 2px solid #17a2b8; background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);">
-                <h3>🖼️ Оптимизация медиа файлов</h3>
-                <p>Создание оптимизированных версий изображений для ускорения загрузки сайта</p>
-                
-                <div style="display:flex; gap:8px; justify-content: center; flex-wrap: wrap;">
-                    <button class="btn btn-info" onclick="runGenerateConversions(this, false)">
-                        🚀 Создать оптимизированные версии
-                    </button>
-                    <button class="btn btn-warning" onclick="runCleanupOldConversions(this, true)">
-                        🔍 Анализ старых конверсий
-                    </button>
-                    <button class="btn btn-danger" onclick="runCleanupOldConversions(this, false)">
-                        🗑️ Удалить старые конверсии
-                    </button>
-                </div>
-                
-                <div class="alert alert-success" id="conversions-success"></div>
-                <div class="alert alert-error" id="conversions-error"></div>
-            </div>
-
-            <!-- Конверсии для кастомных блоков -->
+            <!-- Custom Artisan Command -->
             <div class="command-card" style="border: 2px solid #6f42c1; background: linear-gradient(135deg, #e2d9f3 0%, #d1c4e9 100%);">
-                <h3>🎨 Конверсии кастомных блоков</h3>
-                <p>Создание конверсий preview и preview_webp для кастомных блоков (баннеры)</p>
-                
-                <button class="btn btn-primary" onclick="runCustomBlockConversions(this)">
-                    🖼️ Создать конверсии для блоков
-                </button>
-                
-                <div class="alert alert-success" id="custom-blocks-success"></div>
-                <div class="alert alert-error" id="custom-blocks-error"></div>
-            </div>
-
-            <!-- Быстрый контроль логов -->
-            <div class="command-card" style="border: 2px solid #495057; background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);">
-                <h3>📜 Логи (быстрый просмотр)</h3>
-                <p>Показать последние строки из storage/logs/laravel.log и при необходимости очистить</p>
+                <h3>⚡ Произвольная Artisan команда</h3>
+                <p>Выполнить любую разрешенную Artisan команду с параметрами</p>
                 
                 <div class="form-group">
-                    <label for="log-lines">Строк (по умолчанию 200):</label>
-                    <input type="number" id="log-lines" value="200" min="50" max="3000">
+                    <label for="custom-command">Команда (например: cache:clear, migrate, media:generate-sync --force):</label>
+                    <input type="text" id="custom-command" placeholder="cache:clear" style="width: 100%; padding: 8px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px;">
                 </div>
-                
-                <div style="display:flex; gap:8px;">
-                    <button class="btn btn-primary" onclick="runTailLogs(this)">Показать логи</button>
-                    <button class="btn btn-danger" onclick="runClearLogs(this)">Очистить логи</button>
-                </div>
-                
-                <div class="alert alert-success" id="logs-success"></div>
-                <div class="alert alert-error" id="logs-error"></div>
-                <pre id="logs-output" style="margin-top:10px; max-height: 700px; overflow: auto; background:#111; color:#0f0; padding:10px; border-radius:6px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;"></pre>
-            </div>
-
-            <!-- Очистка неиспользуемых медиа -->
-            <div class="command-card" style="border: 2px solid #dc3545; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);">
-                <h3>🗑️ Очистка неиспользуемых медиа</h3>
-                <p><strong>ВНИМАНИЕ!</strong> Удаляет медиа файлы, которые не привязаны к товарам</p>
                 
                 <div style="display:flex; gap:8px; justify-content: center;">
-                    <button class="btn btn-secondary" onclick="runAnalyzeUnusedMedia(this)">
-                        🔍 Анализ (безопасно)
-                    </button>
-                    <button class="btn btn-danger" onclick="runCleanupUnusedMedia(this)">
-                        🗑️ Удалить неиспользуемые
+                    <button class="btn btn-primary" onclick="runCustomCommand(this)">
+                        🚀 Выполнить команду
                     </button>
                 </div>
                 
-                <div class="alert alert-success" id="unused-success"></div>
-                <div class="alert alert-error" id="unused-error"></div>
+                <div class="alert alert-success" id="custom-command-success"></div>
+                <div class="alert alert-error" id="custom-command-error"></div>
+                <pre id="custom-command-output" style="margin-top:10px; max-height: 400px; overflow: auto; background:#111; color:#0f0; padding:10px; border-radius:6px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; display: none;"></pre>
             </div>
+
         </div>
     </div>
 
@@ -586,8 +536,20 @@
             }
         }
 
-        async function runGenerateConversions(btn, force = false) {
-            if (!confirm('Создать оптимизированные версии изображений? Это может занять время!')) {
+
+
+
+
+
+        async function runCustomCommand(btn) {
+            const command = document.getElementById('custom-command').value.trim();
+            
+            if (!command) {
+                showAlert('custom-command', 'Введите команду для выполнения', false);
+                return;
+            }
+            
+            if (!confirm(`Выполнить команду: "${command}"?`)) {
                 return;
             }
             
@@ -595,206 +557,33 @@
             
             try {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                const response = await fetch('/nova-vendor/command-runner/generate-conversions', {
+                const response = await fetch('/nova-vendor/command-runner/custom-command', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ force })
+                    body: JSON.stringify({ command })
                 });
                 
                 const data = await response.json();
                 
                 if (data.success) {
-                    showAlert('conversions', data.message, true);
-                } else {
-                    showAlert('conversions', data.message, false);
-                }
-            } catch (error) {
-                showAlert('conversions', 'Ошибка соединения: ' + error.message, false);
-            } finally {
-                setLoading(btn, false);
-            }
-        }
-
-        async function runCustomBlockConversions(btn) {
-            if (!confirm('Создать конверсии для кастомных блоков?')) {
-                return;
-            }
-            
-            setLoading(btn, true);
-            
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                const response = await fetch('/nova-vendor/command-runner/custom-blocks-conversions', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+                    showAlert('custom-command', data.message, true);
+                    if (data.output) {
+                        document.getElementById('custom-command-output').textContent = data.output;
+                        document.getElementById('custom-command-output').style.display = 'block';
                     }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showAlert('custom-blocks', data.message, true);
                 } else {
-                    showAlert('custom-blocks', data.message, false);
-                }
-            } catch (error) {
-                showAlert('custom-blocks', 'Ошибка соединения: ' + error.message, false);
-            } finally {
-                setLoading(btn, false);
-            }
-        }
-
-        async function runAnalyzeUnusedMedia(btn) {
-            setLoading(btn, true);
-            
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                const response = await fetch('/nova-vendor/command-runner/analyze-unused-media', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+                    showAlert('custom-command', data.message, false);
+                    if (data.output) {
+                        document.getElementById('custom-command-output').textContent = data.output;
+                        document.getElementById('custom-command-output').style.display = 'block';
                     }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showAlert('unused', data.message, true);
-                } else {
-                    showAlert('unused', data.message, false);
                 }
             } catch (error) {
-                showAlert('unused', 'Ошибка соединения: ' + error.message, false);
-            } finally {
-                setLoading(btn, false);
-            }
-        }
-
-        async function runCleanupUnusedMedia(btn) {
-            if (!confirm('⚠️ ВНИМАНИЕ! Это удалит неиспользуемые медиа файлы навсегда!\n\nВы создали бэкап базы данных?')) {
-                return;
-            }
-            
-            if (!confirm('Вы уверены, что хотите продолжить? Это действие необратимо!')) {
-                return;
-            }
-            
-            setLoading(btn, true);
-            
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                const response = await fetch('/nova-vendor/command-runner/cleanup-unused-media', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showAlert('unused', data.message, true);
-                } else {
-                    showAlert('unused', data.message, false);
-                }
-            } catch (error) {
-                showAlert('unused', 'Ошибка соединения: ' + error.message, false);
-            } finally {
-                setLoading(btn, false);
-            }
-        }
-
-        async function runTailLogs(btn) {
-            setLoading(btn, true);
-            try {
-                const lines = parseInt(document.getElementById('log-lines').value || '200');
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                const res = await fetch('/nova-vendor/command-runner/logs/tail', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ lines })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById('logs-output').textContent = data.data || '';
-                    showAlert('logs', 'Логи загружены', true);
-                } else {
-                    showAlert('logs', data.message || 'Ошибка загрузки логов', false);
-                }
-            } catch (e) {
-                showAlert('logs', 'Ошибка: ' + e.message, false);
-            } finally {
-                setLoading(btn, false);
-            }
-        }
-
-        async function runClearLogs(btn) {
-            if (!confirm('Очистить все логи в storage/logs?')) return;
-            setLoading(btn, true);
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                const res = await fetch('/nova-vendor/command-runner/logs/clear', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
-                });
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById('logs-output').textContent = '';
-                    showAlert('logs', data.message, true);
-                } else {
-                    showAlert('logs', data.message || 'Ошибка очистки логов', false);
-                }
-            } catch (e) {
-                showAlert('logs', 'Ошибка: ' + e.message, false);
-            } finally {
-                setLoading(btn, false);
-            }
-        }
-
-        async function runCleanupOldConversions(btn, dryRun = true) {
-            const action = dryRun ? 'анализ' : 'удаление';
-            const confirmText = dryRun 
-                ? 'Показать старые конверсии для удаления?'
-                : '⚠️ ВНИМАНИЕ! Это удалит старые конверсии навсегда!\n\nВы уверены?';
-                
-            if (!confirm(confirmText)) {
-                return;
-            }
-            
-            setLoading(btn, true);
-            
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                const response = await fetch('/nova-vendor/command-runner/cleanup-old-conversions', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ dry_run: dryRun })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showAlert('conversions', data.message, true);
-                } else {
-                    showAlert('conversions', data.message, false);
-                }
-            } catch (error) {
-                showAlert('conversions', 'Ошибка соединения: ' + error.message, false);
+                showAlert('custom-command', 'Ошибка соединения: ' + error.message, false);
             } finally {
                 setLoading(btn, false);
             }

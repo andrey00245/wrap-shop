@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Http\Enums\DeliveryTypeEnum;
 use App\Http\Enums\PaymentTypeEnum;
-use App\Models\FastOrder;
 use App\Models\Order;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
@@ -21,7 +20,7 @@ class MoySkladSyncService
      * @throws \Illuminate\Http\Client\ConnectionException
      * @throws \MoySklad\Exceptions\EntityCantBeMutatedException
      */
-    public static function sendOrder(Order|FastOrder $order): void
+    public static function sendOrder(Order $order): void
     {
         $sklad = MoySklad::getInstance(
             config('app.my_store.username'),
@@ -45,10 +44,7 @@ class MoySkladSyncService
             ];
         }
 
-        $isFast = $order instanceof \App\Models\FastOrder;
-        $clientName = $isFast
-            ? trim((string) ($order->name ?? ''))
-            : trim(((string) ($order->first_name ?? '')) . ' ' . ((string) ($order->last_name ?? '')));
+        $clientName = trim(((string) ($order->first_name ?? '')) . ' ' . ((string) ($order->last_name ?? '')));
         $clientEmail = trim((string) ($order->email ?? ''));
         $cleanPhone = self::sanitizePhoneNumber($order->phone);
 
@@ -223,46 +219,8 @@ class MoySkladSyncService
 
         // Формируем позиции заказа — вытаскиваем продукты по коду через запрос и собираем массив для заказа
         $positions = [];
-        if ($order instanceof Order) {
-            foreach ($order->products as $orderProduct) {
+        foreach ($order->products as $orderProduct) {
 
-                $productResponse = Http::withBasicAuth(
-                    config('app.my_store.username'),
-                    config('app.my_store.password')
-                )
-                    ->withHeaders([
-                        'Accept-Encoding' => 'gzip',
-                    ])
-                    ->get('https://api.moysklad.ru/api/remap/1.2/entity/product', [
-                        'filter' => 'code=' . $orderProduct->code,
-                    ]);
-
-                $productData = $productResponse->json('rows')[0] ?? null;
-
-                if (!$productData) {
-                    Log::warning("Не найден товар с кодом {$orderProduct->code}");
-                    continue;
-                }
-
-                // Цена должна быть в долларах (USD) и в минимальных единицах (центах)
-                $unitPriceUah = $orderProduct->pivot->price
-                    ? (float) $orderProduct->pivot->price
-                    : (float) $orderProduct->getUnitPriceForQuantity((int)$orderProduct->pivot->quantity);
-                $unitPriceUsd = (float) $orderProduct->getPriceByDollars($unitPriceUah);
-
-                $positions[] = [
-                    'quantity'   => (float)$orderProduct->pivot->quantity,
-                    'price'      => (int) round($unitPriceUsd * 100),
-                    'assortment' => [
-                        'meta' => [
-                            'type'      => $productData['meta']['type'],
-                            'href'      => $productData['meta']['href'],
-                            'mediaType' => 'application/json',
-                        ]
-                    ],
-                ];
-            }
-        } else {
             $productResponse = Http::withBasicAuth(
                 config('app.my_store.username'),
                 config('app.my_store.password')
@@ -271,21 +229,24 @@ class MoySkladSyncService
                     'Accept-Encoding' => 'gzip',
                 ])
                 ->get('https://api.moysklad.ru/api/remap/1.2/entity/product', [
-                    'filter' => 'code=' . $order->product->code,
+                    'filter' => 'code=' . $orderProduct->code,
                 ]);
 
             $productData = $productResponse->json('rows')[0] ?? null;
 
             if (!$productData) {
-                Log::warning("Не найден товар с кодом {order->product->code}");
+                Log::warning("Не найден товар с кодом {$orderProduct->code}");
+                continue;
             }
 
-            // FastOrder: цена за единицу с учетом количества (порогов) в USD центах
-            $unitPriceUah = (float) $order->product->getUnitPriceForQuantity((int)$order->quantity);
-            $unitPriceUsd = (float) $order->product->getPriceByDollars($unitPriceUah);
+            // Цена должна быть в долларах (USD) и в минимальных единицах (центах)
+            $unitPriceUah = $orderProduct->pivot->price
+                ? (float) $orderProduct->pivot->price
+                : (float) $orderProduct->getUnitPriceForQuantity((int)$orderProduct->pivot->quantity);
+            $unitPriceUsd = (float) $orderProduct->getPriceByDollars($unitPriceUah);
 
             $positions[] = [
-                'quantity'   => (float)$order->quantity,
+                'quantity'   => (float)$orderProduct->pivot->quantity,
                 'price'      => (int) round($unitPriceUsd * 100),
                 'assortment' => [
                     'meta' => [
@@ -378,10 +339,18 @@ class MoySkladSyncService
 
         $comment = '';
 
+        // Добавляем пометку для быстрого заказа
+        if ($order->is_fast_order) {
+            $comment .= "Швидка покупка\n";
+        }
+
         if (in_array($order->shipping_method, ['novaposhta', 'novaposhta_doors', 'my_addresses'])) {
             $comment .= "\nНаселений пункт: " . $order->city;
             $comment .= "\nВідділення / Адреса: " . $order->shipping_address;
+        }
 
+        // Устанавливаем описание, если есть комментарий
+        if (!empty(trim($comment))) {
             $payload['description'] = trim($comment);
         }
 
@@ -645,6 +614,255 @@ class MoySkladSyncService
         $metaStorage = $propertyMeta->getValue($metaField);
 
         return (array)$metaStorage;
+    }
+
+    /**
+     * Отправить консультацию в МойСклад
+     */
+    public static function sendConsultation(\App\Models\Consultation $consultation): void
+    {
+        $sklad = MoySklad::getInstance(
+            config('app.my_store.username'),
+            config('app.my_store.password')
+        );
+
+        $organizationsList = Organization::query($sklad)->getList();
+        $organization = $organizationsList[0] ?? null;
+
+        if (!$organization) {
+            throw new \Exception('Организация не найдена');
+        } else {
+            $organizationMeta = $organization->fields->meta;
+
+            $organization = [
+                'meta' => [
+                    'href'      => $organizationMeta->href,
+                    'type'      => $organizationMeta->type,
+                    'mediaType' => $organizationMeta->mediaType,
+                ]
+            ];
+        }
+
+        $clientName = trim($consultation->name);
+        $clientEmail = trim($consultation->email ?? '');
+        $cleanPhone = self::sanitizePhoneNumber($consultation->phone);
+
+        // Ищем контрагента: email -> phone~local(0XXXXXXXXX) -> phone~intl(380XXXXXXXXX) -> phone~+intl(+380XXXXXXXXX) -> phone~last9
+        $response = null;
+        $tryFilters = [];
+        if ($clientEmail !== '') {
+            $tryFilters[] = 'email=' . $clientEmail;
+        }
+
+        // local UA format first: 0XXXXXXXXX (e.g., 0937953126)
+        $localPhone = $cleanPhone;
+        if (strpos($cleanPhone, '380') === 0 && strlen($cleanPhone) >= 12) {
+            $localPhone = '0' . substr($cleanPhone, 3);
+        }
+        $intlPhone = $cleanPhone;              // 380XXXXXXXXX
+        $plusIntlPhone = '+'.$intlPhone;       // +380XXXXXXXXX
+        $last9 = substr($cleanPhone, -9);      // XXXXXXX123 (9 цифр)
+
+        $tryFilters[] = 'phone~' . $localPhone;
+        $tryFilters[] = 'phone~' . $intlPhone;
+        $tryFilters[] = 'phone~' . $plusIntlPhone;
+        if ($last9 && strlen($last9) === 9) {
+            $tryFilters[] = 'phone~' . $last9;
+        }
+
+        foreach ($tryFilters as $filter) {
+            $response = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            )
+                ->withHeaders([
+                    'Accept-Encoding' => 'gzip',
+                ])->get('https://api.moysklad.ru/api/remap/1.2/entity/counterparty', [
+                    'filter' => $filter,
+                ]);
+
+            if ($response->successful() && count($response->json('rows') ?? []) > 0) {
+                break;
+            }
+        }
+
+        if ($response->successful() && count($response->json('rows')) > 0) {
+            $existing = $response->json('rows')[0];
+            $counterpartyMeta = $existing['meta'];
+
+            if (!isset($counterpartyMeta['href'])) {
+                throw new \Exception('Некорректный meta в ответе контрагента');
+            }
+
+            $counterparty = new Counterparty($sklad);
+            $counterparty->meta = [
+                'type'      => $counterpartyMeta['type'] ?? 'counterparty',
+                'href'      => $counterpartyMeta['href'],
+                "mediaType" => "application/json"
+            ];
+
+            $attributes = [
+                [
+                    "meta" => [
+                        "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3c75f405-660c-11f0-0a80-03cb002a009d", // phone
+                        "type" => "attributemetadata",
+                        "mediaType" => "application/json"
+                    ],
+                    "value" => $cleanPhone
+                ],
+                [
+                    "meta" => [
+                        "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/ee963740-660b-11f0-0a80-0d890028be5f", //FIO
+                        "type" => "attributemetadata",
+                        "mediaType" => "application/json"
+                    ],
+                    "value" => $clientName
+                ]
+            ];
+
+            $updateResponse = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password'))
+                    ->withHeaders([
+                        'Accept-Encoding' => 'gzip',
+                    ])->put($counterpartyMeta['href'], [
+                    'attributes' => $attributes
+                ]);
+
+            if ($updateResponse->failed()) {
+                Log::error('Не удалось обновить атрибуты контрагента для консультации', [
+                    'response' => $updateResponse->json()
+                ]);
+            }
+
+        } else {
+            $counterparty = new Counterparty($sklad);
+            $counterparty->name = $clientName !== '' ? $clientName : $cleanPhone;
+            if ($clientEmail !== '') {
+                $counterparty->email = $clientEmail;
+            }
+            $counterparty->phone = $cleanPhone;
+
+            $attributes = [
+                [
+                    "meta"  => [
+                        "href"      => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3c75f405-660c-11f0-0a80-03cb002a009d", // Phone
+                        "type"      => "attributemetadata",
+                        "mediaType" => "application/json"
+                    ],
+                    "value" => $cleanPhone
+                ],
+               [
+                   "meta" => [
+                       "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/ee963740-660b-11f0-0a80-0d890028be5f", //FIO
+                       "type" => "attributemetadata",
+                       "mediaType" => "application/json"
+                   ],
+                   "value" => $clientName
+               ]
+            ];
+
+            $counterparty->attributes = $attributes;
+            $counterparty = $counterparty->create();
+
+            // Получаем meta через рефлексию
+            $counterpartyMeta = self::getEntityMeta($counterparty);
+            $counterparty->meta = [
+                'type'      => $counterpartyMeta['type'] ?? 'counterparty',
+                'href'      => $counterpartyMeta['href'],
+                'mediaType' => 'application/json',
+            ];
+        }
+
+        // Получаем информацию о товаре для консультации
+        $productResponse = Http::withBasicAuth(
+            config('app.my_store.username'),
+            config('app.my_store.password')
+        )
+            ->withHeaders([
+                'Accept-Encoding' => 'gzip',
+            ])
+            ->get('https://api.moysklad.ru/api/remap/1.2/entity/product', [
+                'filter' => 'code=' . $consultation->product->code,
+            ]);
+
+        $productData = $productResponse->json('rows')[0] ?? null;
+
+        // Формируем позиции заказа - используем реальный товар
+        $positions = [];
+        if ($productData) {
+            // Получаем цену товара в USD центах
+            $unitPriceUah = (float) $consultation->product->getUnitPriceForQuantity(1);
+            $unitPriceUsd = (float) $consultation->product->getPriceByDollars($unitPriceUah);
+
+            $positions[] = [
+                'quantity'   => 1.0,
+                'price'      => (int) round($unitPriceUsd * 100), // Реальная цена товара
+                'assortment' => [
+                    'meta' => [
+                        'type'      => $productData['meta']['type'],
+                        'href'      => $productData['meta']['href'],
+                        'mediaType' => 'application/json',
+                    ]
+                ],
+            ];
+        } else {
+            // Если товар не найден в МойСклад, создаем позицию с нулевой ценой
+            $positions[] = [
+                'quantity'   => 1.0,
+                'price'      => 0,
+                'assortment' => [
+                    'meta' => [
+                        'type'      => 'service',
+                        'href'      => 'https://api.moysklad.ru/api/remap/1.2/entity/service/00000000-0000-0000-0000-000000000000',
+                        'mediaType' => 'application/json',
+                    ]
+                ],
+            ];
+        }
+
+        // Формируем комментарий с пометкой о консультации на украинском
+        $comment = "КОНСУЛЬТАЦІЯ\n";
+        $comment .= "Товар: " . $consultation->product->name . "\n";
+        if ($consultation->comment) {
+            $comment .= "Коментар клієнта: " . $consultation->comment . "\n";
+        }
+
+        // Формируем тело запроса
+        $payload = [
+            'organization' => $organization,
+            'agent'        => [
+                'meta' => $counterparty->meta
+            ],
+            'positions'    => $positions,
+            'moment'       => now()->format('Y-m-d H:i:s'),
+            'description'  => $comment,
+        ];
+
+        // Временный лог для диагностики
+        Log::info('MS consultation payload', $payload);
+
+        $orderResponse = Http::withBasicAuth(
+            config('app.my_store.username'),
+            config('app.my_store.password')
+        )
+            ->withHeaders([
+                'Accept-Encoding' => 'gzip',
+            ])
+            ->post('https://api.moysklad.ru/api/remap/1.2/entity/customerorder', $payload);
+
+        if ($orderResponse->failed()) {
+            Log::error('Помилка створення консультації в МойСклад', ['response' => $orderResponse->json()]);
+            throw new \Exception('Помилка при створенні консультації в МойСклад');
+        }
+
+        Log::info("Консультація #{$consultation->id} успішно відправлена в МойСклад", ['ms_order' => $orderResponse->json()]);
+
+        // Сохраняем ID заказа в МойСклад для последующего обновления
+        $msOrderId = $orderResponse->json('id');
+        if ($msOrderId) {
+            $consultation->update(['moysklad_id' => $msOrderId]);
+        }
     }
 
     public static function sanitizePhoneNumber($phone)

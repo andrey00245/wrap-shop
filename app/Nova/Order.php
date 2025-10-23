@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Badge;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Currency;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
@@ -93,6 +94,10 @@ class Order extends Resource
 				'failed' => 'danger',
 				'refunded' => 'warning',
 			])->sortable(),
+
+			Boolean::make('Швидкий заказ', 'is_fast_order')
+				->sortable()
+				->help('Позначає, що це швидкий заказ'),
 
             Text::make('Сума', fn () => number_format((float) $this->total, 2, '.', ' ') . ' ₴')
                 ->sortable(),

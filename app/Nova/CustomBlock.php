@@ -49,15 +49,13 @@ class CustomBlock extends Resource
 
     public static function relatableProducts(NovaRequest $request, $query)
     {
-        $customBlockId = $request->resourceId;
-
-        if ($customBlockId) {
-            return $query->whereDoesntHave('customBlocks', function (Builder $q) use ($customBlockId) {
-                $q->where('custom_block_id', $customBlockId);
-            });
-        }
-
+        // Убираем фильтрацию - позволяем видеть все товары, включая уже добавленные
         return $query;
+    }
+
+    public static function indexQuery(NovaRequest $request, $query)
+    {
+        return $query->with('products');
     }
 
     /**
@@ -74,7 +72,7 @@ class CustomBlock extends Resource
                 Text::make('Назва', 'name')
                     ->help('Для підсвічування тексту використовуйте тег span з класом "colord", наприклад: &lt;span class=&quot;colord&quot;&gt;3M&lt;/span&gt;')
             ]),
-            BelongsToMany::make('Продукти','Products', Product::class)
+            BelongsToMany::make('Продукти','products', Product::class)
                 ->fields(function () {
                     return [
                         Number::make('Порядок', 'sort_order')
@@ -83,13 +81,13 @@ class CustomBlock extends Resource
                     ];
                 })
                 ->searchable()
-                ->sortable(),
+                ->sortable()
+                ->showCreateRelationButton(),
 
             Text::make('Url')->hideFromIndex(),
             Boolean::make('Active', 'is_active'),
 
-            Images::make('Баннер','main')
-                ->conversionOnIndexView('preview'),
+            Images::make('Баннер','main'),
 
             Text::make('Кількість товарів', function () {
                 return $this->products()->count();

@@ -1,6 +1,7 @@
 import {
     productSliderInitialization,
     productSliderInitializationClass,
+    customBlockSliderInitialization,
     popupSliderInitialization,
     imageSliderInProduct
 } from "./sliderInitialization";
@@ -9,6 +10,14 @@ $(document).ready(function () {
     productSliderInitialization('homeBestseller');
     productSliderInitialization('homeLatest');
     productSliderInitializationClass('customBlocks');
+    
+    // Инициализация каждого кастомного блока отдельно
+    $('.customBlocks').each(function() {
+        const blockId = $(this).attr('id');
+        if (blockId) {
+            customBlockSliderInitialization(blockId);
+        }
+    });
 });
 
 new Splide('#topBannersSlider', {

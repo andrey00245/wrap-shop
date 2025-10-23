@@ -1747,16 +1747,17 @@ body::-webkit-scrollbar {
 
 .product-default .name {
     font-weight: 500;
-    font-size: 16px;
+    font-size: 15px;
     text-transform: uppercase;
     margin: 0 auto;
     display: table;
 
-    min-height: 38px;
+    min-height: 45px;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-height: 1.2;
 }
 
 .product-default.product-list .name {
@@ -4539,8 +4540,10 @@ table .notify-quantity {
         }
 
         .name {
-            font-size: 13px;
-            min-height: 30px;
+            font-size: 12px;
+            min-height: 36px;
+            -webkit-line-clamp: 3;
+            line-height: 1.2;
         }
 
         .bottom {

@@ -31,10 +31,10 @@ class Banner extends Model implements HasMedia
 
         $this
             ->addMediaConversion('preview_webp')
-            ->width(748)
-            ->height(257)
+            ->width(1960)
+            ->height(674)
             ->format('webp')
-            ->quality(100)
+            ->quality(85)
             ->nonQueued();
     }
 
@@ -52,14 +52,19 @@ class Banner extends Model implements HasMedia
     {
         $media = $this->getFirstMedia('main');
 
-        if ($media && $media->hasGeneratedConversion('preview_web')) {
-            return $media->getUrl('preview_web');
+        if ($media) {
+            if ($media->hasGeneratedConversion('preview_webp')) {
+                return $media->getUrl('preview_webp');
+            }
+
+            if ($media->hasGeneratedConversion('preview')) {
+                return $media->getUrl('preview');
+            }
+            // Если нет конверсий, возвращаем оригинальный URL
+            return $media->getUrl();
         }
 
-        if ($media && $media->hasGeneratedConversion('preview')) {
-            return $media->getUrl('preview');
-        }
 
-        return $this->getFirstMediaUrl('main');
+        return '';
     }
 }

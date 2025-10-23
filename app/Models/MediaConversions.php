@@ -16,6 +16,15 @@ class MediaConversions
     public static function getConversionsConfig(): array
     {
         return [
+            'preview' => [
+                'width' => 482,
+                'height' => 482,
+                'quality' => 100,
+                'sharpen' => 10,
+                'format' => 'jpg',
+                'collections' => ['images'],
+                'fit' => 'contain'
+            ],
             'preview_webp' => [
                 'width' => 482,
                 'height' => 482,

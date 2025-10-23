@@ -8,13 +8,14 @@ use App\Nova\BestSeller;
 use App\Nova\Category;
 use App\Nova\Consultation;
 use App\Nova\CustomBlock;
+use App\Nova\DeliveryOption;
 use App\Nova\Faq;
-use App\Nova\FastOrder;
 use App\Nova\Feedback;
 use App\Nova\Implementation;
 use App\Nova\News;
 use App\Nova\NewsCategory;
 use App\Nova\Order;
+use App\Nova\PaymentOption;
 use App\Nova\PriceType;
 use App\Nova\PrivacyPolicy;
 use App\Nova\Product;
@@ -55,7 +56,6 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 		MenuSection::make('Замовлення', [
 			MenuItem::resource(Order::class),
 			MenuItem::resource(Consultation::class),
-			MenuItem::resource(FastOrder::class),
 		])->icon('shopping-bag')->collapsable(),
 
 			MenuSection::make('Товари', [
@@ -83,6 +83,11 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 				MenuItem::resource(VideoCategory::class),
 				MenuItem::resource(VideoReview::class),
 			])->icon('document-text')->collapsable(),
+
+			MenuSection::make('Доставка та оплата', [
+				MenuItem::resource(DeliveryOption::class),
+				MenuItem::resource(PaymentOption::class),
+			])->icon('truck')->collapsable(),
 
 			MenuSection::resource(PrivacyPolicy::class)->icon('shield-check'),
 

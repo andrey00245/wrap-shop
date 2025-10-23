@@ -61,7 +61,7 @@ class Implementation extends Resource
             Date::make('Дата','data')->nullable(),
             Images::make('Фото', 'main')
                 ->required()
-                ->conversionOnIndexView('preview'),
+                ->help('Можна завантажити кілька зображень, але відображатиметься тільки перше'),
             Boolean::make('Активний','is_active'),
             BelongsTo::make('Продукт','product',Product::class)->searchable(),
 

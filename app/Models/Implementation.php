@@ -24,7 +24,7 @@ class Implementation extends Model implements HasMedia, Sortable
     protected $with = ['media'];
 
     public $sortable = [
-        'order_column_name' => 'sort_order',
+        'order_column_name'  => 'sort_order',
         'sort_when_creating' => true,
     ];
 
@@ -38,7 +38,7 @@ class Implementation extends Model implements HasMedia, Sortable
 
     protected $casts = [
         'descriptions' => 'json',
-        'data' => 'date',
+        'data'         => 'date',
     ];
 
     protected static function booted()
@@ -58,15 +58,16 @@ class Implementation extends Model implements HasMedia, Sortable
 
         $this
             ->addMediaConversion('preview_webp')
-            ->width(310)
-            ->height(310)
+            ->width(624)       // 312 * 2
+            ->height(1068)     // 534 * 2
             ->format('webp')
+            ->quality(85)
             ->nonQueued();
     }
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('main')->singleFile();
+        $this->addMediaCollection('main');
     }
 
     public function product()
@@ -82,15 +83,20 @@ class Implementation extends Model implements HasMedia, Sortable
     public function getPreviewImage(): string
     {
         $media = $this->getFirstMedia('main');
-        if ($media && $media->hasGeneratedConversion('preview_webp')) {
-            return $media->getUrl('preview_webp');
+
+        if ($media) {
+            if ($media->hasGeneratedConversion('preview_webp')) {
+                return $media->getUrl('preview_webp');
+            }
+
+            if ($media->hasGeneratedConversion('preview')) {
+                return $media->getUrl('preview');
+            }
+
+            return $media->getUrl();
         }
 
-        if ($media && $media->hasGeneratedConversion('preview')) {
-            return $media->getUrl('preview');
-        }
-
-        return $this->getFirstMediaUrl('main');
+        return '';
     }
 
     public function getData(): string

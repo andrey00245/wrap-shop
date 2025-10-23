@@ -3,7 +3,7 @@
     $currentUrl = url()->current();
     $siteName = 'Wrap.Shop';
     $siteDescription = 'Інтернет-магазин плівок для автомобілів, матеріалів для детейлінгу та тюнінгу';
-    
+
     if ($locale === 'ru') {
         $siteDescription = 'Интернет-магазин пленок для автомобилей, материалов для детейлинга и тюнинга';
     } elseif ($locale === 'en') {
@@ -40,11 +40,11 @@
                 "{{ $image->getUrl() }}"{{ $key < $product->getMedia('images')->count() - 1 ? ',' : '' }}
             @endforeach
         ],
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "{{ $average ?? 0 }}",
-            "reviewCount": "{{ $count ?? 0 }}"
-        }
+      "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ min($average ?? 1, 5) }}",
+    "reviewCount": "{{ $count ?? 0 }}"
+       }
     }
     </script>
 @elseif(isset($category))

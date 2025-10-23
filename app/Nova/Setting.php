@@ -100,6 +100,15 @@ class Setting extends Resource
         ];
     }
 
+    protected function headCodeFields(){
+        return[
+            Textarea::make('Код для head', 'head_code')
+                ->help('HTML/JavaScript код, который будет добавлен в секцию <head> всех страниц сайта')
+                ->hideFromIndex()
+                ->rows(10),
+        ];
+    }
+
     /**
      * Get the fields displayed by the resource.
      *
@@ -118,6 +127,7 @@ class Setting extends Resource
             new Panel('Відеобанер', $this->videoBanerFields()),
             new Panel('Слоган', $this->sloganFields()),
             new Panel('Валюта', $this->currency()),
+            new Panel('Код для head', $this->headCodeFields()),
         ];
     }
 
@@ -162,7 +172,6 @@ class Setting extends Resource
      */
     public function actions(NovaRequest $request)
     {
-        return [
-        ];
+        return [];
     }
 }

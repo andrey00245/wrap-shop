@@ -1,5 +1,5 @@
 @foreach($customBlocks as $customBlock)
-    <section class="home-products row customBlocks">
+    <section class="home-products row customBlocks" id="customBlock{{$customBlock->id}}">
         <div class="wrap">
             <div class="home-products-top flex-justify">
                 <h2 class="home-title">{!!$customBlock->name !!}</h2>

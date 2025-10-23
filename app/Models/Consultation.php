@@ -17,7 +17,8 @@ class Consultation extends Model
         'phone',
         'email',
         'comment',
-        'product_id'
+        'product_id',
+        'moysklad_id'
     ];
 
     public function product()

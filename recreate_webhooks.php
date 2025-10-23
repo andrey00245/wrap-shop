@@ -17,7 +17,7 @@ $webhookIds = [
 echo "Удаление старых вебхуков...\n";
 foreach ($webhookIds as $webhookId) {
     echo "Удаление вебхука: $webhookId\n";
-    
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, "$apiUrl/$webhookId");
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
@@ -28,11 +28,11 @@ foreach ($webhookIds as $webhookId) {
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    
+
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    
+
     if ($httpCode >= 200 && $httpCode < 300) {
         echo "✅ Удален\n";
     } else {
@@ -68,7 +68,7 @@ foreach ($webhooksToCreate as $index => $webhookConfig) {
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    
+
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $error = curl_error($ch);

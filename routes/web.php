@@ -82,9 +82,6 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
     });
     // Storage symlink (safe, behind Nova middleware)
     Route::post('/storage-link', [CommandRunnerController::class, 'storageLink']);
-    Route::post('/custom-blocks-conversions', [CommandRunnerController::class, 'generateCustomBlockConversions']);
-    Route::post('/logs/tail', [CommandRunnerController::class, 'tailLogs']);
-    Route::post('/logs/clear', [CommandRunnerController::class, 'clearLogs']);
     Route::post('/sitemap', [CommandRunnerController::class, 'generateSitemap']);
     Route::post('/products', [CommandRunnerController::class, 'updateProducts']);
     Route::post('/cache', [CommandRunnerController::class, 'clearCache']);
@@ -92,11 +89,7 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
     Route::post('/webhook/check', [CommandRunnerController::class, 'webhookCheck']);
     Route::post('/webhook/test', [CommandRunnerController::class, 'webhookTest']);
     Route::post('/webhook/create', [CommandRunnerController::class, 'webhookCreate']);
-    Route::post('/generate-conversions', [CommandRunnerController::class, 'generateConversions']);
-    Route::post('/analyze-media', [CommandRunnerController::class, 'analyzeMedia']);
-    Route::post('/analyze-unused-media', [CommandRunnerController::class, 'analyzeUnusedMedia']);
-    Route::post('/cleanup-unused-media', [CommandRunnerController::class, 'cleanupUnusedMedia']);
-    Route::post('/cleanup-old-conversions', [CommandRunnerController::class, 'cleanupOldConversions']);
+    Route::post('/custom-command', [CommandRunnerController::class, 'runCustomCommand']);
 });
 Route::get('/slug-generate', function () {
     $products = Product::all();
@@ -139,6 +132,11 @@ Route::post('/change-theme', ChangeThemeController::class)->name('change-theme')
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
 
+// Роуты видеоревью выносим из группы локализации
+Route::get('/videoreviews', [VideosController::class, 'index'])->name('videoreviews')->middleware('themeMiddleware');
+Route::get('/videoreviews/category/{id}', [VideosController::class, 'show'])->name('videos.show')->middleware('themeMiddleware');
+
+
 Route::group([
     'prefix'     => LaravelLocalization::setLocale(),
     'middleware' => ['localizationRedirect', 'localeViewPath', 'themeMiddleware']
@@ -176,10 +174,6 @@ Route::group([
     Route::get('/shipping-and-payment', function () {
         return view('base.pages.delivery');
     })->name('delivery');
-
-    Route::get('/videoreviews', [VideosController::class, 'index'])->name('videoreviews');
-
-    Route::get('/videoreviews/{category}', [VideosController::class, 'show'])->name('videos.show');
 
 
     Route::group(['prefix' => '/news'], function () {

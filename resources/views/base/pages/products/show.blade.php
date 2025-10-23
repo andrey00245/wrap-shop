@@ -37,18 +37,18 @@
             <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}"
                    class="button">{{__('header_footer.home')}}</a></li>
             @php
-                $category = $product->category;
-                $parents[] = $category;
+                    $category = $product->category;
+                    $parents[] = $category;
 
-                while ($category->parent) {
-                    $parents[] = $category->parent;
-                    $category = $category->parent;
-                }
-                $reversedParents = array_reverse($parents);
+                    while ($category->parent) {
+                        $parents[] = $category->parent;
+                        $category = $category->parent;
+                    }
+                    $reversedParents = array_reverse($parents);
 
-                foreach ($reversedParents as $parent) {
-                    echo '<li><a href="'.route('products.category', ['category' => $parent->slug]).'" title="'.$parent->name.'" class="button">'.$parent->name.'</a></li>';
-                }
+                    foreach ($reversedParents as $parent) {
+                        echo '<li><a href="'.route('products.category', ['category' => $parent->slug]).'" title="'.$parent->name.'" class="button">'.$parent->name.'</a></li>';
+                    }
             @endphp
         </ul>
     </nav>

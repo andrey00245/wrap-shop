@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +33,7 @@ class WebhookController extends Controller
 
             // Получаем данные из вебхука
             $data = $request->all();
-            
+
             // Проверяем, что это вебхук от МойСклад
             if (!$this->isValidMoySkladWebhook($request)) {
                 Log::warning('Неверный вебхук от МойСклад', ['data' => $data]);
@@ -62,7 +63,7 @@ class WebhookController extends Controller
     {
         $data = $request->all();
         $userAgent = $request->header('User-Agent', '');
-        
+
         // Логируем данные для отладки
         Log::info('Проверка валидности вебхука', [
             'data' => $data,
@@ -70,19 +71,19 @@ class WebhookController extends Controller
             'method' => $request->method(),
             'request_id' => $request->get('requestId')
         ]);
-        
+
         // Проверяем User-Agent от МойСклад
         if (strpos($userAgent, 'MoySklad webhook') !== false) {
             Log::info('Вебхук от МойСклад подтвержден по User-Agent');
             return true;
         }
-        
+
         // Для тестирования принимаем любые POST запросы
         if ($request->method() === 'POST') {
             Log::info('Принят POST запрос для тестирования');
             return true;
         }
-        
+
         // Проверяем, что запрос содержит данные о товаре
         return isset($data['events']) || isset($data['entityType']) || isset($data['action']);
     }
@@ -120,7 +121,7 @@ class WebhookController extends Controller
         $entityType = $event['entityType'] ?? null;
         $action = $event['action'] ?? null;
         $entityId = $event['entityId'] ?? null;
-        
+
         // Извлекаем entityType и entityId из meta, если они не заданы напрямую
         if (isset($event['meta'])) {
             $meta = $event['meta'];
@@ -177,10 +178,10 @@ class WebhookController extends Controller
     private function handleProductCreate(string $entityId): void
     {
         Log::info('Создание товара', ['entityId' => $entityId]);
-        
+
         // Получаем данные товара из МойСклад
         $productData = $this->getProductFromMoySklad($entityId);
-        
+
         if ($productData) {
             // Синхронизируем товар
             $this->syncProduct($productData);
@@ -193,10 +194,10 @@ class WebhookController extends Controller
     private function handleProductUpdate(string $entityId): void
     {
         Log::info('Обновление товара', ['entityId' => $entityId]);
-        
+
         // Получаем данные товара из МойСклад
         $productData = $this->getProductFromMoySklad($entityId);
-        
+
         if ($productData) {
             // Синхронизируем товар
             $this->syncProduct($productData);
@@ -209,14 +210,15 @@ class WebhookController extends Controller
     private function handleProductDelete(string $entityId): void
     {
         Log::info('Удаление товара', ['entityId' => $entityId]);
-        
+
         // Находим товар в нашей базе по external_id
         $product = \App\Models\Product::where('external_id', $entityId)->first();
-        
+
         if ($product) {
             // Помечаем товар как неактивный или удаляем
-            $product->update(['is_active' => false]);
-            Log::info('Товар деактивирован', ['product_id' => $product->id]);
+            /**@var $product Product **/
+            Log::info('Товар удален', ['product_id' => $product->id]);
+            $product->delete();
         }
     }
 
@@ -262,9 +264,9 @@ class WebhookController extends Controller
         try {
             // Используем новый метод для синхронизации товара из вебхука
             $this->productService->syncProductFromWebhook($productData);
-            
+
             Log::info('Товар успешно синхронизирован', ['entityId' => $productData['id']]);
-            
+
         } catch (\Exception $e) {
             Log::error('Ошибка синхронизации товара', [
                 'entityId' => $productData['id'] ?? 'unknown',

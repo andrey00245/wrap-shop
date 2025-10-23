@@ -299,8 +299,21 @@ class Product extends Model implements HasMedia
     public function getPreviewImage(): string
     {
         $media = $this->getFirstMedia('images');
-        if ($media && $media->hasGeneratedConversion('preview_webp')) {
-            return $media->getUrl('preview_webp');
+        if ($media) {
+            // Сначала пробуем preview_webp
+            if ($media->hasGeneratedConversion('preview_webp')) {
+                return $media->getUrl('preview_webp');
+            }
+            
+            // Если preview_webp нет, пробуем gallery
+            if ($media->hasGeneratedConversion('gallery')) {
+                return $media->getUrl('gallery');
+            }
+            
+            // Если gallery нет, пробуем preview
+            if ($media->hasGeneratedConversion('preview')) {
+                return $media->getUrl('preview');
+            }
         }
         
         return $this->getFirstMediaUrl('images');
@@ -314,6 +327,7 @@ class Product extends Model implements HasMedia
     public function getProductAttributes()
     {
         return $this->attributes()
+            ->where('is_visible', true) // Показываем только видимые атрибуты
             ->whereNotIn('field_name', [
                 'name',
                 'application',

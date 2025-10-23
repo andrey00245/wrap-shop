@@ -44,6 +44,9 @@
     <!-- JSON-LD Structured Data -->
     @include('components.json-ld')
 
+    <!-- Google search console -->
+    <meta name="google-site-verification" content="LmHagwQx1TXU6CUHxrW-lm7EPyzPe-0noBJuXR2m1FM" />
+
     @if($theme === 'dark')
         <link href="{{mix('build/css/style-dark.css')}}" rel="stylesheet" type="text/css">
         <link rel="stylesheet" type="text/css" href="{{mix('build/css/social-login-dark.css')}}">
@@ -81,6 +84,11 @@
     <link rel="stylesheet" href="{{asset('third-party/splide/css/splide.min.css')}}" media="screen">
     <link rel="stylesheet" href="{{asset('third-party/fancybox/jquery.fancybox.min.css')}}" media="screen">
     <link rel="stylesheet" href="{{asset('third-party/intlTelInput/css/intlTelInput.css')}}" media="screen">
+
+    <!-- Custom Head Code from Settings -->
+    @if(isset($settings) && $settings->head_code)
+        {!! $settings->head_code !!}
+    @endif
     @stack('styles')
 
     <link rel="alternate" hreflang="uk-ua" href="{{LaravelLocalization::getLocalizedURL('uk')}}">

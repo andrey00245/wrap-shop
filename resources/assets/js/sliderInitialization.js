@@ -2,7 +2,7 @@ export function productSliderInitialization(id) {
     const $block = $('#' + id);
     const $allItems = $block.find('.home-products-item');
     const totalItems = $allItems.length;
-    
+
     // Определяем perPage в зависимости от ширины экрана
     let perPage = 4;
     if (window.innerWidth <= 400) {
@@ -14,10 +14,10 @@ export function productSliderInitialization(id) {
     } else if (window.innerWidth <= 1331) {
         perPage = 3;
     }
-    
+
     // Если товаров меньше или равно perPage * 2, используем 'slide' вместо 'loop' для предотвращения дублирования
     const sliderType = totalItems > (perPage * 2) ? 'loop' : 'slide';
-    
+
     let productsSlider = new Splide('#' + id + ' .splide', {
         pagination: false,
         perPage: perPage,
@@ -82,7 +82,7 @@ export function productSliderInitialization(id) {
             if (productsSlider.Components.Autoplay) {
                 productsSlider.Components.Autoplay.pause();
             }
-            
+
             // Обновляем тип слайдера в зависимости от количества видимых товаров
             const visibleCount = $visibleSlides.length;
             let currentPerPage = perPage;
@@ -95,15 +95,15 @@ export function productSliderInitialization(id) {
             } else if (window.innerWidth <= 1331) {
                 currentPerPage = 3;
             }
-            
+
             // Если видимых товаров меньше или равно perPage, меняем тип на 'slide'
             // Используем 'slide' если товаров меньше чем perPage * 2, чтобы избежать дублирования
             const needsSlideType = visibleCount <= (currentPerPage * 2);
             const currentType = productsSlider.options.type;
-            
+
             // Всегда пересоздаем слайдер при фильтрации для правильной работы
             productsSlider.destroy();
-            
+
             productsSlider = new Splide('#' + id + ' .splide', {
                 pagination: false,
                 perPage: currentPerPage,
@@ -134,7 +134,7 @@ export function productSliderInitialization(id) {
                     const firstVisibleElement = $visibleSlides.first()[0];
                     const $allItems = $block.find('.home-products-item');
                     let originalIndex = -1;
-                    
+
                     // Находим индекс первого видимого товара в исходном массиве
                     $allItems.each(function(index) {
                         if (this === firstVisibleElement) {
@@ -142,7 +142,7 @@ export function productSliderInitialization(id) {
                             return false; // break
                         }
                     });
-                    
+
                     // Если нашли индекс, используем его для прокрутки
                     if (originalIndex !== -1 && productsSlider) {
                         // Для типа 'slide' используем реальный индекс
@@ -151,23 +151,23 @@ export function productSliderInitialization(id) {
                         } else {
                             // Для типа 'loop' ищем через Splide API
                             let targetIndex = -1;
-                            
+
                             if (productsSlider.Components.Slides) {
                                 const allSlides = productsSlider.Components.Slides.get();
-                                
+
                                 for (let i = 0; i < allSlides.length; i++) {
                                     const slideElement = allSlides[i].slide;
                                     const $slide = $(slideElement);
                                     const $itemInSlide = $slide.find('.home-products-item');
-                                    
-                                    if ($itemInSlide.length && 
+
+                                    if ($itemInSlide.length &&
                                         $itemInSlide[0] === firstVisibleElement) {
                                         targetIndex = i;
                                         break;
                                     }
                                 }
                             }
-                            
+
                             if (targetIndex !== -1 && targetIndex >= 0) {
                                 productsSlider.go(targetIndex);
                             } else {
@@ -179,12 +179,12 @@ export function productSliderInitialization(id) {
                         const $splideList = $block.find('.splide__list');
                         const $allSlides = $splideList.find('.splide__slide');
                         let targetIndex = -1;
-                        
+
                         $allSlides.each(function(index) {
                             const $slide = $(this);
                             const $itemInSlide = $slide.find('.home-products-item');
-                            
-                            if ($itemInSlide.length && 
+
+                            if ($itemInSlide.length &&
                                 !$itemInSlide.hasClass('hide') &&
                                 $itemInSlide.hasClass('show') &&
                                 $itemInSlide.attr('data-ids') === activeItem) {
@@ -192,7 +192,7 @@ export function productSliderInitialization(id) {
                                 return false;
                             }
                         });
-                        
+
                         if (targetIndex !== -1 && targetIndex >= 0) {
                             productsSlider.go(targetIndex);
                         } else {
@@ -220,12 +220,12 @@ export function productSliderInitialization(id) {
                 currentPerPage = 3;
             }
             const needsSlideType = totalCount <= (currentPerPage * 2);
-            
+
             // Всегда пересоздаем слайдер при возврате к "Все"
             if (productsSlider) {
                 productsSlider.destroy();
             }
-            
+
             productsSlider = new Splide('#' + id + ' .splide', {
                 pagination: false,
                 perPage: currentPerPage,
@@ -268,7 +268,7 @@ export function productSliderInitializationClass(classEl) {
         const $block = $(elms[i]);
         const $allItems = $block.find('.home-products-item');
         const totalItems = $allItems.length;
-        
+
         // Определяем perPage в зависимости от ширины экрана
         let perPage = 4;
         if (window.innerWidth <= 400) {
@@ -280,10 +280,10 @@ export function productSliderInitializationClass(classEl) {
         } else if (window.innerWidth <= 1331) {
             perPage = 3;
         }
-        
+
         // Если товаров меньше или равно perPage * 2, используем 'slide' вместо 'loop' для предотвращения дублирования
         const sliderType = totalItems > (perPage * 2) ? 'loop' : 'slide';
-        
+
         customBlockSplides[i] = new Splide(elms[i].querySelector('.home-products-list'), {
             pagination: false,
             perPage: perPage,
@@ -344,7 +344,7 @@ export function productSliderInitializationClass(classEl) {
             if (productsSlider && productsSlider.Components.Autoplay) {
                 productsSlider.Components.Autoplay.pause();
             }
-            
+
             // Обновляем тип слайдера в зависимости от количества видимых товаров
             const visibleCount = $visibleSlides.length;
             let currentPerPage = 4;
@@ -357,15 +357,15 @@ export function productSliderInitializationClass(classEl) {
             } else if (window.innerWidth <= 1331) {
                 currentPerPage = 3;
             }
-            
+
             // Используем 'slide' если товаров меньше чем perPage * 2, чтобы избежать дублирования
             const needsSlideType = visibleCount <= (currentPerPage * 2);
-            
+
             // Всегда пересоздаем слайдер при фильтрации для правильной работы
             if (productsSlider) {
                 productsSlider.destroy();
             }
-            
+
             productsSlider = new Splide($block.find('.home-products-list')[0], {
                 pagination: false,
                 perPage: currentPerPage,
@@ -396,7 +396,7 @@ export function productSliderInitializationClass(classEl) {
                     const firstVisibleElement = $visibleSlides.first()[0];
                     const $allItems = $block.find('.home-products-item');
                     let originalIndex = -1;
-                    
+
                     // Находим индекс первого видимого товара в исходном массиве
                     $allItems.each(function(index) {
                         if (this === firstVisibleElement) {
@@ -404,7 +404,7 @@ export function productSliderInitializationClass(classEl) {
                             return false; // break
                         }
                     });
-                    
+
                     // Если нашли индекс, используем его для прокрутки
                     if (originalIndex !== -1 && productsSlider) {
                         // Для типа 'slide' используем реальный индекс
@@ -413,23 +413,23 @@ export function productSliderInitializationClass(classEl) {
                         } else {
                             // Для типа 'loop' ищем через Splide API
                             let targetIndex = -1;
-                            
+
                             if (productsSlider.Components.Slides) {
                                 const allSlides = productsSlider.Components.Slides.get();
-                                
+
                                 for (let i = 0; i < allSlides.length; i++) {
                                     const slideElement = allSlides[i].slide;
                                     const $slide = $(slideElement);
                                     const $itemInSlide = $slide.find('.home-products-item');
-                                    
-                                    if ($itemInSlide.length && 
+
+                                    if ($itemInSlide.length &&
                                         $itemInSlide[0] === firstVisibleElement) {
                                         targetIndex = i;
                                         break;
                                     }
                                 }
                             }
-                            
+
                             if (targetIndex !== -1 && targetIndex >= 0) {
                                 productsSlider.go(targetIndex);
                             } else {
@@ -441,12 +441,12 @@ export function productSliderInitializationClass(classEl) {
                         const $splideList = $block.find('.splide__list');
                         const $allSlides = $splideList.find('.splide__slide');
                         let targetIndex = -1;
-                        
+
                         $allSlides.each(function(index) {
                             const $slide = $(this);
                             const $itemInSlide = $slide.find('.home-products-item');
-                            
-                            if ($itemInSlide.length && 
+
+                            if ($itemInSlide.length &&
                                 !$itemInSlide.hasClass('hide') &&
                                 $itemInSlide.hasClass('show') &&
                                 $itemInSlide.attr('data-ids') === activeItem) {
@@ -454,7 +454,7 @@ export function productSliderInitializationClass(classEl) {
                                 return false;
                             }
                         });
-                        
+
                         if (targetIndex !== -1 && targetIndex >= 0) {
                             productsSlider.go(targetIndex);
                         } else {
@@ -482,12 +482,12 @@ export function productSliderInitializationClass(classEl) {
                 currentPerPage = 3;
             }
             const needsSlideType = totalCount <= (currentPerPage * 2);
-            
+
             // Всегда пересоздаем слайдер при возврате к "Все"
             if (productsSlider) {
                 productsSlider.destroy();
             }
-            
+
             productsSlider = new Splide($block.find('.home-products-list')[0], {
                 pagination: false,
                 perPage: currentPerPage,
@@ -522,7 +522,7 @@ export function customBlockSliderInitialization(id) {
     const $block = $('#' + id);
     const $allItems = $block.find('.home-products-item');
     const totalItems = $allItems.length;
-    
+
     // Определяем perPage в зависимости от ширины экрана
     let perPage = 4;
     if (window.innerWidth <= 400) {
@@ -534,10 +534,10 @@ export function customBlockSliderInitialization(id) {
     } else if (window.innerWidth <= 1331) {
         perPage = 3;
     }
-    
+
     // Если товаров меньше или равно perPage * 2, используем 'slide' вместо 'loop' для предотвращения дублирования
     const sliderType = totalItems > (perPage * 2) ? 'loop' : 'slide';
-    
+
     let productsSlider = new Splide('#' + id + ' .splide', {
         pagination: false,
         perPage: perPage,
@@ -602,14 +602,14 @@ export function customBlockSliderInitialization(id) {
             } else if (window.innerWidth <= 1331) {
                 currentPerPage = 3;
             }
-            
+
             const needsSlideType = visibleCount <= currentPerPage;
-            
+
             // Всегда пересоздаем слайдер при фильтрации для правильной работы
             if (productsSlider) {
                 productsSlider.destroy();
             }
-            
+
             productsSlider = new Splide('#' + id + ' .splide', {
                 pagination: false,
                 perPage: currentPerPage,
@@ -638,7 +638,7 @@ export function customBlockSliderInitialization(id) {
                     const firstVisibleElement = $visibleSlides.first()[0];
                     const $allItems = $block.find('.home-products-item');
                     let originalIndex = -1;
-                    
+
                     // Находим индекс первого видимого товара в исходном массиве
                     $allItems.each(function(index) {
                         if (this === firstVisibleElement) {
@@ -646,7 +646,7 @@ export function customBlockSliderInitialization(id) {
                             return false; // break
                         }
                     });
-                    
+
                     // Если нашли индекс, используем его для прокрутки
                     if (originalIndex !== -1 && productsSlider) {
                         // Для типа 'slide' используем реальный индекс
@@ -655,23 +655,23 @@ export function customBlockSliderInitialization(id) {
                         } else {
                             // Для типа 'loop' ищем через Splide API
                             let targetIndex = -1;
-                            
+
                             if (productsSlider.Components.Slides) {
                                 const allSlides = productsSlider.Components.Slides.get();
-                                
+
                                 for (let i = 0; i < allSlides.length; i++) {
                                     const slideElement = allSlides[i].slide;
                                     const $slide = $(slideElement);
                                     const $itemInSlide = $slide.find('.home-products-item');
-                                    
-                                    if ($itemInSlide.length && 
+
+                                    if ($itemInSlide.length &&
                                         $itemInSlide[0] === firstVisibleElement) {
                                         targetIndex = i;
                                         break;
                                     }
                                 }
                             }
-                            
+
                             if (targetIndex !== -1 && targetIndex >= 0) {
                                 productsSlider.go(targetIndex);
                             } else {
@@ -683,12 +683,12 @@ export function customBlockSliderInitialization(id) {
                         const $splideList = $block.find('.splide__list');
                         const $allSlides = $splideList.find('.splide__slide');
                         let targetIndex = -1;
-                        
+
                         $allSlides.each(function(index) {
                             const $slide = $(this);
                             const $itemInSlide = $slide.find('.home-products-item');
-                            
-                            if ($itemInSlide.length && 
+
+                            if ($itemInSlide.length &&
                                 !$itemInSlide.hasClass('hide') &&
                                 $itemInSlide.hasClass('show') &&
                                 $itemInSlide.attr('data-ids') === activeItem) {
@@ -696,7 +696,7 @@ export function customBlockSliderInitialization(id) {
                                 return false;
                             }
                         });
-                        
+
                         if (targetIndex !== -1 && targetIndex >= 0) {
                             productsSlider.go(targetIndex);
                         } else {
@@ -723,12 +723,12 @@ export function customBlockSliderInitialization(id) {
                 currentPerPage = 3;
             }
             const needsSlideType = totalCount <= (currentPerPage * 2);
-            
+
             // Всегда пересоздаем слайдер при возврате к "Все"
             if (productsSlider) {
                 productsSlider.destroy();
             }
-            
+
             productsSlider = new Splide('#' + id + ' .splide', {
                 pagination: false,
                 perPage: currentPerPage,
@@ -754,6 +754,54 @@ export function customBlockSliderInitialization(id) {
             setTimeout(() => {
                 productsSlider.go(0);
             }, 100);
+        }
+    });
+}
+
+export function customBlockSliderInitialization(id) {
+    let productsSlider = new Splide('#' + id + ' .splide', {
+        pagination: false,
+        perPage: 4,
+        gap: '5px',
+        padding: {right: '8%'},
+        type: 'loop',
+        autoplay: false,
+        classes: {
+            arrows: 'splide__arrows home-products-slide-buttons',
+            prev: 'splide__arrow--prev',
+            next: 'splide__arrow--next',
+        },
+        breakpoints: {
+            1331: {
+                perPage: 3,
+                padding: {right: '3%'},
+            },
+            1019: {
+                perPage: 2,
+                padding: {right: '15%'},
+            },
+            767: {
+                perPage: 2,
+                padding: {right: 0},
+            },
+            400: {
+                perPage: 1,
+                padding: {right: '25%'},
+            }
+        }
+    }).mount();
+
+    $('#' + id + ' .home-products-nav .item').on('click', function () {
+        var activeItem = $(this).attr('data-cat');
+        if (activeItem != 'all') {
+            $('#' + id + ' .home-products-nav .item').removeClass('active');
+            $('#' + id + ' .home-products-item').removeClass('show').addClass('hide');
+            $(this).addClass('active');
+            $('#' + id + ' .home-products-item[data-ids="' + activeItem + '"]').removeClass('hide').addClass('show');
+        } else {
+            $('#' + id + ' .home-products-nav .item').removeClass('active');
+            $('#' + id + ' .home-products-item').removeClass('hide');
+            $(this).addClass('active');
         }
     });
 }

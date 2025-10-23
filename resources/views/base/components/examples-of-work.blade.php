@@ -1,5 +1,4 @@
-{{-- Закомментировано временно --}}
-{{-- @if($exampleWorks->count() > 0)
+@if($exampleWorks->count() > 0)
 <section class="examples-of-work">
   <div class="wrap">
     <div class="home-products-top flex-justify">
@@ -47,4 +46,4 @@
 
   </div>
 </section>
-@endif --}}
+@endif

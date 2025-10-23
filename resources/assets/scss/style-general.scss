@@ -3318,7 +3318,7 @@ table .notify-quantity {
     margin-right: 10px;
     padding-top: 20px;
     margin-bottom: 45px;
-    
+
     /* Убеждаемся, что карточки растягиваются по высоте */
     .example-of-work {
         break-inside: avoid; /* Не разрываем карточки между колонками */
@@ -4781,7 +4781,7 @@ table .notify-quantity {
     }
     .example-of-work {
         height: 430px !important; /* Фиксированная высота для всех карточек на мобильных */
-        
+
         &.button {
             height: 341px;
             a {
@@ -4790,7 +4790,7 @@ table .notify-quantity {
                 }
             }
         }
-        
+
         .image-example {
             height: 200px !important; /* Фиксированная высота изображения на мобильных */
             object-fit: cover !important; /* Обрезаем изображение для одинакового размера */

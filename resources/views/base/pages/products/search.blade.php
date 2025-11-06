@@ -222,7 +222,9 @@
                                                         <div class="ocf-value-list-body">
                                                             @foreach($attribute->getPivotValue() as $value)
                                                                 @php
-                                                                    $count = $responseArray['attributes_count'][$attribute->field_name][$value]['count'];
+                                                                        $count = isset($responseArray['attributes_count'][$attribute->field_name][$value]['count']) 
+                                                                        ? $responseArray['attributes_count'][$attribute->field_name][$value]['count'] 
+                                                                        : 0;
                                                                     $selected = array_key_exists($attribute->field_name, request()->query()) ? (in_array($value, request()->query()[$attribute->field_name]) ? 'ocf-selected' : '') : ''
                                                                 @endphp
                                                                 <button type="button"
@@ -235,7 +237,7 @@
                                                                     <span class="ocf-value-name">{{$value}}</span>
                                                                     <span class="ocf-value-append">
                                       <span
-                                          class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$responseArray['attributes_count'][$attribute->field_name][$value]['count']}}</span>
+                                          class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{isset($responseArray['attributes_count'][$attribute->field_name][$value]['count']) ? $responseArray['attributes_count'][$attribute->field_name][$value]['count'] : 0}}</span>
                                   </span>
                                                                 </button>
                                                             @endforeach

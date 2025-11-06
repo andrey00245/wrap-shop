@@ -1,5 +1,13 @@
 <?php
 
+// Nova Tool routes (должны быть в начале)
+Route::get('/nova-tools/feed-generator', [App\Http\Controllers\Nova\FeedGeneratorController::class, 'index'])->name('nova.feed-generator');
+
+// Feed routes (должны быть в начале)
+Route::get('/feed/remarketing', [App\Http\Controllers\FeedController::class, 'remarketingAllCategories'])->name('feed.remarketing.all');
+Route::get('/feed/remarketing/category', [App\Http\Controllers\FeedController::class, 'remarketingByCategory'])->name('feed.remarketing.category');
+Route::get('/api/categories', [App\Http\Controllers\FeedController::class, 'getCategories'])->name('api.categories');
+
 use App\Http\Controllers\Account\ChangePasswordController;
 use App\Http\Controllers\Account\PersonalDataController;
 use App\Http\Controllers\Account\UserAddressController;
@@ -188,6 +196,14 @@ Route::group([
         return view('base.pages.about-us');
     })->name('about-us');
 
+    Route::get('/implementations', function () {
+        $implementations = \App\Models\Implementation::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->get();
+        return view('base.pages.implementations', compact('implementations'));
+    })->name('implementations');
+
     Route::get('/contacts', function () {
         return view('base.pages.contacts');
     })->name('contacts');
@@ -247,4 +263,6 @@ Route::group([
     });
     Route::get('/{category}/{subcategory?}/{subsubcategory?}', [ProductController::class, 'category'])->name('products.category');
 });
+
+
 

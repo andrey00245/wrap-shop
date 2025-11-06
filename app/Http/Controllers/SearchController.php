@@ -95,6 +95,7 @@ class SearchController extends Controller
 
 
         $products = Product::query()
+            ->where('products.is_active', 1)
             ->when($searchValue, function ($query) use ($columns, $searchValue) {
                 $query->whereLikeInsensitive($columns, $searchValue);
             })

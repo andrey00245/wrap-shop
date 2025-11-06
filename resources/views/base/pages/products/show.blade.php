@@ -92,9 +92,15 @@
                     <div class="list flex-column">
                         @foreach($product->getProductAttributes() as $attribute)
                             @php
+                                $skipFields = ['master_qualification','room_temperature','store_terms'];
+                            @endphp
+                            @if(in_array($attribute->field_name ?? '', $skipFields, true))
+                                @continue
+                            @endif
+                            @php
                                 $value = $attribute->pivot->value;
                             @endphp
-                            <div class="item flex-justify">{{ $attribute->name }} <span class="label">{{$value}}</span>
+                            <div class="item flex-justify">{{ $attribute->name }} <span class="label">{!! $value !!}</span>
                             </div>
                         @endforeach
                     </div>
@@ -237,7 +243,7 @@
                             </div>
                         @endif
 
-                        @if($product->getRollSize())
+                        @if($product->getRollSize() && $count > $product->getSecondStock())
                             <ul class="product-discounts">
                                 @if($product->getSecondStock() && $product->getSecondStock() <= $count)
                                     <li>
@@ -312,9 +318,26 @@
                                 <div class="default">
                                     <div class="top-wrapper">
                                         <span class="text-total-summ">{{__('product-show.total')}}</span>
-                                        <span class="text-discount">
+                                        @php
+                                            // Определяем следующий достижимый порог скидки для показа сообщения
+                                            $showDiscountMessage = false;
+                                            if ($secondStock && $count >= $secondStock && $product->getPrice() != $product->getSmallPrice()) {
+                                                // Если второй порог достижим и даёт скидку
+                                                $showDiscountMessage = true;
+                                            } elseif ($thirdStock && $count >= $thirdStock && $product->getSmallPrice() != $product->getBigPrice()) {
+                                                // Если третий порог достижим и даёт скидку (и второго нет или он уже достигнут)
+                                                $showDiscountMessage = true;
+                                            }
+                                        @endphp
+                                        @if($showDiscountMessage)
+                                            <span class="text-discount">
                                               {!! __('product-show.discont-text')  !!}
                                             </span>
+                                        @else
+                                            <span class="text-discount" style="display: none;">
+                                              {!! __('product-show.discont-text')  !!}
+                                            </span>
+                                        @endif
                                     </div>
                                     <span class="autocalc-product-price"><span class="total-price">0.00</span> ₴</span>
                                 </div>

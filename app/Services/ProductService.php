@@ -62,8 +62,8 @@ class ProductService
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
-                dd($e->getMessage(),$e->getTrace());
-                dd($e->getLine() ,$e->getMessage(),$e->getTraceAsString());
+                dd($e->getMessage(), $e->getTrace());
+                dd($e->getLine(), $e->getMessage(), $e->getTraceAsString());
                 Log::error('Ошибка при обработке продукта: ' . $e->getMessage());
             }
         }
@@ -139,78 +139,30 @@ class ProductService
             $uniqueFilename = $hash . '.png';
 
             try {
-                // Получаем все существующие изображения товара
-                $existingImages = $product->getMedia('images');
-
-                if ($imageIndex < $existingImages->count()) {
-                    // Обновляем существующее изображение по индексу: пересоздаем медиа с сохранением порядка и пропертей
-                    $existingMedia = $existingImages[$imageIndex];
-                    $oldOrder = property_exists($existingMedia, 'order_column') && $existingMedia->order_column !== null
-                        ? $existingMedia->order_column
-                        : $imageIndex;
-
+                // Всегда создаём новое изображение, не заменяя по индексу (чтобы не терять старые при смене порядка)
                     // Сначала регистрируем конверсии в модели продукта
                     $product->registerMediaConversions();
 
-                    // Создаём новое медиа из потока
-                    $newMedia = $product->addMediaFromStream($fileContent)
+                $mediaItem = $product->addMediaFromStream($fileContent)
                         ->usingFileName($uniqueFilename)
                         ->toMediaCollection('images');
 
-                    // Копируем order и custom props
-                    $newMedia->order_column = $oldOrder;
-                    $newMedia->setCustomProperty('moysklad_hash', $hash);
-                    // Сливаем существующие кастомные пропсы, если есть
-                    if (is_array($existingMedia->custom_properties)) {
-                        foreach ($existingMedia->custom_properties as $k => $v) {
-                            if ($k !== 'moysklad_hash') {
-                                $newMedia->setCustomProperty($k, $v);
-                            }
-                        }
-                    }
-                    $newMedia->save();
+                // Устанавливаем hash и порядок согласно порядку из МойСклад
+                $mediaItem->setCustomProperty('moysklad_hash', $hash);
+                $mediaItem->order_column = $imageIndex;
+                $mediaItem->save();
 
-                    // Удаляем старое медиа
-                    $existingMediaId = $existingMedia->id;
-                    $existingMedia->delete();
+                // Генерируем конверсии для конкретного медиа
+                $this->generateConversionsForMedia($product, $mediaItem);
 
-                    // Принудительно генерируем конверсии для конкретного медиа
-                    $this->generateConversionsForMedia($product, $newMedia);
-
-                    Log::info('Изображение пересоздано (обновлено)', [
-                        'product_id' => $product->id,
-                        'hash' => $hash,
-                        'filename' => $uniqueFilename,
-                        'old_media_id' => $existingMediaId,
-                        'new_media_id' => $newMedia->id,
-                        'order' => $oldOrder,
-                        'image_index' => $imageIndex,
-                        'generated_conversions' => $newMedia->fresh()->getGeneratedConversions()->keys()->toArray()
-                    ]);
-                } else {
-                    // Если изображений меньше чем индекс, создаем новое
-                    // Сначала регистрируем конверсии в модели продукта
-                    $product->registerMediaConversions();
-                    
-                    $mediaItem = $product->addMediaFromStream($fileContent)
-                        ->usingFileName($uniqueFilename)
-                        ->toMediaCollection('images');
-
-                    $mediaItem->setCustomProperty('moysklad_hash', $hash);
-                    $mediaItem->save();
-
-                    // Принудительно генерируем конверсии для конкретного медиа
-                    $this->generateConversionsForMedia($product, $mediaItem);
-
-                    Log::info('Изображение создано', [
-                        'product_id' => $product->id,
-                        'hash' => $hash,
-                        'filename' => $uniqueFilename,
-                        'media_id' => $mediaItem->id,
-                        'image_index' => $imageIndex,
-                        'generated_conversions' => $mediaItem->fresh()->getGeneratedConversions()->keys()->toArray()
-                    ]);
-                }
+                Log::info('Изображение создано', [
+                    'product_id'            => $product->id,
+                    'hash'                  => $hash,
+                    'filename'              => $uniqueFilename,
+                    'media_id'              => $mediaItem->id,
+                    'image_index'           => $imageIndex,
+                    'generated_conversions' => $mediaItem->fresh()->getGeneratedConversions()->keys()->toArray()
+                ]);
 
             } catch (\Exception $e) {
                 Log::error("Failed to update image for product ID {$product->external_id}. Error: {$e->getMessage()}");
@@ -221,13 +173,86 @@ class ProductService
     }
 
     /**
+     * Синхронизация стока товара из МойСклад
+     */
+    public function syncProductStock(string $entityId): void
+    {
+        try {
+            Log::info('Синхронизация стока товара', ['entity_id' => $entityId]);
+
+            // Находим товар в нашей базе
+            $product = \App\Models\Product::where('external_id', $entityId)->first();
+
+            if ($product) {
+                $this->syncProductStockByCode($product);
+
+                Log::info('Сток товара синхронизирован', [
+                        'product_id' => $product->id,
+                    'entity_id'  => $entityId
+                    ]);
+                } else {
+                Log::warning('Товар не найден в базе', [
+                    'entity_id' => $entityId
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Ошибка синхронизации стока товара', [
+                'entity_id' => $entityId,
+                'message'   => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Синхронизация стока товара по коду
+     */
+    public function syncProductStockByCode(\App\Models\Product $product): void
+    {
+        $username = config('app.my_store.username');
+        $password = config('app.my_store.password');
+        $encodedCredentials = base64_encode("{$username}:{$password}");
+
+        $jsonUrl = "https://api.moysklad.ru/api/remap/1.2/entity/assortment?filter=code~{$product->code}";
+
+        $response = Http::withHeaders([
+            'Authorization'   => 'Basic ' . $encodedCredentials,
+            'Accept-Encoding' => 'gzip',
+        ])->get($jsonUrl);
+
+        if ($response->successful()) {
+            $data = $response->json();
+
+            if (isset($data['rows'][0]['stock'])) {
+                $product->update(['stock' => $data['rows'][0]['stock']]);
+                Log::info('Сток товара обновлен', [
+                    'product_id'   => $product->id,
+                    'product_code' => $product->code,
+                    'stock'        => $data['rows'][0]['stock']
+                ]);
+            } else {
+                $product->update(['stock' => 0]);
+                Log::info('Сток товара установлен в 0', [
+                    'product_id'   => $product->id,
+                    'product_code' => $product->code
+                ]);
+            }
+        } else {
+            Log::error('Ошибка получения стока товара', [
+                'product_id'   => $product->id,
+                'product_code' => $product->code,
+                'status'       => $response->status()
+            ]);
+        }
+    }
+
+    /**
      * Публичный метод для синхронизации товара из вебхука
      */
     public function syncProductFromWebhook(array $productData): void
     {
         try {
             Log::info('Начало синхронизации товара из вебхука', [
-                'product_id' => $productData['id'] ?? 'unknown',
+                'product_id'   => $productData['id'] ?? 'unknown',
                 'product_name' => $productData['name'] ?? 'unknown',
                 'product_code' => $productData['code'] ?? 'unknown'
             ]);
@@ -245,7 +270,7 @@ class ProductService
             DB::rollBack();
             Log::error('Ошибка синхронизации товара из вебхука: ' . $e->getMessage(), [
                 'product_id' => $productData['id'] ?? 'unknown',
-                'trace' => $e->getTraceAsString()
+                'trace'      => $e->getTraceAsString()
             ]);
             throw $e;
         }
@@ -257,7 +282,7 @@ class ProductService
     private function processProductFromWebhookData(array $productData): void
     {
         Log::info('Обработка товара из вебхука с проверкой атрибута', [
-            'product_id' => $productData['id'] ?? 'unknown',
+            'product_id'   => $productData['id'] ?? 'unknown',
             'product_name' => $productData['name'] ?? 'unknown',
             'product_code' => $productData['code'] ?? 'unknown'
         ]);
@@ -270,7 +295,8 @@ class ProductService
             foreach ($productData['attributes'] as $attribute) {
                 if (isset($attribute['id']) && $attribute['id'] == ProductAttributeEnum::SITE) {
                     $siteAttributeValue = $attribute['value']['name'] ?? $attribute['value'] ?? null;
-                    if ($siteAttributeValue === 'так') {
+                    $normalized = is_string($siteAttributeValue) ? mb_strtolower(trim($siteAttributeValue)) : null;
+                    if ($normalized === 'так') {
                         $hasSiteAttribute = true;
                         break;
                     }
@@ -278,10 +304,10 @@ class ProductService
             }
 
             Log::info('Проверка атрибута "Сайт"', [
-                'product_id' => $productData['id'] ?? 'unknown',
-                'has_site_attribute' => $hasSiteAttribute,
+                'product_id'           => $productData['id'] ?? 'unknown',
+                'has_site_attribute'   => $hasSiteAttribute,
                 'site_attribute_value' => $siteAttributeValue,
-                'total_attributes' => count($productData['attributes'])
+                'total_attributes'     => count($productData['attributes'])
             ]);
 
             // Проверяем, существует ли товар
@@ -292,7 +318,7 @@ class ProductService
                 if ($existingProduct) {
                     $existingProduct->update(['is_active' => false]);
                     Log::info('Товар деактивирован - атрибут "Сайт" = "ні"', [
-                        'product_id' => $existingProduct->id,
+                        'product_id'  => $existingProduct->id,
                         'external_id' => $productData['id']
                     ]);
                 } else {
@@ -307,7 +333,7 @@ class ProductService
                 if ($existingProduct && !$existingProduct->is_active) {
                     $existingProduct->update(['is_active' => true]);
                     Log::info('Товар активирован - атрибут "Сайт" = "так"', [
-                        'product_id' => $existingProduct->id,
+                        'product_id'  => $existingProduct->id,
                         'external_id' => $productData['id']
                     ]);
                 }
@@ -325,7 +351,7 @@ class ProductService
         if ($isNewProduct) {
             // Новый продукт - создаем все 3 локализации
             $product = \App\Models\Product::create([
-                'external_id' => $productData['id'],
+                'external_id'   => $productData['id'],
                 'external_code' => $productData['externalCode'] ?? null,
                 'code'          => $productData['code'] ?? null,
                 'article'       => $productData['article'] ?? null,
@@ -334,7 +360,7 @@ class ProductService
                     'uk' => $productData['name'] ?? '',
                     'en' => $productData['name'] ?? '',
                 ],
-                'descriptions'   => [
+                'descriptions'  => [
                     'ru' => $productData['description'] ?? '',
                     'uk' => $productData['description'] ?? '',
                     'en' => $productData['description'] ?? '',
@@ -343,7 +369,7 @@ class ProductService
 
             Log::info("Создан новый продукт из вебхука", [
                 'external_id' => $productData['id'],
-                'code' => $productData['code'] ?? null
+                'code'        => $productData['code'] ?? null
             ]);
         } else {
             // Старый продукт - обновляем только UK значения переводов
@@ -352,11 +378,11 @@ class ProductService
                 'external_code' => $productData['externalCode'] ?? $product->external_code,
                 'code'          => $productData['code'] ?? $product->code,
                 'article'       => $productData['article'] ?? $product->article,
-                'name' => [
+                'name'          => [
                     'uk' => $productData['name'] ?? $product->getTranslation('name', 'uk'),
                     // ru и en остаются как есть
                 ],
-                'descriptions' => [
+                'descriptions'  => [
                     'uk' => $productData['description'] ?? $product->getTranslation('descriptions', 'uk'),
                     // ru и en остаются как есть
                 ],
@@ -364,7 +390,7 @@ class ProductService
 
             Log::info("Обновлен существующий продукт из вебхука (только UK переводы)", [
                 'external_id' => $productData['id'],
-                'code' => $productData['code'] ?? null
+                'code'        => $productData['code'] ?? null
             ]);
         }
 
@@ -385,8 +411,8 @@ class ProductService
             $currentSlug = $product->slug ?? [];
 
             Log::info('Обработка слага для существующего товара', [
-                'product_id' => $product->id,
-                'current_slug_type' => gettype($currentSlug),
+                'product_id'         => $product->id,
+                'current_slug_type'  => gettype($currentSlug),
                 'current_slug_value' => $currentSlug
             ]);
 
@@ -395,7 +421,7 @@ class ProductService
                 // Если slug - строка, создаем массив с этой строкой как UK слагом
                 $currentSlug = ['uk' => $currentSlug];
                 Log::info('Преобразован строковый слаг в массив', [
-                    'product_id' => $product->id,
+                    'product_id'     => $product->id,
                     'converted_slug' => $currentSlug
                 ]);
             }
@@ -405,7 +431,7 @@ class ProductService
             if (empty($ukName)) {
                 $ukName = $product->name ?? 'product';
                 Log::warning('Название товара на украинском пустое, используем общее название', [
-                    'product_id' => $product->id,
+                    'product_id'    => $product->id,
                     'fallback_name' => $ukName
                 ]);
             }
@@ -416,7 +442,7 @@ class ProductService
 
             Log::info('Обновлен слаг товара', [
                 'product_id' => $product->id,
-                'new_slug' => $newSlug
+                'new_slug'   => $newSlug
             ]);
 
             $product->slug = $newSlug;
@@ -444,7 +470,7 @@ class ProductService
         }
 
         Log::info('Товар обработан из вебхука', [
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'external_id' => $product->external_id
         ]);
     }
@@ -455,21 +481,47 @@ class ProductService
     private function processAttributesFromWebhook(array $attributes, Product $product): void
     {
         Log::info('Обработка атрибутов товара из вебхука', [
-            'product_id' => $product->id,
+            'product_id'       => $product->id,
             'attributes_count' => count($attributes)
         ]);
 
+        $receivedExternalIds = [];
+
         foreach ($attributes as $attribute) {
             try {
+                if (isset($attribute['id'])) {
+                    $receivedExternalIds[] = $attribute['id'];
+                }
                 $this->processAttributeFromWebhook($attribute, $product);
             } catch (\Exception $e) {
                 Log::error('Ошибка обработки атрибута из вебхука', [
-                    'product_id' => $product->id,
-                    'attribute_id' => $attribute['id'] ?? 'unknown',
+                    'product_id'     => $product->id,
+                    'attribute_id'   => $attribute['id'] ?? 'unknown',
                     'attribute_name' => $attribute['name'] ?? 'unknown',
-                    'error' => $e->getMessage()
+                    'error'          => $e->getMessage()
                 ]);
             }
+        }
+
+        // Синхронизируем коллекцию banner_images с текущим набором URL из атрибутов Доп.галерея
+        try {
+            $galleryUrls = $this->extractAdditionalGalleryUrls($attributes);
+            $this->syncBannerImagesFromGalleryUrls($product, $galleryUrls);
+        } catch (\Throwable $e) {
+            Log::error('Ошибка синхронизации banner_images по Доп.галерея', [
+                'product_id' => $product->id,
+                'error'      => $e->getMessage(),
+            ]);
+        }
+
+        // Синхронизируем атрибуты: убираем у товара те, которых нет в текущем вебхуке (только известные по enum)
+        try {
+            $this->syncDetachedAttributes($product, $receivedExternalIds);
+        } catch (\Throwable $e) {
+            Log::error('Ошибка синхронизации (удаления) атрибутов, отсутствующих в вебхуке', [
+                'product_id' => $product->id,
+                'error'      => $e->getMessage(),
+            ]);
         }
     }
 
@@ -486,18 +538,65 @@ class ProductService
             return;
         }
 
-        // Создаем или обновляем атрибут
-        $productAttribute = Attribute::updateOrCreate(
+		// Пустое значение из вебхука — считаем как удаление привязки атрибута у товара
+		if ($attributeValue === null || $attributeValue === '' || (is_array($attributeValue) && empty($attributeValue))) {
+			try {
+				$attr = Attribute::where('external_id', $attributeId)->first();
+				if ($attr) {
+					$product->attributes()->detach($attr->id);
+					Log::info('Атрибут удален (пустое значение из вебхука)', [
+						'product_id'   => $product->id,
+						'attribute_id' => $attributeId,
+						'name'         => $attributeName,
+					]);
+				}
+			} catch (\Throwable $e) {
+				Log::error('Ошибка удаления атрибута (пустое значение)', [
+					'product_id'   => $product->id,
+					'attribute_id' => $attributeId,
+					'error'        => $e->getMessage(),
+				]);
+			}
+			return;
+		}
+
+		// Создаем атрибут при первом появлении
+        $productAttribute = Attribute::firstOrCreate(
             ['external_id' => $attributeId],
             [
                 'field_name' => $this->getFieldNameByAttributeId($attributeId),
-                'name' => [
+                'name'       => [
                     'uk' => $attributeName,
                     'ru' => $attributeName,
                     'en' => $attributeName,
                 ],
             ]
         );
+
+        // Обновляем только украинское имя, сохраняя существующие переводы ru/en
+        try {
+            $existingNames = method_exists($productAttribute, 'getTranslations')
+                ? ($productAttribute->getTranslations('name') ?? [])
+                : ($productAttribute->name ?? []);
+
+            if (!is_array($existingNames)) {
+                $existingNames = [];
+            }
+            $existingNames['uk'] = $attributeName;
+            $productAttribute->update(['name' => $existingNames]);
+        } catch (\Throwable $e) {
+            // fallback: хотя бы uk
+            $productAttribute->update(['name' => ['uk' => $attributeName] ]);
+        }
+
+        // Если ранее поле было custom_*, а у нас есть маппинг — обновляем field_name
+        $mappedField = $this->getFieldNameByAttributeId($attributeId);
+        if (
+            $mappedField !== ('custom_' . $attributeId)
+            && (str_starts_with($productAttribute->field_name, 'custom_'))
+        ) {
+            $productAttribute->update(['field_name' => $mappedField]);
+        }
 
         // Определяем значение атрибута
         $value = null;
@@ -511,26 +610,33 @@ class ProductService
             // Обновляем или создаем связь с товаром
             $existingPivot = $product->attributes()->where('attribute_id', $productAttribute->id)->first();
 
-            $attributeData = [
-                'value' => [
-                    'uk' => $value,
-                    'ru' => $value,
-                    'en' => $value,
-                ]
-            ];
-
-            if ($existingPivot) {
-                $product->attributes()->updateExistingPivot($productAttribute->id, $attributeData);
+            // Мерджим pivot->value: обновляем только uk, ru/en сохраняем
+            if ($existingPivot && isset($existingPivot->pivot)) {
+                $currentVal = $existingPivot->pivot->value;
+                if (!is_array($currentVal)) {
+                    $currentVal = ['uk' => (string) $currentVal];
+                }
+                $currentVal['uk'] = $value;
+                $product->attributes()->updateExistingPivot($productAttribute->id, ['value' => $currentVal]);
             } else {
-                $product->attributes()->attach($productAttribute->id, $attributeData);
+                $product->attributes()->attach($productAttribute->id, [
+                    'value' => [
+                        'uk' => $value,
+                    ]
+                ]);
             }
 
             Log::info('Атрибут обработан из вебхука', [
-                'product_id' => $product->id,
-                'attribute_id' => $attributeId,
+                'product_id'     => $product->id,
+                'attribute_id'   => $attributeId,
                 'attribute_name' => $attributeName,
-                'value' => $value
+                'value'          => $value
             ]);
+
+            // Обработка атрибутов Доп.галерея1..8 → сохранение в коллекцию banner_images
+            if ($this->isAdditionalGalleryAttribute($attributeName)) {
+                $this->saveBannerImageFromUrl($product, $value, $attributeName);
+            }
         }
     }
 
@@ -540,25 +646,223 @@ class ProductService
     private function getFieldNameByAttributeId(string $attributeId): string
     {
         $fieldMap = [
-            ProductAttributeEnum::SITE => 'site',
-            ProductAttributeEnum::SITE_CATEGORY => 'site_category',
-            ProductAttributeEnum::NAME => 'name',
-            ProductAttributeEnum::BRAND => 'brand',
-            ProductAttributeEnum::TYPE => 'type',
-            ProductAttributeEnum::MATERIAL => 'material',
-            ProductAttributeEnum::THICKNESS => 'thickness',
-            ProductAttributeEnum::WIDTH_M => 'width',
-            ProductAttributeEnum::APPLICATION => 'application',
-            ProductAttributeEnum::BENEFITS => 'benefits',
-            ProductAttributeEnum::VOLUME => 'volume',
-            ProductAttributeEnum::COUNTRY_OF_MANUFACTURER => 'country_manufacture',
-            ProductAttributeEnum::DEFAULT_QUANTITY => 'default_quantity',
-            ProductAttributeEnum::QUANTITY_STEP => 'quantity_step',
-            ProductAttributeEnum::MINIMUM_ORDER_QUANTITY => 'min_order_quantity',
-            ProductAttributeEnum::UNDER_ORDER => 'under_order',
+            ProductAttributeEnum::SITE                        => 'site',
+            ProductAttributeEnum::SITE_CATEGORY               => 'site_category',
+            ProductAttributeEnum::NAME                        => 'name',
+            ProductAttributeEnum::BRAND                       => 'brand',
+            ProductAttributeEnum::SERIES                      => 'series',
+            ProductAttributeEnum::TYPE                        => 'type',
+            ProductAttributeEnum::PURPOSE                     => 'purpose',
+            ProductAttributeEnum::MATERIAL                    => 'material',
+            ProductAttributeEnum::STRUCTURE                   => 'structure',
+            ProductAttributeEnum::MAIN_SHADE                  => 'main_shade',
+            ProductAttributeEnum::THICKNESS                   => 'thickness',
+            ProductAttributeEnum::WIDTH_M                     => 'width',
+            ProductAttributeEnum::ROLL_SIZE                   => 'roll_size',
+            ProductAttributeEnum::APPLICATION                 => 'application',
+            ProductAttributeEnum::APPLICATION_METHOD          => 'application_method',
+            ProductAttributeEnum::BENEFITS                    => 'benefits',
+            ProductAttributeEnum::FORM_RELEASE                => 'form_release',
+            ProductAttributeEnum::VOLUME                      => 'volume',
+            ProductAttributeEnum::OPERATING_TEMPERATURE       => 'operating_temperature',
+            ProductAttributeEnum::SURFACE_TEMPERATURE         => 'surface_temperature',
+            ProductAttributeEnum::ROOM_TEMPERATURE            => 'room_temperature',
+            ProductAttributeEnum::ADHESION                    => 'adhesion',
+            ProductAttributeEnum::SERVICE_LIFE                => 'service_life',
+            ProductAttributeEnum::STORAGE_TERM                => 'store_terms',
+            ProductAttributeEnum::WARRANTY                    => 'warranty',
+            ProductAttributeEnum::PRODUCTION_TECHNOLOGY       => 'production_technology',
+            ProductAttributeEnum::MATERIAL_STRETCHING_PERCENT => 'material_stretching_percent',
+            ProductAttributeEnum::PROTECTIVE_LINER            => 'protective_liner',
+            ProductAttributeEnum::MASTER_QUALIFICATION        => 'master_qualification',
+            ProductAttributeEnum::COUNTRY_OF_MANUFACTURER     => 'country_manufacture',
+            ProductAttributeEnum::DEFAULT_QUANTITY            => 'default_quantity',
+            ProductAttributeEnum::QUANTITY_STEP               => 'quantity_step',
+            ProductAttributeEnum::MINIMUM_ORDER_QUANTITY      => 'min_order_quantity',
+            ProductAttributeEnum::STOCK_QUANTITY_1            => 'stock_quantity_1',
+            ProductAttributeEnum::STOCK_QUANTITY_2            => 'stock_quantity_2',
+            ProductAttributeEnum::STOCK_QUANTITY_3            => 'stock_quantity_3',
+            ProductAttributeEnum::UNDER_ORDER                 => 'under_order',
         ];
 
         return $fieldMap[$attributeId] ?? 'custom_' . $attributeId;
+    }
+
+	private function syncDetachedAttributes(Product $product, array $receivedExternalIds): void
+    {
+		$attached = $product->attributes()
+			->select('attributes.id', 'attributes.external_id', 'attributes.field_name')
+			->get();
+
+		// Детачим любые атрибуты, пришедшие из МС (имеют external_id), если их external_id нет в текущем вебхуке
+		$toDetachIds = $attached->filter(function ($attr) use ($receivedExternalIds) {
+			if (empty($attr->external_id)) {
+				return false; // локальные/пользовательские не трогаем
+			}
+			return !in_array($attr->external_id, $receivedExternalIds, true);
+		})->pluck('id')->all();
+
+        if (!empty($toDetachIds)) {
+            $product->attributes()->detach($toDetachIds);
+            Log::info('Удалены атрибуты, отсутствующие в текущем вебхуке', [
+                'product_id'             => $product->id,
+                'detached_attribute_ids' => $toDetachIds,
+            ]);
+        }
+    }
+
+    /**
+     * Проверка, является ли атрибут пунктом дополнительной галереи (Доп.галерея1..8)
+     */
+    private function isAdditionalGalleryAttribute(string $attributeName): bool
+    {
+        // Нормализуем пробелы и регистр
+        $normalized = mb_strtolower(trim($attributeName));
+        // Допускаем варианты с точкой и без после "Доп"
+        // Примеры: "Доп.галерея1", "Доп.галерея 2", "доп.галерея3"
+        if (!str_starts_with($normalized, 'доп.галерея')) {
+            return false;
+        }
+
+        // Извлекаем номер при наличии
+        $num = (int)preg_replace('/[^0-9]/u', '', $normalized);
+        return $num >= 1 && $num <= 8;
+    }
+
+    /**
+     * Сохранение изображения баннера по URL в коллекцию banner_images с дедупликацией
+     */
+    private function saveBannerImageFromUrl(Product $product, string $url, string $attributeName): void
+    {
+        try {
+            if (!filter_var($url, FILTER_VALIDATE_URL)) {
+                Log::warning('URL дополнительной галереи некорректен', [
+                    'product_id' => $product->id,
+                    'attribute'  => $attributeName,
+                    'url'        => $url,
+                ]);
+                return;
+            }
+
+            // Скачиваем файл
+            $response = Http::withHeaders(['Accept-Encoding' => 'gzip'])->get($url);
+            if (!$response->successful()) {
+                Log::warning('Не удалось скачать изображение дополнительной галереи', [
+                    'product_id' => $product->id,
+                    'attribute'  => $attributeName,
+                    'status'     => $response->status(),
+                ]);
+                return;
+            }
+
+            $content = $response->body();
+            if ($content === '' || $content === null) {
+                Log::warning('Пустой ответ при скачивании изображения дополнительной галереи', [
+                    'product_id' => $product->id,
+                    'attribute'  => $attributeName,
+                ]);
+                return;
+            }
+
+            $hash = md5($content);
+
+            // Дедупликация: проверяем по хешу или исходному URL в кастомных свойствах
+            $alreadyExists = $product->getMedia('banner_images')
+                ->first(function ($media) use ($hash, $url) {
+                    $sourceHash = $media->getCustomProperty('source_hash');
+                    $sourceUrl = $media->getCustomProperty('source_url');
+                    return ($sourceHash && $sourceHash === $hash) || ($sourceUrl && $sourceUrl === $url);
+                });
+
+            if ($alreadyExists) {
+                Log::info('Изображение из дополнительной галереи уже существует, пропуск', [
+                    'product_id' => $product->id,
+                    'attribute'  => $attributeName,
+                    'url'        => $url,
+                ]);
+                return;
+            }
+
+            // Определяем имя файла по URL или по хешу
+            $parsed = parse_url($url);
+            $filename = 'banner_' . ($parsed['path'] ?? 'image') . '_' . substr($hash, 0, 8) . '.jpg';
+            $filename = preg_replace('/[^a-zA-Z0-9_\-.]/', '_', $filename);
+
+            // Сохраняем в медиаколлекцию
+            $product
+                ->addMediaFromString($content)
+                ->usingFileName($filename)
+                ->withCustomProperties([
+                    'source_url'  => $url,
+                    'source_hash' => $hash,
+                    'source'      => 'webhook_additional_gallery',
+                    'attribute'   => $attributeName,
+                ])
+                ->toMediaCollection('banner_images');
+
+            Log::info('Изображение из дополнительной галереи сохранено', [
+                'product_id' => $product->id,
+                'attribute'  => $attributeName,
+                'url'        => $url,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Ошибка сохранения изображения из дополнительной галереи', [
+                'product_id' => $product->id,
+                'attribute'  => $attributeName,
+                'url'        => $url,
+                'error'      => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Получаем список URL из атрибутов Доп.галерея1..8
+     */
+    private function extractAdditionalGalleryUrls(array $attributes): array
+    {
+        $urls = [];
+        foreach ($attributes as $attribute) {
+            $name = $attribute['name'] ?? '';
+            if (!$name || !$this->isAdditionalGalleryAttribute($name)) {
+                continue;
+            }
+            $rawValue = $attribute['value'] ?? null;
+            $value = null;
+            if (is_array($rawValue) && isset($rawValue['name'])) {
+                $value = $rawValue['name'];
+            } elseif (is_string($rawValue)) {
+                $value = $rawValue;
+            }
+            if ($value && filter_var($value, FILTER_VALIDATE_URL)) {
+                $urls[] = $value;
+            }
+        }
+        // Уникальные
+        return array_values(array_unique($urls));
+    }
+
+    /**
+     * Удаляем из коллекции banner_images файлы, которые были добавлены из Доп.галерея, но более не присутствуют в атрибутах
+     */
+    private function syncBannerImagesFromGalleryUrls(Product $product, array $actualUrls): void
+    {
+        $actualSet = array_flip($actualUrls);
+        $deleted = 0;
+        foreach ($product->getMedia('banner_images') as $media) {
+            $source = $media->getCustomProperty('source');
+            $url = $media->getCustomProperty('source_url');
+            // Удаляем только те, что были добавлены нашим обработчиком и имеют исходный URL
+            if ($source === 'webhook_additional_gallery' && $url && !isset($actualSet[$url])) {
+                $media->delete();
+                $deleted++;
+            }
+        }
+        if ($deleted > 0) {
+            Log::info('Синхронизация banner_images: удалены устаревшие изображения', [
+                'product_id' => $product->id,
+                'deleted'    => $deleted,
+            ]);
+        }
     }
 
     /**
@@ -576,15 +880,15 @@ class ProductService
                         $product->update(['category_id' => end($categoryIds)]);
 
                         Log::info('Категория товара обновлена из вебхука', [
-                            'product_id' => $product->id,
+                            'product_id'    => $product->id,
                             'category_path' => $categoryPath,
-                            'category_id' => end($categoryIds)
+                            'category_id'   => end($categoryIds)
                         ]);
                     } catch (\Exception $e) {
                         Log::error('Ошибка обработки категории из вебхука', [
-                            'product_id' => $product->id,
+                            'product_id'    => $product->id,
                             'category_path' => $categoryPath,
-                            'error' => $e->getMessage()
+                            'error'         => $e->getMessage()
                         ]);
                     }
                 }
@@ -646,8 +950,9 @@ class ProductService
                     }
                 }
 
-                // Удаляем изображения, которых нет в МойСклад
+                    // Удаляем изображения, которых нет в МойСклад, ТОЛЬКО если в ответе есть хотя бы одно изображение
                 $deletedImagesCount = 0;
+                    if (count($imagesData['rows']) > 0) {
                 foreach ($existingImages as $media) {
                     $mediaHash = $media->getCustomProperty('moysklad_hash');
                     if ($mediaHash && !in_array($mediaHash, $moyskladHashes)) {
@@ -655,10 +960,15 @@ class ProductService
                         $deletedImagesCount++;
                         Log::info('Изображение удалено (отсутствует в МойСклад)', [
                             'product_id' => $product->id,
-                            'media_id' => $media->id,
-                            'hash' => $mediaHash
+                                    'media_id'   => $media->id,
+                                    'hash'       => $mediaHash
                         ]);
                     }
+                        }
+                    } else {
+                        Log::info('Удаление изображений пропущено: в ответе МойСклад нет изображений', [
+                            'product_id' => $product->id
+                        ]);
                 }
 
                 $updatedImagesCount = 0;
@@ -668,7 +978,7 @@ class ProductService
                 foreach ($imagesData['rows'] as $image) {
                     $downloadUrl = $image['meta']['downloadHref'] ?? null;
                     if ($downloadUrl && filter_var($downloadUrl, FILTER_VALIDATE_URL)) {
-                        // Проверяем, нужно ли обновлять изображение
+                            // Если такого хеша ещё нет — добавляем; если есть — просто пересетим порядок позже
                         if ($this->shouldUpdateImage($product, $downloadUrl, $existingHashes)) {
                             $this->handleImageUpdate($product, $downloadUrl, base64_encode(config('app.my_store.username') . ':' . config('app.my_store.password')), $imageIndex);
                             $updatedImagesCount++;
@@ -679,26 +989,45 @@ class ProductService
                     }
                 }
 
-                    Log::info('Изображения товара обработаны из вебхука', [
+                    // После добавления новых изображений — выравниваем порядок изображений согласно порядку МойСклад
+                    try {
+                        $currentMedia = $product->getMedia('images');
+                        foreach ($moyskladHashes as $idx => $hash) {
+                            $media = $currentMedia->first(function ($m) use ($hash) {
+                                return $m->getCustomProperty('moysklad_hash') === $hash;
+                            });
+                            if ($media && $media->order_column !== $idx) {
+                                $media->order_column = $idx;
+                                $media->save();
+                            }
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning('Не удалось выровнять порядок изображений', [
                         'product_id' => $product->id,
-                        'total_images' => count($imagesData['rows']),
-                        'updated_images' => $updatedImagesCount,
-                        'skipped_images' => $skippedImagesCount,
-                        'deleted_images' => $deletedImagesCount,
+                            'error'      => $e->getMessage(),
+                        ]);
+                    }
+
+                    Log::info('Изображения товара обработаны из вебхука', [
+                        'product_id'      => $product->id,
+                        'total_images'    => count($imagesData['rows']),
+                        'updated_images'  => $updatedImagesCount,
+                        'skipped_images'  => $skippedImagesCount,
+                        'deleted_images'  => $deletedImagesCount,
                         'existing_images' => $existingImages->count()
                     ]);
                 }
             } else {
                 Log::error('Ошибка получения изображений из вебхука', [
                     'product_id' => $product->id,
-                    'status' => $response->status(),
-                    'response' => $response->body()
+                    'status'     => $response->status(),
+                    'response'   => $response->body()
                 ]);
             }
         } catch (\Exception $e) {
             Log::error('Исключение при обработке изображений из вебхука', [
                 'product_id' => $product->id,
-                'error' => $e->getMessage()
+                'error'      => $e->getMessage()
             ]);
         }
     }
@@ -726,25 +1055,25 @@ class ProductService
                 // Проверяем, есть ли уже изображение с таким хешем у этого товара
                 if (in_array($hash, $existingHashes)) {
                     Log::info('Изображение не изменилось, пропускаем', [
-                        'product_id' => $product->id,
-                        'hash' => $hash,
+                        'product_id'   => $product->id,
+                        'hash'         => $hash,
                         'download_url' => $downloadUrl
                     ]);
                     return false;
                 }
 
                 Log::info('Изображение изменилось, обновляем', [
-                    'product_id' => $product->id,
-                    'hash' => $hash,
+                    'product_id'   => $product->id,
+                    'hash'         => $hash,
                     'download_url' => $downloadUrl
                 ]);
                 return true;
             }
         } catch (\Exception $e) {
             Log::warning('Ошибка проверки изображения, скачиваем', [
-                'product_id' => $product->id,
+                'product_id'   => $product->id,
                 'download_url' => $downloadUrl,
-                'error' => $e->getMessage()
+                'error'        => $e->getMessage()
             ]);
         }
 
@@ -765,14 +1094,14 @@ class ProductService
 
            foreach ($attributes as $attribute) {
                if ($attribute->id === ProductAttributeEnum::SITE) {
-                   if ($attribute->value->name === 'так'){
+                    if ($attribute->value->name === 'так') {
                        // Проверяем, существует ли продукт
                        $existingProduct = Product::where('external_id', $parseData->id)->first();
                        $isNewProduct = !$existingProduct;
 
                        if ($isNewProduct) {
                            $product = Product::create([
-                               'external_id' => $parseData->id,
+                                'external_id'   => $parseData->id,
                                'external_code' => $parseData->externalCode,
                                'code'          => $parseData->code,
                                'article'       => $parseData->article ?? null,
@@ -781,7 +1110,7 @@ class ProductService
                                    'uk' => $parseData->name ?? '',
                                    'en' => $parseData->name ?? '',
                                ],
-                               'descriptions'   => [
+                                'descriptions'  => [
                                    'ru' => $parseData->description ?? '',
                                    'uk' => $parseData->description ?? '',
                                    'en' => $parseData->description ?? '',
@@ -790,7 +1119,7 @@ class ProductService
 
                            Log::info("Создан новый продукт", [
                                'external_id' => $parseData->id,
-                               'code' => $parseData->code
+                                'code'        => $parseData->code
                            ]);
                        } else {
                            // Старый продукт - обновляем только UK локализацию
@@ -802,14 +1131,14 @@ class ProductService
                                'name'          => [
                                    'uk' => $parseData->name ?? $product->getTranslation('name', 'uk'),
                                ],
-                               'descriptions'   => [
+                                'descriptions'  => [
                                    'uk' => $parseData->description ?? $product->getTranslation('descriptions', 'uk'),
                                ],
                            ]);
 
                            Log::info("Обновлен существующий продукт (только UK)", [
                                'external_id' => $parseData->id,
-                               'code' => $parseData->code
+                                'code'        => $parseData->code
                            ]);
                        }
 
@@ -822,14 +1151,13 @@ class ProductService
                        $product->save();
 
                        $this->processPrices($parseData->salePrices, $product);
-                   }
-                   else{
+                    } else {
                        return;
                    }
                }
            }
 
-           if (!$product){
+            if (!$product) {
                return;
            }
 
@@ -881,12 +1209,14 @@ class ProductService
                 $hasGallery = true;
             }
 
-            if ($hasGallery){
-                $product->update(['banner_title' => [
+            if ($hasGallery) {
+                $product->update([
+                    'banner_title' => [
                     'en' => 'Look at how this film will look on the car',
                     'uk' => 'Подивіться, як виглядатиме ця плівка на автомобілі',
                     'ru' => 'Посмотрите, как будет выглядеть эта пленка на автомобиле'
-                ]]);
+                    ]
+                ]);
             }
         }
     }
@@ -912,7 +1242,7 @@ class ProductService
                     'external_id'   => $salePrice['priceType']['id'] ?? null,
                     'name'          => $salePrice['priceType']['name'] ?? 'Unknown',
                     'external_code' => $salePrice['priceType']['externalCode'] ?? null,
-                    'price'         => (int) ($salePrice['value'] ?? 0),
+                    'price'         => (int)($salePrice['value'] ?? 0),
                     'product_id'    => $product->id,
                 ];
             }, $salePrices);
@@ -923,7 +1253,7 @@ class ProductService
                     'external_id'   => $salePrice->priceType->id,
                     'name'          => $salePrice->priceType->name,
                     'external_code' => $salePrice->priceType->externalCode,
-                    'price'         => (int) $salePrice->value,
+                    'price'         => (int)$salePrice->value,
                     'product_id'    => $product->id,
                 ];
             }, $salePrices);
@@ -941,8 +1271,8 @@ class ProductService
 
             ProductPrice::query()->updateOrCreate(
                 [
-                    'type_id'       => $priceType->id,
-                    'product_id'    => $product->id,
+                    'type_id'    => $priceType->id,
+                    'product_id' => $product->id,
                 ],
                 ['price' => $priceData['price'] / 100]
             );
@@ -982,7 +1312,7 @@ class ProductService
         try {
         foreach ($parts as $part) {
 
-           $createSlug =  Str::slug($part);
+                $createSlug = Str::slug($part);
             // Проверяем, существует ли категория с таким именем на всех языках (украинском, английском, русском)
             $category = Category::query()
                 ->whereJsonContains('slug->uk', $createSlug)
@@ -993,7 +1323,7 @@ class ProductService
             // Если категория не найдена, создаем новую
             if (!$category) {
                 $category = Category::create([
-                    'name' => [
+                        'name'      => [
                         'uk' => $part,
                         'en' => $part,
                         'ru' => $part,
@@ -1131,6 +1461,7 @@ class ProductService
             }
         }
     }
+
 
     /**
      * @param $attributes
@@ -1284,7 +1615,7 @@ class ProductService
     {
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::PURPOSE) {
-                $this->saveProductAttribute($attribute, $product,'purpose');
+                $this->saveProductAttribute($attribute, $product, 'purpose');
             }
         }
     }
@@ -1310,7 +1641,7 @@ class ProductService
     {
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::BENEFITS) {
-                $this->saveProductAttribute($attribute, $product,'benefits');
+                $this->saveProductAttribute($attribute, $product, 'benefits');
             }
         }
     }
@@ -1323,7 +1654,7 @@ class ProductService
     {
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::MATERIAL) {
-                $this->saveProductAttribute($attribute, $product,'material');
+                $this->saveProductAttribute($attribute, $product, 'material');
             }
         }
     }
@@ -1336,10 +1667,11 @@ class ProductService
     {
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::STRUCTURE) {
-                $this->saveProductAttribute($attribute, $product,'structure');
+                $this->saveProductAttribute($attribute, $product, 'structure');
             }
         }
     }
+
     /**
      * @param $attributes
      * @param $product
@@ -1348,10 +1680,11 @@ class ProductService
     {
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::WIDTH_M) {
-                $this->saveProductAttribute($attribute, $product,'width');
+                $this->saveProductAttribute($attribute, $product, 'width');
             }
         }
     }
+
     /**
      * @param $attributes
      * @param $product
@@ -1360,7 +1693,7 @@ class ProductService
     {
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::APPLICATION_METHOD) {
-                $this->saveProductAttribute($attribute, $product,'application_method');
+                $this->saveProductAttribute($attribute, $product, 'application_method');
             }
         }
     }
@@ -1373,7 +1706,7 @@ class ProductService
     {
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::SURFACE_TEMPERATURE) {
-                $this->saveProductAttribute($attribute, $product,'surface_temperature');
+                $this->saveProductAttribute($attribute, $product, 'surface_temperature');
             }
         }
     }
@@ -1387,7 +1720,7 @@ class ProductService
     {
         foreach ($attributes as $attribute) {
             if ($attribute->id === ProductAttributeEnum::OPERATING_TEMPERATURE) {
-                $this->saveProductAttribute($attribute, $product,'operating_temperature');
+                $this->saveProductAttribute($attribute, $product, 'operating_temperature');
             }
         }
     }
@@ -1503,7 +1836,8 @@ class ProductService
      */
     protected function saveProductAttribute($attribute, $product, $name): void
     {
-        $productAttribute = Attribute::updateOrCreate(
+        // Сохраняем/обновляем атрибут, не перетирая ru/en для name
+        $productAttribute = Attribute::firstOrCreate(
             ['external_id' => $attribute->id],
             [
                 'field_name' => $name,
@@ -1514,44 +1848,31 @@ class ProductService
                 ],
             ]
         );
+        try {
+            $names = method_exists($productAttribute, 'getTranslations')
+                ? ($productAttribute->getTranslations('name') ?? [])
+                : ($productAttribute->name ?? []);
+            if (!is_array($names)) { $names = []; }
+            $names['uk'] = $attribute->name;
+            $productAttribute->update(['name' => $names, 'field_name' => $name]);
+        } catch (\Throwable $e) {
+            $productAttribute->update(['name' => ['uk' => $attribute->name], 'field_name' => $name]);
+        }
 
         $existingPivot = $product->attributes()->where('attribute_id', $productAttribute->id)->first();
 
         if ($existingPivot) {
-            if (is_object($attribute->value)){
-                $product->attributes()->updateExistingPivot($productAttribute->id, [
-                    'value' => [
-                        'uk' => $attribute->value?->name,
-                        'ru' => $attribute->value?->name,
-                        'en' => $attribute->value?->name,
-                    ]
-                ]);
-            }
-            else{
-                $product->attributes()->updateExistingPivot($productAttribute->id, [
-                    'value' => [
-                        'uk' => $attribute->value,
-                        'ru' => $attribute->value,
-                        'en' => $attribute->value,
-                    ]
-                ]);
-            }
-        } else if (is_object($attribute->value)){
+            $currentVal = $existingPivot->pivot->value;
+            if (!is_array($currentVal)) { $currentVal = ['uk' => (string) $currentVal]; }
+            $currentVal['uk'] = is_object($attribute->value) ? ($attribute->value?->name ?? '') : $attribute->value;
+            $product->attributes()->updateExistingPivot($productAttribute->id, ['value' => $currentVal]);
+        } else if (is_object($attribute->value)) {
             $product->attributes()->attach($productAttribute->id, [
-                'value' => [
-                    'uk' => $attribute->value?->name,
-                    'ru' => $attribute->value?->name,
-                    'en' => $attribute->value?->name,
-                ]
+                'value' => [ 'uk' => $attribute->value?->name ]
             ]);
-        }
-        else{
+        } else {
             $product->attributes()->attach($productAttribute->id, [
-                'value' => [
-                    'uk' => $attribute->value,
-                    'ru' => $attribute->value,
-                    'en' => $attribute->value,
-                ]
+                'value' => [ 'uk' => $attribute->value ]
             ]);
         }
     }
@@ -1596,10 +1917,10 @@ class ProductService
                     // $conversion->performOnMedia($mediaItem);
                     
                     Log::info('Конверсия создана', [
-                        'product_id' => $product->id,
-                        'media_id' => $mediaItem->id,
+                        'product_id'      => $product->id,
+                        'media_id'        => $mediaItem->id,
                         'conversion_name' => $conversionName,
-                        'file_name' => $mediaItem->file_name
+                        'file_name'       => $mediaItem->file_name
                     ]);
                 }
             }
@@ -1608,20 +1929,21 @@ class ProductService
             $mediaItem->refresh();
             
             Log::info('Конверсии сгенерированы для изображения', [
-                'product_id' => $product->id,
-                'media_id' => $mediaItem->id,
-                'file_name' => $mediaItem->file_name,
+                'product_id'            => $product->id,
+                'media_id'              => $mediaItem->id,
+                'file_name'             => $mediaItem->file_name,
                 'generated_conversions' => $mediaItem->getGeneratedConversions()->keys()->toArray()
             ]);
             
         } catch (\Exception $e) {
             Log::error('Ошибка генерации конверсий', [
                 'product_id' => $product->id,
-                'media_id' => $mediaItem->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'media_id'   => $mediaItem->id,
+                'error'      => $e->getMessage(),
+                'trace'      => $e->getTraceAsString()
             ]);
         }
     }
+
 
 }

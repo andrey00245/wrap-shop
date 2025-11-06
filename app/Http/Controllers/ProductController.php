@@ -213,7 +213,8 @@ class ProductController extends Controller
         if (request()->get('in_stock')) {
             $products = $products->where('stock', '>', 0)
                 ->whereDoesntHave('attributes', function ($subQ) {
-                    $subQ->where('field_name', 'under_order');
+                    $subQ->where('field_name', 'under_order')
+                        ->where('value', 'так');
                 });
         }
 

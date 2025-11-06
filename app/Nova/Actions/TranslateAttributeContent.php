@@ -27,12 +27,20 @@ class TranslateAttributeContent extends Action
                     return Action::danger("Відсутні початкові дані для перекладу у атрибуту #{$attribute->id}");
                 }
 
-                // Переводим название атрибута
-                $attribute->name = [
-                    'uk' => $originalName, // Оригинальное название на украинском
-                    'ru' => $translator->translate($originalName, 'русский'),
-                    'en' => $translator->translate($originalName, 'английский'),
-                ];
+                // Переводим название атрибута, но если это брендоподобное имя — не трогаем (редкий кейс)
+                if ($this->shouldSkipTranslation($originalName)) {
+                    $attribute->name = [
+                        'uk' => $originalName,
+                        'ru' => $originalName,
+                        'en' => $originalName,
+                    ];
+                } else {
+                    $attribute->name = [
+                        'uk' => $originalName,
+                        'ru' => $translator->translate($originalName, 'русский'),
+                        'en' => $translator->translate($originalName, 'английский'),
+                    ];
+                }
 
                 $attribute->save();
 
@@ -44,5 +52,19 @@ class TranslateAttributeContent extends Action
         }
 
         return Action::message('Переклад атрибутів виконано');
+    }
+
+    private function shouldSkipTranslation($text): bool
+    {
+        if (!is_string($text)) return true;
+        $trimmed = trim($text);
+        if ($trimmed === '') return true;
+        if (preg_match('/^[A-Za-z0-9 .\-\_\+\&\/#]+$/u', $trimmed)) {
+            return true;
+        }
+        if (preg_match('/^[A-Z0-9\-\_]+$/', $trimmed)) {
+            return true;
+        }
+        return false;
     }
 }

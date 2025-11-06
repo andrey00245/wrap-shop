@@ -16,30 +16,30 @@ try {
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    
+
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $error = curl_error($ch);
     curl_close($ch);
-    
+
     echo "HTTP код: $httpCode\n";
     echo "Ошибка: " . ($error ?: 'Нет') . "\n";
-    
+
     if ($httpCode >= 200 && $httpCode < 300) {
         $decodedResponse = gzdecode($response);
         if ($decodedResponse === false) {
             $decodedResponse = $response;
         }
-        
+
         $data = json_decode($decodedResponse, true);
-        
+
         if (isset($data['meta']['size'])) {
             echo "Всего товаров: {$data['meta']['size']}\n";
         }
-        
+
         if (isset($data['rows'])) {
             echo "Товаров в ответе: " . count($data['rows']) . "\n";
-            
+
             if (count($data['rows']) > 0) {
                 echo "\nПервый товар:\n";
                 $firstProduct = $data['rows'][0];

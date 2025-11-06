@@ -185,6 +185,9 @@ class WebhookController extends Controller
         if ($productData) {
             // Синхронизируем товар
             $this->syncProduct($productData);
+            
+            // Синхронизируем сток товара
+            $this->productService->syncProductStock($entityId);
         }
     }
 
@@ -201,6 +204,9 @@ class WebhookController extends Controller
         if ($productData) {
             // Синхронизируем товар
             $this->syncProduct($productData);
+            
+            // Синхронизируем сток товара
+            $this->productService->syncProductStock($entityId);
         }
     }
 

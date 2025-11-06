@@ -17,6 +17,7 @@ return [
   'subscribe' => 'Оформіть підписку та будьте в темі!',
   'subscribe_btn' => 'Відправити',
   'all_rights_reserved' => 'Всі права захищені. © :year',
+  'films_in_other_cities' => 'Плівки в інших містах',
 
   'home' => 'Головна'
 

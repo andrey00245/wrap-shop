@@ -194,37 +194,37 @@ class Product extends Model implements HasMedia
     public function registerMediaConversions(?Media $media = null): void
     {
         $conversions = MediaConversions::getConversionsConfig();
-        
+
         foreach ($conversions as $conversionName => $config) {
             $conversion = $this->addMediaConversion($conversionName);
-            
+
             if ($config['width'] && $config['height']) {
                 $conversion->width($config['width'])->height($config['height']);
             }
-            
+
             if ($config['quality']) {
                 $conversion->quality($config['quality']);
             }
-            
+
             if ($config['sharpen']) {
                 $conversion->sharpen($config['sharpen']);
             }
-            
+
             if ($config['format']) {
                 $conversion->format($config['format']);
             }
-            
+
             // Используем contain для правильного масштабирования без искажений
             if (isset($config['fit'])) {
                 $conversion->fit(Fit::Contain);
             }
-            
+
             $conversion->optimize();
-            
+
             foreach ($config['collections'] as $collection) {
                 $conversion->performOnCollections($collection);
             }
-            
+
             $conversion->nonQueued();
         }
     }
@@ -292,7 +292,7 @@ class Product extends Model implements HasMedia
                 return $media->getUrl($conversion);
             }
         }
-        
+
         return $this->getFirstMediaUrl('images');
     }
 
@@ -304,18 +304,18 @@ class Product extends Model implements HasMedia
             if ($media->hasGeneratedConversion('preview_webp')) {
                 return $media->getUrl('preview_webp');
             }
-            
+
             // Если preview_webp нет, пробуем gallery
             if ($media->hasGeneratedConversion('gallery')) {
                 return $media->getUrl('gallery');
             }
-            
+
             // Если gallery нет, пробуем preview
             if ($media->hasGeneratedConversion('preview')) {
                 return $media->getUrl('preview');
             }
         }
-        
+
         return $this->getFirstMediaUrl('images');
     }
 
@@ -410,7 +410,8 @@ class Product extends Model implements HasMedia
             if ($request->filled('in_stock')) {
                 $productsQuery = $productsQuery->where('stock', '>', 0)
                      ->whereDoesntHave('attributes', function ($subQ) {
-                            $subQ->where('field_name', 'under_order');
+                            $subQ->where('field_name', 'under_order')
+                                ->where('value', 'так');
                         });
             }
 
@@ -818,7 +819,7 @@ class Product extends Model implements HasMedia
         $productAttributes = $this->products_attributes()->get();
         foreach ($productAttributes as $attribute) {
             $value = $attribute->value;
-            
+
             // Если значение не является массивом (не переведено), пропускаем
             if (!is_array($value)) {
                 continue;

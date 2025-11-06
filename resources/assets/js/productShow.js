@@ -145,33 +145,66 @@ $(document).ready(function () {
     }
 
     function recalcTotalPrice(newVal) {
-        for (const key in discounts) {
-            if (discounts.hasOwnProperty(key)) {
-                const item = discounts[key];
-                if (discounts.length === 1) {
-                    textDiscount.hide()
-                }
+        // Нормализуем в массив в правильном порядке по ключам 0,1,2...
+        const tiers = Object.keys(discounts)
+            .sort((a, b) => parseInt(a) - parseInt(b))
+            .map(k => discounts[k]);
 
-                if (key != 0) {
-                    const prevItem = discounts[key - 1];
-                    if (newVal < item.discountFrom && newVal >= prevItem.discountFrom) {
-                        countForDiscont.text((item.discountFrom - newVal).toFixed(1))
-                        savingVal.text(item.discountFrom * prevItem.price - item.discountFrom * item.price)
-                    }
-                    if (newVal >= item.discountFrom) {
-                        textDiscount.hide()
-                    } else {
-                        textDiscount.show()
-                    }
-                }
-                if (newVal >= item.discountFrom) {
-                    price.text(item.price.toFixed(2))
-                    $('.autocalc-product-price .total-price').text((item.price * newVal).toFixed(2));
+        if (!Array.isArray(tiers) || tiers.length === 0) {
+            textDiscount.hide();
+            return;
+        }
 
-                    restyleThreeLastChart('.price-wrap .only-price');
-                    restyleThreeLastChart('.autocalc-product-price .total-price-main');
-                }
+        // Находим текущий активный уровень (максимальный discountFrom <= newVal)
+        let currentIdx = 0;
+        for (let i = 0; i < tiers.length; i++) {
+            if (newVal >= parseFloat(tiers[i].discountFrom)) {
+                currentIdx = i;
             }
+        }
+        const currentTier = tiers[currentIdx];
+        const nextTier = tiers[currentIdx + 1];
+
+        // Обновляем цену за ед. и сумму по текущему уровню
+        const unitPrice = parseFloat(currentTier.price);
+        price.text(unitPrice.toFixed(2));
+        $('.autocalc-product-price .total-price').text((unitPrice * newVal).toFixed(2));
+        restyleThreeLastChart('.price-wrap .only-price');
+        restyleThreeLastChart('.autocalc-product-price .total-price-main');
+
+        // Обновляем текст о следующей скидке, если она реально существует и даёт экономию
+        if (nextTier) {
+            const threshold = parseFloat(nextTier.discountFrom);
+            const nextPrice = parseFloat(nextTier.price);
+            const maxVal = parseFloat(quantityInput.data('max'));
+            const left = threshold - newVal;
+            
+            // Если уже достигли/перешли порог — сразу скрываем сообщение
+            if (left <= 1e-9) {
+                textDiscount.hide();
+                return;
+            }
+            
+            // Если порог скидки недостижим (больше максимального количества) — не показываем
+            if (maxVal > 0 && threshold > maxVal) {
+                textDiscount.hide();
+                return;
+            }
+            
+            const potentialSaving = threshold * (unitPrice - nextPrice);
+
+            if (potentialSaving > 0) {
+                // показываем только если есть реальная экономия
+                const leftDisplay = (left % 1 === 0) ? left.toFixed(0) : left.toFixed(1);
+                countForDiscont.text(leftDisplay);
+                savingVal.text(potentialSaving.toFixed(2));
+                textDiscount.show();
+            } else {
+                textDiscount.hide();
+            }
+        } else {
+            // Следующего уровня нет — скрываем
+            textDiscount.hide();
         }
     }
 

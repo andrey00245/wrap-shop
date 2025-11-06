@@ -65,6 +65,12 @@ class News extends Model implements HasMedia
               ->height(201)
               ->format('webp')
               ->nonQueued();
+
+          $this
+              ->addMediaConversion('preview')
+              ->width(683)
+              ->height(201)
+              ->nonQueued();
       }
 
     public function registerMediaCollections(): void

@@ -28,6 +28,7 @@ class IndexController extends Controller
             ->orderBy('sort_order','asc')->get();
 
         $products = Product::query()
+            ->where('is_active', 1)
             ->whereHas('media')
             ->whereHas('category')
             ->with(['media'])

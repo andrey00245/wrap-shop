@@ -16,7 +16,7 @@ class RecreateProductMedia extends Command
     public function handle()
     {
         $limit = $this->option('limit');
-        
+
         $this->info("🔄 Пересоздание медиа для продуктов (лимит: {$limit})");
 
         // 1. Удаляем ВСЮ медиа продуктов из БД и файлы
@@ -71,7 +71,7 @@ class RecreateProductMedia extends Command
     {
         // Получаем все медиа продуктов
         $productMedia = Media::where('model_type', Product::class)->get();
-        
+
         $this->info("Найдено медиа файлов продуктов: {$productMedia->count()}");
 
         $deletedFiles = 0;

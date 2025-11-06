@@ -25,14 +25,14 @@ try {
 
     if ($response->successful()) {
         $product = $response->json();
-        
+
         echo "Товар найден:\n";
         echo "ID: {$product['id']}\n";
         echo "Название: {$product['name']}\n";
         echo "Артикул: " . ($product['article'] ?? 'не указан') . "\n";
         echo "Обновлен: " . ($product['updated'] ?? 'не указано') . "\n";
         echo "Активен: " . ($product['archived'] ? 'Нет' : 'Да') . "\n";
-        
+
         if (isset($product['attributes'])) {
             echo "\nАтрибуты (" . count($product['attributes']) . " шт.):\n";
             $hasSiteAttribute = false;
@@ -48,7 +48,7 @@ try {
                 } else {
                     echo "    Значение: не указано\n";
                 }
-                
+
                 // Проверяем атрибут "Сайт"
                 if (isset($attribute['id']) && $attribute['id'] === '10726') {
                     $hasSiteAttribute = true;
@@ -56,7 +56,7 @@ try {
                 }
                 echo "\n";
             }
-            
+
             if (!$hasSiteAttribute) {
                 echo "❌ Атрибут 'Сайт' (ID: 10726) НЕ НАЙДЕН\n";
             } else {
@@ -65,7 +65,7 @@ try {
         } else {
             echo "\n❌ У товара нет атрибутов\n";
         }
-        
+
     } else {
         echo "❌ Ошибка получения товара! Статус: " . $response->status() . "\n";
         echo "Ответ: " . $response->body() . "\n";

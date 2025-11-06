@@ -12,7 +12,7 @@
                             <td class="image"><a
                                     href="{{route('products.show', ['product' => $product->slugEn])}}"><img
                                         loading="lazy"
-                                        src="{{$product->getMedia('images')[0]->getUrl('preview_webp')}}"
+                                        src="{{ optional($product->getMedia('images')->first())->getUrl('preview_webp') ?? asset('assets/img/no-image.png') }}"
                                         alt="{{$product->name}}"
                                         title="{{$product->name}}" class="img-thumbnail"></a></td>
                             <td class="name"><span class="cat">{{$product->category->name}}</span><a

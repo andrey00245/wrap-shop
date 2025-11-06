@@ -14,7 +14,7 @@ class CleanImageMetadata extends Command
     public function handle()
     {
         $limit = $this->option('limit');
-        
+
         $this->info("🧹 Очистка метаданных изображений (лимит: {$limit})");
 
         $mediaFiles = Media::whereIn('mime_type', [
@@ -61,19 +61,19 @@ class CleanImageMetadata extends Command
     protected function cleanImageMetadata($media): void
     {
         $filePath = $media->getPath();
-        
+
         if (!File::exists($filePath)) {
             return;
         }
 
         // Используем ImageMagick для очистки метаданных
         $command = "convert '{$filePath}' -strip '{$filePath}'";
-        
+
         $output = [];
         $returnCode = 0;
-        
+
         exec($command, $output, $returnCode);
-        
+
         if ($returnCode === 0) {
             $this->line("\n✅ Очищены метаданные для {$media->file_name}");
         } else {

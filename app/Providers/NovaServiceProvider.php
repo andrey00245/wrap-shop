@@ -97,6 +97,10 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 				MenuItem::externalLink('Виконати команди', '/nova-vendor/command-runner'),
 			])->icon('terminal')->collapsable(),
 
+			MenuSection::make('Генератор фідів', [
+				MenuItem::externalLink('Генератор фідів', '/nova-tools/feed-generator'),
+			])->icon('document-text')->collapsable(),
+
 	];
 });
 

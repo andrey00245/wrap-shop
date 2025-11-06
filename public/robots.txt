@@ -1,2 +1,15 @@
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
 User-agent: *
-Disallow: /
+Disallow: /nova
+Disallow: /admin
+Disallow: /account
+Disallow: /cart
+Disallow: /checkout
+Allow: /
+
+Sitemap: https://wrap.shop/sitemap.xml

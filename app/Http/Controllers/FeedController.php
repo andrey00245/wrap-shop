@@ -13,7 +13,7 @@ class FeedController extends Controller
     private static $categoryMappingCache = null;
 
     /**
-     * Загрузка JSON маппинга категорий (с кешированием)
+     * Завантаження JSON-мапи категорій (з кешуванням)
      */
     private function loadCategoryMapping(): ?array
     {
@@ -41,7 +41,7 @@ class FeedController extends Controller
     }
 
     /**
-     * Поиск соответствия категории в JSON
+     * Пошук відповідності категорії в JSON-мапі
      */
     private function findMappingByCategoryId(int $categoryId, ?array $mapping = null): ?array
     {
@@ -57,12 +57,12 @@ class FeedController extends Controller
     }
 
     /**
-     * Получение Google Product Category ID
+     * Отримання Google Product Category ID
      */
     private function getGoogleProductCategoryId(Category $category): string
     {
         $mapping = $this->loadCategoryMapping();
-        if (!$mapping) return '3680';
+        if (!$mapping) return '3680'; // fallback
 
         $found = $this->findMappingByCategoryId($category->id, $mapping);
         if ($found && isset($found['google_category_id'])) {
@@ -80,18 +80,20 @@ class FeedController extends Controller
     }
 
     /**
-     * Генерация XML для массива продуктов
+     * Генерація XML для масиву продуктів
      */
     private function generateFeedXml($products, string $feedTitle): string
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
 
+        // Створення <rss>
         $rss = $dom->createElement('rss');
         $rss->setAttribute('version', '2.0');
         $rss->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:g', 'http://base.google.com/ns/1.0');
         $dom->appendChild($rss);
 
+        // Створення <channel>
         $channel = $dom->createElement('channel');
         $rss->appendChild($channel);
 
@@ -102,6 +104,7 @@ class FeedController extends Controller
         $channel->appendChild($dom->createElementNS('http://base.google.com/ns/1.0', 'g:target_country', 'UA'));
         $channel->appendChild($dom->createElementNS('http://base.google.com/ns/1.0', 'g:currency', 'UAH'));
 
+        // Товари
         foreach ($products as $product) {
             $item = $dom->createElement('item');
             $channel->appendChild($item);
@@ -109,9 +112,25 @@ class FeedController extends Controller
             $category = $product->category ?? new Category();
             $googleCategoryId = $this->getGoogleProductCategoryId($category);
 
-            $title = $product->getTranslation('name', app()->getLocale()) ?? $product->name;
+            $title = $product->getTranslation('name', app()->getLocale()) ?? ($product->name ?? '');
             $description = Str::limit(strip_tags($product->getTranslation('descriptions', app()->getLocale()) ?? ''), 500);
 
+            // Формуємо шлях категорій
+            $categoryParts = [];
+            if ($category && $category->id) {
+                $current = $category;
+                while ($current) {
+                    $categoryParts[] = is_array($current->name)
+                        ? ($current->name['uk'] ?? $current->name['ru'] ?? $current->name['en'] ?? '')
+                        : (string)$current->name;
+                    $current = $current->parent ?? null;
+                }
+            }
+            $productType = implode(' > ', array_reverse(array_filter($categoryParts)));
+
+            $modelNumber = $product->article ?? ($product->code ?? null);
+
+            // Упрощений хелпер для додавання тегів
             $append = function ($name, $value, $useCdata = true) use ($dom, $item) {
                 if ($value !== null && $value !== '') {
                     $el = $dom->createElementNS('http://base.google.com/ns/1.0', $name);
@@ -124,24 +143,31 @@ class FeedController extends Controller
                 }
             };
 
+            // Формування структури item
             $append('g:id', (string)$product->id);
             $append('g:title', $title);
             $append('g:description', $description);
             $append('g:link', route('products.show', ['product' => $product->slugEn]));
             $append('g:image_link', $product->getImage());
-            $append('g:availability', $product->stock > 0 ? 'in_stock' : 'out_of_stock');
-            $append('g:condition', 'new');
-            $append('g:price', number_format($product->getPrice(), 2, '.', '') . ' UAH');
+            $append('g:availability', $product->stock > 0 ? 'in stock' : 'out of stock', false);
+            $append('g:condition', 'new', false);
+            $append('g:price', number_format($product->getPrice(), 2, '.', '') . ' UAH', false);
             $append('g:google_product_category', $googleCategoryId);
-            $append('g:product_type', $category->name ?? 'Інше');
+            $append('g:product_type', $productType ?: 'Інше');
             $append('g:brand', $product->getBrand() ?? 'Wrap Shop');
+            $append('g:identifier_exists', 'false', false);
+
+            if ($modelNumber) {
+                $append('g:model_number', (string)$modelNumber);
+            }
         }
 
-        return $dom->saveXML();
+        // Додаємо заголовок XML перед поверненням
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" . $dom->saveXML($dom->documentElement);
     }
 
     /**
-     * Фид для всех категорий
+     * Фід для всіх категорій
      */
     public function remarketingAllCategories()
     {
@@ -166,7 +192,7 @@ class FeedController extends Controller
     }
 
     /**
-     * Фид для одной категории
+     * Фід для однієї категорії
      */
     public function remarketingByCategory(Request $request)
     {

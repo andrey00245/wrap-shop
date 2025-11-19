@@ -29,7 +29,8 @@
         "spatie/laravel-sitemap": "^7.3",
         "tooyz/moysklad": "^0.7.3",
         "wayforpay/php-sdk": "^1.0",
-        "wesselperik/nova-status-field": "^2.1"
+        "wesselperik/nova-status-field": "^2.1",
+      "ext-dom": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

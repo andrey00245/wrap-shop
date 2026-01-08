@@ -15,6 +15,7 @@ mix.sass('resources/assets/scss/style-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/social-login-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-information-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-blog-dark.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/style-implementations.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/account-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-category-dark.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/all-dark.scss', 'public/build/css').version();

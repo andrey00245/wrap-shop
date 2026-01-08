@@ -5,3 +5,5 @@ return [
 <p>We work with various car brands and use only the best materials to achieve the perfect result.</p>',
     'no_implementations' => 'Currently there are no available implementations.'
 ];
+
+

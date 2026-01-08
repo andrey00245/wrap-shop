@@ -118,7 +118,6 @@
                     </div>
                 @endif
 
-
                 <div id="product-slider" class="splide product-images-slider">
                     <div class="splide__track">
                         <ul class="splide__list">

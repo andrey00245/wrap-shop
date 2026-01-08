@@ -43,7 +43,9 @@ class ProductController extends Controller
                         ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
                 })->where('price', '>', 0);
             })
-            ->whereHas('media')
+            ->whereHas('media', function ($query) {
+                $query->where('collection_name', 'images');
+            })
             ->whereHas('category')
             ->with(['media'])
             ->paginate(6);
@@ -153,6 +155,7 @@ class ProductController extends Controller
         ]);
 
         $currentCategory = $subsubcategory ?? $subcategory ?? $category;
+        $categoryBreadcrumbs = $this->buildCategoryBreadcrumbs($currentCategory);
 
         // Получаем вложенные ID
         $categories = $currentCategory->children()->exists()
@@ -184,7 +187,9 @@ class ProductController extends Controller
             ->where('price_types.external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
             ->where('product_prices.price', '>', 0)
             ->whereIn('category_id', $categories)
-            ->whereHas('media')
+            ->whereHas('media', function ($query) {
+                $query->where('collection_name', 'images');
+            })
             ->select('products.*', DB::raw('MAX(product_prices.price) as price'))
             ->groupBy('products.id',
                 'products.code',
@@ -289,7 +294,58 @@ class ProductController extends Controller
             'step' => $step,
             'attributes' => $attributes->flatten()->unique('field_name') ?? collect(),
             'responseArray' => $responseArray,
+            'categoryBreadcrumbs' => $categoryBreadcrumbs,
         ]);
+    }
+
+    protected function buildCategoryBreadcrumbs(Category $currentCategory): array
+    {
+        $chain = [];
+        $cursor = $currentCategory;
+
+        while ($cursor) {
+            $chain[] = $cursor;
+            $cursor = $cursor->parent;
+        }
+
+        $chain = array_reverse($chain);
+        $parameterMap = ['category', 'subcategory', 'subsubcategory'];
+        $breadcrumbs = [];
+
+        foreach ($chain as $index => $category) {
+            $routeParams = [];
+
+            foreach (range(0, $index) as $position) {
+                if (! isset($parameterMap[$position]) || ! isset($chain[$position])) {
+                    continue;
+                }
+
+                $routeParams[$parameterMap[$position]] = $this->resolveCategorySlugForRoute($chain[$position]);
+            }
+
+            $breadcrumbs[] = [
+                'name' => $this->resolveCategoryNameForLocale($category),
+                'url' => route('products.category', $routeParams),
+            ];
+        }
+
+        return $breadcrumbs;
+    }
+
+    protected function resolveCategorySlugForRoute(Category $category): string
+    {
+        $locale = App::getLocale();
+        $slug = $category->getTranslation('slug', $locale);
+
+        return $slug ?: $category->slugEn;
+    }
+
+    protected function resolveCategoryNameForLocale(Category $category): string
+    {
+        $locale = App::getLocale();
+        $name = $category->getTranslation('name', $locale);
+
+        return $name ?: $category->name;
     }
 
     /**

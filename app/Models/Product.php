@@ -85,6 +85,7 @@ class Product extends Model implements HasMedia
         'slug'         => 'json',
         'name'         => 'json',
         'descriptions' => 'json',
+        'stock'        => 'float',
     ];
 
     /**

@@ -148,7 +148,8 @@ class Product extends Resource
 
             Number::make('Кількість','stock')
                 ->sortable()
-                ->rules('required', 'integer', 'min:0')
+                ->rules('required', 'numeric', 'min:0')
+                ->step(0.01)
                 ->default(0)
                 ->help('Обязательное поле'),
             Boolean::make('Активний','is_active')

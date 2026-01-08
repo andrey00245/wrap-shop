@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -14,6 +15,23 @@ class Category extends Model implements HasMedia
     use HasFactory,
         InteractsWithMedia,
         HasTranslations;
+
+    protected static function booted(): void
+    {
+        static::saving(function (Category $category) {
+            if (! $category->isDirty('name')) {
+                return;
+            }
+
+            $category->setTranslations(
+                'slug',
+                array_merge(
+                    $category->getTranslations('slug'),
+                    $category->generateSlugsFromName()
+                )
+            );
+        });
+    }
 
     protected $translatable = ['name', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'h1', 'content', 'seo_text'];
 
@@ -137,5 +155,24 @@ class Category extends Model implements HasMedia
     public function hasChildren(): bool
     {
         return $this->children()->exists();
+    }
+
+    protected function generateSlugsFromName(): array
+    {
+        $slugs = [];
+        $names = $this->getTranslations('name');
+
+        foreach ($this->getTranslatableLocales() as $locale) {
+            if (! empty($names[$locale])) {
+                $slugs[$locale] = Str::slug($names[$locale]);
+            }
+        }
+
+        return array_filter($slugs);
+    }
+
+    protected function getTranslatableLocales(): array
+    {
+        return config('tab-translatable.locales', ['uk', 'ru', 'en']);
     }
 }

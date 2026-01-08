@@ -83,7 +83,7 @@
             <div class="cart-mini-button">
                 <a href="{{route('checkout')}}" title="{{__('popup.cart_popup.checkout')}}" class="checkout colord"><i
                         class="fas fa-chevron-right"></i>{{__('popup.cart_popup.checkout')}}</a>
-                <div class="continion close-cart-popup"><i class="fas fa-chevron-right"></i>{{__('popup.cart_popup.continue_shopping')}}</div>
+                <div class="continion popup-close"><i class="fas fa-chevron-right"></i>{{__('popup.cart_popup.continue_shopping')}}</div>
             </div>
         </div>
     </li>

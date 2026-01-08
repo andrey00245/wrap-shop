@@ -42,17 +42,16 @@
                     <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}" class="button"><i
                                 class="far fa-chevron-left"></i>{{__('header_footer.home')}}</a>
                     </li>
-                    @if(isset($category) && isset($subcategory))
-                        <li><a href="{{route('products.category', ['category' => $category->slugEn])}}"
-                               title="{{$category->name}}"
-                               class="button"><i class="far fa-chevron-left"></i>{{$category->name}}</a></li>
-                    @endif
-                    @if(isset($category) && isset($subcategory) && isset($subsubcategory))
-                        <li><a
-                                href="{{route('products.category', ['category' => $category->slugEn, 'subcategory' => $subcategory->slugEn])}}"
-                                title="{{$subcategory->name}}" class="button"><i
-                                    class="far fa-chevron-left"></i>{{$subcategory->name}}
-                            </a></li>
+                    @if(!empty($categoryBreadcrumbs ?? []))
+                        @foreach($categoryBreadcrumbs as $breadcrumb)
+                            <li>
+                                <a href="{{ $breadcrumb['url'] }}"
+                                   title="{{ $breadcrumb['name'] }}"
+                                   class="button">
+                                    <i class="far fa-chevron-left"></i>{{ $breadcrumb['name'] }}
+                                </a>
+                            </li>
+                        @endforeach
                     @endif
                 </ul>
             </nav>
@@ -665,7 +664,7 @@
                         {!! $currentCategory->content !!}
                     </div>
                 @endif
-                
+
                 @if($currentCategory->seo_text)
                     <div class="category-seo-text">
                         {!! $currentCategory->seo_text !!}

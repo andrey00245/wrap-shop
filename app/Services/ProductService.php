@@ -679,9 +679,9 @@ class ProductService
             ProductAttributeEnum::DEFAULT_QUANTITY            => 'default_quantity',
             ProductAttributeEnum::QUANTITY_STEP               => 'quantity_step',
             ProductAttributeEnum::MINIMUM_ORDER_QUANTITY      => 'min_order_quantity',
-            ProductAttributeEnum::STOCK_QUANTITY_1            => 'stock_quantity_1',
-            ProductAttributeEnum::STOCK_QUANTITY_2            => 'stock_quantity_2',
-            ProductAttributeEnum::STOCK_QUANTITY_3            => 'stock_quantity_3',
+            ProductAttributeEnum::STOCK_QUANTITY_1            => 'first_stock',
+            ProductAttributeEnum::STOCK_QUANTITY_2            => 'second_stock',
+            ProductAttributeEnum::STOCK_QUANTITY_3            => 'third_stock',
             ProductAttributeEnum::UNDER_ORDER                 => 'under_order',
         ];
 
@@ -1884,38 +1884,38 @@ class ProductService
     {
         try {
             $conversions = \App\Models\MediaConversions::getConversionsConfig();
-            
+
             foreach ($conversions as $conversionName => $config) {
                 if (in_array('images', $config['collections'])) {
                     $conversion = $product->addMediaConversion($conversionName);
-                    
+
                     if ($config['width'] && $config['height']) {
                         $conversion->width($config['width'])->height($config['height']);
                     }
-                    
+
                     if ($config['quality']) {
                         $conversion->quality($config['quality']);
                     }
-                    
+
                     if ($config['sharpen']) {
                         $conversion->sharpen($config['sharpen']);
                     }
-                    
+
                     if ($config['format']) {
                         $conversion->format($config['format']);
                     }
-                    
+
                     if (isset($config['fit'])) {
                         $conversion->fit(\Spatie\Image\Enums\Fit::Contain);
                     }
-                    
+
                     $conversion->optimize();
                     $conversion->nonQueued();
                     $conversion->performOnCollections('images');
-                    
+
                     // Выполняем конверсию для конкретного медиа файла
                     // $conversion->performOnMedia($mediaItem);
-                    
+
                     Log::info('Конверсия создана', [
                         'product_id'      => $product->id,
                         'media_id'        => $mediaItem->id,
@@ -1924,17 +1924,17 @@ class ProductService
                     ]);
                 }
             }
-            
+
             // Обновляем медиа файл, чтобы обновить generated_conversions
             $mediaItem->refresh();
-            
+
             Log::info('Конверсии сгенерированы для изображения', [
                 'product_id'            => $product->id,
                 'media_id'              => $mediaItem->id,
                 'file_name'             => $mediaItem->file_name,
                 'generated_conversions' => $mediaItem->getGeneratedConversions()->keys()->toArray()
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Ошибка генерации конверсий', [
                 'product_id' => $product->id,

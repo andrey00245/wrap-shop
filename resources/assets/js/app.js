@@ -434,9 +434,10 @@ function popupSearchHandler(dropdownMenu, event) {
 }
 
 function popupsOpenClose(){
-    const closeBtns = document.querySelectorAll('.general-popup .popup-close')
     const popups = document.querySelectorAll('.general-popup');
-    document.querySelector('body').addEventListener('click', function(event) {
+    const body = document.querySelector('body');
+
+    body.addEventListener('click', function(event) {
         const button = event.target.closest('.general-popup-btn')
         if (button) {
             closeAllPopups(popups)
@@ -445,12 +446,18 @@ function popupsOpenClose(){
         }
     })
 
-    closeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            btn.closest('.general-popup').classList.remove('active');
-            btn.closest('.general-popup').setAttribute('data-step', '1')
-            clearText()
-        });
+    body.addEventListener('click', function (event) {
+        const closeBtn = event.target.closest('.general-popup .popup-close');
+        if (!closeBtn) {
+            return;
+        }
+
+        const popup = closeBtn.closest('.general-popup');
+        if (popup) {
+            popup.classList.remove('active');
+            popup.setAttribute('data-step', '1');
+            clearText();
+        }
     });
 }
 

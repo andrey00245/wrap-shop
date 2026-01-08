@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <div class="center">
-                    <div class="name ">{{$product->name}}</div>
+                    <div class="name ">{{$product->getName()}}</div>
                 </div>
                 <div class="right">
                     <div class="price "><span class="price-base">{{number_format($product->getPrice())}} ₴</span></div>

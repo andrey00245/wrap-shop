@@ -17,3 +17,5 @@ class FeedGeneratorController extends Controller
         ]);
     }
 }
+
+

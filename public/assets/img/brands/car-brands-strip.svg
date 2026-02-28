@@ -1,0 +1,60 @@
+<svg width="1200" height="60" viewBox="0 0 1200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Mercedes-Benz -->
+  <circle cx="50" cy="30" r="20" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M50 10 L50 50 M35 30 L65 30 M50 10 L42 30 L50 50 L58 30 Z" stroke="#666" stroke-width="2" fill="none"/>
+  
+  <!-- Tesla -->
+  <rect x="100" y="15" width="40" height="30" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M120 20 L120 40 M110 30 L130 30" stroke="#666" stroke-width="2"/>
+  
+  <!-- BMW -->
+  <circle cx="200" cy="30" r="20" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M200 10 L200 50 M185 30 L215 30" stroke="#666" stroke-width="2"/>
+  
+  <!-- Honda -->
+  <rect x="250" y="15" width="40" height="30" rx="5" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M270 20 L270 40 M260 30 L280 30" stroke="#666" stroke-width="2"/>
+  
+  <!-- Volkswagen -->
+  <circle cx="350" cy="30" r="20" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M350 10 L350 50 M335 30 L365 30" stroke="#666" stroke-width="2"/>
+  
+  <!-- Toyota -->
+  <ellipse cx="450" cy="30" rx="25" ry="15" fill="none" stroke="#666" stroke-width="2"/>
+  <ellipse cx="450" cy="30" rx="15" ry="8" fill="none" stroke="#666" stroke-width="2"/>
+  
+  <!-- Lexus -->
+  <ellipse cx="550" cy="30" rx="20" ry="12" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M550 20 L550 40" stroke="#666" stroke-width="2"/>
+  
+  <!-- Citroën -->
+  <path d="M600 20 L610 10 L620 20 L610 30 Z" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M630 20 L640 10 L650 20 L640 30 Z" fill="none" stroke="#666" stroke-width="2"/>
+  
+  <!-- Suzuki -->
+  <path d="M700 20 Q720 10 740 20 Q720 30 700 20" fill="none" stroke="#666" stroke-width="2"/>
+  
+  <!-- Ferrari -->
+  <rect x="780" y="15" width="40" height="30" rx="5" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M800 20 L800 40" stroke="#666" stroke-width="2"/>
+  
+  <!-- Infiniti -->
+  <ellipse cx="900" cy="30" rx="20" ry="12" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M900 20 L900 40" stroke="#666" stroke-width="2"/>
+  
+  <!-- Porsche -->
+  <rect x="980" y="15" width="40" height="30" rx="5" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M1000 20 L1000 40" stroke="#666" stroke-width="2"/>
+  
+  <!-- Acura -->
+  <ellipse cx="1100" cy="30" rx="20" ry="12" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M1100 20 L1100 40" stroke="#666" stroke-width="2"/>
+  
+  <!-- Audi -->
+  <circle cx="50" cy="30" r="8" fill="none" stroke="#666" stroke-width="2"/>
+  <circle cx="70" cy="30" r="8" fill="none" stroke="#666" stroke-width="2"/>
+  <circle cx="90" cy="30" r="8" fill="none" stroke="#666" stroke-width="2"/>
+  <circle cx="110" cy="30" r="8" fill="none" stroke="#666" stroke-width="2"/>
+</svg>
+
+

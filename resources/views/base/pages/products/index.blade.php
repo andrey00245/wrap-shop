@@ -554,9 +554,9 @@
                                 class="image default-products-images">
                                 <i class="far fa-search-plus colord"
                                    data-src="{{$product->getPreviewImage()}}"
-                                   data-fancybox="products{{$product->id}}" data-caption="{{$product->name}}"></i>
+                                   data-fancybox="products{{$product->id}}" data-caption="{{$product->getName()}}"></i>
                                 <a class="image-link" href="{{route('products.show', ['product'=>$product->slugEn])}}"
-                                   title="{{$product->name}}">
+                                   title="{{$product->getName()}}">
                                     <div class="splide products-images">
                                         <div class="splide__track">
                                             <ul class="splide__list">
@@ -566,12 +566,12 @@
                                                             <div class="hide"
                                                                  data-src="{{$image->getUrl()}}"
                                                                  data-fancybox="products{{$product->id}}"
-                                                                 data-caption="{{$product->name}}"></div>
+                                                                 data-caption="{{$product->getName()}}"></div>
                                                         @endif
                                                         <img loading="lazy"
                                                              src="{{App\Helpers\MediaHelper::getCatalogImageUrl($image)}}"
-                                                             alt="{{$product->name}}"
-                                                             title="{{$product->name}}"
+                                                             alt="{{$product->getName()}}"
+                                                             title="{{$product->getName()}}"
                                                              class="swiper-lazy swiper-lazy-loaded"
                                                              width="310" height="310">
                                                     </li>

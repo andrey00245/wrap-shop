@@ -9,5 +9,10 @@ return [
     'category_decorative' => 'ДЕКОРАТИВНІ АВТОПЛІВКИ',
     'category_wheels' => 'ФАРБУВАННЯ ДИСКІВ',
     'category_tinting' => 'ТОНУВАННЯ СКЛА',
-    'category_armoring' => 'БРОНЮВАННЯ СКЛА'
+    'category_armoring' => 'БРОНЮВАННЯ СКЛА',
+    'more_projects' => 'БІЛЬШЕ ПРОЄКТІВ',
+    'collapse' => 'ЗГОРНУТИ',
+    'no_description' => 'Немає опису',
+    'image_caption' => 'Зображення :number',
+    'category_default' => 'КОЛЬОРОВІ ПЛІВКИ'
 ];

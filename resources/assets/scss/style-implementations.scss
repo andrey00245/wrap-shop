@@ -1,0 +1,1608 @@
+/* Implementations Page Styles */
+@import "variables";
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Hero Section - Full-width background image with dark overlay */
+.implementations-hero {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #000; /* Fallback цвет на случай если изображение не загрузится */
+}
+
+/* Background image for hero (reuse products background styles, как на категориях) */
+.category-page.row .products-background {
+    width: 100%;
+    height: auto;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin-top: -173px;
+    height: -webkit-fill-available;
+    object-fit: cover;
+}
+
+.category-page.row .products-background:not(img) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2); /* Светлый overlay 20% */
+}
+
+/* Увеличенный hero-блок для страницы реализаций */
+.category-page.row.implementations-page .category-top {
+    padding: 60px 0 50px; /* чуть меньше места снизу после категорий */
+}
+
+/* Для страницы реализаций убираем общий нижний отступ category-page */
+.category-page.row.implementations-page {
+    padding-bottom: 0;
+}
+
+/* Мобильный: отдельный отступ сверху для заголовка на странице реализаций */
+@media screen and (max-width: 768px) {
+    .category-page.row.implementations-page .category-top .title {
+        margin-top: 30px;
+    }
+}
+
+/* Десктоп: переопределяем отступы и сохраняем типографику, как просили */
+@media screen and (min-width: 769px) {
+    .category-page.row.implementations-page .category-top .title {
+        margin-top: 30px;
+        margin-bottom: 40px;
+        font-weight: 500;
+        font-size: 30px;
+        line-height: 36px;
+        text-transform: uppercase;
+        position: relative;
+    }
+}
+
+/* Breadcrumbs - aligned to the left, parallel to title */
+.hero-breadcrumbs {
+    position: absolute;
+    top: 78px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    width: auto;
+    height: 12px;
+    opacity: 1;
+}
+
+.hero-breadcrumbs ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+    align-items: center;
+    height: 100%;
+}
+
+.hero-breadcrumbs li {
+    width: auto;
+    height: 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 9.5px;
+    line-height: 12px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+    opacity: 1;
+}
+
+.hero-breadcrumbs li:not(:last-child)::after {
+    content: ' / ';
+    margin-left: 8px;
+    margin-right: 8px;
+    color: rgba(255, 255, 255, 0.5); /* Серый цвет для слэша */
+}
+
+.hero-breadcrumbs a {
+    color: rgba(255, 255, 255, 0.6); /* Серый цвет для ссылок */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.hero-breadcrumbs a:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.hero-breadcrumbs span {
+    color: #fff; /* Белый цвет для текущей страницы */
+}
+
+/* Hero Title - centered */
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px;
+}
+
+.hero-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 30px;
+    line-height: 36px;
+    letter-spacing: 0px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    margin: 0;
+    opacity: 1;
+}
+
+/* Category Filter Strip - Below title, centered */
+.implementations-categories {
+    position: absolute;
+    top: calc(50% + 80px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    width: 100%;
+    max-width: 1327px;
+    height: 46px;
+    opacity: 1;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.category-buttons {
+    display: flex;
+    gap: 14px;
+    height: 100%;
+    align-items: center;
+    justify-content: center;   /* центрируем кнопки по горизонтали */
+    flex-wrap: wrap;           /* позволяем перенос, если категорий или текст длинные */
+}
+
+.category-btn {
+    width: auto;
+    min-width: 200px;
+    min-height: 46px;
+    padding: 12px 20px;
+    gap: 10px;
+    border-radius: 4px;
+    border: 1px solid #FFFFFF42;
+    background: transparent;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: normal;       /* длинные названия переносятся, не вылезают */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.category-btn:hover {
+    background: #fff;
+    border-color: #fff;
+    color: #000;
+}
+
+.category-btn.active {
+    background: #fff;
+    border-color: #fff;
+    color: #000;
+}
+
+/* Intro Text Block - according to Figma specs */
+.implementations-description {
+    width: 100%;
+    padding: 80px 0;
+    /* Фон берём из общей темы (light/dark), поэтому здесь прозрачный */
+    background: transparent;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.description-content {
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 300;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: 0;
+    text-align: center;
+    width: 445px;
+    height: 120px;
+    opacity: 1;
+    margin: 0 auto;
+    /* По умолчанию цвет текста как на светлой теме,
+       для тёмной переопределяем ниже через $theme */
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.description-content p {
+    margin: 0;
+}
+
+.description-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Brands Strip - Below text, monochrome gray */
+.implementations-brands {
+    background: transparent;
+    padding: 0 0 40px;
+}
+
+.brands-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.brands-strip-image {
+    max-width: 100%;
+    height: auto;
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+
+/* Desktop: Show desktop image, hide mobile */
+.brands-strip-desktop {
+    display: block;
+}
+
+.brands-strip-mobile {
+    display: none;
+}
+
+/* Mobile: Show mobile image, hide desktop */
+@media screen and (max-width: 768px) {
+    .brands-strip-desktop {
+        display: none;
+    }
+    
+    .brands-strip-mobile {
+        display: block;
+    }
+}
+
+/* Projects Grid - White background */
+.implementations-gallery {
+    background: transparent;
+    padding: 0 0 80px; /* убрали верхний паддинг */
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 60px;
+}
+
+.gallery-item {
+    position: relative;
+    overflow: hidden;
+    background: #f5f5f5; /* базовый светлый фон для светлой темы */
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    transition: opacity 0.3s ease, transform 0.3s ease, all 0.35s ease;
+    /* No border, no shadow for flat premium look */
+}
+
+.gallery-item.is-open {
+    background: #f5f5f5; /* Такой же как у details-inner */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: visible !important;
+    z-index: 10;
+}
+
+/* Mobile/Tablet: Keep flex layout for accordion (opens down) */
+@media screen and (max-width: 1023px) {
+    .gallery-item.is-open {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-column: span 1 !important;
+    }
+}
+
+.gallery-item-clickable {
+    cursor: pointer;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* Desktop: Reset width for grid layout */
+@media screen and (min-width: 1024px) {
+    .gallery-item.is-open .gallery-item-clickable {
+        width: auto;
+    }
+    
+    .gallery-item.is-open .gallery-item-title {
+        width: auto;
+    }
+}
+
+.gallery-item-clickable::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.gallery-item.is-open .gallery-item-clickable::after {
+    opacity: 1;
+}
+
+/* Gallery Item Details (Accordion) */
+.gallery-item-details {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease 0.15s, visibility 0s linear 0.5s;
+    width: 100%;
+    order: 3;
+    flex-shrink: 0;
+    visibility: hidden;
+}
+
+/* Mobile/Tablet: Accordion opens down */
+@media screen and (max-width: 1023px) {
+    .gallery-item.is-open .gallery-item-details {
+        max-height: 2000px !important; /* достаточно большое значение */
+        opacity: 1 !important;
+        overflow: visible !important;
+        display: block !important;
+        visibility: visible !important;
+        height: auto !important;
+    }
+}
+
+/* Desktop: Accordion opens to the right, NOT down */
+@media screen and (min-width: 1024px) {
+    .gallery-item.is-open .gallery-item-details {
+        max-height: none !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        display: block !important;
+        visibility: visible !important;
+        height: auto !important;
+        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease 0.2s, visibility 0s linear 0s !important;
+    }
+}
+
+.details-inner {
+    padding: 20px;
+    background: #f5f5f5; /* Light gray background */
+    min-height: 100px;
+    max-height: 600px;      /* Фиксированная максимальная высота */
+    overflow-y: auto;       /* Вертикальный скролл при длинном контенте */
+    overflow-x: hidden;     /* Скрываем горизонтальный скролл */
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;     /* Для правильного позиционирования дочерних элементов */
+    border: none !important; /* Убираем любые границы */
+    outline: none !important; /* Убираем outline */
+    
+    /* Десктоп: фиксированная высота 580px */
+    @media screen and (min-width: 1024px) {
+        height: 580px;
+    }
+    
+    /* Стили для скроллбара */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        
+        &:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+    
+    /* Стили для скроллбара */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        
+        &:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+}
+
+.details-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.details-header-top {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 10px; /* Отступ снизу до product-info */
+    padding-left: 55px; /* 40px (product-image width) + 15px (gap) */
+}
+
+.details-footer {
+    display: none;          /* Скрываем по умолчанию */
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: auto;        /* Прижимаем к низу */
+    margin-bottom: 0;        /* Убираем нижний отступ */
+    padding: 0;
+    border: none !important; /* Убираем любые границы */
+    outline: none !important; /* Убираем outline */
+    flex-shrink: 0;         /* Кнопка не сжимается */
+    position: relative;     /* Для правильного позиционирования */
+    z-index: 10;            /* Кнопка всегда поверх контента */
+}
+
+/* Показываем кнопку только когда карточка открыта */
+.gallery-item.is-open .details-footer {
+    display: flex !important;
+}
+
+.details-category {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 15px;
+    line-height: 15px;
+    letter-spacing: 0.12px;
+    text-transform: uppercase;
+    color: rgba(33, 33, 33, 0.3);
+    margin: 0;
+}
+
+.details-close {
+    background: transparent;
+    border: 1px solid transparent;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    padding: 10px 28px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    padding: 10px 20px;
+    transition: opacity 0.3s ease;
+    pointer-events: auto;
+    z-index: 100;
+    position: relative;
+    
+    &:hover {
+        opacity: 0.7;
+    }
+    
+    &:active {
+        opacity: 0.5;
+    }
+}
+
+/* Цвета кнопки "Згорнути" в зависимости от темы */
+.theme-dark .details-close {
+    border-color: $main-color-dark;
+    color: $main-color-dark;
+    background-color: $main-color-dark-010;
+}
+
+.theme-light .details-close {
+    border-color: $main-color-light;
+    color: $main-color-light;
+    background-color: $main-color-light-010;
+}
+
+.details-product-info {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.details-product-info .product-image {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 4px;
+    
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.details-product-info .product-name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: 0px;
+    text-transform: uppercase;
+    color: #333;
+    flex: 1;
+    margin: 0;
+    transition: color 0.3s ease;
+    text-decoration: none;
+    
+    &:hover {
+        color: #E55C5C; /* Красный для светлой темы */
+    }
+}
+
+.details-divider {
+    width: 100%;
+    height: 2px; /* Пожирнее */
+    background: #000000; /* Черный */
+    margin: 15px 0 20px 0; /* Отступы сверху и снизу для разделителя */
+}
+
+.details-description {
+    font-family: 'Gilroy', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666;
+    max-height: 195px;      /* Фиксированная максимальная высота */
+    overflow-y: auto;       /* Вертикальный скролл при длинном тексте */
+    overflow-x: hidden;      /* Скрываем горизонтальный скролл */
+    margin-top: 0;          /* Убираем верхний отступ, так как галерея уже имеет margin-bottom */
+    margin-bottom: 0;       /* Убираем нижний отступ, кнопка сама добавит отступ */
+    flex-shrink: 0;         /* Не сжимается */
+    
+    /* Стили для скроллбара */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        
+        &:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+
+    p {
+        margin: 0 0 15px 0;
+        
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.details-gallery {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 0;
+    margin-bottom: 20px; /* Отступ снизу перед описанием */
+    
+    a {
+        display: block;
+        width: calc(33.333% - 7px);
+        max-width: 170px;
+        text-decoration: none;
+        border-radius: 4px;
+        overflow: hidden;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        
+        &:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+    }
+    
+    .gallery-thumbnail {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-radius: 4px;
+        cursor: pointer;
+        display: block;
+    }
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    aspect-ratio: 4 / 3;
+    transition: transform 0.3s ease;
+}
+
+/* Когда карточка открыта - показываем изображение полностью без обрезки */
+.gallery-item.is-open .gallery-item-clickable img {
+    object-fit: contain;
+    aspect-ratio: auto;
+    height: auto;
+}
+
+/* Hover effect: image slightly zooms (scale 1.03) */
+/* Отключаем hover эффект когда карточка открыта (есть details-inner) */
+.gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+.gallery-item.is-open:hover img {
+    transform: none;
+}
+
+/* Подсветка рамки при наведении, чтобы было очевидно, что карточка кликабельна */
+.theme-dark .gallery-item:hover {
+    border-color: $main-color-dark-075;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7);
+    background: radial-gradient(circle at top, rgba(255, 206, 28, 0.16) 0, rgba(255, 206, 28, 0.0) 55%), #3c3e41;
+}
+
+.theme-light .gallery-item:hover {
+    border-color: $main-color-light-075;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+    background: radial-gradient(circle at top, rgba(255, 64, 64, 0.12) 0, rgba(255, 64, 64, 0.0) 55%), #f5f5f5;
+}
+
+/* Отключаем hover эффекты когда карточка открыта (есть details-inner) */
+.gallery-item.is-open:hover {
+    border-color: inherit !important; /* Сохраняем border */
+    box-shadow: inherit !important; /* Сохраняем box-shadow */
+}
+
+.theme-dark .gallery-item.is-open:hover {
+    border-color: rgba(255, 255, 255, 0.18) !important; /* Сохраняем border для темной темы */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7) !important; /* Сохраняем box-shadow для темной темы */
+}
+
+.theme-light .gallery-item.is-open:hover {
+    border-color: transparent !important; /* Для светлой темы border прозрачный */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important; /* Сохраняем box-shadow для светлой темы */
+}
+
+.gallery-item-title {
+    padding: 12px 20px 18px; /* меньше сверху, больше ощущение "внизу" */
+    background: #f4f4f4; /* Светлый фон под названием */
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
+    color: rgba(33, 33, 33, 0.6); /* Серый, подсвеченный */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+    order: 2;
+}
+
+.gallery-item-details {
+    order: 3;
+}
+
+/* Desktop: Reset order for grid layout */
+@media screen and (min-width: 1024px) {
+    .gallery-item.is-open .gallery-item-clickable {
+        order: unset !important;
+    }
+    
+    .gallery-item.is-open .gallery-item-title {
+        order: unset !important;
+    }
+    
+    .gallery-item.is-open .gallery-item-details {
+        order: unset !important;
+    }
+}
+
+/* Desktop: Accordion раскрывается вправо - moved to end of file for proper override */
+
+/* Load More Button - Centered, minimal style */
+.more-projects {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.more-projects-btn {
+    display: inline-block;
+    padding: 14px 40px;
+    border: 1px solid #333;
+    background: transparent;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+}
+
+/* On hover: dark background + white text */
+.more-projects-btn:hover {
+    background: #333;
+    color: #fff;
+    border-color: #333;
+}
+
+/* Тёмная тема через класс на body: theme-dark */
+.theme-dark {
+    .description-content {
+        color: #F5F5F5;
+    }
+
+    /* Секция галереи на общем тёмном фоне без белых блоков */
+    .implementations-gallery {
+        background: transparent;
+    }
+
+    /* Карточки реализаций в сетке */
+    /* Карточки в сетке и раскрытая карточка — плотный тёмно‑серый фон */
+    .gallery-item {
+        background: #3c3e41 !important;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .gallery-item.is-open {
+        background: #3c3e41 !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .details-inner {
+        background: rgba(0, 0, 0, 0.45) !important;            /* ещё темнее подложка под текст */
+    }
+    
+    /* Десктоп: правая часть (details-inner и details-footer) должна иметь такой же фон */
+    @media screen and (min-width: 1024px) {
+        .gallery-item.is-open .details-inner {
+            background: rgba(0, 0, 0, 0.45) !important;
+        }
+        
+        .gallery-item.is-open .details-footer {
+            background: rgba(0, 0, 0, 0.45) !important; /* Такой же фон как у details-inner в темной теме */
+        }
+    }
+
+    .details-category {
+        color: $text-gray-dark;
+    }
+
+    .details-product-info .product-name {
+        color: $text-color-dark;
+        transition: color 0.3s ease;
+        
+        &:hover {
+            color: #FFCE1C; /* Желтый для темной темы */
+        }
+    }
+
+    .details-description {
+        color: $text-gray-general-dark;
+    }
+
+    .details-divider {
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    .details-close {
+        color: $text-gray-dark;
+    }
+
+    .more-projects-btn {
+        border-color: rgba(255, 255, 255, 0.7);
+        color: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .more-projects-btn:hover {
+        background: rgba(255, 255, 255, 0.9);
+        color: #202123;
+        border-color: transparent;
+    }
+
+    .gallery-item-title {
+        background: transparent !important;
+        color: rgba(255, 255, 255, 0.82);
+    }
+    
+    .gallery-item.is-open .gallery-item-title {
+        background: transparent !important;
+    }
+    
+}
+
+/* Gallery Empty State */
+.gallery-empty {
+    text-align: center;
+    padding: 60px 0;
+    color: #666;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 1200px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .hero-title {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: auto;
+        height: auto;
+        margin: 0 auto 40px;
+    }
+    
+    /* Tablet: 2 columns */
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+    
+    .gallery-item {
+        grid-column: span 1 !important;
+    }
+    
+    /* Tablet: Keep accordion behavior (opens down) - only for tablets, not desktop */
+    @media screen and (max-width: 1023px) {
+        .gallery-item.is-open {
+            grid-column: span 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            grid-template-columns: none !important;
+        }
+    }
+    
+    .implementations-categories {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: 100%;
+        max-width: 100%;
+        height: auto;        /* позволяем блоку расти по высоте, если кнопки переносятся */
+        padding: 0 15px;
+        margin-top: 30px;
+    }
+    
+    .description-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+    
+    .category-btn {
+        width: auto;
+        min-width: 180px;    /* чуть меньше, чтобы не ломаться на планшете */
+        flex: 0 1 auto;      /* не растягиваем на всю ширину, даём кнопкам переноситься */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .implementations-hero {
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 15px 20px; /* Уменьшили вертикальный padding */
+        box-sizing: border-box;
+    }
+    
+    .hero-breadcrumbs {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        width: 100%;
+        height: auto;
+        margin-top: 10px; /* Уменьшили отступ сверху */
+        margin-bottom: 10px; /* Уменьшили отступ снизу */
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+        z-index: 4;
+    }
+    
+    .hero-breadcrumbs ul {
+        justify-content: center;
+    }
+    
+    .hero-breadcrumbs li {
+        width: auto;
+        height: auto;
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+    
+    .hero-content {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin-top: 16px;
+        margin-bottom: 15px;
+        z-index: 4;
+    }
+    
+    .hero-title {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: 100%;
+        height: auto;
+        font-size: 22px; /* Еще уменьшили размер шрифта */
+        line-height: 1.2;
+        margin: 0 0 10px 0; /* Уменьшили нижний отступ */
+        text-align: center;
+    }
+    
+    .implementations-categories {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        padding: 0;
+        margin-top: 0; /* Убрали верхний отступ полностью */
+    }
+    
+    .category-buttons {
+        gap: 8px; /* Уменьшили gap между кнопками */
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .category-btn {
+        width: auto;
+        min-width: 140px; /* Уменьшили минимальную ширину */
+        padding: 8px 14px; /* Уменьшили padding */
+        font-size: 10px; /* Уменьшили размер шрифта */
+        height: 38px; /* Уменьшили высоту */
+        flex: 1 1 auto;
+    }
+    
+    /* Mobile: 1 column */
+    .gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .gallery-item {
+        grid-column: span 1 !important;
+    }
+    
+    .gallery-item.is-open {
+        grid-column: span 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: none !important;
+    }
+    
+    .details-header {
+        margin-bottom: 15px;
+    }
+    
+    .details-category {
+        font-size: 14px;
+        line-height: 18px;
+    }
+    
+    .details-product-info .product-name {
+        font-size: 14px;
+        line-height: 18px;
+    }
+    
+    .details-inner {
+        padding: 15px 16px;        /* общий горизонтальный отступ */
+        flex-direction: column !important; /* На мобильных вертикальная раскладка */
+        gap: 15px;
+        max-height: 500px !important;  /* Меньшая высота на мобильных */
+        overflow-y: auto !important;    /* Вертикальный скролл на мобильных */
+        overflow-x: hidden !important;   /* Скрываем горизонтальный скролл */
+    }
+    
+    .details-gallery {
+        width: 100% !important; /* На мобильных галерея на всю ширину */
+        min-width: 100% !important;
+        max-height: none !important;
+        flex-direction: row !important; /* Горизонтальная галерея на мобильных */
+        overflow-x: auto; /* Горизонтальная прокрутка на мобильных */
+        overflow-y: hidden;
+        gap: 8px !important; /* Уменьшили gap */
+        
+        a {
+            flex-shrink: 0;
+            width: calc(33.333% - 6px) !important; /* Три колонки с учетом gap */
+            min-width: calc(33.333% - 6px) !important;
+            max-width: calc(33.333% - 6px) !important;
+        }
+        
+        .gallery-thumbnail {
+            width: 100% !important;
+            height: auto !important;
+            aspect-ratio: 4 / 3 !important;
+            object-fit: contain !important; /* Не обрезаем картинки */
+        }
+    }
+    
+    .details-content-wrapper {
+        width: 100%;
+    }
+    
+    /* Категория визуально именно над product-name с небольшим отступом и смещением, как картинка */
+    .details-header-top {
+        margin-left: 55px;
+        margin-bottom: 6px;
+    }
+
+    .details-description {
+        font-size: 13px;
+        margin-bottom: 15px;       /* Отступ снизу до кнопки */
+        margin-top: 20px;           /* Отступ сверху от галереи */
+        padding: 0;                /* опираемся на паддинги .details-inner */
+        max-height: 120px;          /* Меньшая высота на мобильных */
+        overflow-y: auto;           /* Скролл на мобильных тоже */
+    }
+    
+    .details-footer {
+        margin-top: 20px !important; /* Фиксированный отступ сверху */
+        margin-bottom: 0 !important;
+        position: relative !important;
+        z-index: 10 !important;
+    }
+    
+    .implementations-description {
+        padding: 60px 0 40px;
+    }
+    
+    .implementations-gallery {
+        padding: 40px 0 60px;
+    }
+    
+    .description-content {
+        font-size: 15px;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+    
+    .brands-logos {
+        gap: 25px;
+        padding: 0 15px;
+    }
+    
+    .gallery-item-title {
+        font-size: 14px;
+        padding: 20px 15px;
+    }
+    
+    /* На мобилке gallery-item-title после кнопки */
+    .gallery-item.is-open .gallery-item-title {
+        order: 3 !important; /* После кнопки */
+        margin-top: 0 !important;
+    }
+
+    /* Мобильный: больше воздуха между галереей и кнопкой */
+    .details-gallery {
+        margin-top: 0;
+        margin-bottom: 24px;
+        padding: 0;                /* опираемся на паддинги .details-inner */
+    }
+
+    /* Мобильный: порядок - details-inner, потом кнопка, потом gallery-item-title */
+    .gallery-item.is-open .gallery-item-details {
+        order: 1 !important; /* Первым идет details-inner */
+    }
+    
+    .gallery-item.is-open .details-footer {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding: 10px 16px 0 !important; /* Отступы для кнопки на мобильных */
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        position: relative !important;
+        z-index: 10 !important;
+        background: transparent !important;
+        flex-shrink: 0 !important;
+        order: 2 !important; /* После details-inner */
+        height: auto !important;
+    }
+    
+    /* Кнопка без рамок, просто текст на мобилке */
+    .gallery-item.is-open .details-close {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Темная тема на мобилке: цвет кнопки */
+    .theme-dark .gallery-item.is-open .details-close {
+        color: rgb(255, 206, 28) !important;
+    }
+    
+    .gallery-item.is-open .gallery-item-title {
+        order: 3 !important; /* После кнопки */
+        margin-top: 0 !important;
+    }
+    
+    /* Темная тема на мобилке: единый фон для всех элементов открытой карточки */
+    .theme-dark .gallery-item.is-open {
+        background: #3c3e41 !important;
+    }
+    
+    .theme-dark .gallery-item.is-open .details-inner {
+        background: rgba(0, 0, 0, 0.45) !important;
+    }
+    
+    .theme-dark .gallery-item.is-open .details-footer {
+        background: rgba(0, 0, 0, 0.45) !important; /* Такой же фон как у details-inner */
+    }
+    
+    .theme-dark .gallery-item.is-open .gallery-item-title {
+        background: rgba(0, 0, 0, 0.45) !important; /* Такой же фон */
+    }
+    
+    /* Отдельные блоки теперь используют общий паддинг .details-inner */
+    .details-product-info,
+    .details-header-top {
+        padding: 0;
+    }
+    
+    /* Divider на ширину контента внутри .details-inner */
+    .details-divider {
+        margin: 10px 0;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .implementations-hero {
+        height: 250px;
+        padding: 15px;
+    }
+    
+    .hero-breadcrumbs {
+        margin-top: 40px;
+        margin-bottom: 15px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .hero-breadcrumbs ul {
+        justify-content: center;
+    }
+    
+    .hero-content {
+        margin-top: 16px;
+        margin-bottom: 15px;
+    }
+    
+    .hero-title {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: 100%;
+        height: auto;
+        font-size: 24px;
+        line-height: 1.2;
+        margin: 0;
+        text-align: center;
+    }
+    
+    .description-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+    
+    .category-buttons {
+        flex-direction: row;
+        justify-content: center;
+    }
+    
+    .category-btn {
+        padding: 8px 14px;
+        font-size: 10px;
+        height: 38px;
+    }
+    
+    .gallery-item-title {
+        font-size: 13px;
+        padding: 18px 15px;
+    }
+    
+    .more-projects-btn {
+        padding: 12px 30px;
+        font-size: 13px;
+    }
+}
+
+/* Global Drawer Overlay */
+
+#sidebarClose {
+    background: transparent;
+    border: none;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.3s ease;
+    
+    &:hover {
+        opacity: 0.7;
+    }
+}
+
+/* Gallery Item Details Styles */
+.details-gallery-item {
+    width: calc(33.333% - 10px);
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border-radius: 4px;
+    
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+
+/* Modal Window Styles */
+.implementation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.implementation-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1;
+}
+
+.modal-content {
+    position: relative;
+    z-index: 2;
+    width: 90%;
+    max-width: 1200px;
+    height: 75vh;
+    max-height: 75vh;
+    background: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+.implementation-modal.is-open .modal-content {
+    transform: scale(1);
+}
+
+.modal-body {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 0;
+    height: 100%;
+    max-height: 75vh;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.modal-image-wrapper {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.modal-main-image-link {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    
+    &:hover {
+        opacity: 0.9;
+    }
+    
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+    }
+}
+
+.modal-main-title {
+    width: 100%;
+    padding: 16px 24px;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #FFFFFF;
+    background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.95) 100%);
+    text-align: left;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.modal-details {
+    padding: 40px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    
+    /* Scrollbar styles */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        
+        &:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+}
+
+/* Footer button in modal details ("Згорнути") */
+.implementation-modal {
+    .details-footer {
+        display: flex !important;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: auto;
+        padding-top: 32px;
+        padding-bottom: 0;
+    }
+}
+
+/* Scrollbar for details-description in dark theme */
+.theme-dark {
+    .details-description {
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        &::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+            background: rgba(255, 206, 28, 0.4);
+            border-radius: 3px;
+            
+            &:hover {
+                background: rgba(255, 206, 28, 0.6);
+            }
+        }
+    }
+}
+
+/* Dark theme for modal */
+.theme-dark {
+    .modal-content {
+        background: #3c3e41;
+        border: 2px solid rgba(255, 206, 28, 0.3);
+    }
+    
+    .modal-details {
+        background: rgba(0, 0, 0, 0.45);
+        
+        /* Yellow scrollbar for dark theme */
+        &::-webkit-scrollbar-thumb {
+            background: rgba(255, 206, 28, 0.4);
+            
+            &:hover {
+                background: rgba(255, 206, 28, 0.6);
+            }
+        }
+    }
+
+    .modal-main-title {
+        background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.98) 100%);
+        color: #FFCE1C;
+    }
+}
+
+/* Mobile: Modal becomes fullscreen */
+@media screen and (max-width: 1023px) {
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+    
+    .modal-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: 100%;
+    }
+    
+    .modal-image-wrapper {
+        min-height: 300px;
+        max-height: 40vh;
+    }
+    
+    .modal-details {
+        padding: 20px;
+        height: 60vh;
+    }
+}
+
+/* Remove desktop accordion styles - only modal on desktop */
+@media screen and (min-width: 1024px) {
+    .gallery-item.is-open {
+        grid-column: span 1 !important; /* Don't span full row */
+        display: flex !important; /* Keep flex layout */
+        flex-direction: column !important;
+        background: #f5f5f5 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        overflow: hidden !important;
+        z-index: 1 !important;
+    }
+    
+    .gallery-item.is-open .gallery-item-details {
+        display: none !important; /* Hide accordion on desktop */
+    }
+    
+    .gallery-item.is-open .details-footer {
+        display: none !important; /* Hide close button on desktop */
+    }
+}

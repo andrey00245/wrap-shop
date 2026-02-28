@@ -363,48 +363,6 @@ class CommandRunnerController extends Controller
                 ], 400);
             }
 
-            // Безопасность: разрешаем только определенные команды
-            $allowedCommands = [
-                'cache:clear',
-                'config:clear',
-                'view:clear',
-                'route:clear',
-                'optimize:clear',
-                'storage:link',
-                'migrate',
-                'migrate:status',
-                'db:seed',
-                'queue:work',
-                'queue:restart',
-                'queue:failed',
-                'tinker',
-                'make:controller',
-                'make:model',
-                'make:migration',
-                'make:seeder',
-                'make:command',
-                'media:generate-sync',
-                'media:clean-filenames',
-                'products:recreate-media',
-                'products:list',
-                'generate:sitemap',
-                'media-library:clean',
-                'media:analyze',
-                'media:analyze-unused',
-                'media:cleanup-unused',
-                'media:cleanup-old-conversions',
-            ];
-
-            // Извлекаем команду без аргументов для проверки
-            $baseCommand = explode(' ', $command)[0];
-            
-            if (!in_array($baseCommand, $allowedCommands)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Команда "' . $baseCommand . '" не разрешена для выполнения'
-                ], 403);
-            }
-
             Log::info('Executing custom Artisan command', [
                 'command' => $command,
                 'user' => auth()->user()?->email ?? 'unknown'

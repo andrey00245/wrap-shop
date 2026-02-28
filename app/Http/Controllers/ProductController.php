@@ -36,6 +36,7 @@ class ProductController extends Controller
     public function index(): View
     {
         $products = Product::query()
+            ->where('is_active', 1)
             ->whereHas('prices', function ($query) {
                 $query->where('type_id', function ($subQuery) {
                     $subQuery->select('id')
@@ -71,51 +72,67 @@ class ProductController extends Controller
      */
     public function show(Product $product): View
     {
-        if ($product->getRollSize()) {
-            $products = Product::query()
-                ->where('id', '<>', $product->id)
-                ->whereHas('prices', function ($query) {
-                    $query->where('type_id', function ($subQuery) {
-                        $subQuery->select('id')
-                            ->from('price_types')
-                            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-                    })->where('price', '>', 0);
-                })
-                ->whereHas('media')
-                ->where('category_id', $product->category_id)
-                ->with(['media', 'category'])
-                ->get();
+        // Базовый набор кандидатов для рекомендаций:
+        // активные товары с ценой, картинками, из той же категории, кроме текущего товара
+        $candidates = Product::query()
+            ->where('id', '<>', $product->id)
+            ->where('is_active', 1)
+            ->whereHas('prices', function ($query) {
+                $query->where('type_id', function ($subQuery) {
+                    $subQuery->select('id')
+                        ->from('price_types')
+                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+                })->where('price', '>', 0);
+            })
+            ->whereHas('media', function ($query) {
+                $query->where('collection_name', 'images');
+            })
+            ->where('category_id', $product->category_id)
+            ->with(['media', 'category'])
+            ->get();
 
-            $filteredProducts = $products->filter(function (Product $productItem) use ($product): bool {
-                return $product->getMainColor() === $productItem->getMainColor();
+        // Сначала ищем максимально похожие: по основному цвету
+        $similarByColor = $candidates->filter(function (Product $productItem) use ($product): bool {
+            return $product->getMainColor() !== null
+                && $product->getMainColor() === $productItem->getMainColor();
+        });
+
+        // Если по цвету нашли товары — используем их как основу
+        $products = $similarByColor->isNotEmpty() ? $similarByColor : collect();
+
+        // Если по цвету ничего не нашли или нашли мало — пробуем по бренду
+        if ($products->count() < 4) {
+            $similarByBrand = $candidates->filter(function (Product $productItem) use ($product): bool {
+                return $product->getBrand() !== null
+                    && $product->getBrand() === $productItem->getBrand();
             });
 
-            if ($filteredProducts->isEmpty()) {
-                $filteredProducts = $products->filter(function (Product $productItem) use ($product): bool {
-                    return $product->getBrand() === $productItem->getBrand();
-                });
-            }
-
-            if ($filteredProducts->isEmpty()) {
-                $products = $products->take(10);
-            } else {
-                $products = $filteredProducts->take(10);
-            }
-
-        } else {
-            $products = Product::query()
-                ->whereHas('prices', function ($query) {
-                    $query->where('type_id', function ($subQuery) {
-                        $subQuery->select('id')
-                            ->from('price_types')
-                            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-                    })->where('price', '>', 0);
-                })
-                ->whereHas('media')
-                ->whereHas('category')
-                ->with(['media', 'category'])
-                ->paginate(6);
+            // Добавляем товары по бренду, которых ещё нет в коллекции
+            $existingIds = $products->pluck('id')->toArray();
+            $similarByBrand->each(function ($item) use (&$products, $existingIds) {
+                if (!in_array($item->id, $existingIds)) {
+                    $products->push($item);
+                    $existingIds[] = $item->id;
+                }
+            });
         }
+
+        // Если всё ещё мало товаров — добавляем остальные из категории
+        if ($products->count() < 4) {
+            $existingIds = $products->pluck('id')->toArray();
+            $candidates->each(function ($item) use (&$products, $existingIds) {
+                if (!in_array($item->id, $existingIds) && $products->count() < 10) {
+                    $products->push($item);
+                    $existingIds[] = $item->id;
+                }
+            });
+        }
+
+        // Гарантируем уникальность по ID и ограничиваем количество
+        $products = $products
+            ->unique('id')
+            ->take(10)
+            ->values();
 
         $exampleWorks = Implementation::query()->where('is_active', true)->take(12)->get();
         $latestCategory = Category::query()
@@ -184,6 +201,7 @@ class ProductController extends Controller
         $products = Product::query()
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->join('price_types', 'product_prices.type_id', '=', 'price_types.id')
+            ->where('products.is_active', 1)
             ->where('price_types.external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
             ->where('product_prices.price', '>', 0)
             ->whereIn('category_id', $categories)

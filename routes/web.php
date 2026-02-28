@@ -191,6 +191,12 @@ Route::group([
         Route::get('/{news_category:slug}/{news:slug}', [NewsController::class, 'show'])->name('news.show');
     });
 
+    // Blog routes (static pages for testing)
+    Route::group(['prefix' => '/blog'], function () {
+        Route::get('/', [App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
+        Route::get('/article', [App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
+    });
+
 
     Route::get('/about-us', function () {
         return view('base.pages.about-us');

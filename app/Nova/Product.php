@@ -5,6 +5,7 @@ namespace App\Nova;
 use App\Nova\Actions\TranslateProductContent;
 use App\Nova\Filters\TranslatedStatusFilter;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
+use Ebess\AdvancedNovaMediaLibrary\Fields\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
@@ -192,6 +193,8 @@ class Product extends Resource
             ])->hideFromIndex(),
             Images::make('Фото Вигляду', 'banner_images')
                 ->conversionOnIndexView('preview_webp')
+                ->hideFromIndex(),
+            HasMany::make('YouTube Відео', 'youtubeVideos', ProductVideo::class)
                 ->hideFromIndex(),
         ];
     }

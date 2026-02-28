@@ -25,7 +25,7 @@
           <div class="image"><a href="{{route('products.show',['product' => $product->slugEn])}}"><img data-src="{{ optional($product->getMedia('images')->first())->getUrl('preview_webp') ?? asset('assets/img/no-image.png') }}" src="{{ optional($product->getMedia('images')->first())->getUrl('preview_webp') ?? asset('assets/img/no-image.png') }}"></a></div>
           <div class="name">
             <span class="model"></span>
-            <a href="{{route('products.show',['product' => $product->slugEn])}}">{{$product->name}}</a>
+            <a href="{{route('products.show',['product' => $product->slugEn])}}">{{$product->getName()}}</a>
             <div class="option"></div>
           </div>
           <div class="price">{{$product->pivot->price}} ₴<span class="price-unit-xvr"></span></div>

@@ -265,7 +265,7 @@ body::-webkit-scrollbar {
 
 /*header*/
 .header {
-    z-index: 3;
+    z-index: 10001; /* выше любых всплывающих карточек/модалок на странице */
     min-height: 174px;
 }
 
@@ -3292,26 +3292,44 @@ table .notify-quantity {
     margin-right: 10px;
     padding-top: 20px;
     margin-bottom: 45px;
+    
+    /* Убеждаемся, что карточки растягиваются по высоте */
+    .example-of-work {
+        break-inside: avoid; /* Не разрываем карточки между колонками */
+        page-break-inside: avoid;
+        display: flex;
+        flex-direction: column;
+        height: 430px !important; /* Фиксированная высота для всех карточек */
+    }
 }
 
 .example-of-work {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column; /* Вертикальная раскладка */
     overflow: hidden;
 
     background-color: $mod-product-default-bg;
     border: 1px solid $mod-product-default-border;
     border-radius: 3px;
-    height: fit-content;
+    height: 430px; /* Фиксированная высота для всех карточек */
     margin-right: -9px;
     margin-bottom: 7px;
+    break-inside: avoid; /* Не разрываем карточки между колонками */
+    page-break-inside: avoid;
 }
 
 
 .example-of-work .image-example {
     width: 100%;
-    height: auto;
+    height: 200px; /* Фиксированная высота изображения */
+    min-height: 200px;
+    max-height: 200px;
     margin-bottom: 15px;
+    flex-shrink: 0; /* Изображение не сжимается */
+    object-fit: cover; /* Обрезаем изображение для одинакового размера */
+    object-position: center;
+    display: block;
+    overflow: hidden;
 }
 
 .example-of-work .image-product {
@@ -3322,14 +3340,23 @@ table .notify-quantity {
 
 .examples-wrapper .middle-content-wrapper {
     padding: 0 13px;
+    flex: 1; /* Растягиваем контент для заполнения пространства */
+    display: flex;
+    flex-direction: column;
 }
 
 .examples-wrapper .car-name {
-    display: block;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Ограничиваем 2 строками */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
     font-size: 18px;
     font-weight: 500;
     line-height: 20px;
     margin-bottom: 5px;
+    min-height: 40px; /* Фиксированная высота: 2 строки * 20px line-height */
+    max-height: 40px; /* Фиксированная высота: 2 строки * 20px line-height */
 }
 
 .examples-wrapper .date {
@@ -3338,6 +3365,8 @@ table .notify-quantity {
     font-weight: 400;
     margin-bottom: 8px;
     opacity: 0.5;
+    height: 20px; /* Фиксированная высота для выравнивания */
+    flex-shrink: 0; /* Не сжимается */
 }
 
 .example-of-work ul {
@@ -3354,11 +3383,19 @@ table .notify-quantity {
     background-color: $mod-example-product;
     border-radius: 4px;
     padding: 5px;
+    margin-top: auto; /* Прижимаем к низу карточки */
 }
 
 .example-of-work .example-product .product-link {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Выравниваем по верху для правильного отображения текста */
+}
+
+.example-of-work .example-product .product-link .text-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0; /* Позволяет тексту обрезаться */
 }
 
 .example-of-work .example-product .product-link .title-product {
@@ -3368,6 +3405,12 @@ table .notify-quantity {
     text-transform: uppercase;
     margin-bottom: 10px;
     color: #FFFFFF4D;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Ограничиваем 2 строками */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 24px; /* Фиксированная высота: 2 строки * 12px line-height */
 }
 
 .example-of-work .example-product .product-link .name-product {
@@ -3376,41 +3419,57 @@ table .notify-quantity {
     color: $mod-text-color;
     text-transform: uppercase;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 3; /* Ограничиваем 3 строками */
     -webkit-box-orient: vertical;
     overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4; /* Для правильного расчета высоты */
+    min-height: calc(1.4em * 3); /* Минимальная высота: 3 строки */
+    max-height: calc(1.4em * 3); /* Максимальная высота: 3 строки */
 }
 
-.text-wrapper {
+.example-of-work .example-product .product-link .text-wrapper {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-width: 0; /* Позволяет тексту обрезаться */
 }
 
+/* Search popup dropdown: адаптивен под светлую и тёмную темы */
+#search-popup #search,
 #search {
-    .dropdown-menu {
+    .search-popup-input-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .dropdown-menu.search-popup-dropdown {
         position: absolute;
         top: 100%;
         left: 0;
+        right: 0;
         z-index: 1000;
-        float: left;
-        min-width: 270px;
-        padding: 5px 0;
-        margin: 2px 0 0;
+        min-width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin: 6px 0 0;
         font-size: 12px;
         text-align: left;
         list-style: none;
-        background-color: white;
-        -webkit-background-clip: padding-box;
-        background-clip: padding-box;
-        border: 1px solid rgba(0, 0, 0, .15);
-        border-radius: 4px;
-        -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+        background-color: $mod-product-default-bg;
+        border: 1px solid $mod-product-default-border;
+        border-radius: 6px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         width: 100%;
+        max-height: min(70vh, 420px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
 
         li {
             &:not(.disabled, .inline, .more) {
-                border-bottom: 1px solid #f1f1f1;
+                border-bottom: 1px solid $mod-product-default-aditional-border;
             }
 
             &.inline {
@@ -3422,28 +3481,40 @@ table .notify-quantity {
             &.disabled {
                 .title {
                     width: fit-content;
-                    padding-bottom: 5px;
+                    padding: 8px 12px 6px;
                     font-size: 14px;
                     font-weight: 300;
+                    color: $mod-text-color;
                 }
 
-                .search-suggestion {
-                    .title {
-                        border-bottom: 2px solid #d04b4b;
-
-                    }
+                .search-suggestion .title {
+                    border-bottom: 2px solid $mod-main-color;
                 }
+            }
+
+            &.more a {
+                background: $mod-main-color-010;
+            }
+
+            &.more a:hover {
+                background: $mod-main-color-075;
             }
         }
 
-        & > li > a, & li.disabled {
+        & > li > a,
+        & li.disabled {
             display: block;
-            padding: 3px 10px;
+            padding: 10px 12px;
             clear: both;
             font-weight: 700;
-            color: #333;
+            color: $mod-text-color;
             white-space: unset;
             text-decoration: none;
+            transition: background-color 0.15s ease;
+        }
+
+        & > li:not(.disabled):not(.more) > a:hover {
+            background-color: $mod-main-color-010;
         }
     }
 }
@@ -3470,6 +3541,7 @@ table .notify-quantity {
             font-weight: bold;
             text-decoration: none;
             text-transform: uppercase;
+            color: $mod-text-color;
         }
 
         .price {
@@ -3477,17 +3549,25 @@ table .notify-quantity {
             font-size: 16px;
             letter-spacing: 1px;
             white-space: nowrap;
+            color: $mod-main-color;
         }
 
         .image {
             width: 70px;
+            flex-shrink: 0;
+            img {
+                width: 100%;
+                height: auto;
+                display: block;
+                border-radius: 4px;
+            }
         }
 
         .more {
-            background-color: #d04b4b;
+            background: $mod-main-color;
             border-radius: 4px;
             text-align: center;
-            color: white;
+            color: #fff;
             line-height: 30px;
         }
     }
@@ -4667,16 +4747,22 @@ table .notify-quantity {
         }
     }
     .example-of-work {
+        height: 430px !important; /* Фиксированная высота для всех карточек на мобильных */
+        
         &.button {
-
             height: 341px;
-
             a {
                 span {
-
                     font-size: 14px;
                 }
             }
+        }
+        
+        .image-example {
+            height: 200px !important; /* Фиксированная высота изображения на мобильных */
+            object-fit: cover !important; /* Обрезаем изображение для одинакового размера */
+            object-position: center;
+            display: block;
         }
     }
 

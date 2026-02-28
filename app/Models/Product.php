@@ -13,6 +13,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -42,6 +43,7 @@ class Product extends Model implements HasMedia
 {
     use HasFactory,
         HasTranslations,
+        Searchable,
         InteractsWithMedia;
 
     public array $translatable = [
@@ -118,6 +120,52 @@ class Product extends Model implements HasMedia
         });
 
         return $query;
+    }
+
+
+    /**
+     * Данные, которые отправляются в Algolia (Laravel Scout).
+     */
+    public function toSearchableArray(): array
+    {
+        // Подгружаем связи, которые нужны для индекса
+        $this->loadMissing(['category', 'attributes']);
+
+        // Переводы названия продукта
+        $nameTranslations = method_exists($this, 'getTranslations')
+            ? $this->getTranslations('name')
+            : (array)$this->name;
+
+        // Переводы названия категории
+        $categoryNameTranslations = [];
+        if ($this->category && method_exists($this->category, 'getTranslations')) {
+            $categoryNameTranslations = $this->category->getTranslations('name');
+        }
+
+        // Бренд как строка
+        $brandValue = $this->getBrand();
+        if (is_array($brandValue)) {
+            $brandValue = implode(' ', array_filter($brandValue));
+        }
+
+        return [
+            'id'           => $this->id,
+            'code'         => $this->code,
+            'article'      => $this->article,
+            'name'         => $nameTranslations,
+            'category_id'  => $this->category_id,
+            'category'     => $categoryNameTranslations,
+            'brand'        => $brandValue,
+        ];
+    }
+
+
+    /**
+     * Ограничиваем, какие товары попадают в индекс поиска.
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return (bool) $this->is_active && $this->media()->exists();
     }
 
 
@@ -228,12 +276,22 @@ class Product extends Model implements HasMedia
 
             $conversion->nonQueued();
         }
+
+        // Конвертация видео для мобильных устройств (легкая версия)
+        // ВАЖНО: Для работы конвертации видео нужен ffmpeg и пакет php-ffmpeg/php-ffmpeg
+        // Пока что используем оригинальное видео, но структура готова для будущей конвертации
+        // Конвертация видео будет реализована через отдельный Job или внешний сервис
+        // TODO: Реализовать конвертацию видео через ffmpeg в отдельном Job
+        // - mobile: 720p, битрейт ~2Mbps
+        // - desktop: 1080p, битрейт ~5Mbps
     }
 
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images');
         $this->addMediaCollection('banner_images');
+        // Видео теперь загружаются через YouTube ссылки (ProductVideo модель)
+        // $this->addMediaCollection('videos')->singleFile();
     }
 
     /**
@@ -260,6 +318,14 @@ class Product extends Model implements HasMedia
         return $this->belongsToMany(Attribute::class, 'products_attributes')
             ->using(ProductAttribute::class)
             ->withPivot('value');
+    }
+
+    /**
+     * YouTube видео
+     */
+    public function youtubeVideos(): HasMany
+    {
+        return $this->hasMany(ProductVideo::class)->orderBy('sort_order');
     }
 
     /**
@@ -325,6 +391,120 @@ class Product extends Model implements HasMedia
         return $this->getMedia('banner_images');
     }
 
+    public function getVideos()
+    {
+        return $this->getMedia('videos');
+    }
+
+    /**
+     * Получить все YouTube видео продукта
+     */
+    public function getYoutubeVideos()
+    {
+        return $this->youtubeVideos;
+    }
+
+    /**
+     * Проверить, есть ли YouTube видео
+     */
+    public function hasYoutubeVideos(): bool
+    {
+        return $this->youtubeVideos()->count() > 0;
+    }
+
+    /**
+     * Получить URL видео для мобильных устройств (легкая версия)
+     * Если конверсия не существует, возвращает оригинал
+     */
+    public function getMobileVideoUrl(): ?string
+    {
+        $video = $this->getFirstMedia('videos');
+        if (!$video) {
+            return null;
+        }
+
+        // Пытаемся получить легкую версию для мобильных
+        if ($video->hasGeneratedConversion('mobile')) {
+            return $video->getUrl('mobile');
+        }
+
+        // Если конверсии нет, возвращаем оригинал
+        return $video->getUrl();
+    }
+
+    /**
+     * Получить URL видео для десктопа (качественная версия)
+     * Если конверсия не существует, возвращает оригинал
+     */
+    public function getDesktopVideoUrl(): ?string
+    {
+        $video = $this->getFirstMedia('videos');
+        if (!$video) {
+            return null;
+        }
+
+        // Пытаемся получить качественную версию для десктопа
+        if ($video->hasGeneratedConversion('desktop')) {
+            return $video->getUrl('desktop');
+        }
+
+        // Если конверсии нет, возвращаем оригинал
+        return $video->getUrl();
+    }
+
+    /**
+     * Получить первое видео
+     */
+    public function getFirstVideo()
+    {
+        return $this->getFirstMedia('videos');
+    }
+
+    /**
+     * Получить постер (первый кадр) видео
+     * Если постер не существует, возвращает null
+     */
+    public function getVideoPoster(): ?string
+    {
+        $video = $this->getFirstMedia('videos');
+        if (!$video) {
+            return null;
+        }
+
+        // Проверяем существование файла постера напрямую
+        // Job создает постер в: storage/app/public/media-library/conversions/{id}/poster_{file_name}.jpg
+        // И сохраняет в: storage/app/public/{id}/poster/{file_name}.jpg
+        $originalPath = $video->getPath();
+
+        // Вариант 1: Постер в директории медиа (после saveConversion)
+        $posterDirectory = dirname($originalPath) . '/poster';
+        $posterFileName = pathinfo($video->file_name, PATHINFO_FILENAME) . '.jpg';
+        $posterPath = $posterDirectory . '/' . $posterFileName;
+
+        // Вариант 2: Постер в директории конверсий (временный путь)
+        $conversionsPath = storage_path('app/public/media-library/conversions/' . $video->id);
+        $conversionsPosterPath = $conversionsPath . '/poster_' . pathinfo($video->file_name, PATHINFO_FILENAME) . '.jpg';
+
+        // Проверяем оба варианта
+        if (file_exists($posterPath)) {
+            // Возвращаем публичный URL
+            $publicPath = str_replace(storage_path('app/public'), '', $posterPath);
+            return asset('storage' . $publicPath);
+        } elseif (file_exists($conversionsPosterPath)) {
+            // Если постер еще в директории конверсий, перемещаем его
+            if (!is_dir($posterDirectory)) {
+                mkdir($posterDirectory, 0755, true);
+            }
+            if (copy($conversionsPosterPath, $posterPath)) {
+                $publicPath = str_replace(storage_path('app/public'), '', $posterPath);
+                return asset('storage' . $publicPath);
+            }
+        }
+
+        // Если постер не создан, возвращаем null (будет использован fallback)
+        return null;
+    }
+
     public function getProductAttributes()
     {
         return $this->attributes()
@@ -387,6 +567,7 @@ class Product extends Model implements HasMedia
             }
 
             $products = self::query()
+                ->where('is_active', 1)
                 ->whereIn('category_id', $categories)
                 ->when($searchValue, function ($query) use ($columns, $searchValue) {
                     $query->whereLikeInsensitive($columns, $searchValue);
@@ -400,6 +581,7 @@ class Product extends Model implements HasMedia
                 ->get();
         } else {
             $productsQuery = self::query()
+                ->where('is_active', 1)
                 ->whereIn('category_id', $categories)
                 ->whereHas('attributes')
                 ->whereHas('media')

@@ -16,14 +16,13 @@
                     </svg>
                 </span>
                         <span class="date">{{$works->getData()}}</span>
-                        {!! $works->descriptions !!}
                     </div>
                     <div class="example-product">
                         <a class="product-link" href="{{route('products.show', ['product'=>$works->product->slugEn])}}">
-                            <img class="image-product" src="{{$works->product->getPreviewImage()}}" alt="{{$works->product->name}}">
+                            <img class="image-product" src="{{$works->product->getPreviewImage()}}" alt="{{$works->product->getName()}}">
                             <div class="text-wrapper">
                                 <span class="title-product">{{$works->product->category->name}}</span>
-                                <span class="name-product">{{$works->product->name}}</span>
+                                <span class="name-product">{{$works->product->getName()}}</span>
                             </div>
                         </a>
                     </div>

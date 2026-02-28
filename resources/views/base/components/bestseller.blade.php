@@ -46,9 +46,9 @@
                                 class="image swiper swiper-initialized swiper-horizontal swiper-android swiper-backface-hidden">
                                 <i class="far fa-search-plus colord"
                                    data-src="{{$item->product->getPreviewImage()}}"
-                                   data-fancybox="bestseller{{$item->product->id}}" data-caption="{{$item->product->name}}"></i>
+                                   data-fancybox="bestseller{{$item->product->id}}" data-caption="{{$item->product->getName()}}"></i>
                                 <a href="{{route('products.show', ['product'=>$item->product->slugEn])}}"
-                                   title="{{$item->product->name}}">
+                                   title="{{$item->product->getName()}}">
                                     <div class="splide products-images">
                                         <div class="splide__track">
                                             <ul class="splide__list">
@@ -59,12 +59,12 @@
                                                             <div class="hide"
                                                                  data-src="{{$image->getUrl()}}"
                                                                  data-fancybox="bestseller{{$item->product->id}}"
-                                                                 data-caption="{{$item->product->name}}"></div>
+                                                                 data-caption="{{$item->product->getName()}}"></div>
                                                         @endif
                                                         <img loading="lazy"
                                                              src="{{$image->getUrl('preview_webp')}}"
-                                                             alt="{{$item->product->name}}"
-                                                             title="{{$item->product->name}}"
+                                                             alt="{{$item->product->getName()}}"
+                                                             title="{{$item->product->getName()}}"
                                                              class="swiper-lazy swiper-lazy-loaded"
                                                              width="310" height="310">
                                                     </li>
@@ -77,7 +77,7 @@
                             <div class="product-default-texts-wrapper">
                                 <div class="category">{{$item->product->category->name}}</div>
                                 <a href="{{route('products.show', ['product'=>$item->product->slugEn])}}"
-                                   title="{{$item->product->name}}" class="name">{{$item->product->name}}</a>
+                                   title="{{$item->product->getName()}}" class="name">{{$item->product->getName()}}</a>
                                 <div class="bottom flex-center">
                                     <div class="price">{{number_format($item->product->getPrice())}} ₴<span
                                             class="price-unit-xvr"></span></div>

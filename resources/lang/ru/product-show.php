@@ -10,6 +10,8 @@ return [
     'technical-specifications' => 'Технические характеристики',
     'quantity' => 'Кол-во',
     'add-to-cart' => 'Купить',
+    'back' => 'Назад',
+    'loading-video' => 'Загрузка видео...',
     'stock-in-alert' => 'Сообщить о наличии',
     'fast-buy' => 'Быстрая покупка',
     'want-to-learn-more' => 'Хочешь узнать больше?',

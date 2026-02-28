@@ -10,6 +10,8 @@ return [
     'technical-specifications' => 'Technical specifications',
     'quantity' => 'Qty',
     'add-to-cart' => 'Add to cart',
+    'back' => 'Back',
+    'loading-video' => 'Loading video...',
     'stock-in-alert' => 'Stock in alert',
     'fast-buy' => 'Fast buy',
     'want-to-learn-more' => 'Want to learn more?',

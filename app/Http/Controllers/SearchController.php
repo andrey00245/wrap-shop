@@ -93,11 +93,31 @@ class SearchController extends Controller
             $columns[] = 'descriptions';
         }
 
+        // Используем Algolia (Scout), если включен драйвер и не запрошен поиск по описанию
+        $useAlgolia = config('scout.driver') === 'algolia'
+            && !empty($searchValue)
+            && !$includeDescription;
+
+        $searchIds = null;
+        if ($useAlgolia) {
+            $searchIds = Product::search($searchValue)->keys();
+        }
 
         $products = Product::query()
             ->where('products.is_active', 1)
-            ->when($searchValue, function ($query) use ($columns, $searchValue) {
-                $query->whereLikeInsensitive($columns, $searchValue);
+            ->when($useAlgolia, function ($query) use ($searchIds) {
+                // Если Algolia ничего не нашла – вернем пустой результат
+                if (empty($searchIds)) {
+                    $query->whereRaw('0 = 1');
+                    return;
+                }
+
+                $query->whereIn('products.id', $searchIds);
+            }, function ($query) use ($columns, $searchValue) {
+                // Фоллбэк на старый SQL‑поиск
+                if (!empty($searchValue)) {
+                    $query->whereLikeInsensitive($columns, $searchValue);
+                }
             })
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->join('price_types', 'product_prices.type_id', '=', 'price_types.id')
@@ -214,45 +234,79 @@ class SearchController extends Controller
         $columns = ['name', 'code'];
         $search = $request->get('search');
 
-        $products = Product::query()
-            ->whereHas('prices', function ($query) {
-                $query->where('type_id', function ($subQuery) {
-                    $subQuery->select('id')
-                        ->from('price_types')
-                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-                })->where('price', '>', 0);
-            })
-            ->whereHas('media')
-            ->whereHas('category')
-            ->with(['media'])
-            ->where(function ($query) use ($columns, $search) {
-                $query->whereLikeInsensitive($columns, $search)
-                    ->orWhereHas('attributes', function ($attrQuery) use ($search) {
-                        $keywords = preg_split('/\s+/', mb_strtolower($search), -1, PREG_SPLIT_NO_EMPTY);
-                        $allKeywords = [];
+        $useAlgolia = config('scout.driver') === 'algolia' && !empty($search);
 
-                        foreach ($keywords as $word) {
-                            $allKeywords[] = $word;
-                            $allKeywords[] = Product::toTranslit($word);
-                        }
+        if ($useAlgolia) {
+            // Берем id товаров из Algolia с учетом релевантности (->all() для implode/whereIn)
+            $ids = Product::search($search)->take(20)->keys()->all();
 
-                        $locales = ['uk', 'ru', 'en'];
+            $productsQuery = Product::query()
+                ->where('is_active', 1)
+                ->whereHas('prices', function ($query) {
+                    $query->where('type_id', function ($subQuery) {
+                        $subQuery->select('id')
+                            ->from('price_types')
+                            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+                    })->where('price', '>', 0);
+                })
+                ->whereHas('media')
+                ->whereHas('category')
+                ->with(['media']);
 
-                        $attrQuery->where(function ($innerQuery) use ($allKeywords, $locales) {
-                            foreach ($locales as $locale) {
-                                foreach ($allKeywords as $keyword) {
-                                    if (!empty($keyword)) {
-                                        $innerQuery->orWhereRaw(
-                                            "LOWER(JSON_UNQUOTE(JSON_EXTRACT(value, '$.\"$locale\"'))) LIKE ?",
-                                            ['%' . $keyword . '%']
-                                        );
+            if (!empty($ids)) {
+                $idsList = implode(',', $ids);
+                $productsQuery
+                    ->whereIn('id', $ids)
+                    ->orderByRaw("FIELD(id, {$idsList})");
+            } else {
+                // Явно возвращаем пустой результат
+                $productsQuery->whereRaw('0 = 1');
+            }
+
+            $products = $productsQuery->get();
+        } else {
+            // Старый SQL‑вариант поиска как фоллбэк
+            $products = Product::query()
+                ->where('is_active', 1)
+                ->whereHas('prices', function ($query) {
+                    $query->where('type_id', function ($subQuery) {
+                        $subQuery->select('id')
+                            ->from('price_types')
+                            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+                    })->where('price', '>', 0);
+                })
+                ->whereHas('media')
+                ->whereHas('category')
+                ->with(['media'])
+                ->where(function ($query) use ($columns, $search) {
+                    $query->whereLikeInsensitive($columns, $search)
+                        ->orWhereHas('attributes', function ($attrQuery) use ($search) {
+                            $keywords = preg_split('/\s+/', mb_strtolower($search), -1, PREG_SPLIT_NO_EMPTY);
+                            $allKeywords = [];
+
+                            foreach ($keywords as $word) {
+                                $allKeywords[] = $word;
+                                $allKeywords[] = Product::toTranslit($word);
+                            }
+
+                            $locales = ['uk', 'ru', 'en'];
+
+                            $attrQuery->where(function ($innerQuery) use ($allKeywords, $locales) {
+                                foreach ($locales as $locale) {
+                                    foreach ($allKeywords as $keyword) {
+                                        if (!empty($keyword)) {
+                                            $innerQuery->orWhereRaw(
+                                                "LOWER(JSON_UNQUOTE(JSON_EXTRACT(value, '$.\"$locale\"'))) LIKE ?",
+                                                ['%' . $keyword . '%']
+                                            );
+                                        }
                                     }
                                 }
-                            }
+                            });
                         });
-                    });
-            })
-            ->get();
+                })
+                ->get();
+        }
 
         return response()->json([
             'data' => [

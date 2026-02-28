@@ -355,6 +355,7 @@ class ProductService
                 'external_code' => $productData['externalCode'] ?? null,
                 'code'          => $productData['code'] ?? null,
                 'article'       => $productData['article'] ?? null,
+                'is_active'     => 1, // Активируем товар при создании из вебхука
                 'name'          => [
                     'ru' => $productData['name'] ?? '',
                     'uk' => $productData['name'] ?? '',
@@ -486,12 +487,18 @@ class ProductService
         ]);
 
         $receivedExternalIds = [];
+        $receivedAttributesForLog = [];
 
         foreach ($attributes as $attribute) {
             try {
                 if (isset($attribute['id'])) {
                     $receivedExternalIds[] = $attribute['id'];
                 }
+                $receivedAttributesForLog[] = [
+                    'id'    => $attribute['id']   ?? null,
+                    'name'  => $attribute['name'] ?? null,
+                    'value' => $attribute['value'] ?? null,
+                ];
                 $this->processAttributeFromWebhook($attribute, $product);
             } catch (\Exception $e) {
                 Log::error('Ошибка обработки атрибута из вебхука', [
@@ -502,6 +509,11 @@ class ProductService
                 ]);
             }
         }
+
+        Log::info('Список атрибутов из вебхука', [
+            'product_id'  => $product->id,
+            'attributes'  => $receivedAttributesForLog,
+        ]);
 
         // Синхронизируем коллекцию banner_images с текущим набором URL из атрибутов Доп.галерея
         try {
@@ -598,15 +610,19 @@ class ProductService
             $productAttribute->update(['field_name' => $mappedField]);
         }
 
-        // Определяем значение атрибута
+        // Определяем значение атрибута (поддержка строк/чисел/булевых)
         $value = null;
         if (is_array($attributeValue) && isset($attributeValue['name'])) {
             $value = $attributeValue['name'];
-        } elseif (is_string($attributeValue)) {
+        } elseif (is_scalar($attributeValue)) { // строки, числа, bool
             $value = $attributeValue;
         }
 
         if ($value !== null) {
+            // Для всех булевых значений сохраняем как булевые, не как строки
+            // Это работает для всех атрибутов, не только для UNDER_ORDER
+            $isBooleanValue = is_bool($value);
+            
             // Обновляем или создаем связь с товаром
             $existingPivot = $product->attributes()->where('attribute_id', $productAttribute->id)->first();
 
@@ -614,14 +630,14 @@ class ProductService
             if ($existingPivot && isset($existingPivot->pivot)) {
                 $currentVal = $existingPivot->pivot->value;
                 if (!is_array($currentVal)) {
-                    $currentVal = ['uk' => (string) $currentVal];
+                    $currentVal = ['uk' => $currentVal]; // Keep original type for non-array
                 }
-                $currentVal['uk'] = $value;
+                $currentVal['uk'] = $value; // Assign value directly, preserving type
                 $product->attributes()->updateExistingPivot($productAttribute->id, ['value' => $currentVal]);
             } else {
                 $product->attributes()->attach($productAttribute->id, [
                     'value' => [
-                        'uk' => $value,
+                        'uk' => $value, // Assign value directly, preserving type
                     ]
                 ]);
             }
@@ -630,7 +646,10 @@ class ProductService
                 'product_id'     => $product->id,
                 'attribute_id'   => $attributeId,
                 'attribute_name' => $attributeName,
-                'value'          => $value
+                'value'          => $value,
+                'value_type'     => gettype($value),
+                'is_boolean'     => is_bool($value),
+                'is_under_order' => ($attributeId === ProductAttributeEnum::UNDER_ORDER),
             ]);
 
             // Обработка атрибутов Доп.галерея1..8 → сохранение в коллекцию banner_images
@@ -926,6 +945,64 @@ class ProductService
                 $existingHashes = $existingImages->map(function ($media) {
                     return $media->getCustomProperty('moysklad_hash');
                 })->filter()->toArray();
+
+                // Если есть старые изображения без moysklad_hash — считаем их "старым форматом" и просто чистим коллекцию
+                $hasImagesWithoutHash = $existingImages->contains(function ($media) {
+                    return !$media->getCustomProperty('moysklad_hash');
+                });
+
+                if ($hasImagesWithoutHash) {
+                    try {
+                        $countBefore = $existingImages->count();
+                        $product->clearMediaCollection('images');
+                        Log::info('Очищена коллекция изображений (старый формат без hash)', [
+                            'product_id'    => $product->id,
+                            'deleted_count' => $countBefore,
+                        ]);
+                        // после очистки пересобираем коллекции
+                        $existingImages = $product->getMedia('images');
+                        $existingHashes = [];
+                    } catch (\Throwable $e) {
+                        Log::warning('Не удалось очистить коллекцию изображений', [
+                            'product_id' => $product->id,
+                            'error'      => $e->getMessage(),
+                        ]);
+                    }
+                } else {
+                    // Удаляем дубликаты среди уже сохранённых (один media на каждый hash)
+                    try {
+                        $seen = [];
+                        $deletedDuplicates = 0;
+                        foreach ($existingImages as $media) {
+                            $hash = $media->getCustomProperty('moysklad_hash');
+                            if (!$hash) {
+                                continue;
+                            }
+                            if (isset($seen[$hash])) {
+                                $media->delete();
+                                $deletedDuplicates++;
+                                continue;
+                            }
+                            $seen[$hash] = true;
+                        }
+                        if ($deletedDuplicates > 0) {
+                            Log::info('Удалены дубликаты изображений по hash', [
+                                'product_id' => $product->id,
+                                'deleted'    => $deletedDuplicates,
+                            ]);
+                            // Обновляем коллекцию и хеши после чистки
+                            $existingImages = $product->getMedia('images');
+                            $existingHashes = $existingImages->map(function ($media) {
+                                return $media->getCustomProperty('moysklad_hash');
+                            })->filter()->toArray();
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning('Не удалось удалить дубликаты изображений', [
+                            'product_id' => $product->id,
+                            'error'      => $e->getMessage(),
+                        ]);
+                    }
+                }
 
                 // Получаем хеши изображений из МойСклад
                 $moyskladHashes = [];

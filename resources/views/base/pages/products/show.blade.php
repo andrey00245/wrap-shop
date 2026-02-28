@@ -461,6 +461,179 @@
             </div>
         @endif
 
+        @if($product->hasYoutubeVideos() || $product->getVideos()->count() > 0)
+            @php
+                $youtubeVideos = $product->getYoutubeVideos();
+                $hasYoutube = $youtubeVideos->count() > 0;
+                
+                // Для обратной совместимости - если есть старое видео, но нет YouTube
+                $oldVideo = null;
+                $originalVideoUrl = null;
+                $posterImage = $product->getPreviewImage() ?: $product->getImage();
+                
+                if (!$hasYoutube && $product->getVideos()->count() > 0) {
+                    $oldVideo = $product->getFirstVideo();
+                    $mobileVideoUrl = $product->getMobileVideoUrl();
+                    $desktopVideoUrl = $product->getDesktopVideoUrl();
+                    $originalVideoUrl = $oldVideo ? $oldVideo->getUrl() : null;
+                    $posterImage = $product->getVideoPoster() ?: $posterImage;
+                }
+            @endphp
+            
+            @if($hasYoutube)
+                {{-- Слайдер YouTube видео --}}
+                <section class="home-about product-page-video product-page-video-slider">
+                    <div id="product-video-slider" class="splide">
+                        <div class="splide__track">
+                            <div class="splide__list">
+                                @foreach($youtubeVideos as $index => $youtubeVideo)
+                                    <div class="splide__slide product-video-slide" data-youtube-id="{{$youtubeVideo->youtube_id}}" data-youtube-url="{{$youtubeVideo->youtube_url}}">
+                                        <div class="product-video-slide-wrapper">
+                                            <div class="product-video-youtube-container" data-youtube-id="{{$youtubeVideo->youtube_id}}">
+                                                <img src="{{$youtubeVideo->getThumbnailUrl()}}" alt="Video thumbnail" class="product-video-youtube-thumbnail">
+                                                <div class="home-about-play button product-video-play-btn product-video-youtube-play-btn" 
+                                                     data-youtube-id="{{$youtubeVideo->youtube_id}}"
+                                                     data-youtube-url="{{$youtubeVideo->youtube_url}}"
+                                                     data-product-name="{{$product->getName()}}"
+                                                     data-product-price="{{number_format($product->getPrice(), 2, '.', '')}}"
+                                                     data-product-description="{{strip_tags($product->descriptions ?? '')}}"
+                                                     data-product-id="{{$product->id}}"
+                                                     data-product-stock="{{$product->getStock()}}">
+                                                    <i class="far fa-play button colord"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                {{-- Модальное окно с YouTube видео слайдером для мобильных --}}
+                <div id="product-video-modal" class="product-video-modal">
+                    <div class="product-video-modal-overlay"></div>
+                    <div class="product-video-modal-container">
+                        {{-- Слайдер YouTube видео по центру --}}
+                        <div class="product-video-modal-video">
+                            <div id="product-video-modal-slider" class="splide">
+                                <div class="splide__track">
+                                    <div class="splide__list">
+                                        @foreach($youtubeVideos as $youtubeVideo)
+                                            <div class="splide__slide product-video-modal-slide">
+                                                <div class="product-video-youtube-iframe-container" 
+                                                     data-youtube-id="{{$youtubeVideo->youtube_id ?: \App\Models\ProductVideo::extractYoutubeId($youtubeVideo->youtube_url)}}"
+                                                     data-youtube-url="{{$youtubeVideo->youtube_url}}">
+                                                    {{-- Индикатор загрузки --}}
+                                                    <div class="product-video-loading-spinner">
+                                                        <div class="spinner"></div>
+                                                        <p>{{__('product-show.loading-video')}}</p>
+                                                    </div>
+                                                    <iframe 
+                                                        class="product-video-youtube-iframe"
+                                                        src=""
+                                                        frameborder="0" 
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                        allowfullscreen>
+                                                    </iframe>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- Попап с информацией о товаре справа --}}
+                        <div class="product-video-modal-sidebar">
+                            <div class="product-video-modal-content">
+                                <h2 class="product-video-modal-title"></h2>
+                                <div class="product-video-modal-price"></div>
+                                <div class="product-video-modal-description"></div>
+                                <div class="product-video-modal-actions">
+                                    <button type="button" id="product-video-modal-back-btn" class="product-video-modal-back button">
+                                        <i class="fas fa-chevron-left"></i> {{__('product-show.back')}}
+                                    </button>
+                                    <button type="button" id="product-video-modal-cart-btn" class="product-video-modal-cart button colord"
+                                            data-product-id="{{$product->id}}"
+                                            data-product-quantity="{{$product->getDefaultQuantity()}}">
+                                        <i class="fas fa-chevron-right"></i>{{__('product-show.add-to-cart')}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                {{-- Старое видео (для обратной совместимости) --}}
+                <section class="home-about product-page-video">
+                    <video 
+                        id="product-video-player"
+                        class="product-video-player"
+                        width="1200"
+                        height="400"
+                        loop
+                        playsinline
+                        preload="none"
+                        loading="lazy"
+                        poster="{{$posterImage}}"
+                        data-mobile-video="{{$mobileVideoUrl ?? ''}}" 
+                        data-desktop-video="{{$desktopVideoUrl ?? ''}}" 
+                        data-original-video="{{$originalVideoUrl}}">
+                        <source src="{{$originalVideoUrl}}" type="{{$oldVideo->mime_type ?? 'video/mp4'}}">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="home-about-play button product-video-play-btn" 
+                         data-src="{{$originalVideoUrl}}" 
+                         data-product-name="{{$product->getName()}}"
+                         data-product-price="{{number_format($product->getPrice(), 2, '.', '')}}"
+                         data-product-description="{{strip_tags($product->descriptions ?? '')}}"
+                         data-product-id="{{$product->id}}"
+                         data-product-stock="{{$product->getStock()}}">
+                        <i class="far fa-play button colord"></i>
+                    </div>
+                </section>
+                
+                {{-- Модальное окно с видео и попапом товара для мобильных --}}
+                <div id="product-video-modal" class="product-video-modal">
+                    <div class="product-video-modal-overlay"></div>
+                    <div class="product-video-modal-container">
+                        {{-- Видео по центру --}}
+                        <div class="product-video-modal-video">
+                            <video 
+                                id="product-video-modal-player"
+                                class="product-video-modal-player"
+                                controls
+                                playsinline
+                                preload="auto">
+                                <source src="{{$originalVideoUrl}}" type="{{$oldVideo->mime_type ?? 'video/mp4'}}">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        
+                        {{-- Попап с информацией о товаре справа --}}
+                        <div class="product-video-modal-sidebar">
+                            <div class="product-video-modal-content">
+                                <h2 class="product-video-modal-title"></h2>
+                                <div class="product-video-modal-price"></div>
+                                <div class="product-video-modal-description"></div>
+                                <div class="product-video-modal-actions">
+                                    <button type="button" id="product-video-modal-back-btn" class="product-video-modal-back button">
+                                        <i class="fas fa-chevron-left"></i> {{__('product-show.back')}}
+                                    </button>
+                                    <button type="button" id="product-video-modal-cart-btn" class="product-video-modal-cart button colord"
+                                            data-product-id="{{$product->id}}"
+                                            data-product-quantity="{{$product->getDefaultQuantity()}}">
+                                        <i class="fas fa-chevron-right"></i>{{__('product-show.add-to-cart')}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endif
+
         <div class="product-page-info flex-justify wrap">
             <div class="item">
                 @if($product->descriptions)

@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\ProductBanner;
 use App\Models\Setting;
 use App\Observers\ProductObserver;
+use App\Observers\MediaObserver;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -32,6 +34,26 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Подавляем PHP Notice/Warning для Broken pipe через error handler
+        set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+            // Подавляем ошибки Broken pipe
+            if (str_contains($errstr, 'file_put_contents') && 
+                (str_contains($errstr, 'Broken pipe') || 
+                 str_contains($errstr, 'errno=32'))) {
+                return true; // Подавляем ошибку
+            }
+            
+            // Подавляем ошибки из server.php
+            if (str_contains($errfile, 'server.php') && 
+                (str_contains($errstr, 'Broken pipe') || 
+                 str_contains($errstr, 'errno=32'))) {
+                return true; // Подавляем ошибку
+            }
+            
+            // Возвращаем false для других ошибок, чтобы они обрабатывались стандартным образом
+            return false;
+        }, E_WARNING | E_NOTICE);
+        
         $privateKey = file_get_contents(storage_path('AuthKey_' . env('APPLE_KEY_ID') . '.p8'));
 
         $payload = [
@@ -51,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Product::observe(ProductObserver::class);
+        Media::observe(MediaObserver::class);
 
         /**
        * @var Setting $settings

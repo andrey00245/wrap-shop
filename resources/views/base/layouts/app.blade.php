@@ -2,7 +2,7 @@
 
 @include('base.layouts.head')
 
-<body>
+<body class="theme-{{$theme ?? 'light'}}">
 
 <div class="ellipse-body">
   <div class="ellipse red"></div>
@@ -13,6 +13,10 @@
 @yield('content')
 
 @include('base.layouts.footer')
+
+@stack('drawers')
+
+@stack('scripts')
 
 </body>
 </html>

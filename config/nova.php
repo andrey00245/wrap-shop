@@ -208,6 +208,6 @@ return [
     ],
 
     'file_upload' => [
-        'max_file_size' => 20240,
+        'max_file_size' => 204800, // 200MB в килобайтах
     ],
 ];

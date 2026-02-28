@@ -134,6 +134,7 @@ class Attribute extends Model
            ->pluck('product_id')->toArray();
 
       return Product::query()
+          ->where('is_active', 1)
           ->whereIn('id', $productIds)
           ->whereHas('media')
           ->whereIn('category_id', $category->isParent() ? $category->children()->pluck('id') : [$category->id])

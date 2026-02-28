@@ -50,7 +50,7 @@
                                                         <div class="hide"
                                                              data-src="{{$image->getUrl()}}"
                                                              data-fancybox="latest{{$product->id}}"
-                                                             data-caption="{{$product->name}}"></div>
+                                                             data-caption="{{$product->getName()}}"></div>
                                                     @endif
                                                     <li class="splide__slide"
                                                         role="group">

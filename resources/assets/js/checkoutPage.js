@@ -630,7 +630,7 @@ $(document).ready(function() {
         // Фильтруем предложения по введенному запросу
         branchesData.forEach(function(branch) {
             if (branch.name.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
-                suggestionsList += `<li data-id="${branch.id}" data-value="${branch.name}">
+                suggestionsList += `<li data-id="${branch.id}" data-value="${branch.name}" data-city="${branch.city || ''}">
                     ${branch.name}
                 </li>`;
             }
@@ -675,8 +675,9 @@ $(document).ready(function() {
                 // Экранируем HTML и правильно формируем атрибуты
                 let escapedName = postMachine.name.replace(/"/g, '&quot;');
                 let escapedDisplayName = displayName.replace(/"/g, '&quot;');
+                let city = (postMachine.city || "").replace(/"/g, '&quot;');
                 
-                suggestionsList += `<li data-id="${postMachine.id}" data-value="${escapedName}">
+                suggestionsList += `<li data-id="${postMachine.id}" data-value="${escapedName}" data-city="${city}">
                     ${escapedDisplayName}
                 </li>`;
             }
@@ -719,14 +720,18 @@ $(document).ready(function() {
         e.preventDefault();
         let selectedAddress = $(this).data("value");
         let ref = $(this).data("id"); // <--- ВАЖНО
+        let city = $(this).data("city") || ""; // Получаем город
 
-        // Заполняем поле с адресом
-        $("#shipping_address").val(selectedAddress);
+        // Формируем адрес с городом: "Город, Название отделения"
+        let fullAddress = city ? city + ", " + selectedAddress : selectedAddress;
+
+        // Заполняем поле с адресом (полный адрес с городом)
+        $("#shipping_address").val(fullAddress);
 
         // Записываем ref в скрытое поле
         $("#novaposhta_warehouse_ref").val(ref); // <--- ВОТ ЭТО
 
-        console.log(ref);
+        console.log(ref, city);
         // Прячем список предложений
         $("#address-suggestions").hide();
     });
@@ -736,10 +741,14 @@ $(document).ready(function() {
         e.preventDefault();
         let selectedLocker = $(this).data("value");
         let ref = $(this).data("id");
+        let city = $(this).data("city") || "";
         let displayText = $(this).text().trim(); // Получаем текст для отображения
 
-        // Заполняем поле с почтоматом полным названием
-        $("#locker_address").val(displayText);
+        // Формируем адрес с городом: "Город, Название почтомата"
+        let fullAddress = city ? city + ", " + displayText : displayText;
+
+        // Заполняем поле с почтоматом полным названием с городом
+        $("#locker_address").val(fullAddress);
         
         // Сохраняем ID почтомата в скрытое поле
         $("#locker_warehouse_ref").val(ref);
@@ -750,7 +759,7 @@ $(document).ready(function() {
         // Обновляем поля Nova Poshta
         window.updateNovaPoshtaFields();
 
-        console.log('Selected locker:', ref, 'Display text:', displayText);
+        console.log('Selected locker:', ref, 'City:', city, 'Display text:', displayText);
         console.log('Locker warehouse ref field value:', $("#locker_warehouse_ref").val());
         
         // Прячем список предложений после обновления полей

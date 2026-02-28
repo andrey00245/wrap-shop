@@ -59,7 +59,7 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
-            'max_file_size' => 50 * 1024 * 1024, // максимальний розмір файлу в байтах (50MB)
+            'max_file_size' => 200 * 1024 * 1024, // максимальний розмір файлу в байтах (200MB)
         ],
 
         'public' => [
@@ -68,7 +68,7 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
-            'max_file_size' => 50 * 1024 * 1024, // максимальний розмір файлу в байтах (50MB)
+            'max_file_size' => 200 * 1024 * 1024, // максимальний розмір файлу в байтах (200MB)
         ],
 
         's3' => [

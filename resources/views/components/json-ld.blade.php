@@ -48,18 +48,34 @@
     }
     </script>
 @elseif(isset($category))
-    {{-- Category JSON-LD --}}
+    {{-- Category JSON-LD (CollectionPage) --}}
+    @php
+        $categoryDescription = $category->content ?? $category->seo_text ?? ($category->name . ' - ' . $siteDescription);
+        $categoryDescription = strip_tags($categoryDescription);
+    @endphp
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
         "name": "{{ $category->name }}",
-        "description": "{{ $category->name }} - {{ $siteDescription }}",
+        "description": "{{ $categoryDescription }}",
         "url": "{{ $currentUrl }}",
+        "about": {
+            "@type": "Thing",
+            "name": "{{ $category->name }}"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "{{ $siteName }}",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{{ url('assets/img/logo.png') }}"
+            }
+        },
         "mainEntity": {
             "@type": "ItemList",
             "name": "{{ $category->name }}",
-            "description": "Товари в категорії {{ $category->name }}"
+            "description": "{{ $locale === 'ru' ? 'Товары в категории' : ($locale === 'en' ? 'Products in category' : 'Товари в категорії') }} {{ $category->name }}"
         }
     }
     </script>

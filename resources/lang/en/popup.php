@@ -104,6 +104,17 @@ return [
         'send_review' => 'Send review',
         'success_message' => 'Thank you for your review. It has been submitted to the administrator for spam check and will be published soon.',
         'error_message' => 'Error sending review.',
+        'validation' => [
+            'name_required' => 'Please enter your name.',
+            'name_string' => 'Name must be text.',
+            'name_max' => 'Name is too long (maximum 255 characters).',
+            'text_required' => 'Please enter your review.',
+            'text_string' => 'Review must be text.',
+            'text_max' => 'Review is too long (maximum 1000 characters).',
+            'rating_required' => 'Please select a rating.',
+            'rating_integer' => 'Rating must be a number.',
+            'rating_between' => 'Please select a rating from 1 to 5.',
+        ],
     ]
 
 ];

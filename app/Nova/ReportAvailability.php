@@ -5,6 +5,7 @@ namespace App\Nova;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\DateTime;
 use Illuminate\Http\Request;
 use Laravel\Nova\Resource;
 
@@ -44,6 +45,13 @@ class ReportAvailability extends Resource
                 ->sortable()
                 ->searchable()
                 ->rules('required'),
+
+            DateTime::make('Дата додавання', 'created_at')
+                ->sortable()
+                ->readonly()
+                ->displayUsing(function ($value) {
+                    return $value ? $value->format('d.m.Y H:i') : null;
+                }),
         ];
     }
 }

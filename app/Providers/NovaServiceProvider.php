@@ -43,71 +43,101 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 	 *
 	 * @return void
 	 */
-	public function boot()
-	{
-		parent::boot();
+    public function boot()
+    {
+        parent::boot();
 
-		Nova::name('Wrap Shop');
+        Nova::name('Wrap Shop');
 
-	Nova::mainMenu(function (Request $request) {
-		return [
-			MenuSection::dashboard(Main::class)->icon('chart-bar'),
+        Nova::mainMenu(function (Request $request) {
+            $user = $request->user();
+            $role = $user?->role ?? 'user';
 
-		MenuSection::make('Замовлення', [
-			MenuItem::resource(Order::class),
-			MenuItem::resource(Consultation::class),
-		])->icon('shopping-bag')->collapsable(),
+            // Базовые секции, общие для админа и контент‑менеджера
+            $menu = [
+                MenuSection::dashboard(Main::class)->icon('chart-bar'),
+            ];
 
-			MenuSection::make('Товари', [
-				MenuItem::resource(Product::class),
-				MenuItem::resource(BestSeller::class),
-				MenuItem::resource(Attribute::class),
-				MenuItem::resource(Category::class),
-				MenuItem::resource(PriceType::class),
-				MenuItem::resource(Implementation::class),
-				MenuItem::resource(ReportAvailability::class),
-			])->icon('collection')->collapsable(),
+            // Только админ: заказы и консультации
+            if ($role === 'admin') {
+                $menu[] = MenuSection::make('Замовлення', [
+                    MenuItem::resource(Order::class),
+                    MenuItem::resource(Consultation::class),
+                ])->icon('shopping-bag')->collapsable();
+            }
 
-			MenuSection::make('Користувачі', [
-				MenuItem::resource(User::class),
-				MenuItem::resource(Review::class),
-			])->icon('user')->collapsable(),
+            // Товары
+            if ($role === 'admin') {
+                // Админ видит всё
+                $menu[] = MenuSection::make('Товари', [
+                    MenuItem::resource(Product::class),
+                    MenuItem::resource(BestSeller::class),
+                    MenuItem::resource(Attribute::class),
+                    MenuItem::resource(Category::class),
+                    MenuItem::resource(PriceType::class),
+                    MenuItem::resource(Implementation::class),
+                    MenuItem::resource(ReportAvailability::class),
+                ])->icon('collection')->collapsable();
+            } elseif ($role === 'content_manager') {
+                // Контент‑менеджер: товары + категории, но без типов цен
+                $menu[] = MenuSection::make('Товари', [
+                    MenuItem::resource(Product::class),
+                    MenuItem::resource(Category::class),
+                ])->icon('collection')->collapsable();
+            }
 
-			MenuSection::make('Контент', [
-				MenuItem::resource(Banner::class),
-				MenuItem::resource(ProductBanner::class),
-				MenuItem::resource(CustomBlock::class),
-				MenuItem::resource(NewsCategory::class),
-				MenuItem::resource(News::class),
-				MenuItem::resource(Faq::class),
-				MenuItem::resource(VideoCategory::class),
-				MenuItem::resource(VideoReview::class),
-			])->icon('document-text')->collapsable(),
+            // Пользователи / отзывы
+            if ($role === 'admin') {
+                $menu[] = MenuSection::make('Користувачі', [
+                    MenuItem::resource(User::class),
+                    MenuItem::resource(Review::class),
+                ])->icon('user')->collapsable();
+            } elseif ($role === 'content_manager') {
+                // Контент‑менеджер видит только отзывы
+                $menu[] = MenuSection::make('Користувачі', [
+                    MenuItem::resource(Review::class),
+                ])->icon('user')->collapsable();
+            }
 
-			MenuSection::make('Доставка та оплата', [
-				MenuItem::resource(DeliveryOption::class),
-				MenuItem::resource(PaymentOption::class),
-			])->icon('truck')->collapsable(),
+            // Контент (виды, «звуки», новини, FAQ тощо)
+            if (in_array($role, ['admin', 'content_manager'], true)) {
+                $menu[] = MenuSection::make('Контент', [
+                    MenuItem::resource(Banner::class),
+                    MenuItem::resource(ProductBanner::class),
+                    MenuItem::resource(CustomBlock::class),
+                    MenuItem::resource(NewsCategory::class),
+                    MenuItem::resource(News::class),
+                    MenuItem::resource(Faq::class),
+                    MenuItem::resource(VideoCategory::class),
+                    MenuItem::resource(VideoReview::class),
+                ])->icon('document-text')->collapsable();
+            }
 
-			MenuSection::resource(PrivacyPolicy::class)->icon('shield-check'),
+            // Доставка та оплата – доступно и админу, и контент‑менеджеру
+            if (in_array($role, ['admin', 'content_manager'], true)) {
+                $menu[] = MenuSection::make('Доставка та оплата', [
+                    MenuItem::resource(DeliveryOption::class),
+                    MenuItem::resource(PaymentOption::class),
+                ])->icon('truck')->collapsable();
+            }
 
-			MenuSection::resource(Setting::class)->icon('cog'),
+            // Ниже — только для админа
+            if ($role === 'admin') {
+                $menu[] = MenuSection::resource(PrivacyPolicy::class)->icon('shield-check');
 
-			MenuSection::make('Команди', [
-				MenuItem::externalLink('Виконати команди', '/nova-vendor/command-runner'),
-			])->icon('terminal')->collapsable(),
+                $menu[] = MenuSection::resource(Setting::class)->icon('cog');
 
-			MenuSection::make('Генератор фідів', [
-				MenuItem::externalLink('Генератор фідів', '/nova-tools/feed-generator'),
-			])->icon('document-text')->collapsable(),
+                $menu[] = MenuSection::make('Команди', [
+                    MenuItem::externalLink('Виконати команди', '/nova-vendor/command-runner'),
+                ])->icon('terminal')->collapsable();
 
-	];
-});
+                $menu[] = MenuSection::make('Генератор фідів', [
+                    MenuItem::externalLink('Генератор фідів', '/nova-tools/feed-generator'),
+                ])->icon('document-text')->collapsable();
+            }
 
-
-
-
-
+            return $menu;
+        });
 		// Кастомный футер
 		Nova::footer(function ($request) {
 			return Blade::render('
@@ -136,15 +166,12 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 	 *
 	 * @return void
 	 */
-	protected function gate()
-	{
-		Gate::define('viewNova', function ($user) {
-			return in_array($user->email, [
-				'test@gmail.com',
-				'admin-wrap@gmail.com',
-			], true);
-		});
-	}
+    protected function gate()
+    {
+        Gate::define('viewNova', function ($user) {
+            return in_array($user->role, ['admin', 'content_manager'], true);
+        });
+    }
 
 	/**
 	 * Get the dashboards that should be listed in the Nova sidebar.

@@ -71,6 +71,31 @@ Route::get('/admin/run-media', function () {
     }
 });
 
+Route::get('/admin/run-migrations', function () {
+    try {
+        $exitCode = Artisan::call('migrate', [
+            '--force' => true,
+        ]);
+
+        $output = Artisan::output();
+
+        return response()->json([
+            'success'   => $exitCode === 0,
+            'message'   => $exitCode === 0
+                ? 'Міграції успішно виконано'
+                : 'Міграції завершилися з кодом ' . $exitCode,
+            'output'    => $output,
+            'exit_code' => $exitCode,
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Помилка виконання міграцій: ' . $e->getMessage(),
+            'trace'   => $e->getTraceAsString(),
+        ], 500);
+    }
+});
+
 Route::match(['get', 'post'], 'login/apple/callback', [SocialController::class, 'handleAppleCallback'])
     ->withoutMiddleware([VerifyCsrfToken::class]);
 Route::post('checkout/wayforpay/callback', [WayForPayController::class, 'callback'])

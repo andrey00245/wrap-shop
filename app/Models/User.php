@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'phone',
         'last_name',
+        'role',
         'verification_code',
         'verification_code_expires_at'
     ];
@@ -88,5 +89,15 @@ class User extends Authenticatable
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isContentManager(): bool
+    {
+        return $this->role === 'content_manager';
     }
 }

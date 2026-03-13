@@ -474,7 +474,6 @@ class MoySkladSyncService
                                 "mediaType" => "application/json"
                             ],
                             "id" => $order->novaposhta_warehouse_ref,
-                            "name" => $deliveryAddress,
                         ]
                     ];
                 }

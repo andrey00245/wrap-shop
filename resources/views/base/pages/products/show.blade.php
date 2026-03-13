@@ -165,19 +165,19 @@
                 </div>
                 <div class="center flex-justify">
                     @php
-                        $count= $product->getStock();
+                        $count = $product->getStock();
                         $secondStock = $product->getSecondStock();
                         $thirdStock = $product->getThirdStock();
                     @endphp
                     <div class="left">
                         <div class="info flex-center">
                             <div class="availability">
-                                @if($product->getUnderOrder())
-                                    <i class="fas fa-times nonstock"></i>{{ __('product-show.under_order') }}
-                                @elseif($count == 0)
-                                    <i class="fas fa-times nonstock"></i>{{ __('product-show.out-of-stock') }}
-                                @else
+                                @if($count > 0)
                                     <i class="fas fa-check"></i>{{ __('product-show.in-stock') }}
+                                @elseif($product->getUnderOrder())
+                                    <i class="fas fa-times nonstock"></i>{{ __('product-show.under_order') }}
+                                @else
+                                    <i class="fas fa-times nonstock"></i>{{ __('product-show.out-of-stock') }}
                                 @endif
                             </div>
                         </div>

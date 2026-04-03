@@ -2,9 +2,8 @@
 
 namespace App\Nova;
 
+use App\Nova\Fields\NovaTabTranslatable;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
-use Illuminate\Database\Eloquent\Builder;
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
@@ -16,8 +15,8 @@ use Outl1ne\NovaSortable\Traits\HasSortableRows;
 
 class CustomBlock extends Resource
 {
-    use HasSortableRows;
     use HasSortableManyToManyRows;
+    use HasSortableRows;
 
     /**
      * The model the resource corresponds to.
@@ -61,7 +60,6 @@ class CustomBlock extends Resource
     /**
      * Get the fields displayed by the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function fields(NovaRequest $request)
@@ -70,9 +68,9 @@ class CustomBlock extends Resource
             ID::make()->sortable(),
             NovaTabTranslatable::make([
                 Text::make('Назва', 'name')
-                    ->help('Для підсвічування тексту використовуйте тег span з класом "colord", наприклад: &lt;span class=&quot;colord&quot;&gt;3M&lt;/span&gt;')
+                    ->help('Для підсвічування тексту використовуйте тег span з класом "colord", наприклад: &lt;span class=&quot;colord&quot;&gt;3M&lt;/span&gt;'),
             ]),
-            BelongsToMany::make('Продукти','products', Product::class)
+            BelongsToMany::make('Продукти', 'products', Product::class)
                 ->fields(function () {
                     return [
                         Number::make('Порядок', 'sort_order')
@@ -87,7 +85,7 @@ class CustomBlock extends Resource
             Text::make('Url')->hideFromIndex(),
             Boolean::make('Active', 'is_active'),
 
-            Images::make('Баннер','main'),
+            Images::make('Баннер', 'main'),
 
             Text::make('Кількість товарів', function () {
                 return $this->products()->count();
@@ -95,14 +93,13 @@ class CustomBlock extends Resource
 
             Number::make('Порядок сортування', 'sort_order')
                 ->sortable()
-                ->rules('required', 'integer', 'min:0')
+                ->rules('required', 'integer', 'min:0'),
         ];
     }
 
     /**
      * Get the cards available for the request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function cards(NovaRequest $request)
@@ -113,7 +110,6 @@ class CustomBlock extends Resource
     /**
      * Get the filters available for the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function filters(NovaRequest $request)
@@ -124,7 +120,6 @@ class CustomBlock extends Resource
     /**
      * Get the lenses available for the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function lenses(NovaRequest $request)
@@ -135,7 +130,6 @@ class CustomBlock extends Resource
     /**
      * Get the actions available for the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function actions(NovaRequest $request)

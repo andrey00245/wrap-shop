@@ -1,7 +1,7 @@
 @props(['category'])
 @if($category->hasChildren())
   <li class="item parent flex-all">
-    <a href="{{ route('products.category', ['category' => $category->slugEn]) }}"
+    <a href="{{ route('products.category', ['path' => $category->slugEn]) }}"
        title="{{ $category->name }}">
       <figure>
         <img loading="lazy" src="{{$category->getPreviewImage()}}" srcset="{{$category->getPreviewImage()}}"
@@ -15,7 +15,7 @@
   <li class="item">
     <figure><img loading="lazy" src="{{$category->getPreviewImage()}}" srcset="{{$category->getPreviewImage()}}"
                  alt="{{$category->name}}" title="{{$category->name}}" width="180" height="140"></figure>
-    <a href="{{ route('products.category', ['category' => $category->slugEn]) }}"
+    <a href="{{ route('products.category', ['path' => $category->slugEn]) }}"
        title="{{ $category->name }}">{{ $category->name }}</a>
   </li>
 @endif

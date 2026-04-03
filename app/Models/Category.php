@@ -13,8 +13,8 @@ use Spatie\Translatable\HasTranslations;
 class Category extends Model implements HasMedia
 {
     use HasFactory,
-        InteractsWithMedia,
-        HasTranslations;
+        HasTranslations,
+        InteractsWithMedia;
 
     protected static function booted(): void
     {
@@ -70,7 +70,7 @@ class Category extends Model implements HasMedia
             ->width(310)
             ->height(310)
             ->nonQueued();
-            
+
         $this
             ->addMediaConversion('preview_webp')
             ->width(310)
@@ -109,7 +109,7 @@ class Category extends Model implements HasMedia
 
     public function getSlugEnAttribute()
     {
-      return $this->getTranslation('slug', 'en');
+        return $this->getTranslation('slug', 'en');
     }
 
     public function products()
@@ -127,6 +127,30 @@ class Category extends Model implements HasMedia
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
+    /**
+     * Сегменти URL каталогу від кореня до цієї категорії: plivki/kolorovi-plivky
+     */
+    public function catalogPath(?string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+        $chain = [];
+        $cursor = $this;
+        while ($cursor) {
+            $chain[] = $cursor;
+            $cursor = $cursor->parent;
+        }
+        $chain = array_reverse($chain);
+        $segments = [];
+        foreach ($chain as $c) {
+            $slug = $c->getTranslation('slug', $locale) ?: $c->getTranslation('slug', 'en');
+            if ($slug !== null && $slug !== '') {
+                $segments[] = $slug;
+            }
+        }
+
+        return implode('/', $segments);
+    }
+
     public function getNameUkAttribute()
     {
         return $this->getTranslation('name', 'uk');
@@ -134,7 +158,7 @@ class Category extends Model implements HasMedia
 
     public function getImage(): string
     {
-       return $this->getFirstMediaUrl('main');
+        return $this->getFirstMediaUrl('main');
     }
 
     public function getPreviewImage(): string
@@ -143,13 +167,13 @@ class Category extends Model implements HasMedia
         if ($media && $media->hasGeneratedConversion('preview_webp')) {
             return $media->getUrl('preview_webp');
         }
-        
+
         return $this->getFirstMediaUrl('main');
     }
 
     public function isParent(): bool
     {
-       return is_null($this->parent_id);
+        return is_null($this->parent_id);
     }
 
     public function hasChildren(): bool

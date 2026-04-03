@@ -5,12 +5,15 @@ namespace App\Providers;
 use App\Nova\Attribute;
 use App\Nova\Banner;
 use App\Nova\BestSeller;
+use App\Nova\BlogAuthor;
+use App\Nova\BlogCategory;
+use App\Nova\BlogComment;
+use App\Nova\BlogPost;
 use App\Nova\Category;
 use App\Nova\Consultation;
 use App\Nova\CustomBlock;
 use App\Nova\DeliveryOption;
 use App\Nova\Faq;
-use App\Nova\Feedback;
 use App\Nova\Implementation;
 use App\Nova\News;
 use App\Nova\NewsCategory;
@@ -20,11 +23,12 @@ use App\Nova\PriceType;
 use App\Nova\PrivacyPolicy;
 use App\Nova\Product;
 use App\Nova\ProductBanner;
+use App\Nova\Redirect as RedirectResource;
 use App\Nova\ReportAvailability;
 use App\Nova\Review;
+use App\Nova\SeoFilterPage;
 use App\Nova\Setting;
 use App\Nova\User;
-use App\Nova\Video;
 use App\Nova\VideoCategory;
 use App\Nova\VideoReview;
 use Illuminate\Http\Request;
@@ -38,11 +42,11 @@ use Laravel\Nova\NovaApplicationServiceProvider;
 
 class NovaServiceProvider extends NovaApplicationServiceProvider
 {
-	/**
-	 * Bootstrap any application services.
-	 *
-	 * @return void
-	 */
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
     public function boot()
     {
         parent::boot();
@@ -107,6 +111,10 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                     MenuItem::resource(CustomBlock::class),
                     MenuItem::resource(NewsCategory::class),
                     MenuItem::resource(News::class),
+                    MenuItem::resource(BlogAuthor::class),
+                    MenuItem::resource(BlogCategory::class),
+                    MenuItem::resource(BlogPost::class),
+                    MenuItem::resource(BlogComment::class),
                     MenuItem::resource(Faq::class),
                     MenuItem::resource(VideoCategory::class),
                     MenuItem::resource(VideoReview::class),
@@ -119,6 +127,14 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                     MenuItem::resource(DeliveryOption::class),
                     MenuItem::resource(PaymentOption::class),
                 ])->icon('truck')->collapsable();
+            }
+
+            // SEO – редиректи та SEO-сторінки фільтрів для адміна та контент-менеджера
+            if (in_array($role, ['admin', 'content_manager'], true)) {
+                $menu[] = MenuSection::make('SEO', [
+                    MenuItem::resource(RedirectResource::class),
+                    MenuItem::resource(SeoFilterPage::class),
+                ])->icon('link')->collapsable();
             }
 
             // Ниже — только для админа
@@ -138,34 +154,34 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
             return $menu;
         });
-		// Кастомный футер
-		Nova::footer(function ($request) {
-			return Blade::render('
+        // Кастомный футер
+        Nova::footer(function ($request) {
+            return Blade::render('
 				Wrap Shop
 			');
-		});
-	}
+        });
+    }
 
-	/**
-	 * Register the Nova routes.
-	 *
-	 * @return void
-	 */
-	protected function routes()
-	{
-		Nova::routes()
-				->withAuthenticationRoutes()
-				->withPasswordResetRoutes()
-				->register();
-	}
+    /**
+     * Register the Nova routes.
+     *
+     * @return void
+     */
+    protected function routes()
+    {
+        Nova::routes()
+            ->withAuthenticationRoutes()
+            ->withPasswordResetRoutes()
+            ->register();
+    }
 
-	/**
-	 * Register the Nova gate.
-	 *
-	 * This gate determines who can access Nova in non-local environments.
-	 *
-	 * @return void
-	 */
+    /**
+     * Register the Nova gate.
+     *
+     * This gate determines who can access Nova in non-local environments.
+     *
+     * @return void
+     */
     protected function gate()
     {
         Gate::define('viewNova', function ($user) {
@@ -173,36 +189,34 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
         });
     }
 
-	/**
-	 * Get the dashboards that should be listed in the Nova sidebar.
-	 *
-	 * @return array
-	 */
-	protected function dashboards()
-	{
-		return [
-			new \App\Nova\Dashboards\Main,
-		];
-	}
+    /**
+     * Get the dashboards that should be listed in the Nova sidebar.
+     *
+     * @return array
+     */
+    protected function dashboards()
+    {
+        return [
+            new \App\Nova\Dashboards\Main,
+        ];
+    }
 
-	/**
-	 * Get the tools that should be listed in the Nova sidebar.
-	 *
-	 * @return array
-	 */
-	public function tools()
-	{
-		return [
-			new \App\Nova\Tools\CommandRunner,
-		];
-	}
+    /**
+     * Get the tools that should be listed in the Nova sidebar.
+     *
+     * @return array
+     */
+    public function tools()
+    {
+        return [
+            new \App\Nova\Tools\CommandRunner,
+        ];
+    }
 
-	/**
-	 * Register any application services.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
-	}
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register() {}
 }

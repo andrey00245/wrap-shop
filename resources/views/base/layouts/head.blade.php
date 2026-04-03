@@ -1,6 +1,6 @@
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="locale" content="{{ app()->getLocale() }}"/>
 
@@ -28,6 +28,9 @@
 
     <!-- Canonical URL -->
     <link rel="canonical" href="@yield('canonical', url()->current())">
+
+    @yield('pagination_links')
+    @stack('head_links')
 
     <!-- Additional SEO Meta Tags -->
     <meta name="theme-color" content="@yield('theme_color', __('seo.default_theme_color'))">

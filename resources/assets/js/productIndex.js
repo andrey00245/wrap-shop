@@ -48,20 +48,28 @@ $(document).ready(function () {
         const sortOpenBtn = $('.category-sort-open')
         const sortCloseBtn = $('.category-right-top .category-sort-close')
 
-        filterOpenBtn[0].onclick = () => {
-            filterContainer.addClass('ocf-mobile-active')
+        if (filterOpenBtn.length && filterOpenBtn[0]) {
+            filterOpenBtn[0].onclick = () => {
+                filterContainer.addClass('ocf-mobile-active')
+            }
         }
 
-        sortOpenBtn[0].onclick = () => {
-            sortContainer.addClass('active')
+        if (sortOpenBtn.length && sortOpenBtn[0]) {
+            sortOpenBtn[0].onclick = () => {
+                sortContainer.addClass('active')
+            }
         }
 
-        filterCloseBtn[0].onclick = () => {
-            filterContainer.removeClass('ocf-mobile-active')
+        if (filterCloseBtn.length && filterCloseBtn[0]) {
+            filterCloseBtn[0].onclick = () => {
+                filterContainer.removeClass('ocf-mobile-active')
+            }
         }
 
-        sortCloseBtn[0].onclick = () => {
-            sortContainer.removeClass('active')
+        if (sortCloseBtn.length && sortCloseBtn[0]) {
+            sortCloseBtn[0].onclick = () => {
+                sortContainer.removeClass('active')
+            }
         }
     }
 

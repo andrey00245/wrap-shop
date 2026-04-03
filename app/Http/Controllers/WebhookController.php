@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\MoySkladApiHelper;
 use App\Models\Product;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
@@ -28,15 +29,16 @@ class WebhookController extends Controller
                 'headers' => $request->headers->all(),
                 'body' => $request->all(),
                 'method' => $request->method(),
-                'url' => $request->fullUrl()
+                'url' => $request->fullUrl(),
             ]);
 
             // Получаем данные из вебхука
             $data = $request->all();
 
             // Проверяем, что это вебхук от МойСклад
-            if (!$this->isValidMoySkladWebhook($request)) {
+            if (! $this->isValidMoySkladWebhook($request)) {
                 Log::warning('Неверный вебхук от МойСклад', ['data' => $data]);
+
                 return response()->json(['error' => 'Invalid webhook'], 400);
             }
 
@@ -49,7 +51,7 @@ class WebhookController extends Controller
             Log::error('Ошибка обработки вебхука МойСклад', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'data' => $request->all()
+                'data' => $request->all(),
             ]);
 
             return response()->json(['error' => 'Internal server error'], 500);
@@ -69,18 +71,20 @@ class WebhookController extends Controller
             'data' => $data,
             'user_agent' => $userAgent,
             'method' => $request->method(),
-            'request_id' => $request->get('requestId')
+            'request_id' => $request->get('requestId'),
         ]);
 
         // Проверяем User-Agent от МойСклад
         if (strpos($userAgent, 'MoySklad webhook') !== false) {
             Log::info('Вебхук от МойСклад подтвержден по User-Agent');
+
             return true;
         }
 
         // Для тестирования принимаем любые POST запросы
         if ($request->method() === 'POST') {
             Log::info('Принят POST запрос для тестирования');
+
             return true;
         }
 
@@ -96,8 +100,9 @@ class WebhookController extends Controller
         Log::info('Обработка вебхука МойСклад', ['data' => $data]);
 
         // Проверяем, что это реальный вебхук от МойСклад
-        if (!isset($data['events']) && !isset($data['entityType']) && !isset($data['action'])) {
+        if (! isset($data['events']) && ! isset($data['entityType']) && ! isset($data['action'])) {
             Log::info('Тестовый запрос - пропускаем обработку');
+
             return;
         }
 
@@ -138,7 +143,7 @@ class WebhookController extends Controller
             'entityType' => $entityType,
             'action' => $action,
             'entityId' => $entityId,
-            'original_event' => $event
+            'original_event' => $event,
         ]);
 
         // Обрабатываем только товары
@@ -154,7 +159,7 @@ class WebhookController extends Controller
     {
         Log::info('Обработка события товара', [
             'action' => $action,
-            'entityId' => $entityId
+            'entityId' => $entityId,
         ]);
 
         switch ($action) {
@@ -185,7 +190,7 @@ class WebhookController extends Controller
         if ($productData) {
             // Синхронизируем товар
             $this->syncProduct($productData);
-            
+
             // Синхронизируем сток товара
             $this->productService->syncProductStock($entityId);
         }
@@ -204,7 +209,7 @@ class WebhookController extends Controller
         if ($productData) {
             // Синхронизируем товар
             $this->syncProduct($productData);
-            
+
             // Синхронизируем сток товара
             $this->productService->syncProductStock($entityId);
         }
@@ -222,7 +227,7 @@ class WebhookController extends Controller
 
         if ($product) {
             // Помечаем товар как неактивный или удаляем
-            /**@var $product Product **/
+            /** @var $product Product * */
             Log::info('Товар удален', ['product_id' => $product->id]);
             $product->delete();
         }
@@ -238,26 +243,28 @@ class WebhookController extends Controller
                 config('app.my_store.username'),
                 config('app.my_store.password')
             )
-            ->withHeaders([
-                'Accept-Encoding' => 'gzip',
-            ])
-            ->get("https://api.moysklad.ru/api/remap/1.2/entity/product/{$entityId}");
+                ->withHeaders([
+                    'Accept-Encoding' => 'gzip',
+                ])
+                ->get("https://api.moysklad.ru/api/remap/1.2/entity/product/{$entityId}");
 
             if ($response->successful()) {
                 return $response->json();
-            } else {
-                Log::error('Ошибка получения товара из МойСклад', [
-                    'entityId' => $entityId,
-                    'status' => $response->status(),
-                    'response' => $response->body()
-                ]);
-                return null;
             }
+            $msErr = MoySkladApiHelper::formatErrorsFromResponse($response);
+            Log::error("Ошибка получения товара из МойСклад: {$msErr}", [
+                'entityId' => $entityId,
+                'status' => $response->status(),
+                'moysklad_error' => $msErr,
+            ]);
+
+            return null;
         } catch (\Exception $e) {
             Log::error('Исключение при получении товара из МойСклад', [
                 'entityId' => $entityId,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -277,7 +284,7 @@ class WebhookController extends Controller
             Log::error('Ошибка синхронизации товара', [
                 'entityId' => $productData['id'] ?? 'unknown',
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }

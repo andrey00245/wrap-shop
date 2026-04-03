@@ -2,9 +2,31 @@
 
 @php
     $seoService = app(\App\Services\SeoService::class);
-    $categoryTitle = $seoService->generateCategoryTitle($category, $subcategory ?? null, $subsubcategory ?? null);
-    $categoryDescription = $seoService->generateCategoryDescription($category, $subcategory ?? null, $subsubcategory ?? null);
+    $categoryTitle = isset($seoFilterPage) && $seoFilterPage
+        ? ($seoFilterPage->getTranslation('meta_title', app()->getLocale()) ?: $seoService->generateCategoryTitle($category, $subcategory ?? null, $subsubcategory ?? null))
+        : $seoService->generateCategoryTitle($category, $subcategory ?? null, $subsubcategory ?? null);
+    $categoryDescription = isset($seoFilterPage) && $seoFilterPage
+        ? ($seoFilterPage->getTranslation('meta_description', app()->getLocale()) ?: $seoService->generateCategoryDescription($category, $subcategory ?? null, $subsubcategory ?? null))
+        : $seoService->generateCategoryDescription($category, $subcategory ?? null, $subsubcategory ?? null);
     $currentCategory = $subsubcategory ?? $subcategory ?? $category;
+    $categoryPath = $categoryPath ?? implode('/', array_filter([$category->slugEn ?? null, $subcategory->slugEn ?? null, $subsubcategory->slugEn ?? null]));
+    $isSeoFilterPage = isset($seoFilterPage) && $seoFilterPage;
+    $baseUrl = route('products.category', ['path' => $categoryPath . ($isSeoFilterPage ? '/' . $seoFilterPage->slug : '')]);
+
+    $hasPage = request()->filled('page') && (int) request()->get('page') > 1;
+    $hasSortPriceFilters = request()->hasAny([
+        'sort_by', 'sort_direction', 'min_price', 'max_price', 'in_stock',
+        'sort', 'order', 'ocf',
+    ]);
+    $queryExcept = request()->except([
+        'page', 'path', 'sort_by', 'sort_direction', 'min_price', 'max_price', 'in_stock',
+        'sort', 'order', 'ocf',
+    ]);
+    $hasAttributeFilters = count(array_filter($queryExcept, fn ($v) => $v !== null && $v !== '')) > 0;
+    $noindex = $hasPage || $hasSortPriceFilters || $hasAttributeFilters;
+
+    $robotsContent = $noindex ? 'noindex,follow' : 'index,follow';
+    $canonicalUrl = $baseUrl;
 @endphp
 
 @section('title', $categoryTitle)
@@ -14,25 +36,42 @@
 @section('og_title', $categoryTitle)
 @section('og_description', $categoryDescription)
 @section('og_image', url('assets/img/og-default.jpg'))
-@section('og_url', url()->current())
+@section('og_url', $canonicalUrl)
 @section('twitter_card', 'summary_large_image')
 @section('twitter_title', $categoryTitle)
 @section('twitter_description', $categoryDescription)
 @section('twitter_image', url('assets/img/og-default.jpg'))
-@section('canonical', url()->current())
+@section('canonical', $canonicalUrl)
+@section('robots', $robotsContent)
+
+@section('pagination_links')
+    @if(isset($products) && $products->lastPage() > 1)
+        @if($products->currentPage() > 1)
+            @php
+                $prevPage = $products->currentPage() - 1;
+                $prevHref = $prevPage === 1 ? $baseUrl : $baseUrl . '?page=' . $prevPage;
+            @endphp
+            <link rel="prev" href="{{ $prevHref }}">
+        @endif
+        @if($products->currentPage() < $products->lastPage())
+            <link rel="next" href="{{ $baseUrl . '?page=' . ($products->currentPage() + 1) }}">
+        @endif
+    @endif
+@endsection
+
+@push('styles')
+    @if($theme === 'dark')
+        <link rel="stylesheet" href="{{mix('build/css/all-dark.css')}}">
+        <link rel="stylesheet" href="{{mix('build/css/style-category-dark.css')}}">
+    @else
+        <link rel="stylesheet" href="{{mix('build/css/all-light.css')}}">
+        <link rel="stylesheet" href="{{mix('build/css/style-category-light.css')}}">
+    @endif
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"/>
+    @include('base.pages.products.partials.is-stock-switch-styles')
+@endpush
 
 @section('content')
-
-    @push('styles')
-        @if($theme === 'dark')
-            <link rel="stylesheet" href="{{mix('build/css/all-dark.css')}}">
-            <link rel="stylesheet" href="{{mix('build/css/style-category-dark.css')}}">
-        @else
-            <link rel="stylesheet" href="{{mix('build/css/all-light.css')}}">
-            <link rel="stylesheet" href="{{mix('build/css/style-category-light.css')}}">
-        @endif
-
-    @endpush
     <section class="category-page row">
         <div class="category-top">
             <img class="products-background" src="{{asset('assets/img/products/fon_wrap_webp.webp')}}" alt="">
@@ -71,7 +110,7 @@
                             @if($category && !$subcategory)
                                 <li>
                                     <a
-                                        href="{{route('products.category', ['category' => $category->slugEn, 'subcategory'=>$childrenCategory->slugEn])}}"
+                                        href="{{ route('products.category', ['path' => $category->slugEn . '/' . $childrenCategory->slugEn]) }}"
                                         title="{{$childrenCategory->name}}"
                                         class="flex-center">
                                         {{$childrenCategory->name}}
@@ -80,7 +119,7 @@
                             @elseif($category && $subcategory && !$subsubcategory)
                                 <li>
                                     <a
-                                        href="{{route('products.category', ['category' => $category->slugEn, 'subcategory' => $subcategory->slugEn, 'subsubcategory'=>$childrenCategory->slugEn])}}"
+                                        href="{{ route('products.category', ['path' => $category->slugEn . '/' . $subcategory->slugEn . '/' . $childrenCategory->slugEn]) }}"
                                         title="{{$childrenCategory->name}}"
                                         class="flex-center">{{$childrenCategory->name}}</a>
                                 </li>
@@ -265,14 +304,22 @@
                                                             <div class="ocf-value-list-body">
                                                                 @foreach($attribute->getPivotValue() as $value)
                                                                     @php
-                                                                        $count = $responseArray['attributes_count'][$attribute->field_name][$value]['count'];
-                                                                        $selected = array_key_exists($attribute->field_name, request()->query()) ? (in_array($value, request()->query()[$attribute->field_name]) ? 'ocf-selected' : '') : ''
+                                                                        $count = $responseArray['attributes_count'][$attribute->field_name][$value]['count'] ?? 0;
+                                                                        $selectedValues = array_key_exists($attribute->field_name, request()->query())
+                                                                            ? array_map(
+                                                                                fn ($v) => mb_strtolower(trim((string) $v)),
+                                                                                (array) request()->query()[$attribute->field_name]
+                                                                            )
+                                                                            : [];
+                                                                        $currentNormalized = mb_strtolower(trim((string) $value));
+                                                                        $selected = in_array($currentNormalized, $selectedValues, true) ? 'ocf-selected' : '';
+                                                                        $showOption = $count > 0 || $selected !== '';
                                                                     @endphp
+                                                                    @if($showOption)
                                                                     <button type="button"
                                                                             class="ocf-value ocf-checkbox filterProducts {{$selected}}"
                                                                             data-filter="{{$value}}"
-                                                                            data-filter-type="{{$attribute->field_name}}"
-                                                                        {{$count === 0 && $selected ==='' ? 'disabled' : ''}}>
+                                                                            data-filter-type="{{$attribute->field_name}}">
 
                                     <span class="ocf-value-color"
                                           style="background-color: {{__('colors.' . $value)}};"></span>
@@ -280,9 +327,10 @@
                                                                         <span class="ocf-value-name">{{$value}}</span>
                                                                         <span class="ocf-value-append">
                                       <span
-                                          class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$responseArray['attributes_count'][$attribute->field_name][$value]['count']}}</span>
+                                          class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$count}}</span>
                                     </span>
                                                                     </button>
+                                                                    @endif
                                                                 @endforeach
                                                             </div>
 
@@ -315,22 +363,31 @@
                                                         <div class="ocf-value-list-body">
                                                             @foreach($attribute->getPivotValue() as $value)
                                                                 @php
-                                                                    $count = $responseArray['attributes_count'][$attribute->field_name][$value]['count'];
-                                                                    $selected = array_key_exists($attribute->field_name, request()->query()) ? (in_array($value, request()->query()[$attribute->field_name]) ? 'ocf-selected' : '') : ''
+                                                                    $count = $responseArray['attributes_count'][$attribute->field_name][$value]['count'] ?? 0;
+                                                                    $selectedValues = array_key_exists($attribute->field_name, request()->query())
+                                                                        ? array_map(
+                                                                            fn ($v) => mb_strtolower(trim((string) $v)),
+                                                                            (array) request()->query()[$attribute->field_name]
+                                                                        )
+                                                                        : [];
+                                                                    $currentNormalized = mb_strtolower(trim((string) $value));
+                                                                    $selected = in_array($currentNormalized, $selectedValues, true) ? 'ocf-selected' : '';
+                                                                    $showOption = $count > 0 || $selected !== '';
                                                                 @endphp
+                                                                @if($showOption)
                                                                 <button type="button"
                                                                         class="ocf-value ocf-checkbox filterProducts {{$selected}}"
                                                                         data-filter="{{$value}}"
-                                                                        data-filter-type="{{$attribute->field_name}}"
-                                                                    {{$count === 0 && $selected ==='' ? 'disabled' : ''}}>
+                                                                        data-filter-type="{{$attribute->field_name}}">
                                                                     <span
                                                                         class="ocf-value-input ocf-value-input-checkbox"></span>
                                                                     <span class="ocf-value-name">{{$value}}</span>
                                                                     <span class="ocf-value-append">
                                       <span
-                                          class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$responseArray['attributes_count'][$attribute->field_name][$value]['count']}}</span>
+                                          class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$count}}</span>
                                   </span>
                                                                 </button>
+                                                                @endif
                                                             @endforeach
                                                         </div>
                                                     </div>
@@ -348,12 +405,7 @@
                                     $allowedParams = ['sort_by', 'sort_direction'];
                                     $queryParams = array_intersect_key($queryParams, array_flip($allowedParams));
                                 @endphp
-                                <button type="button" id="cancel" data-link="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                  ...$queryParams
-                  ])}}" class="ocf-btn" disabled>{{__('product-index.reset')}}</button>
+                                <button type="button" id="cancel" data-link="{{ route('products.category', ['path' => $categoryPath, ...$queryParams]) }}" class="ocf-btn" disabled>{{__('product-index.reset')}}</button>
                                 <button type="button" class="ocf-btn ocf-btn-block ocfFilterBottom"
                                         disabled>{!! $responseArray['total_count'] !!}
                                 </button>
@@ -401,62 +453,22 @@
                                 unset($withoutSomeParams['sort_direction']);
                                 unset($withoutSomeParams['page']);
                             @endphp
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                  ...$withoutSomeParams
-                  ])}}"
+                            <a href="{{ route('products.category', ['path' => $categoryPath, ...$withoutSomeParams]) }}"
                                class="button {{!request()->get('sort_by') && !request()->get('sort_direction') ? 'active' : null}}"
                                title="{{__('product-index.default')}}">{{__('product-index.default')}}</a>
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                  ...$withoutSomeParams,
-                  'sort_by' => 'name',
-                  'sort_direction' => 'asc',
-                  ])}}"
+                            <a href="{{ route('products.category', ['path' => $categoryPath, ...$withoutSomeParams, 'sort_by' => 'name', 'sort_direction' => 'asc']) }}"
                                class="button {{request()->get('sort_by') === 'name' && request()->get('sort_direction') === 'asc' ? 'active' : null}}"
                                title="{{__('product-index.alphabet')}}">{{__('product-index.alphabet')}}</a>
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                  ...$withoutSomeParams,
-                  'sort_by' => 'price',
-                  'sort_direction' => 'asc',
-                  ])}}"
+                            <a href="{{ route('products.category', ['path' => $categoryPath, ...$withoutSomeParams, 'sort_by' => 'price', 'sort_direction' => 'asc']) }}"
                                class="button {{request()->get('sort_by') === 'price' && request()->get('sort_direction') === 'asc' ? 'active' : null}}"
                                title="{{__('product-index.ascending_price')}}">{{__('product-index.ascending_price')}}</a>
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                   ...$withoutSomeParams,
-                  'sort_by' => 'price',
-                  'sort_direction' => 'desc',
-                  ])}}"
+                            <a href="{{ route('products.category', ['path' => $categoryPath, ...$withoutSomeParams, 'sort_by' => 'price', 'sort_direction' => 'desc']) }}"
                                class="button {{request()->get('sort_by') === 'price' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
                                title="{{__('product-index.descending_price')}}">{{__('product-index.descending_price')}}</a>
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                  ...$withoutSomeParams,
-                  'sort_by' => 'is_top_seller',
-                  'sort_direction' => 'desc',
-                  ])}}"
+                            <a href="{{ route('products.category', ['path' => $categoryPath, ...$withoutSomeParams, 'sort_by' => 'is_top_seller', 'sort_direction' => 'desc']) }}"
                                class="button {{request()->get('sort_by') === 'is_top_seller' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
                                title="{{__('product-index.most_popular')}}">{{__('product-index.most_popular')}}</a>
-                            <a href="{{route('products.category', [
-                  'category' => $category->slugEn,
-                  'subcategory' => $subcategory ? $subcategory->slugEn : null,
-                  'subsubcategory' => $subsubcategory ? $subsubcategory->slugEn : null,
-                   ...$withoutSomeParams,
-                  'sort_by' => 'created_at',
-                  'sort_direction' => 'desc',
-                  ])}}"
+                            <a href="{{ route('products.category', ['path' => $categoryPath, ...$withoutSomeParams, 'sort_by' => 'created_at', 'sort_direction' => 'desc']) }}"
                                class="button {{request()->get('sort_by') === 'created_at' && request()->get('sort_direction') === 'desc' ? 'active' : null}}"
                                title="{{__('product-index.date_added')}}">{{__('product-index.date_added')}}</a>
                         </div>
@@ -656,89 +668,36 @@
         </div>
     </section>
 
-    @if($currentCategory && ($currentCategory->content || $currentCategory->seo_text))
+    @php
+        $seoFilterPageText = isset($seoFilterPage) && $seoFilterPage ? $seoFilterPage->getTranslation('seo_text', app()->getLocale()) : null;
+    @endphp
+    @if($seoFilterPageText || ($currentCategory && ($currentCategory->content || $currentCategory->seo_text)))
         <section class="category-seo-content wrap row">
             <div class="category-content">
-                @if($currentCategory->content)
-                    <div class="category-main-content">
-                        {!! $currentCategory->content !!}
-                    </div>
-                @endif
-
-                @if($currentCategory->seo_text)
+                @if($seoFilterPageText)
                     <div class="category-seo-text">
-                        {!! $currentCategory->seo_text !!}
+                        {!! $seoFilterPageText !!}
                     </div>
+                @elseif($currentCategory)
+                    @if($currentCategory->content)
+                        <div class="category-main-content">
+                            {!! $currentCategory->content !!}
+                        </div>
+                    @endif
+                    @if($currentCategory->seo_text)
+                        <div class="category-seo-text">
+                            {!! $currentCategory->seo_text !!}
+                        </div>
+                    @endif
                 @endif
             </div>
         </section>
     @endif
 
-    @push('scripts')
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"></script>
-        <script src="{{mix('build/js/productIndex.js')}}"></script>
-    @endpush
-    @push('styles')
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"/>
-    @endpush
 @endsection
-<style>
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 50px;
-        height: 24px;
-    }
 
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-        border-radius: 24px;
-    }
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 18px;
-        width: 18px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
-
-    input:checked + .slider {
-        background-color: rgb(255, 206, 28);
-    }
-
-    input:checked + .slider:before {
-        transform: translateX(26px);
-    }
-</style>
-
-<script>
-    document.getElementById('in-stock-switch').addEventListener('change', function () {
-        const url = new URL(window.location.href);
-
-        if (this.checked) {
-            url.searchParams.set('in_stock', '1');
-        } else {
-            url.searchParams.delete('in_stock');
-        }
-
-        window.location.href = url.toString();
-    });
-</script>
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"></script>
+    <script src="{{mix('build/js/productIndex.js')}}"></script>
+    @include('base.pages.products.partials.is-stock-switch-script')
+@endpush

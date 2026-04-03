@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html dir="ltr" lang="{{ app()->getLocale() }}">
 
 @include('base.layouts.head')
@@ -10,7 +11,9 @@
 
 @include('base.layouts.header')
 
+<main id="main-content" role="main">
 @yield('content')
+</main>
 
 @include('base.layouts.footer')
 

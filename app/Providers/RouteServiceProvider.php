@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\BlogAuthor;
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\News;
 use App\Models\NewsCategory;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,11 @@ class RouteServiceProvider extends ServiceProvider
         Route::bind('subsubcategory', fn ($slug) => $this->resolveCategoryBySlug($slug));
         Route::bind('news_category', fn ($slug) => $this->resolveNewsCategoryBySlug($slug));
         Route::bind('news', fn ($slug) => $this->resolveNewsBySlug($slug));
+        Route::bind('blog_author', fn (string $slug) => BlogAuthor::query()
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail());
+        Route::bind('blog_post', fn (string $slug) => $this->resolveBlogPostBySlug($slug));
     }
 
     public function map()
@@ -47,6 +54,11 @@ class RouteServiceProvider extends ServiceProvider
     protected function resolveNewsBySlug(string $slug): News
     {
         return $this->applyTranslatableSlugScope(News::query(), $slug)->firstOrFail();
+    }
+
+    protected function resolveBlogPostBySlug(string $slug): BlogPost
+    {
+        return $this->applyTranslatableSlugScope(BlogPost::query(), $slug)->firstOrFail();
     }
 
     protected function applyTranslatableSlugScope(Builder $query, string $slug): Builder

@@ -33,3 +33,6 @@ mix.sass('resources/assets/scss/style-category-light.scss', 'public/build/css').
 mix.sass('resources/assets/scss/all-light.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/style-product-light.scss', 'public/build/css').version();
 mix.sass('resources/assets/scss/simple-light.scss', 'public/build/css').version();
+
+mix.sass('resources/assets/scss/style-reviews-dark.scss', 'public/build/css').version();
+mix.sass('resources/assets/scss/style-reviews-light.scss', 'public/build/css').version();

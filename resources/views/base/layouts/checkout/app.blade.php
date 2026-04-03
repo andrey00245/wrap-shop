@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html dir="ltr" lang="">
 
 @include('base.layouts.head')

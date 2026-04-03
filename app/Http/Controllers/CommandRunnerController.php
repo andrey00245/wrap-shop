@@ -7,6 +7,7 @@ use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -19,20 +20,20 @@ class CommandRunnerController extends Controller
     {
         try {
             Artisan::call('generate:sitemap');
-            
+
             return response()->json([
                 'success' => true,
-                'message' => 'Sitemap успішно згенеровано у public/sitemap.xml'
+                'message' => 'Sitemap успішно згенеровано у public/sitemap.xml',
             ]);
         } catch (\Throwable $e) {
             Log::error('Помилка генерації sitemap', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'Помилка: ' . $e->getMessage()
+                'message' => 'Помилка: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -42,13 +43,13 @@ class CommandRunnerController extends Controller
      */
     public function webhookCheck(Request $request): JsonResponse
     {
-        $url = (string) ($request->input('url') ?: request()->getSchemeAndHttpHost() . '/webhook/moysklad');
+        $url = (string) ($request->input('url') ?: request()->getSchemeAndHttpHost().'/webhook/moysklad');
 
         try {
             $start = microtime(true);
             $response = Http::withHeaders([
-                    'User-Agent' => 'WrapShop/CommandRunner'
-                ])
+                'User-Agent' => 'WrapShop/CommandRunner',
+            ])
                 ->timeout(3)
                 ->connectTimeout(1)
                 ->retry(0)
@@ -66,7 +67,7 @@ class CommandRunnerController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Помилка підключення: ' . $e->getMessage(),
+                'message' => 'Помилка підключення: '.$e->getMessage(),
                 'url' => $url,
             ], 400);
         }
@@ -77,7 +78,7 @@ class CommandRunnerController extends Controller
      */
     public function webhookTest(Request $request): JsonResponse
     {
-        $url = (string) ($request->input('url') ?: request()->getSchemeAndHttpHost() . '/webhook/moysklad');
+        $url = (string) ($request->input('url') ?: request()->getSchemeAndHttpHost().'/webhook/moysklad');
         $payload = $request->input('payload', [
             'event' => 'test',
             'source' => 'WrapShop',
@@ -87,10 +88,10 @@ class CommandRunnerController extends Controller
         try {
             $start = microtime(true);
             $response = Http::withHeaders([
-                    'User-Agent' => 'WrapShop/CommandRunner',
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ])
+                'User-Agent' => 'WrapShop/CommandRunner',
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
                 ->timeout(3)
                 ->connectTimeout(1)
                 ->retry(0)
@@ -109,7 +110,7 @@ class CommandRunnerController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Помилка відправки: ' . $e->getMessage(),
+                'message' => 'Помилка відправки: '.$e->getMessage(),
                 'url' => $url,
             ], 400);
         }
@@ -120,7 +121,7 @@ class CommandRunnerController extends Controller
      */
     public function webhookCreate(Request $request): JsonResponse
     {
-        $url = (string) ($request->input('url') ?: request()->getSchemeAndHttpHost() . '/webhook/moysklad');
+        $url = (string) ($request->input('url') ?: request()->getSchemeAndHttpHost().'/webhook/moysklad');
         $token = (string) ($request->input('token') ?: env('MOYSKLAD_TOKEN', ''));
         $apiUrl = 'https://api.moysklad.ru/api/remap/1.2/entity/webhook';
 
@@ -132,14 +133,15 @@ class CommandRunnerController extends Controller
         }
 
         // Убеждаемся, что URL полный и валидный
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        if (! filter_var($url, FILTER_VALIDATE_URL)) {
             Log::error('Webhook URL validation failed', [
                 'url' => $url,
-                'is_valid' => filter_var($url, FILTER_VALIDATE_URL)
+                'is_valid' => filter_var($url, FILTER_VALIDATE_URL),
             ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'URL не является корректным адресом: ' . $url,
+                'message' => 'URL не является корректным адресом: '.$url,
             ], 400);
         }
 
@@ -156,10 +158,10 @@ class CommandRunnerController extends Controller
         try {
             foreach ($toCreate as $cfg) {
                 $resp = Http::withHeaders([
-                        'Authorization' => 'Bearer ' . $token,
-                        'Accept-Encoding' => 'gzip',
-                        'Content-Type' => 'application/json'
-                    ])
+                    'Authorization' => 'Bearer '.$token,
+                    'Accept-Encoding' => 'gzip',
+                    'Content-Type' => 'application/json',
+                ])
                     ->timeout(5)
                     ->post($apiUrl, [
                         'url' => $url,
@@ -168,14 +170,14 @@ class CommandRunnerController extends Controller
                     ]);
 
                 $body = $resp->json();
-                
+
                 // Логируем ошибки от MoySklad
-                if (!$resp->successful()) {
+                if (! $resp->successful()) {
                     Log::error('MoySklad webhook creation failed', [
                         'action' => $cfg['action'],
                         'status' => $resp->status(),
                         'body' => $body,
-                        'url' => $url
+                        'url' => $url,
                     ]);
                 }
 
@@ -187,7 +189,7 @@ class CommandRunnerController extends Controller
                 ];
             }
 
-            $ok = collect($results)->every(fn($r) => $r['ok'] === true);
+            $ok = collect($results)->every(fn ($r) => $r['ok'] === true);
 
             return response()->json([
                 'success' => $ok,
@@ -198,7 +200,7 @@ class CommandRunnerController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Помилка створення: ' . $e->getMessage(),
+                'message' => 'Помилка створення: '.$e->getMessage(),
             ], 400);
         }
     }
@@ -209,13 +211,13 @@ class CommandRunnerController extends Controller
     public function updateProducts(Request $request): JsonResponse
     {
         try {
-            $start = (int)($request->input('start', 0));
-            $end = (int)($request->input('end', 1000));
+            $start = (int) ($request->input('start', 0));
+            $end = (int) ($request->input('end', 1000));
 
             if ($start < 0 || $end <= $start) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Некоректні параметри діапазону'
+                    'message' => 'Некоректні параметри діапазону',
                 ], 400);
             }
 
@@ -231,17 +233,17 @@ class CommandRunnerController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => "Поставлено в чергу {$jobsCount} джоб(и) на оновлення товарів"
+                'message' => "Поставлено в чергу {$jobsCount} джоб(и) на оновлення товарів",
             ]);
         } catch (\Throwable $e) {
             Log::error('Помилка оновлення товарів', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'Помилка: ' . $e->getMessage()
+                'message' => 'Помилка: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -255,20 +257,20 @@ class CommandRunnerController extends Controller
             Artisan::call('optimize:clear');
             Artisan::call('config:clear');
             Artisan::call('view:clear');
-            
+
             return response()->json([
                 'success' => true,
-                'message' => 'Кеш успішно очищено'
+                'message' => 'Кеш успішно очищено',
             ]);
         } catch (\Throwable $e) {
             Log::error('Помилка очищення кешу', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'Помилка: ' . $e->getMessage()
+                'message' => 'Помилка: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -281,7 +283,7 @@ class CommandRunnerController extends Controller
         try {
             $dryRun = (bool) $request->input('dryRun', true);
 
-            Artisan::call('media-library:clean', [ '--dry-run' => $dryRun ]);
+            Artisan::call('media-library:clean', ['--dry-run' => $dryRun]);
             $output = Artisan::output();
 
             // Підрахунок кількості рядків/файлів у виводі
@@ -292,7 +294,7 @@ class CommandRunnerController extends Controller
                     $count++;
                 }
             }
-            
+
             return response()->json([
                 'success' => true,
                 'message' => $dryRun
@@ -304,12 +306,12 @@ class CommandRunnerController extends Controller
         } catch (\Throwable $e) {
             Log::error('Помилка очищення медіа', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'Помилка: ' . $e->getMessage()
+                'message' => 'Помилка: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -338,7 +340,7 @@ class CommandRunnerController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Ошибка storage:link', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
@@ -355,17 +357,47 @@ class CommandRunnerController extends Controller
     {
         try {
             $command = trim($request->input('command', ''));
-            
+
             if (empty($command)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Команда не может быть пустой'
+                    'message' => 'Команда не может быть пустой',
                 ], 400);
+            }
+
+            // queue:work — довгоживучий процес, через веб призведе до таймауту
+            if (preg_match('/^queue:work(?:\s|$)/', $command)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Команду queue:work не можна виконувати через веб (працює нескінченно). Запустіть на хості в консолі: php artisan queue:work',
+                    'command' => $command,
+                    'output' => null,
+                ], 400);
+            }
+
+            // Синк цін/залишків — ставимо прапорець у cache; виконається при виклику scheduler (cron або URL без SSH)
+            if (preg_match('/^products:sync-prices-and-stock(?:\s|$)/', $command)) {
+                $chunk = 100;
+                $limit = 0;
+                if (preg_match('/--chunk=(\d+)/', $command, $m)) {
+                    $chunk = max(1, min(500, (int) $m[1]));
+                }
+                if (preg_match('/--limit=(\d+)/', $command, $m)) {
+                    $limit = max(0, (int) $m[1]);
+                }
+                Cache::put('sync_prices_stock_pending', ['chunk' => $chunk, 'limit' => $limit], 600);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Вона виконається у фоні за кілька хвилин.',
+                    'command' => $command,
+                    'output' => null,
+                ]);
             }
 
             Log::info('Executing custom Artisan command', [
                 'command' => $command,
-                'user' => auth()->user()?->email ?? 'unknown'
+                'user' => auth()->user()?->email ?? 'unknown',
             ]);
 
             // Выполняем команду
@@ -383,12 +415,42 @@ class CommandRunnerController extends Controller
             Log::error('Ошибка выполнения пользовательской команды', [
                 'command' => $request->input('command'),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Ошибка выполнения команды: ' . $e->getMessage(),
+                'message' => 'Ошибка выполнения команды: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Синхронізація цін та залишків товарів з МойСклад — ставиться в чергу, щоб уникнути 504 Gateway Timeout.
+     */
+    public function syncPricesAndStock(Request $request): JsonResponse
+    {
+        try {
+            $chunk = (int) $request->input('chunk', 100);
+            $chunk = max(1, min(500, $chunk));
+            $limit = (int) $request->input('limit', 0);
+
+            Cache::put('sync_prices_stock_pending', ['chunk' => $chunk, 'limit' => $limit], 600);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Вона виконається у фоні за кілька хвилин.',
+                'output' => null,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Помилка постановки синхронізації цін/залишків у чергу', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Помилка: '.$e->getMessage(),
             ], 500);
         }
     }

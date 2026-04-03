@@ -211,6 +211,17 @@
                 <div class="alert alert-error" id="sitemap-error"></div>
             </div>
 
+            <!-- Ціни та залишки з МС -->
+            <div class="command-card" style="border: 2px solid #0d6efd;">
+                <h3>📦 Ціни та залишки з МойСклад</h3>
+                <p>Оновлює ціни та залишки товарів з МойСклад (виконується у фоні).</p>
+                <button class="btn btn-primary" onclick="runSyncPricesAndStock(this)">
+                    Оновити ціни та залишки з МС
+                </button>
+                <div class="alert alert-success" id="sync-prices-stock-success"></div>
+                <div class="alert alert-error" id="sync-prices-stock-error"></div>
+            </div>
+
             <!-- Оновлення товарів (закоментовано - потребує queue worker) -->
             <!--
             <div class="command-card">
@@ -349,6 +360,43 @@
                 setLoading(btn, false);
             }
         }
+
+        async function runSyncPricesAndStock(btn) {
+            if (!confirm('Оновити ціни та залишки для всіх товарів з МС? Може зайняти кілька хвилин.')) {
+                return;
+            }
+            setLoading(btn, true);
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/sync-prices-stock', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ chunk: 100, limit: 0 })
+                });
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    showAlert('sync-prices-stock', 'Сервер повернув не JSON (таймаут або помилка). Запустіть з консолі: php artisan products:sync-prices-and-stock', false);
+                    return;
+                }
+                if (data.success) {
+                    showAlert('sync-prices-stock', data.message + (data.output ? '\n' + data.output : ''), true);
+                } else {
+                    showAlert('sync-prices-stock', data.message || 'Помилка', false);
+                }
+            } catch (error) {
+                showAlert('sync-prices-stock', 'Помилка: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
         async function runWebhookCheck(btn) {
             setLoading(btn, true);
             try {

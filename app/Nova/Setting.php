@@ -2,8 +2,8 @@
 
 namespace App\Nova;
 
+use App\Nova\Fields\NovaTabTranslatable;
 use Illuminate\Http\Request;
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
@@ -15,6 +15,7 @@ use Spatie\Translatable\HasTranslations;
 class Setting extends Resource
 {
     use HasTranslations;
+
     /**
      * The model the resource corresponds to.
      *
@@ -43,50 +44,57 @@ class Setting extends Resource
         'id',
     ];
 
-    public static function authorizedToCreate(Request $request) : bool
+    public static function authorizedToCreate(Request $request): bool
     {
         return false;
     }
 
-    public function authorizedToDelete(Request $request) : bool
+    public function authorizedToDelete(Request $request): bool
     {
         return false;
     }
 
-    public function authorizedToReplicate(Request $request) : bool
+    public function authorizedToReplicate(Request $request): bool
     {
         return false;
     }
 
-    protected function contactsFields(){
-        return[
+    protected function contactsFields()
+    {
+        return [
             Text::make('Номер телефону', 'phone')->sortable(),
             Text::make('Номер телефону для відображення', 'phone_view')->sortable()->hideFromIndex(),
             Text::make('Додатковий номер телефону', 'phone_aditional')->sortable()->hideFromIndex(),
             Text::make('Додатковий номер телефону для відображення', 'phone_aditional_view')->sortable()->hideFromIndex(),
             Text::make('Посилання на телеграм', 'telegram')->sortable()->hideFromIndex(),
             Text::make('Посилання на інстаграм', 'instagram')->sortable()->hideFromIndex(),
-            Text::make('Email', 'email')->sortable()->hideFromIndex()
+            Text::make('Email', 'email')->sortable()->hideFromIndex(),
         ];
     }
-    protected function addressFields(){
-        return[
+
+    protected function addressFields()
+    {
+        return [
             NovaTabTranslatable::make([
                 Text::make('Адреса', 'address')->sortable(),
             ])->hideFromIndex(),
             Text::make('Email', 'email')->sortable()->hideFromIndex(),
         ];
     }
-    protected function videoBanerFields(){
-        return[
+
+    protected function videoBanerFields()
+    {
+        return [
             NovaTabTranslatable::make([
                 Text::make('Заголовок', 'video_banner_title')->sortable(),
                 Textarea::make('Контент', 'video_banner_desc'),
             ])->hideFromIndex(),
         ];
     }
-    protected function sloganFields(){
-        return[
+
+    protected function sloganFields()
+    {
+        return [
             NovaTabTranslatable::make([
                 Text::make('Заголовок', 'slogan_title')->sortable(),
                 Textarea::make('Контент', 'slogan_desc')->hideFromIndex(),
@@ -94,14 +102,29 @@ class Setting extends Resource
         ];
     }
 
-    protected function currency(){
-        return[
+    protected function productSeoTemplatesFields()
+    {
+        return [
+            NovaTabTranslatable::make([
+                Text::make('Шаблон meta title для товарів', 'product_meta_title_template')
+                    ->help('Доступні змінні: {mod_title}, {price}, {site}, {article_for_display}'),
+                Textarea::make('Шаблон meta description для товарів', 'product_meta_description_template')
+                    ->rows(3)
+                    ->help('Доступні змінні: {mod_title}, {price}, {site}, {article_for_display}'),
+            ])->hideFromIndex(),
+        ];
+    }
+
+    protected function currency()
+    {
+        return [
             Number::make('Курс $', 'currency')->step(0.01)->sortable(),
         ];
     }
 
-    protected function headCodeFields(){
-        return[
+    protected function headCodeFields()
+    {
+        return [
             Textarea::make('Код для head', 'head_code')
                 ->help('HTML/JavaScript код, который будет добавлен в секцию <head> всех страниц сайта')
                 ->hideFromIndex()
@@ -112,20 +135,20 @@ class Setting extends Resource
     /**
      * Get the fields displayed by the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function fields(NovaRequest $request)
     {
         return [
             ID::make()->sortable(),
-            Text::make('-', function (){
+            Text::make('-', function () {
                 return 'Налаштування';
             })->onlyOnIndex(),
             new Panel('Контакти', $this->contactsFields()),
             new Panel('Aдреси', $this->addressFields()),
             new Panel('Відеобанер', $this->videoBanerFields()),
             new Panel('Слоган', $this->sloganFields()),
+            new Panel('SEO товарів', $this->productSeoTemplatesFields()),
             new Panel('Валюта', $this->currency()),
             new Panel('Код для head', $this->headCodeFields()),
         ];
@@ -134,7 +157,6 @@ class Setting extends Resource
     /**
      * Get the cards available for the request.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function cards(NovaRequest $request)
@@ -145,7 +167,6 @@ class Setting extends Resource
     /**
      * Get the filters available for the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function filters(NovaRequest $request)
@@ -156,7 +177,6 @@ class Setting extends Resource
     /**
      * Get the lenses available for the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function lenses(NovaRequest $request)
@@ -167,7 +187,6 @@ class Setting extends Resource
     /**
      * Get the actions available for the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function actions(NovaRequest $request)

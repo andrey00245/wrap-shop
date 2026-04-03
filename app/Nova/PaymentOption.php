@@ -2,14 +2,14 @@
 
 namespace App\Nova;
 
-use Illuminate\Http\Request;
-use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Number;
-use Laravel\Nova\Fields\Boolean;
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
+use App\Nova\Fields\NovaTabTranslatable;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
+use Illuminate\Http\Request;
+use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Http\Requests\NovaRequest;
 use Mostafaznv\NovaCkEditor\CkEditor;
 use Outl1ne\NovaSortable\Traits\HasSortableRows;
 
@@ -34,9 +34,8 @@ class PaymentOption extends Resource
     }
 
     public static $search = [
-        'name'
+        'name',
     ];
-
 
     public function fields(Request $request)
     {

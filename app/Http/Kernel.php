@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\CartMiddleware;
+use App\Http\Middleware\RedirectMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -15,11 +16,11 @@ class Kernel extends HttpKernel
     protected $middleware = [
         \Illuminate\Http\Middleware\HandleCors::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        RedirectMiddleware::class,
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \Illuminate\Auth\Middleware\Authenticate::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        CartMiddleware::class
+        CartMiddleware::class,
     ];
 
     /**
@@ -32,14 +33,12 @@ class Kernel extends HttpKernel
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \Illuminate\Auth\Middleware\Authenticate::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
         'api' => [
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\Auth\Middleware\Authenticate::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];

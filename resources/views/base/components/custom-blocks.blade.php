@@ -24,9 +24,12 @@
                         @if($customBlock->getImage())
                             <li class="splide__slide home-products-item banner product-default"
                                 role="group">
-                                <a href="{{$customBlock->url ?? '#'}}" title="3m color">
-                                    <img class="vertical" data-src="{{$customBlock->getPreviewImage()}}" alt="3m color"
-                                         title="3m color" src="{{$customBlock->getPreviewImage()}}">
+                                <a href="{{$customBlock->url ?? '#'}}" title="{{$customBlock->name}}">
+                                    <img class="vertical"
+                                         data-src="{{$customBlock->getPreviewImage()}}"
+                                         src="{{$customBlock->getPreviewImage()}}"
+                                         alt="{{$customBlock->name}}"
+                                         title="{{$customBlock->name}}">
                                 </a>
                             </li>
                         @endif

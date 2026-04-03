@@ -132,7 +132,55 @@ $(document).ready(function () {
     $('.review-form-open').click(function (){
         $(this).closest('.general-popup').attr('data-step', 3)
     })
+
+    initHomeAboutVideoLazy()
 })
+
+/**
+ * Відео в блоці «про нас»: не тягнемо MP4, поки блок не близько до viewport (менше навантаження на першому екрані).
+ */
+function initHomeAboutVideoLazy() {
+    const video = document.querySelector('.home-about-video')
+    if (!video) {
+        return
+    }
+    const source = video.querySelector('source')
+    const dataSrc = source && source.getAttribute('data-src')
+    if (!dataSrc || !source) {
+        return
+    }
+
+    const start = () => {
+        if (source.getAttribute('src')) {
+            return
+        }
+        source.setAttribute('src', dataSrc)
+        video.load()
+        const playPromise = video.play()
+        if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(function () {})
+        }
+    }
+
+    if (!('IntersectionObserver' in window)) {
+        start()
+
+        return
+    }
+
+    const io = new IntersectionObserver(
+        function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    start()
+                    io.disconnect()
+                }
+            })
+        },
+        { rootMargin: '120px' }
+    )
+    io.observe(video)
+}
 
 function getUserData(callback) {
     let dataToSession = (callback) => {
@@ -216,6 +264,7 @@ function telInputInitialization() {
 
 $(document).ready(function () {
     popupsOpenClose()
+    openAuthModalFromUrl()
     $('#popup-consultation').on('submit', function (e) {
         e.preventDefault()
         var name = $('#name').val().trim();
@@ -473,6 +522,26 @@ function closeAllPopups(popups) {
         popup.classList.remove('active')
         popup.setAttribute('data-step', '1')
     });
+}
+
+/**
+ * Якщо в URL є ?modal=login|register|forgot — відкрити модалку входу/реєстрації/відновлення пароля.
+ */
+function openAuthModalFromUrl() {
+    const params = new URLSearchParams(window.location.search)
+    const modal = params.get('modal')
+    const steps = { login: '1', register: '5', forgot: '3' }
+    if (!modal || !steps[modal]) return
+    const popups = document.querySelectorAll('.general-popup')
+    const loginPopup = document.getElementById('login-popup')
+    if (!loginPopup) return
+    closeAllPopups(popups)
+    loginPopup.classList.add('active')
+    loginPopup.setAttribute('data-step', steps[modal])
+    params.delete('modal')
+    const newSearch = params.toString()
+    const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash
+    window.history.replaceState({}, '', newUrl)
 }
 
 function debounce(fn, delay) {

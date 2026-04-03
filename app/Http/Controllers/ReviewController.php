@@ -7,6 +7,22 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
+    public function index()
+    {
+        $baseQuery = Review::query()
+            ->where('is_active', true);
+
+        $reviews = (clone $baseQuery)
+            ->with('product')
+            ->orderByDesc('created_at')
+            ->paginate(12);
+
+        $averageRating = round((float) $baseQuery->avg('rating'), 1);
+        $totalReviews = (int) $baseQuery->count();
+
+        return view('base.pages.reviews.index', compact('reviews', 'averageRating', 'totalReviews'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -30,7 +46,7 @@ class ReviewController extends Controller
 
         return response()->json([
             'message' => __('popup.reviews_popup.success_message'),
-            'review' => $review
+            'review' => $review,
         ]);
     }
 }

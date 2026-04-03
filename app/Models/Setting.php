@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 
@@ -16,6 +15,8 @@ class Setting extends Model
         'video_banner_desc',
         'slogan_title',
         'slogan_desc',
+        'product_meta_title_template',
+        'product_meta_description_template',
     ];
 
     protected $fillable = [
@@ -32,6 +33,8 @@ class Setting extends Model
         'video_banner_desc',
         'slogan_title',
         'slogan_desc',
-        'head_code'
+        'head_code',
+        'product_meta_title_template',
+        'product_meta_description_template',
     ];
 }

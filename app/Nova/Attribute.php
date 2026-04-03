@@ -2,8 +2,8 @@
 
 namespace App\Nova;
 
+use App\Nova\Fields\NovaTabTranslatable;
 use Illuminate\Http\Request;
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -41,7 +41,6 @@ class Attribute extends Resource
     /**
      * Determine if the given user can create a resource.
      *
-     * @param Request $request
      *
      * @return bool
      */
@@ -50,11 +49,9 @@ class Attribute extends Resource
         return false;
     }
 
-
     /**
      * Get the fields displayed by the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function fields(NovaRequest $request)
@@ -71,19 +68,19 @@ class Attribute extends Resource
             NovaTabTranslatable::make([
                 Text::make('Назва', 'name')
                     ->rules('required', 'string', 'max:255')
-                    ->help('Обязательное поле'),
+                    ->help('Обовʼязкове поле'),
             ]),
 
             Text::make('Назва', 'name')
                 ->displayUsing(function ($value) {
-                    return \Str::limit($value, 50) . (strlen($value) > 50 ? '...' : '');
+                    return \Str::limit($value, 50).(strlen($value) > 50 ? '...' : '');
                 })
                 ->onlyOnIndex()
                 ->sortable(),
 
             Boolean::make('Видимий', 'is_visible')
                 ->sortable()
-                ->help('Показывать атрибут на странице товара')
+                ->help('Показувати атрибут на сторінці товару')
                 ->default(true),
 
             Boolean::make('Перекладено', function () {
@@ -99,7 +96,6 @@ class Attribute extends Resource
     /**
      * Get the actions available for the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function actions(NovaRequest $request)

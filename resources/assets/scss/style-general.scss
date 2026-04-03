@@ -3492,12 +3492,21 @@ table .notify-quantity {
                 }
             }
 
+            /* Рядок «ще N…»: клікабельний увесь <a>, підсвітка лише на кнопці всередині */
             &.more a {
-                background: $mod-main-color-010;
+                background: transparent;
             }
 
             &.more a:hover {
-                background: $mod-main-color-075;
+                background: transparent;
+            }
+
+            &.more .search-suggestion.product .more {
+                transition: filter 0.15s ease, background-color 0.15s ease;
+            }
+
+            &.more .search-suggestion.product .more:hover {
+                filter: brightness(0.92);
             }
         }
 

@@ -36,20 +36,11 @@
         <ul class="flex-center">
             <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}"
                    class="button">{{__('header_footer.home')}}</a></li>
-            @php
-                    $category = $product->category;
-                    $parents[] = $category;
-
-                    while ($category->parent) {
-                        $parents[] = $category->parent;
-                        $category = $category->parent;
-                    }
-                    $reversedParents = array_reverse($parents);
-
-                    foreach ($reversedParents as $parent) {
-                        echo '<li><a href="'.route('products.category', ['category' => $parent->slug]).'" title="'.$parent->name.'" class="button">'.$parent->name.'</a></li>';
-                    }
-            @endphp
+            @foreach($productCategoryBreadcrumbs ?? [] as $breadcrumb)
+                <li>
+                    <a href="{{ $breadcrumb['url'] }}" title="{{ $breadcrumb['name'] }}" class="button">{{ $breadcrumb['name'] }}</a>
+                </li>
+            @endforeach
         </ul>
     </nav>
 
@@ -78,7 +69,9 @@
                             </div>
                         </div>
 
-                        <div class="count">{{ '('.$count.')' }}</div>
+                        @if($count > 0)
+                            <div class="count">({{ $count }})</div>
+                        @endif
                     </div>
 
                     <div class="reviews-open button general-popup-btn" data-popup="review-popup" data-product-id="{{ $product->id }}">
@@ -637,20 +630,20 @@
         <div class="product-page-info flex-justify wrap">
             <div class="item">
                 @if($product->descriptions)
-                    <div class="title">{{__('product-show.description')}}</div>
+                    <h2 class="title">{{__('product-show.description')}}</h2>
                     <div class="text">{!! $product->descriptions !!}</div>
                 @endif
             </div>
             @if($product->getBenefits())
                 <div class="item width-33">
-                    <div class="title">{{__('product-show.advantages')}}</div>
+                    <h2 class="title">{{__('product-show.advantages')}}</h2>
                     <div class="text">{!! $product->getBenefits() !!}
                     </div>
                 </div>
             @endif
             @if($product->getApplication())
                 <div class="item width-33">
-                    <div class="title">{{__('product-show.application')}}</div>
+                    <h2 class="title">{{__('product-show.application')}}</h2>
                     <div class="text">{!! $product->getApplication() !!}
                     </div>
                 </div>

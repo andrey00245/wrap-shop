@@ -5,15 +5,65 @@
 import { customBlockSliderInitialization, imageSliderInProduct } from "./sliderInitialization";
 
 $(document).ready(function() {
-    // Category filter functionality
+    function applyBlogCategoryFilter(category) {
+        const $blogLatest = $('#blog-latest');
+        const $cards = $('.blog-latest .article-card, .blog-categories .article-card');
+        const $featured = $('.blog-featured');
+        const $sections = $('.blog-categories .category-section');
+
+        if (category === 'all') {
+            $blogLatest.show();
+            $cards.show();
+            $featured.show();
+            $sections.show();
+            return;
+        }
+
+        const catStr = String(category);
+        // Блок «Останні публікації» не показуємо при виборі конкретної категорії
+        $blogLatest.hide();
+
+        $cards.each(function () {
+            const cardCat = String($(this).attr('data-category') ?? '');
+            $(this).toggle(cardCat === catStr);
+        });
+
+        // Featured завжди лишається на екрані при фільтрі категорій
+        if ($featured.length) {
+            $featured.show();
+        }
+
+        $sections.each(function () {
+            const secCat = String($(this).attr('data-category') ?? '');
+            $(this).toggle(secCat === catStr);
+        });
+    }
+
     $('.category-filter').on('click', function() {
         $('.category-filter').removeClass('active');
         $(this).addClass('active');
-        
-        const category = $(this).data('category');
-        
-        // TODO: Implement filtering logic when connected to backend
-        console.log('Filter by category:', category);
+        applyBlogCategoryFilter($(this).data('category'));
+    });
+
+    $(document).on('click', '.js-blog-show-all-publications', function (e) {
+        e.preventDefault();
+        $('.category-filter[data-category="all"]').trigger('click');
+        const $t = $('#blog-latest');
+        if ($t.length) {
+            $('html, body').animate({ scrollTop: $t.offset().top - 100 }, 400);
+        }
+    });
+
+    $(document).on('click', '.js-blog-filter-to-category', function (e) {
+        e.preventDefault();
+        const id = $(this).data('category');
+        $('.category-filter').removeClass('active');
+        $('.category-filter[data-category="' + id + '"]').addClass('active');
+        applyBlogCategoryFilter(id);
+        const $sec = $('#blog-category-' + id);
+        if ($sec.length) {
+            $('html, body').animate({ scrollTop: $sec.offset().top - 100 }, 400);
+        }
     });
     
     // Smooth scroll for table of contents links
@@ -52,7 +102,7 @@ $(document).ready(function() {
         const $slider = $('#latest-slider');
         const $dots = $('.latest-slider-dots');
         
-        if ($slider.length && $(window).width() <= 768) {
+        if ($slider.length && $(window).width() <= 768 && $dots.length) {
             const $cards = $slider.find('.article-card');
             const totalSlides = $cards.length;
             let currentSlide = 0;
@@ -60,6 +110,19 @@ $(document).ready(function() {
             // Remove any existing click handlers to prevent duplicates
             $dots.off('click', '.dot');
             $slider.off('touchstart touchmove touchend');
+            $dots.removeAttr('style');
+            
+            if (totalSlides <= 1) {
+                $dots.empty().hide();
+                $slider.find('.article-card').css({
+                    'display': 'flex',
+                    'visibility': 'visible',
+                    'opacity': '1',
+                    'position': 'relative',
+                    'width': '100%'
+                });
+                return;
+            }
             
             // Hide all cards except first
             $cards.css({
@@ -158,7 +221,7 @@ $(document).ready(function() {
                 }
             });
         } else {
-            // Desktop: show all cards
+            // Desktop / немає контейнера точок: показати всі картки
             $slider.find('.article-card').css({
                 'display': 'flex',
                 'visibility': 'visible',
@@ -174,10 +237,9 @@ $(document).ready(function() {
         $('.category-section').each(function() {
             const $section = $(this);
             const $slider = $section.find('.articles-grid-2');
-            const category = $slider.data('category');
-            const $dots = $section.find('.category-slider-dots[data-category="' + category + '"]');
+            const $dots = $section.find('.category-slider-dots');
             
-            if ($slider.length && $(window).width() <= 768) {
+            if ($slider.length && $(window).width() <= 768 && $dots.length) {
                 const $cards = $slider.find('.article-card');
                 const totalSlides = $cards.length;
                 let currentSlide = 0;
@@ -185,6 +247,19 @@ $(document).ready(function() {
                 // Remove any existing click handlers to prevent duplicates
                 $dots.off('click', '.dot');
                 $slider.off('touchstart touchmove touchend');
+                $dots.removeAttr('style');
+                
+                if (totalSlides <= 1) {
+                    $dots.empty().hide();
+                    $slider.find('.article-card').css({
+                        'display': 'flex',
+                        'visibility': 'visible',
+                        'opacity': '1',
+                        'position': 'relative',
+                        'width': '100%'
+                    });
+                    return;
+                }
                 
                 // Hide all cards except first
                 $cards.css({
@@ -492,6 +567,14 @@ $(document).ready(function() {
                 } catch (e) {
                     console.warn('Error destroying global slider instance:', e);
                 }
+            }
+
+            const productsListEl = sliderEl.querySelector(':scope > .splide__track > .splide__list');
+            const productsSlideCount = productsListEl
+                ? productsListEl.querySelectorAll(':scope > .splide__slide').length
+                : 0;
+            if (productsSlideCount < 3) {
+                return;
             }
             
             const isMobile = $(window).width() <= 768;
@@ -1209,6 +1292,10 @@ $(document).ready(function() {
         const sliderEl = document.querySelector('#blogSimilarSlider');
         
         if (sliderEl) {
+            const slideCount = sliderEl.querySelectorAll('.splide__list .splide__slide').length;
+            if (slideCount < 3) {
+                return;
+            }
             // Используем Splide с настройками для 3 карточек на десктопе, 1 на мобильном
             const isMobile = window.innerWidth <= 768;
             let similarSlider = new Splide('#blogSimilarSlider', {
@@ -1499,4 +1586,25 @@ $(document).ready(function() {
         initBlogProductsSlider();
         initBlogSimilarSlider();
     });
+
+    const $commentPanel = $('#blog-comment-form-panel');
+    const $commentToggle = $('#blog-comment-form-toggle');
+    const $commentClose = $('#blog-comment-form-close');
+    if ($commentPanel.length && $commentToggle.length) {
+        function setBlogCommentFormOpen(open) {
+            $commentPanel.prop('hidden', !open);
+            $commentToggle.prop('hidden', open);
+            $commentToggle.attr('aria-expanded', open ? 'true' : 'false');
+        }
+
+        $commentToggle.on('click', function () {
+            setBlogCommentFormOpen(true);
+        });
+
+        if ($commentClose.length) {
+            $commentClose.on('click', function () {
+                setBlogCommentFormOpen(false);
+            });
+        }
+    }
 });

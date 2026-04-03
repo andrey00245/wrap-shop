@@ -14,7 +14,8 @@
     @media screen and (max-width: 768px) {
         display: block;
         
-        &.blog-products-slider-dots {
+        &.blog-products-slider-dots,
+        &.blog-similar-slider-dots {
             display: flex !important;
         }
     }
@@ -231,6 +232,21 @@
     margin-top: 10px;
 }
 
+/* Десктоп (2 колонки): прев’ю лишається 630∶355 (align-self: start), текстова колонка тягнеться — підвал унизу */
+@media screen and (min-width: 1025px) {
+    .featured-image {
+        align-self: start;
+    }
+
+    .featured-content {
+        min-height: 100%;
+    }
+
+    .featured-footer {
+        margin-top: auto;
+    }
+}
+
 .featured-author {
     font-size: 13px;
     color: #666;
@@ -275,17 +291,39 @@
 }
 
 .featured-image {
+    position: relative;
     width: 100%;
-    height: 100%;
     border-radius: 8px;
     overflow: hidden;
-    display: flex;
-    align-items: stretch;
-    
-    .image-placeholder {
+    display: block;
+    /* Як на wrap.shop/blog і hero статті: 630 × 355 */
+    aspect-ratio: 630 / 355;
+
+    picture {
+        display: block;
         width: 100%;
         height: 100%;
+        margin: 0;
+        line-height: 0;
+    }
+
+    picture,
+    img {
+        width: 100%;
+        height: 100%;
+        display: block;
         object-fit: cover;
+        object-position: center;
+    }
+    
+    > .image-placeholder {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
@@ -314,6 +352,53 @@
 .blog-latest {
     padding: 60px 0;
     background: transparent;
+}
+
+.latest-slider-wrapper,
+.category-slider-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.latest-slider-dots,
+.category-slider-dots {
+    display: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Головна блогу: заголовок + кнопка в один ряд на десктопі; на мобілці — заголовок, картки, кнопка знизу */
+.blog-latest__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+        "title link"
+        "slider slider";
+    align-items: center;
+    column-gap: 24px;
+}
+
+.blog-latest__title {
+    grid-area: title;
+    margin: 0 0 40px;
+    align-self: center;
+}
+
+.blog-latest__all-link {
+    grid-area: link;
+    margin: 0 0 40px;
+    align-self: center;
+    justify-self: end;
+}
+
+.blog-latest__slider {
+    grid-area: slider;
+    width: 100%;
+    min-width: 0;
 }
 
 .section-header {
@@ -376,15 +461,21 @@
         .article-card {
             .article-image {
                 width: 646px;
+                max-width: 100%;
                 height: 266px;
                 min-height: 266px;
                 flex-shrink: 0;
+                overflow: hidden;
+                border-radius: 8px;
+                display: block;
+                background: #ececec;
                 
                 img, .image-placeholder {
-                    width: 646px;
-                    height: 266px;
+                    width: 100%;
+                    height: 100%;
                     min-height: 266px;
                     object-fit: cover;
+                    object-position: center;
                     display: block;
                 }
             }
@@ -443,30 +534,37 @@
         }
     }
     
-    /* Special grid for Latest Publications */
+    /* Special grid for Latest Publications (десктоп: 646×292 + дві по 312×292) */
     &.articles-grid-latest {
-        grid-template-columns: 646px 1fr 1fr;
+        grid-template-columns: 646px 312px 312px;
         column-gap: 25px;
         row-gap: 25px;
         align-items: stretch;
         
-        .article-card:first-child {
+        .article-card--latest:first-child {
             width: 646px;
+            max-width: 100%;
             height: auto;
-            min-height: 295px;
+            min-height: 0;
             flex-shrink: 0;
             
             .article-image {
                 width: 646px;
+                max-width: 100%;
                 height: 292px;
                 min-height: 292px;
                 flex-shrink: 0;
+                overflow: hidden;
+                border-radius: 8px;
+                display: block;
+                background: #ececec;
                 
                 img, .image-placeholder {
-                    width: 646px;
-                    height: 292px;
+                    width: 100%;
+                    height: 100%;
                     min-height: 292px;
                     object-fit: cover;
+                    object-position: center;
                     display: block;
                 }
             }
@@ -502,24 +600,31 @@
             }
         }
         
-        .article-card:not(:first-child) {
-            width: 100%;
+        .article-card--latest:not(:first-child) {
+            width: 312px;
+            max-width: 100%;
             height: 100%;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             
             .article-image {
-                width: 100%;
+                width: 312px;
+                max-width: 100%;
                 height: 292px;
                 min-height: 292px;
                 flex-shrink: 0;
+                overflow: hidden;
+                border-radius: 8px;
+                display: block;
+                background: #ececec;
                 
                 img, .image-placeholder {
                     width: 100%;
-                    height: 292px;
+                    height: 100%;
                     min-height: 292px;
                     object-fit: cover;
+                    object-position: center;
                     display: block;
                 }
             }
@@ -682,6 +787,29 @@
     }
 }
 
+/* Секції категорій: одна зовнішня рамка + overflow — без «зазорів» біля заокругленого фото */
+.blog-categories .article-card {
+    gap: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #E6E6E6;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+
+    .article-image {
+        border-radius: 0;
+    }
+
+    .article-content {
+        border: none;
+        border-top: 1px solid #E6E6E6;
+    }
+
+    &:hover {
+        border-color: rgba(33, 33, 33, 0.3);
+    }
+}
+
 .article-content-icon {
     position: absolute;
     top: 10px;
@@ -738,12 +866,33 @@
 .blog-article-hero {
     width: 100%;
     margin-bottom: 40px;
+
+    /* Десктоп: 1132 × 334 */
+    picture {
+        display: block;
+        width: 100%;
+        max-width: 1132px;
+        margin-left: auto;
+        margin-right: auto;
+        aspect-ratio: 1132 / 334;
+        overflow: hidden;
+        border-radius: 8px;
+        line-height: 0;
+    }
+
+    .blog-cover-img--article-hero {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+    }
 }
 
 .hero-image-placeholder {
-    width: 1132px;
-    max-width: 100%;
-    height: 334px;
+    width: 100%;
+    max-width: 1132px;
+    aspect-ratio: 1132 / 334;
     margin: 0 auto;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
@@ -752,27 +901,104 @@
     color: #fff;
     font-size: 24px;
     font-weight: 600;
+    border-radius: 8px;
 }
 
 .blog-article-content {
-    padding: 40px 0 60px;
+    padding: 40px 0 0;
     background: transparent;
 }
 
+/* Сітка статті: колонки лише коли є лівий каталог / правий блог-сайдбар.
+   Центрування як у макеті; середня колонка minmax(800px, 1100px), щоб не стискалась до ~630px при 1fr. */
 .article-main-wrapper {
     display: grid;
-    grid-template-columns: 303px minmax(800px, 1100px) 303px;
-    gap: 40px;
+    gap: 25px;
     align-items: start;
     justify-content: center;
-    max-width: 1800px;
     margin: 0 auto;
-    padding: 0 40px;
+    padding: 0;
     box-sizing: border-box;
     width: 100%;
-    
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 1132px;
+
     @media screen and (min-width: 1600px) {
-        grid-template-columns: 303px minmax(900px, 1200px) 303px;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    &.article-main-wrapper--with-product-catalog-nav {
+        max-width: 1800px;
+
+        @media screen and (min-width: 1231px) {
+            grid-template-columns: 303px minmax(800px, 1100px);
+        }
+
+        &:not(.article-main-wrapper--with-category-sidebar) .article-main {
+            max-width: none;
+            width: 100%;
+            margin-left: 0;
+            margin-right: auto;
+        }
+    }
+
+    /* Правий сайдбар без лівого каталогу: 2 колонки лише коли вистачає ширини (узгоджено з порогом каталогу). */
+    &.article-main-wrapper--with-category-sidebar:not(.article-main-wrapper--with-product-catalog-nav) {
+        @media screen and (min-width: 1231px) {
+            grid-template-columns: minmax(0, 1fr) 303px;
+            max-width: 1560px;
+
+            .article-main {
+                max-width: 930px;
+                width: 100%;
+                margin-inline-start: 90px;
+                margin-inline-end: auto;
+            }
+        }
+    }
+
+    &.article-main-wrapper--with-product-catalog-nav.article-main-wrapper--with-category-sidebar {
+        @media screen and (min-width: 1366px) {
+            grid-template-columns: 303px minmax(800px, 1100px) 303px;
+            max-width: 1800px;
+        }
+
+        .article-main {
+            max-width: none;
+            width: 100%;
+            margin-left: 0;
+            margin-right: auto;
+        }
+    }
+}
+
+@media screen and (max-width: 1230px) {
+    /* Та сама специфічність, що й у базових правилах (--with-product-catalog-nav = 2–3 класи),
+       інакше grid-template-columns: 303px … лишається на мобілці й ламає верстку. */
+    .article-main-wrapper,
+    .article-main-wrapper.article-main-wrapper--with-category-sidebar,
+    .article-main-wrapper.article-main-wrapper--with-product-catalog-nav,
+    .article-main-wrapper.article-main-wrapper--with-product-catalog-nav.article-main-wrapper--with-category-sidebar {
+        grid-template-columns: 1fr;
+        max-width: 720px;
+        gap: 25px;
+
+        .article-main {
+            max-width: 100% !important;
+            margin-inline-start: 0 !important;
+            margin-inline-end: auto;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+    
+    .article-categories-sidebar,
+    .article-sidebar {
+        position: static !important;
+        width: 100% !important;
+        max-width: 440px;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 
@@ -783,8 +1009,42 @@
     flex-direction: column;
 }
 
+/* Обведення основного тексту статті (світла тема) + акцент як на сторінці автора */
+.article-content-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 28px 32px 40px;
+    box-sizing: border-box;
+    background: #fff;
+    box-shadow: inset 4px 0 0 $main-color-light;
+}
+
+.blog-article-content .article-title-accent {
+    color: $main-color-light;
+}
+
+.blog-article-content .article-title-plain {
+    color: inherit;
+}
+
 .article-header {
-    margin-bottom: 30px;
+    margin-bottom: 24px;
+}
+
+@media screen and (max-width: 768px) {
+    .article-content-card {
+        padding: 20px 16px 28px;
+        border-radius: 8px;
+        box-shadow: none;
+    }
+
+    .blog-comments-title {
+        font-size: 20px;
+
+        &::after {
+            display: none;
+        }
+    }
 }
 
 .article-title {
@@ -799,14 +1059,26 @@
 
 .article-meta {
     display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: center;
-    gap: 20px;
+    gap: 14px 20px;
     font-size: 14px;
     color: #666;
     
     .article-tag {
-        margin-right: auto;
+        margin-right: 0;
+        flex-shrink: 0;
+    }
+    
+    .article-meta-right {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px 28px;
+        margin-left: auto;
+        min-width: 0;
     }
     
     .article-date {
@@ -814,7 +1086,8 @@
         align-items: center;
         gap: 5px;
         font-family: 'Inter', sans-serif;
-        margin-left: auto;
+        margin-left: 0;
+        flex-shrink: 0;
         
         .article-date-label {
             font-size: 14px;
@@ -875,6 +1148,374 @@
     display: flex;
     flex-direction: column;
     gap: 30px;
+}
+
+/* Контент з CKEditor: списки, таблиці */
+.blog-post-body {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #333;
+
+    h2, h3, h4 {
+        font-weight: 600;
+        color: #000;
+        margin: 0 0 12px;
+    }
+    h2 { font-size: 24px; }
+    h3 { font-size: 20px; }
+    h4 { font-size: 18px; }
+
+    p { margin: 0 0 16px; }
+
+    ul, ol {
+        margin: 0 0 16px;
+        padding-left: 1.4em;
+    }
+    li { margin-bottom: 6px; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+        font-size: 15px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px 12px;
+        text-align: left;
+    }
+    th { background: #f5f5f5; font-weight: 600; }
+
+    img, video {
+        max-width: 100%;
+        height: auto;
+    }
+
+    a {
+        color: $main-color-light;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+
+        &:hover {
+            color: $main-color-light-075;
+        }
+    }
+}
+
+/* Коментарі на сторінці статті */
+.blog-comments {
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid #ececec;
+}
+
+.blog-comments-title {
+    position: relative;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 20px;
+    padding-bottom: 12px;
+    color: #000;
+
+    &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 52px;
+        height: 3px;
+        border-radius: 2px;
+        background: $main-color-light;
+    }
+}
+
+.blog-comment-form-accordion {
+    margin-top: 28px;
+    text-align: center;
+}
+
+.blog-comment-form-toggle {
+    appearance: none;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 32px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    color: #fff;
+    background: $main-color-light;
+    border: 1px solid $main-color-light-075;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+        background: $main-color-light-085;
+        border-color: $main-color-light;
+    }
+
+    &:focus-visible {
+        outline: 2px solid $main-color-light;
+        outline-offset: 3px;
+    }
+}
+
+.blog-comment-form-panel {
+    margin-top: 22px;
+    text-align: left;
+}
+
+.blog-comment-form-panel[hidden] {
+    display: none !important;
+}
+
+.blog-comment-form-toggle[hidden] {
+    display: none !important;
+}
+
+.blog-comment-form-panel__header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 0 0 10px;
+    min-height: 36px;
+}
+
+.blog-comment-form-close {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1;
+    color: #555;
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+        color: $main-color-light;
+        border-color: $main-color-light-050;
+        background: $main-color-light-010;
+    }
+
+    &:focus-visible {
+        outline: 2px solid $main-color-light;
+        outline-offset: 2px;
+    }
+}
+
+.blog-comment-form__req {
+    margin-left: 2px;
+    color: $main-color-light;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: help;
+    border: none;
+}
+
+.blog-comment-item {
+    padding: 16px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.blog-comment-item__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    margin-bottom: 8px;
+}
+
+.blog-comment-item__author {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.blog-comment-item__author--reply {
+    margin-bottom: 6px;
+}
+
+.blog-comment-item__author--reply .blog-comment-item__avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+}
+
+.blog-comment-item__avatar {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: $main-color-light;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.blog-comment-item__name {
+    font-weight: 600;
+    font-size: 15px;
+    color: $main-color-light;
+}
+
+.blog-comment-item__date {
+    font-size: 13px;
+    color: #888;
+}
+
+.blog-comment-item__body {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #333;
+    max-height: min(42vh, 320px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding-right: 6px;
+}
+
+.blog-comment-item__body--small {
+    font-size: 14px;
+    margin-top: 6px;
+    max-height: min(36vh, 260px);
+}
+
+.blog-comment-item__body,
+.blog-comment-item__body--small {
+    scrollbar-width: thin;
+    scrollbar-color: $main-color-light rgba(0, 0, 0, 0.08);
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.06);
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $main-color-light-050;
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: $main-color-light-075;
+    }
+}
+
+.blog-comment-reply {
+    margin: 12px 0 0 20px;
+    padding-left: 16px;
+    border-left: 3px solid $main-color-light-050;
+}
+
+.blog-comment-form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+}
+
+/* Honeypot: поза екраном, без Bootstrap d-none (надійніше + без чужих підказок автозаповнення) */
+.blog-comment-form__honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.blog-comment-form__field {
+    margin-bottom: 18px;
+}
+
+.blog-comment-form__label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
+}
+
+.blog-comment-form__input,
+.blog-comment-form__textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    font-size: 15px;
+    line-height: 1.45;
+    color: #1a1a1a;
+    background: #fafafa;
+    border: 1px solid #c8c8c8;
+    border-radius: 6px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+
+    &:focus {
+        outline: none;
+        border-color: #c9a227;
+        box-shadow: 0 0 0 2px rgba(255, 206, 28, 0.28);
+        background: #fff;
+    }
+}
+
+.blog-comment-form__textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.blog-comment-form__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #fff;
+    background: $main-color-light;
+    border: 1px solid $main-color-light-075;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+        background: $main-color-light-085;
+        border-color: $main-color-light;
+    }
+
+    &:focus-visible {
+        outline: 2px solid $main-color-light;
+        outline-offset: 2px;
+    }
 }
 
 .article-section {
@@ -956,16 +1597,18 @@
    LEFT SIDEBAR - CATEGORIES ACCORDION
    ============================================ */
 .article-categories-sidebar {
-    width: 303px;
+    width: 100%;
+    max-width: 360px;
     position: sticky;
     top: 100px;
     height: fit-content;
+    justify-self: start;
 }
 
 .categories-accordion {
     background: #f9f9f9;
     border-radius: 8px;
-    padding: 20px;
+    padding: 10px 22px;
     box-sizing: border-box;
 }
 
@@ -1066,25 +1709,28 @@
    RIGHT SIDEBAR
    ============================================ */
 .article-sidebar {
-    width: 303px;
+    width: 100%;
+    max-width: 360px;
     position: sticky;
     top: 100px;
     height: fit-content;
+    justify-self: start;
 }
 
 .sidebar-section {
     background: #f9f9f9;
-    padding: 35px;
-    border-radius: 8px;
+    padding: 10px 32px;
+    border-radius: 10px;
 }
 
 .sidebar-title {
-    font-size: 16px;
+    font-size: 17px;
     font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     color: #000;
-    margin: 0 0 25px 0;
+    margin: 0 0 28px 0;
+    line-height: 1.25;
 }
 
 .sidebar-articles {
@@ -1097,13 +1743,17 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 15px;
+    gap: 12px;
+    padding: 20px 18px;
+    min-height: 220px;
     border: 1px solid #e6e6e6;
-    border-radius: 4px;
-    margin-bottom: 15px;
+    border-radius: 8px;
+    margin-bottom: 18px;
     cursor: pointer;
     transition: background 0.2s ease, border-color 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    box-sizing: border-box;
     
     &:last-child {
         margin-bottom: 0;
@@ -1124,32 +1774,44 @@
 
 .sidebar-article-tag {
     display: inline-block;
-    padding: 3px 10px;
+    padding: 5px 12px;
     background: #ffd700;
     color: #fff;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     width: fit-content;
+    line-height: 1.2;
+    border-radius: 4px;
 }
 
 .sidebar-article-date {
-    font-size: 12px;
+    font-size: 13px;
     color: #666;
     margin-left: auto;
 }
 
 .sidebar-article-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     color: #000;
     margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
 }
 
 .sidebar-article-excerpt {
-    font-size: 12px;
-    color: #666;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #555;
     margin: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
 }
 
 .sidebar-article-bookmark {
@@ -1178,6 +1840,10 @@
     padding: 60px 0;
     background: transparent;
     position: relative;
+
+    @media screen and (min-width: 769px) {
+        padding: 44px 0 20px;
+    }
     
     .container {
         max-width: 1400px;
@@ -1188,7 +1854,7 @@
     .blog-products-wrapper {
         position: relative;
     }
-    
+
     .home-products-list {
         position: relative;
         padding-bottom: 50px;
@@ -1296,6 +1962,49 @@
                 }
             }
         }
+    }
+
+    /* Менше 3 карток: без Splide, сітка (слайдер не ініціалізується в blog.js) */
+    &.blog-products--static {
+        .blog-products-static-grid {
+            display: grid;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            padding-bottom: 36px;
+
+            @media screen and (min-width: 769px) {
+                /* Без 1fr: одна картка не розтягується на всю ширину (як у слайдері ~310px). */
+                gap: 5px;
+                grid-template-columns: repeat(auto-fill, minmax(260px, 310px));
+                justify-content: start;
+                padding-bottom: 20px;
+            }
+
+            @media screen and (max-width: 768px) {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+
+                /* Перебиваємо flex-правила для слайдера: тут сітка на всю комірку */
+                .home-products-item.product-default {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    min-width: 0 !important;
+                    flex: none !important;
+                    margin: 0 !important;
+                }
+            }
+
+            .home-products-item.product-default {
+                min-width: 0;
+            }
+        }
+    }
+}
+
+/* Десктоп: менший зазор між блоком товарів і «схожі статті» (мобілка — свої правила нижче) */
+@media screen and (min-width: 769px) {
+    .blog-products + .blog-similar {
+        margin-top: -8px;
     }
 }
 
@@ -1425,6 +2134,10 @@
     padding: 60px 0;
     background: transparent;
     position: relative;
+
+    @media screen and (min-width: 769px) {
+        padding: 30px 0 44px;
+    }
     
     .container {
         max-width: 1400px;
@@ -1435,10 +2148,83 @@
     .section-title {
         margin-bottom: 40px;
     }
+
+    /* Менше 3 карток: без Splide, сітка (слайдер не ініціалізується) */
+    &.blog-similar--static {
+        .blog-similar-static-grid {
+            display: grid;
+            gap: 16px;
+            width: 100%;
+            box-sizing: border-box;
+
+            @media screen and (min-width: 769px) {
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            }
+
+            @media screen and (max-width: 768px) {
+                grid-template-columns: 1fr;
+            }
+
+            > .article-card {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                min-width: 0;
+                width: 100%;
+                cursor: pointer;
+
+                .article-image {
+                    width: 100%;
+                    height: 250px;
+                    min-height: 250px;
+                    overflow: hidden;
+                    border-radius: 8px;
+                    flex-shrink: 0;
+
+                    img,
+                    .image-placeholder {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        display: block;
+                    }
+                }
+
+                .article-content {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    position: relative;
+                    flex: 1;
+                    border: 1px solid #e6e6e6;
+                    padding: 10px;
+                    min-height: 200px;
+                    transition: background 0.2s ease, border-color 0.2s ease;
+
+                    .article-title {
+                        font-family: 'InterVariable', 'Inter', sans-serif;
+                        font-size: 24px;
+                        font-weight: 600;
+                        line-height: 1.4;
+                        color: #000;
+                        margin: 0;
+                    }
+
+                    .article-author {
+                        margin-top: auto;
+                    }
+                }
+
+                &:hover .article-content {
+                    border-color: rgba(33, 33, 33, 0.3) !important;
+                    background: #e6e6e6 !important;
+                }
+            }
+        }
+    }
     
     .blog-similar-wrapper {
         position: relative;
-        min-height: 500px; // Минимальная высота чтобы блок был виден
     }
     
     .home-products-list {
@@ -1648,6 +2434,71 @@
 /* ============================================
    RESPONSIVE
    ============================================ */
+/* «Останні»: нижче ~1320px три колонки 646+312+312 не вміщаються — адаптив, висота прев’ю 292 */
+@media screen and (max-width: 1320px) {
+    .articles-grid.articles-grid-latest {
+        grid-template-columns: 1fr 1fr;
+        column-gap: 20px;
+        row-gap: 25px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        
+        .article-card--latest:first-child {
+            grid-column: 1 / -1;
+            width: 100% !important;
+            max-width: 100%;
+            min-width: 0;
+            
+            .article-image {
+                width: 100% !important;
+                max-width: 100%;
+                height: 292px;
+                min-height: 292px;
+                overflow: hidden;
+                border-radius: 8px;
+                
+                img,
+                .image-placeholder {
+                    width: 100% !important;
+                    max-width: 100%;
+                    height: 100%;
+                    min-height: 292px;
+                    object-fit: cover;
+                    object-position: center;
+                    display: block;
+                }
+            }
+        }
+        
+        .article-card--latest:not(:first-child) {
+            width: 100% !important;
+            max-width: 100%;
+            min-width: 0;
+            
+            .article-image {
+                width: 100% !important;
+                max-width: 100%;
+                height: 292px;
+                min-height: 292px;
+                overflow: hidden;
+                border-radius: 8px;
+                
+                img,
+                .image-placeholder {
+                    width: 100% !important;
+                    max-width: 100%;
+                    height: 100%;
+                    min-height: 292px;
+                    object-fit: cover;
+                    object-position: center;
+                    display: block;
+                }
+            }
+        }
+    }
+}
+
    @media screen and (max-width: 1024px) {
     /* Breadcrumbs: небольшой отступ сверху на мобилке */
     .blog-breadcrumbs {
@@ -1668,6 +2519,33 @@
     
     .articles-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .articles-grid.articles-grid-2 {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        
+        .article-card {
+            min-width: 0;
+            
+            .article-image {
+                width: 100% !important;
+                max-width: 100%;
+                height: 266px;
+                min-height: 266px;
+                
+                img,
+                .image-placeholder {
+                    width: 100% !important;
+                    max-width: 100%;
+                    height: 100%;
+                    min-height: 266px;
+                    object-fit: cover;
+                    object-position: center;
+                }
+            }
+        }
     }
     
     .products-grid {
@@ -1691,7 +2569,7 @@
     
     .blog-categories-nav {
         gap: 8px;
-        padding: 0 10px;
+        padding: 20px 10px;
         margin-top: 10px;
     }
     
@@ -1705,7 +2583,7 @@
     }
     
     .blog-featured {
-        padding: 30px 0 0px;
+        padding: 20px 0 0px;
     }
     
     .featured-article {
@@ -1716,13 +2594,12 @@
         .featured-image {
             order: -1;
             width: 100%;
-            height: 292px;
+            height: auto;
+            aspect-ratio: 630 / 355;
             
-            .image-placeholder {
-                width: 370px;
-                height: 292px;
-                max-width: 100%;
-                margin: 0 auto;
+            > .image-placeholder {
+                position: absolute;
+                inset: 0;
             }
         }
         
@@ -1802,8 +2679,39 @@
         padding: 40px 0;
     }
     
+    .blog-latest__inner {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "title"
+            "slider"
+            "link";
+        column-gap: 0;
+    }
+    
+    .blog-latest__title {
+        margin: 0 0 25px;
+    }
+    
+    .blog-latest__all-link {
+        margin: 20px 0 0;
+        justify-self: stretch;
+        width: 100%;
+        min-width: 0;
+    }
+    
+    .blog-latest__slider {
+        margin: 0;
+    }
+    
+    .blog-products .products-title {
+        font-size: 20px;
+        line-height: 1.2;
+        font-weight: 300;
+        margin: 0 0 16px 0;
+    }
+
     .blog-similar {
-        padding: 40px 0;
+        padding: 24px 0;
         
         .container {
             padding: 0 19px;
@@ -1812,10 +2720,12 @@
         .section-title {
             font-size: 20px;
             line-height: 1.2;
-            margin-bottom: 25px;
+            margin-bottom: 16px;
         }
         
         .home-products-list {
+            padding-bottom: 36px;
+
             .splide__slide {
                 .article-card {
                     .article-image {
@@ -2006,7 +2916,7 @@
             grid-template-columns: 1fr;
             gap: 20px;
             
-            .article-card {
+            .article-card--latest {
                 width: 100% !important;
                 max-width: 100%;
                 height: auto !important;
@@ -2025,15 +2935,21 @@
                 
                 .article-image {
                     width: 100% !important;
-                    height: 292px;
-                    min-height: 292px;
+                    height: 292px !important;
+                    min-height: 292px !important;
+                    max-height: 292px !important;
                     flex-shrink: 1 !important;
+                    overflow: hidden;
+                    border-radius: 8px;
+                    display: block;
+                    background: #ececec;
                     
                     img, .image-placeholder {
                         width: 100% !important;
-                        height: 292px;
-                        min-height: 292px;
+                        height: 100% !important;
+                        min-height: 292px !important;
                         object-fit: cover;
+                        object-position: center;
                         display: block;
                     }
                 }
@@ -2082,15 +2998,21 @@
                 
                 .article-image {
                     width: 100% !important;
-                    height: 266px;
-                    min-height: 266px;
+                    height: 266px !important;
+                    min-height: 266px !important;
+                    max-height: 266px !important;
                     flex-shrink: 1 !important;
+                    overflow: hidden;
+                    border-radius: 8px;
+                    display: block;
+                    background: #ececec;
                     
                     img, .image-placeholder {
                         width: 100% !important;
-                        height: 266px;
-                        min-height: 266px;
+                        height: 100% !important;
+                        min-height: 266px !important;
                         object-fit: cover;
+                        object-position: center;
                         display: block;
                     }
                 }
@@ -2120,8 +3042,17 @@
         gap: 12px;
     }
     
+    .blog-categories .article-card {
+        gap: 0;
+    }
+    
     .article-image {
         height: 200px;
+    }
+    
+    /* latest: висоти задає сітка latest; категорії — фіксована рамка вище */
+    .blog-latest .article-image {
+        height: auto;
     }
     
     .article-tag {
@@ -2184,16 +3115,29 @@
     /* Article Detail Page Mobile Styles */
     .blog-article-hero {
         margin-bottom: 8px; /* ещё ближе к аккордеону */
+
+        picture {
+            max-width: 100%;
+            aspect-ratio: 630 / 355;
+        }
+
+        .blog-cover-img--article-hero {
+            height: 100%;
+        }
     }
     
     .blog-article-hero .hero-image-placeholder {
-        width: 370px;
-        height: 250px;
-        max-width: 100%;
+        width: 100%;
+        max-width: 370px;
+        aspect-ratio: 630 / 355;
+        height: auto;
+        min-height: 0;
         margin: 0 auto;
     }
     
-    .article-main-wrapper {
+    .article-main-wrapper,
+    .article-main-wrapper.article-main-wrapper--with-product-catalog-nav,
+    .article-main-wrapper.article-main-wrapper--with-product-catalog-nav.article-main-wrapper--with-category-sidebar {
         grid-template-columns: 1fr;
         gap: 12px;
     }
@@ -2217,15 +3161,26 @@
     
     .article-sidebar {
         width: 100%;
+        max-width: 338px;
+        margin-left: auto;
+        margin-right: auto;
         position: relative;
         top: 0;
         order: 1;
     }
-    
-    /* Article main: общая колонка 338px */
+
+    /* Як на проді: та сама ширина колонки, що й у тексту; компактні відступи як у .article-content-card */
+    .article-sidebar .sidebar-section {
+        padding: 20px 16px;
+        border-radius: 8px;
+        box-sizing: border-box;
+    }
+
+    /* Article main: общая колонка 338px; перебиває desktop-правила з вищою специфічністю */
     .article-main {
-        max-width: 338px;
-        margin: 0 auto;
+        max-width: 338px !important;
+        margin-inline: auto !important;
+        width: 100%;
     }
 
     /* Article header: внутри той же колонки */
@@ -2241,16 +3196,17 @@
         line-height: 100%;
     }
 
-    /* Тег слева, дата справа 134x22 */
+    /* Мобілка: тег зверху; у рядку — автор зліва, дата справа (у DOM спочатку дата, потім автор) */
     .article-main .article-meta {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
         margin-bottom: 16px;
     }
 
     .article-main .article-meta .article-tag {
+        align-self: flex-start;
         min-width: 134px;
         height: 22px;
         display: inline-flex;
@@ -2260,7 +3216,39 @@
         font-size: 11px;
     }
 
+    .article-main .article-meta .article-meta-right {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        min-width: 0;
+        margin-left: 0;
+        gap: 8px;
+    }
+
+    .article-main .article-meta .article-meta-right > .article-date:nth-child(1) {
+        order: 2;
+        text-align: right;
+        justify-content: flex-end;
+    }
+
+    .article-main .article-meta .article-meta-right > .article-date:nth-child(2) {
+        order: 1;
+        text-align: left;
+        justify-content: flex-start;
+    }
+
+    /* Лише дата (немає автора) — притискаємо вправо */
+    .article-main .article-meta .article-meta-right > .article-date:only-child {
+        order: 0;
+        margin-left: auto;
+        text-align: right;
+    }
+
     .article-main .article-meta .article-date {
+        display: inline-flex;
+        flex-wrap: wrap;
         font-family: 'Inter', 'InterVariable', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         font-size: 14px;
         line-height: 19px;
@@ -2271,18 +3259,21 @@
         display: none;
     }
 
-    /* Sidebar title "ІНШІ СТАТТІ..." 15px */
+    /* Sidebar title "ІНШІ СТАТТІ..." — як раніше по пропорціях до колонки */
     .article-sidebar .sidebar-title {
         font-size: 15px;
+        margin-bottom: 16px;
     }
 
-    /* Sidebar articles ~346x107 */
+    /* Sidebar articles: на всю ширину колонки 338px; та сама мін. висота, що й на десктопі (клампи тексту) */
     .article-sidebar .sidebar-article {
-        width: 346px;
+        width: 100%;
         max-width: 100%;
-        min-height: 107px;
+        min-height: 200px;
+        padding: 16px 14px;
         margin-left: auto;
         margin-right: auto;
+        box-sizing: border-box;
     }
 
     /* Article body уже внутри .article-main, отдельных ограничений не нужно */
@@ -2326,9 +3317,11 @@
     .blog-article-content .article-image-inline,
     .blog-article-content .article-image-inline .image-placeholder {
         max-width: 100%;
-        width: 100%;
+        /* width: 100%; */
         height: auto;
         display: block;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     /* Убираем возможные горизонтальные отступы */
@@ -2353,24 +3346,57 @@
 
     /* Article page – blog products (КОЛЬОРОВІ ПЛІВКИ) */
     .blog-products {
-        padding: 40px 0;
+        padding: 24px 0;
 
         .container {
             padding: 0 19px;
         }
 
+        .home-products-list {
+            padding-bottom: 36px;
+        }
+
         /* Карточки товаров в мобильном слайдере: 2 шт. по ширине, ~180x274 */
         .home-products-item.product-default {
-            @media screen and (max-width: 768px) {
-                width: calc(50% - 4px) !important;
-                max-width: calc(50% - 4px) !important;
-                min-width: calc(50% - 4px) !important;
-                min-height: 274px;
-                margin: 0 2px;
-                flex: 0 0 calc(50% - 4px) !important;
-                border: 1px solid rgba(33, 33, 33, 0.3) !important;
-                box-sizing: border-box !important;
-            }
+            width: calc(50% - 4px) !important;
+            max-width: calc(50% - 4px) !important;
+            min-width: calc(50% - 4px) !important;
+            min-height: 274px;
+            margin: 0 2px;
+            flex: 0 0 calc(50% - 4px) !important;
+            border: 1px solid rgba(33, 33, 33, 0.3) !important;
+            box-sizing: border-box !important;
+        }
+
+        /* Мобілка: ряд 1 — category-status зліва, серце справа; ряд 2 — SKU зліва на всю ширину */
+        .home-products-item.product-default .blog-product-card-top.flex-justify {
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .home-products-item.product-default .blog-product-card-top .sale.statuses {
+            order: 1;
+            flex: 0 1 auto;
+            min-width: 0;
+        }
+
+        .home-products-item.product-default .blog-product-card-top .wishlist {
+            order: 2;
+            flex: 0 0 auto;
+            margin-left: auto;
+        }
+
+        .home-products-item.product-default .blog-product-card-top .sku {
+            order: 3;
+            flex: 1 1 100%;
+            width: 100%;
+            text-align: left;
+            font-size: 10px;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         // Используем стандартные стили карточек из style-general.scss
@@ -2403,6 +3429,12 @@
         
         span {
             color: $text-gray-dark;
+        }
+    }
+
+    @media screen and (min-width: 769px) {
+        .blog-article-hero picture {
+            background-color: #1a1a1a;
         }
     }
     
@@ -2455,7 +3487,8 @@
         .section-title {
             color: rgba(255, 206, 28, 1);
         }
-        
+
+        .blog-similar-static-grid .article-card,
         .home-products-list .splide__slide .article-card {
             cursor: pointer;
             
@@ -2560,6 +3593,41 @@
     }
     
     /* Article Cards */
+    .blog-latest,
+    .blog-categories {
+        .article-image {
+            background: rgba(255, 255, 255, 0.06) !important;
+        }
+    }
+    
+    .blog-categories .article-card {
+        gap: 0;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-sizing: border-box;
+
+        .article-image {
+            border-radius: 0 !important;
+        }
+
+        .article-content {
+            border: none !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+            background: $product-default-bg-dark;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        &:hover {
+            border-color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        &:hover .article-content {
+            border-top-color: rgba(255, 255, 255, 0.35) !important;
+            background: rgba(255, 255, 255, 0.06) !important;
+        }
+    }
+    
     .article-card {
         .article-content {
             background: $product-default-bg-dark;
@@ -2678,6 +3746,70 @@
                 }
             }
         }
+
+        /*
+         * Тіло статті з CKEditor: часто все в <p> з inline color:#000 або успадкування #333.
+         * Примусово світлий текст у темній темі + inherit для вкладень (перебиває inline).
+         */
+        .blog-post-body {
+            color: rgba(255, 255, 255, 0.92) !important;
+
+            h1, h2, h3, h4, h5, h6 {
+                color: #ffffff !important;
+                font-weight: 600;
+            }
+
+            p,
+            ul,
+            ol,
+            li,
+            blockquote {
+                color: rgba(255, 255, 255, 0.92) !important;
+            }
+
+            p *,
+            li *,
+            blockquote * {
+                color: inherit !important;
+            }
+
+            a {
+                color: $main-color-dark !important;
+                text-decoration: underline;
+                text-underline-offset: 2px;
+
+                &:hover {
+                    color: #ffdf4d !important;
+                }
+            }
+
+            a * {
+                color: inherit !important;
+            }
+
+            table {
+                border-color: rgba(255, 255, 255, 0.2) !important;
+            }
+
+            th, td {
+                border-color: rgba(255, 255, 255, 0.15) !important;
+            }
+
+            th {
+                background: rgba(255, 255, 255, 0.08) !important;
+                color: #ffffff !important;
+            }
+
+            td {
+                color: rgba(255, 255, 255, 0.9) !important;
+            }
+
+            code, pre {
+                color: rgba(255, 255, 255, 0.92) !important;
+                background: rgba(0, 0, 0, 0.35) !important;
+                border-color: rgba(255, 255, 255, 0.12) !important;
+            }
+        }
         
         /* Article main - весь текст белый */
         .article-main {
@@ -2685,6 +3817,150 @@
             
             p, span, div, li, ul, ol {
                 color: #FFFFFF;
+            }
+        }
+
+        .article-content-card {
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow: inset 4px 0 0 $main-color-dark;
+
+            @media screen and (max-width: 768px) {
+                box-shadow: none;
+            }
+        }
+
+        /* Перше слово заголовка: жовтий акцент (як на сторінці автора), поверх правила .article-main span */
+        .article-main .article-content-card .article-header .article-title .colord,
+        .article-main .article-content-card .article-header .article-title .article-title-accent {
+            color: $main-color-dark;
+        }
+
+        .blog-comments {
+            border-top-color: rgba(255, 255, 255, 0.14);
+        }
+
+        .blog-comments-title {
+            color: $text-color-dark;
+        }
+
+        .blog-comment-form-toggle {
+            color: #1a1a1a;
+            background: $main-color-dark;
+            border-color: $main-color-dark-075;
+
+            &:hover {
+                background: #ffdf4d;
+                border-color: $main-color-dark;
+                color: #1a1a1a;
+            }
+
+            &:focus-visible {
+                outline-color: $main-color-dark;
+            }
+        }
+
+        .blog-comment-form-close {
+            color: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+
+            &:hover {
+                color: $main-color-dark;
+                border-color: $main-color-dark-050;
+                background: rgba(255, 206, 28, 0.12);
+            }
+
+            &:focus-visible {
+                outline-color: $main-color-dark;
+            }
+        }
+
+        .blog-comment-form__req {
+            color: $main-color-dark;
+        }
+
+        .blog-comments-title::after {
+            background: $main-color-dark;
+        }
+
+        .blog-comment-item {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Ім’я та аватар: фірмовий жовтий; вище за .article-main span */
+        .article-main .article-content-card .blog-comments .blog-comment-item__name {
+            color: $main-color-dark;
+        }
+
+        .article-main .article-content-card .blog-comments .blog-comment-item__avatar {
+            background: $main-color-dark;
+            color: #1a1a1a;
+        }
+
+        .blog-comment-item__name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .blog-comment-item__date {
+            color: $text-gray-dark;
+        }
+
+        .blog-comment-item__body {
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        .blog-comment-item__body,
+        .blog-comment-item__body--small {
+            scrollbar-color: $main-color-dark rgba(255, 255, 255, 0.08);
+
+            &::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.06);
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: $main-color-dark-050;
+            }
+
+            &::-webkit-scrollbar-thumb:hover {
+                background: $main-color-dark;
+            }
+        }
+
+        .blog-comment-reply {
+            border-left-color: rgba(255, 206, 28, 0.35);
+        }
+
+        .blog-comment-form__label {
+            color: rgba(255, 255, 255, 0.78);
+        }
+
+        .blog-comment-form__input,
+        .blog-comment-form__textarea {
+            color: #f2f2f2;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+
+            &:focus {
+                border-color: rgba(255, 206, 28, 0.65);
+                box-shadow: 0 0 0 2px rgba(255, 206, 28, 0.12);
+                background: rgba(255, 255, 255, 0.09);
+            }
+        }
+
+        .blog-comment-form__submit {
+            color: #1a1a1a;
+            background: $main-color-dark;
+            border-color: $main-color-dark-075;
+
+            &:hover {
+                background: #ffdf4d;
+                border-color: $main-color-dark;
+            }
+
+            &:focus-visible {
+                outline-color: $main-color-dark;
             }
         }
 
@@ -2895,13 +4171,12 @@
             }
         }
         
-        /* Slider navigation dots – визуально одна сплошная линия */
         .blog-similar-slider-dots {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 0; /* без зазоров, чтобы линия выглядела цельной */
-            margin: 10px 0 20px 0; /* Поднимаем точки выше */
+            margin: 25px 0 5px 0;
             padding: 0;
             list-style: none;
 
@@ -2935,7 +4210,7 @@
             justify-content: center;
             align-items: center;
             gap: 0; /* без зазоров, чтобы линия выглядела цельной */
-            margin: 20px 0;
+            margin: 20px 0 0;
             padding: 0;
             list-style: none;
 
@@ -2959,6 +4234,11 @@
                 }
             }
         }
+    }
+
+    /* Менший зазор між блоком товарів і схожими статтями */
+    .blog-products + .blog-similar {
+        padding-top: 0;
     }
 }
 

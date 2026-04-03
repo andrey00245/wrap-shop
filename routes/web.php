@@ -13,11 +13,16 @@ use App\Http\Controllers\Account\PersonalDataController;
 use App\Http\Controllers\Account\UserAddressController;
 use App\Http\Controllers\Account\ViewedProductsController;
 use App\Http\Controllers\Auth\SocialController;
+use App\Http\Controllers\BlogCommentController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ChangeThemeController;
+use App\Http\Controllers\CommandRunnerController;
 use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FastOrderController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\MoySkladBearerSyncController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NovaPoshtaController;
 use App\Http\Controllers\OrderController;
@@ -26,47 +31,185 @@ use App\Http\Controllers\ReportAvailabilityController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SubscribeController;
+use App\Http\Controllers\SyncProductController;
 use App\Http\Controllers\SyncProductImagesController;
 use App\Http\Controllers\VideosController;
 use App\Http\Controllers\WayForPayController;
+use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\FaqController;
 use App\Models\Category;
 use App\Models\PrivacyPolicy;
 use App\Models\Product;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
-use App\Http\Controllers\SyncProductController;
-use App\Http\Controllers\WebhookController;
-use App\Http\Controllers\CommandRunnerController;
-use Illuminate\Support\Facades\Artisan;
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
+
+// Виклик розкладу (cron без SSH): налаштуйте на хості виклик URL кожну хвилину, напр. https://wrap.shop/run-scheduler?token=ВАШ_ТОКЕН
+Route::get('/run-scheduler', function () {
+    $token = env('SCHEDULER_TOKEN');
+    $given = trim((string) request('token', ''));
+    if ($token !== null && $token !== '' && $given !== trim((string) $token)) {
+        abort(403, 'Invalid token');
+    }
+    try {
+        Artisan::call('schedule:run');
+        $output = trim(Artisan::output());
+        Log::info('Cron: schedule:run виконано', [
+            'at' => now()->toIso8601String(),
+            'ip' => request()->ip(),
+            'scheduler_output' => $output !== '' ? $output : '(немає рядків — жодна задача не була в черзі на цю хвилину)',
+        ]);
+        Log::info('Cron: /run-scheduler — OK, планувальник успішно відпрацював без помилок.');
+    } catch (\Throwable $e) {
+        Log::error('Cron: schedule:run помилка', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        throw $e;
+    }
+
+    return response()->json(['ok' => true, 'message' => 'Schedule run completed'], 200);
+})->name('run-scheduler');
+
+// Тест синхронізації цін і залишку одного товару через MOY_SKLAD_TOKEN (Bearer). Захист: ?token= той самий, що SCHEDULER_TOKEN (якщо заданий).
+Route::get('/moysklad/bearer-sync-one-product', MoySkladBearerSyncController::class)->name('moysklad.bearer-sync-one-product');
+
+/*
+| Обробка черги без SSH: додайте в FASTPANEL другий cron (кожну хвилину), напр.:
+| curl -sS "https://ваш-домен/run-queue?token=ТОЙ_САМИЙ_ЩО_SCHEDULER_TOKEN"
+| Той самий SCHEDULER_TOKEN. Потрібно QUEUE_CONNECTION=database (або redis), не sync.
+| Необов’язково: QUEUE_WORK_MAX_TIME (сек., за замовч. 55), QUEUE_WORK_MAX_JOBS (0 = без ліміту джоб за один запуск).
+*/
+Route::get('/run-queue', function () {
+    $token = env('SCHEDULER_TOKEN');
+    $given = trim((string) request('token', ''));
+    if ($token !== null && $token !== '' && $given !== trim((string) $token)) {
+        abort(403, 'Invalid token');
+    }
+
+    $connection = (string) config('queue.default', 'database');
+    if ($connection === 'sync') {
+        Log::info('Cron: /run-queue — OK (пропуск: QUEUE_CONNECTION=sync, окремий воркер не потрібен).', [
+            'ip' => request()->ip(),
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'QUEUE_CONNECTION=sync — воркер не потрібен, джоби виконуються в тому ж запиті.',
+        ]);
+    }
+
+    $lock = Cache::lock('run-queue-http', 120);
+    if (! $lock->get()) {
+        Log::warning('Cron: /run-queue — пропуск: вже виконується інший запит (lock).', [
+            'ip' => request()->ip(),
+        ]);
+
+        return response()->json([
+            'ok' => false,
+            'message' => 'run-queue вже виконується (інший запит/cron). Спробуйте через хвилину.',
+        ], 429);
+    }
+
+    try {
+        $maxTime = max(10, min(120, (int) env('QUEUE_WORK_MAX_TIME', 55)));
+        $maxJobs = (int) env('QUEUE_WORK_MAX_JOBS', 0);
+
+        $jobsTable = config('queue.connections.database.table', 'jobs');
+        $jobsPendingBefore = null;
+        if ($connection === 'database') {
+            try {
+                $jobsPendingBefore = DB::table($jobsTable)->count();
+            } catch (\Throwable) {
+                $jobsPendingBefore = null;
+            }
+        }
+
+        $params = [
+            'connection' => $connection,
+            '--stop-when-empty' => true,
+            '--max-time' => $maxTime,
+            '--sleep' => 1,
+        ];
+        if ($maxJobs > 0) {
+            $params['--max-jobs'] = $maxJobs;
+        }
+
+        Artisan::call('queue:work', $params);
+        $output = trim(Artisan::output());
+
+        $jobsPendingAfter = null;
+        if ($connection === 'database') {
+            try {
+                $jobsPendingAfter = DB::table($jobsTable)->count();
+            } catch (\Throwable) {
+                $jobsPendingAfter = null;
+            }
+        }
+
+        Log::info('Cron: queue:work через /run-queue — деталі виконання', [
+            'at' => now()->toIso8601String(),
+            'ip' => request()->ip(),
+            'connection' => $connection,
+            'max_time' => $maxTime,
+            'jobs_in_queue_before' => $jobsPendingBefore,
+            'jobs_in_queue_after' => $jobsPendingAfter,
+            'worker_output' => $output !== '' ? $output : '(немає виводу воркера)',
+        ]);
+        Log::info('Cron: /run-queue — OK, обробник черги успішно відпрацював (завершився без помилки).', [
+            'connection' => $connection,
+            'jobs_left' => $jobsPendingAfter,
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Queue worker stopped (empty or max-time)',
+            'connection' => $connection,
+            'max_time_sec' => $maxTime,
+            'jobs_in_queue_before' => $jobsPendingBefore,
+            'jobs_in_queue_after' => $jobsPendingAfter,
+            'output' => $output,
+        ]);
+    } catch (\Throwable $e) {
+        Log::error('Cron: /run-queue помилка', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        throw $e;
+    } finally {
+        $lock->release();
+    }
+})->name('run-queue');
 
 Route::get('/admin/run-media', function () {
     try {
         $output = Artisan::call('media:generate-sync', [
-            '--collection'   => 'images',
-            '--force'        => true,
+            '--collection' => 'images',
+            '--force' => true,
             '--only-missing' => true,
         ]);
-        
+
         $result = Artisan::output();
-        
+
         return response()->json([
             'success' => true,
             'message' => '✅ Конверсии пересозданы',
             'output' => $result,
-            'exit_code' => $output
+            'exit_code' => $output,
         ]);
-        
+
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,
             'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
+            'trace' => $e->getTraceAsString(),
         ], 500);
     }
 });
@@ -80,18 +223,18 @@ Route::get('/admin/run-migrations', function () {
         $output = Artisan::output();
 
         return response()->json([
-            'success'   => $exitCode === 0,
-            'message'   => $exitCode === 0
+            'success' => $exitCode === 0,
+            'message' => $exitCode === 0
                 ? 'Міграції успішно виконано'
-                : 'Міграції завершилися з кодом ' . $exitCode,
-            'output'    => $output,
+                : 'Міграції завершилися з кодом '.$exitCode,
+            'output' => $output,
             'exit_code' => $exitCode,
         ]);
     } catch (\Throwable $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Помилка виконання міграцій: ' . $e->getMessage(),
-            'trace'   => $e->getTraceAsString(),
+            'message' => 'Помилка виконання міграцій: '.$e->getMessage(),
+            'trace' => $e->getTraceAsString(),
         ], 500);
     }
 });
@@ -123,6 +266,7 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
     Route::post('/webhook/test', [CommandRunnerController::class, 'webhookTest']);
     Route::post('/webhook/create', [CommandRunnerController::class, 'webhookCreate']);
     Route::post('/custom-command', [CommandRunnerController::class, 'runCustomCommand']);
+    Route::post('/sync-prices-stock', [CommandRunnerController::class, 'syncPricesAndStock']);
 });
 Route::get('/slug-generate', function () {
     $products = Product::all();
@@ -131,7 +275,7 @@ Route::get('/slug-generate', function () {
         $product->slug = [
             'en' => Str::slug($product->getTranslation('name', 'en')),
             'uk' => Str::slug($product->getTranslation('name', 'uk')),
-            'ru' => Str::slug($product->getTranslation('name', 'ru'))
+            'ru' => Str::slug($product->getTranslation('name', 'ru')),
         ];
         $product->save();
     }
@@ -139,7 +283,7 @@ Route::get('/slug-generate', function () {
         $category->slug = [
             'en' => Str::slug($category->getTranslation('name', 'en')),
             'uk' => Str::slug($category->getTranslation('name', 'uk')),
-            'ru' => Str::slug($category->getTranslation('name', 'ru'))
+            'ru' => Str::slug($category->getTranslation('name', 'ru')),
         ];
         $category->save();
     }
@@ -164,15 +308,13 @@ Route::post('/fast-order', [FastOrderController::class, 'store'])->name('fast-or
 Route::post('/change-theme', ChangeThemeController::class)->name('change-theme');
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
-
 // Роуты видеоревью выносим из группы локализации
 Route::get('/videoreviews', [VideosController::class, 'index'])->name('videoreviews')->middleware('themeMiddleware');
 Route::get('/videoreviews/category/{id}', [VideosController::class, 'show'])->name('videos.show')->middleware('themeMiddleware');
 
-
 Route::group([
-    'prefix'     => LaravelLocalization::setLocale(),
-    'middleware' => ['localizationRedirect', 'localeViewPath', 'themeMiddleware']
+    'prefix' => LaravelLocalization::setLocale(),
+    'middleware' => ['localizationRedirect', 'localeViewPath', 'themeMiddleware'],
 ], function () {
 
     Route::get('/api/get-cities', [NovaPoshtaController::class, 'getCities']);
@@ -183,14 +325,13 @@ Route::group([
     Route::get('/search', SearchController::class)->name('search');
     Route::post('/get-search-items', [SearchController::class, 'popupSearch'])->name('get-count');
 
-
     Route::get('/', IndexController::class)->name('index');
 
     Route::post('/get-count', [ProductController::class, 'getCount'])->name('get-count');
 
-
     Route::get('/privacy-policy', function () {
         $privacy_policy = PrivacyPolicy::first();
+
         return view('base.pages.privacy-policy', compact('privacy_policy'));
     })->name('privacy-policy');
 
@@ -208,7 +349,6 @@ Route::group([
         return view('base.pages.delivery');
     })->name('delivery');
 
-
     Route::group(['prefix' => '/news'], function () {
 
         Route::get('/', [NewsController::class, 'index'])->name('news.index');
@@ -216,12 +356,14 @@ Route::group([
         Route::get('/{news_category:slug}/{news:slug}', [NewsController::class, 'show'])->name('news.show');
     });
 
-    // Blog routes (static pages for testing)
     Route::group(['prefix' => '/blog'], function () {
-        Route::get('/', [App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
-        Route::get('/article', [App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
+        Route::get('/', [BlogController::class, 'index'])->name('blog.index');
+        Route::get('/author/{blog_author}', [BlogController::class, 'author'])->name('blog.author');
+        Route::post('/{blog_post}/comments', [BlogCommentController::class, 'store'])
+            ->middleware('throttle:15,1')
+            ->name('blog.comments.store');
+        Route::get('/{blog_post}', [BlogController::class, 'show'])->name('blog.show');
     });
-
 
     Route::get('/about-us', function () {
         return view('base.pages.about-us');
@@ -232,12 +374,15 @@ Route::group([
             ->where('is_active', true)
             ->orderBy('sort_order', 'asc')
             ->get();
+
         return view('base.pages.implementations', compact('implementations'));
     })->name('implementations');
 
     Route::get('/contacts', function () {
         return view('base.pages.contacts');
     })->name('contacts');
+
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 
     Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 
@@ -282,18 +427,29 @@ Route::group([
 
     Route::get('/wishlist/{product}/delete', [WishlistController::class, 'delete'])->name('wishlist.delete');
 
-
     Route::get('/restore-password', function () {
         return view('base.pages.account.restore-password');
     })->name('restore-password');
-
 
     Route::group(['prefix' => '/products'], function () {
         Route::get('/', [ProductController::class, 'index'])->name('products.index');
         Route::get('/{product}/show', [ProductController::class, 'show'])->name('products.show');
     });
-    Route::get('/{category}/{subcategory?}/{subsubcategory?}', [ProductController::class, 'category'])->name('products.category');
+
+    // Категорії та SEO-сторінки фільтрів: /catalog/{path} щоб не перехоплювати /login, /cart, /api, /admin тощо
+    Route::get('/catalog/{path}', [ProductController::class, 'categoryOrSeoFilter'])
+        ->where('path', '[a-z0-9\-/]+')
+        ->name('products.category');
+
+    // 301 редірект старих URL (/uk/plivki, /uk/plivki/kolir-chornyj) → /uk/catalog/... (SEO: зберегти індекс)
+    // Має бути останнім у групі, щоб не перехоплювати /login, /cart, /account тощо
+    Route::get('/{path}', function (string $path) {
+        $url = route('products.category', ['path' => $path]);
+        $query = request()->getQueryString();
+        if ($query !== null && $query !== '') {
+            $url .= '?'.$query;
+        }
+
+        return redirect()->to($url, 301);
+    })->where('path', '[a-z0-9\-/]+');
 });
-
-
-

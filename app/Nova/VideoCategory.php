@@ -2,8 +2,8 @@
 
 namespace App\Nova;
 
+use App\Nova\Fields\NovaTabTranslatable;
 use Illuminate\Http\Request;
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Kongulov\NovaTabTranslatable\TranslatableTabToRowTrait;
 use Laravel\Nova\Fields\Text;
 
@@ -33,7 +33,7 @@ class VideoCategory extends Resource
     {
         return [
             NovaTabTranslatable::make([
-                Text::make('Назва', 'name')
+                Text::make('Назва', 'name'),
             ])->hideFromIndex(),
         ];
     }

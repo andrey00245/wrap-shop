@@ -57,11 +57,20 @@
     <!-- Breadcrumbs -->
         <nav class="category-breadcrumbs">
             <ul class="flex-center">
-                <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}" class="button"><i class="far fa-chevron-left"></i>{{__('header_footer.home')}}</a></li>
-                <li><a href="{{route('about-us')}}" title="{{__('header_footer.about_us')}}" class="button"><i class="far fa-chevron-left"></i>{{__('header_footer.about_us')}}</a></li>
-                <li><span class="button"><i class="far fa-chevron-left"></i>{{__('implementations.title')}}</span></li>
-        </ul>
-    </nav>
+                <li>
+                    <a href="{{route('index')}}"
+                       title="{{__('header_footer.home')}}"
+                       class="button">
+                        <i class="far fa-chevron-left"></i>{{__('header_footer.home')}}
+                    </a>
+                </li>
+                <li>
+                    <span class="button">
+                        <i class="far fa-chevron-left"></i>{{__('implementations.title')}}
+                    </span>
+                </li>
+            </ul>
+        </nav>
 
     <!-- Hero Title -->
         <h1 class="title">{{__('implementations.title')}}</h1>

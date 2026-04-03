@@ -5,6 +5,7 @@
     $newsTitle = $seoService->generateNewsTitle($news_category, $news);
     $newsDescription = $seoService->generateNewsDescription($news_category, $news);
     $ogImage = $news->getMedia('images')->first()?->getUrl() ?? url('assets/img/og-default.jpg');
+    $mainMedia = $news->getMedia('main')->first();
 @endphp
 
 @section('title', $newsTitle)
@@ -50,7 +51,9 @@
 
   <section id="page-post">
     <div class="page-post-top">
-      <img src="{{$news->getMedia('main')[0]->getUrl()}}" title="{{$news->title}}" alt="{{$news->title}}">
+      @if($mainMedia)
+        <img src="{{ $mainMedia->getUrl() }}" title="{{$news->title}}" alt="{{$news->title}}">
+      @endif
       <div class="info">
         <h1>{{$news->title}}</h1>
         <div class="items flex-center">

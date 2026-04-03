@@ -33,6 +33,15 @@
     object-fit: cover;
 }
 
+/* На странице реализаций подравниваем высоту фонового баннера
+   под ту же, что дизайнеры используют для категорий (≈415.5px на десктопе),
+   чтобы визуально блок был одинаковым по высоте */
+@media screen and (min-width: 1024px) {
+    .category-page.row.implementations-page .products-background {
+        height: 415.5px;
+    }
+}
+
 .category-page.row .products-background:not(img) {
     position: absolute;
     top: 0;
@@ -42,14 +51,13 @@
     background: rgba(0, 0, 0, 0.2); /* Светлый overlay 20% */
 }
 
-/* Увеличенный hero-блок для страницы реализаций */
-.category-page.row.implementations-page .category-top {
-    padding: 60px 0 50px; /* чуть меньше места снизу после категорий */
-}
-
-/* Для страницы реализаций убираем общий нижний отступ category-page */
+/* Для страницы реализаций: собственные отступы */
 .category-page.row.implementations-page {
     padding-bottom: 0;
+}
+
+.category-page.row.implementations-page .category-top {
+    padding: 30px 0 40px;
 }
 
 /* Мобильный: отдельный отступ сверху для заголовка на странице реализаций */
@@ -220,7 +228,11 @@
 /* Intro Text Block - according to Figma specs */
 .implementations-description {
     width: 100%;
-    padding: 80px 0;
+    /* Делаем блок ниже, чем было, чтобы по высоте
+       он визуально не «перетягивал» на себя место
+       и общая верхняя часть страницы была ближе
+       к категориям */
+    padding: 40px 0;
     /* Фон берём из общей темы (light/dark), поэтому здесь прозрачный */
     background: transparent;
     margin: 0 auto;
@@ -236,7 +248,11 @@
     letter-spacing: 0;
     text-align: center;
     width: 445px;
-    height: 120px;
+    /* Раньше была фиксированная высота 120px, из‑за этого
+       padding-bottom визуально не срабатывал. Делаем авто,
+       а 120px оставляем как минимальную высоту для дизайна. */
+    min-height: 120px;
+    height: auto;
     opacity: 1;
     margin: 0 auto;
     /* По умолчанию цвет текста как на светлой теме,
@@ -245,6 +261,9 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    /* Дополнительный нижний отступ именно для страницы реализаций,
+       чтобы блок описания "дышал" над галереей */
+    padding-bottom: 20px;
 }
 
 .description-content p {
@@ -309,7 +328,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
-    margin-bottom: 60px;
 }
 
 .gallery-item {
@@ -684,9 +702,11 @@
 .gallery-item img {
     width: 100%;
     height: auto;
-    object-fit: cover;
+    /* Показываем главное фото целиком, без обрезки */
+    object-fit: contain;
     display: block;
-    aspect-ratio: 4 / 3;
+    /* Даем браузеру самому подстроить высоту под пропорции картинки */
+    aspect-ratio: auto;
     transition: transform 0.3s ease;
 }
 
@@ -881,6 +901,12 @@
     
     .gallery-item.is-open .gallery-item-title {
         background: transparent !important;
+    }
+
+    /* Активный пункт breadcrumbs на странице реализаций
+       (мы уже на странице реализаций) — делаем текст белым */
+    .category-page.row.implementations-page .category-breadcrumbs span.button {
+        color: #FFFFFF;
     }
     
 }
@@ -1132,7 +1158,7 @@
     }
     
     .implementations-description {
-        padding: 60px 0 40px;
+        padding: 40px 0 30px;
     }
     
     .implementations-gallery {

@@ -1,7 +1,21 @@
 User-agent: Googlebot
+# Дублікати: URL з index.php у шляху
+Disallow: /*index.php
+# Дублікати листингу: сортування та OCF (підтримка * у Google)
+Disallow: /*sort_by=
+Disallow: /*sort_direction=
+Disallow: /*sort=
+Disallow: /*order=
+Disallow: /*ocf=
 Allow: /
 
 User-agent: Googlebot-Image
+Disallow: /*index.php
+Disallow: /*sort_by=
+Disallow: /*sort_direction=
+Disallow: /*sort=
+Disallow: /*order=
+Disallow: /*ocf=
 Allow: /
 
 User-agent: *
@@ -10,6 +24,12 @@ Disallow: /admin
 Disallow: /account
 Disallow: /cart
 Disallow: /checkout
+Disallow: /*index.php
+Disallow: /*sort_by=
+Disallow: /*sort_direction=
+Disallow: /*sort=
+Disallow: /*order=
+Disallow: /*ocf=
 Allow: /
 
 Sitemap: https://wrap.shop/sitemap.xml

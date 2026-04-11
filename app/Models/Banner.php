@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\HasMedia;
 use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -36,6 +36,13 @@ class Banner extends Model implements HasMedia
             ->format('webp')
             ->quality(85)
             ->nonQueued();
+
+        $this
+            ->addMediaConversion('hero')
+            ->fit(Fit::Crop, 1312, 450)
+            ->format('webp')
+            ->quality(82)
+            ->nonQueued();
     }
 
     public function registerMediaCollections(): void
@@ -60,11 +67,33 @@ class Banner extends Model implements HasMedia
             if ($media->hasGeneratedConversion('preview')) {
                 return $media->getUrl('preview');
             }
-            // Если нет конверсий, возвращаем оригинальный URL
+
             return $media->getUrl();
         }
 
-
         return '';
+    }
+
+    public function getHeroImageUrl(): string
+    {
+        $media = $this->getFirstMedia('main');
+
+        if (! $media) {
+            return '';
+        }
+
+        if ($media->hasGeneratedConversion('hero')) {
+            return $media->getUrl('hero');
+        }
+
+        if ($media->hasGeneratedConversion('preview_webp')) {
+            return $media->getUrl('preview_webp');
+        }
+
+        if ($media->hasGeneratedConversion('preview')) {
+            return $media->getUrl('preview');
+        }
+
+        return $media->getUrl();
     }
 }

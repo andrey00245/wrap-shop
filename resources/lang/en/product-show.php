@@ -8,6 +8,7 @@ return [
     'total' => 'Total',
     'total-description' => 'ATTENTION! This product is sold in multiples: :step<br>MINIMUM order quantity: :min',
     'technical-specifications' => 'Technical specifications',
+    'article' => 'Article',
     'quantity' => 'Qty',
     'add-to-cart' => 'Add to cart',
     'back' => 'Back',

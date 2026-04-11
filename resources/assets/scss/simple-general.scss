@@ -1032,7 +1032,8 @@ margin-bottom: 5px;
   }
 }
 
-#simplecheckout_shipping .simplecheckout-block-content .form-horizontal {
+#simplecheckout_shipping .simplecheckout-block-content .form-horizontal,
+#simplecheckout_payment .simplecheckout-block-content .form-horizontal {
   padding: 5px 30px 10px;
   font-weight: 300;
   font-size: 14px;

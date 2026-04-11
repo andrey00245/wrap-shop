@@ -144,7 +144,7 @@
         "logo": "{{ url('assets/img/logo.png') }}",
         "contactPoint": {
             "@type": "ContactPoint",
-            "telephone": "+38-066-000-32-02",
+            "telephone": "{{ $settings?->phone_view ?: ($settings?->phone ?: '+38-066-000-32-02') }}",
             "contactType": "customer service",
             "areaServed": "UA",
             "availableLanguage": ["Ukrainian", "Russian", "English"]

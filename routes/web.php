@@ -40,6 +40,7 @@ use App\Http\Controllers\WishlistController;
 use App\Models\Category;
 use App\Models\PrivacyPolicy;
 use App\Models\Product;
+use App\Models\Redirect;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -77,6 +78,110 @@ Route::get('/run-scheduler', function () {
 
     return response()->json(['ok' => true, 'message' => 'Schedule run completed'], 200);
 })->name('run-scheduler');
+
+// SMTP ping без SSH: https://wrap.shop/mail-debug/ping?token=SCHEDULER_TOKEN
+Route::get('/mail-debug/ping', function () {
+    $token = env('SCHEDULER_TOKEN');
+    $given = trim((string) request('token', ''));
+    if ($token !== null && $token !== '' && $given !== trim((string) $token)) {
+        abort(403, 'Invalid token');
+    }
+
+    $defaultHost = (string) env('MAIL_HOST', '');
+    $defaultPort = (int) env('MAIL_PORT', 587);
+    $defaultTimeout = (float) env('MAIL_TIMEOUT', 10);
+
+    $host = trim((string) request('host', $defaultHost));
+    $port = (int) request('port', $defaultPort);
+    $timeout = (float) request('timeout', $defaultTimeout);
+    if ($port < 1 || $port > 65535) {
+        $port = $defaultPort;
+    }
+    if ($timeout < 1 || $timeout > 30) {
+        $timeout = $defaultTimeout;
+    }
+
+    $ips = @gethostbynamel($host) ?: [];
+    $target = sprintf('tcp://%s:%d', $host, $port);
+
+    $errno = 0;
+    $errstr = '';
+    $startedAt = microtime(true);
+    $stream = @stream_socket_client($target, $errno, $errstr, $timeout);
+    $elapsedMs = (int) round((microtime(true) - $startedAt) * 1000);
+
+    $connected = is_resource($stream);
+    if ($connected) {
+        fclose($stream);
+    }
+
+    return response()->json([
+        'ok' => $connected,
+        'mail' => [
+            'host_default' => $defaultHost,
+            'host' => $host,
+            'port_default' => $defaultPort,
+            'port' => $port,
+            'encryption' => env('MAIL_ENCRYPTION'),
+            'timeout' => $timeout,
+        ],
+        'dns_ips' => $ips,
+        'connect' => [
+            'target' => $target,
+            'connected' => $connected,
+            'errno' => $errno,
+            'error' => $errstr,
+            'elapsed_ms' => $elapsedMs,
+        ],
+    ], $connected ? 200 : 503);
+})->name('mail-debug.ping');
+
+// SMTP send-test без SSH: https://wrap.shop/mail-debug/send?token=SCHEDULER_TOKEN&to=you@example.com
+Route::get('/mail-debug/send', function () {
+    $token = env('SCHEDULER_TOKEN');
+    $given = trim((string) request('token', ''));
+    if ($token !== null && $token !== '' && $given !== trim((string) $token)) {
+        abort(403, 'Invalid token');
+    }
+
+    $to = trim((string) request('to', env('MAIL_FROM_ADDRESS', '')));
+    if ($to === '' || ! filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        return response()->json([
+            'ok' => false,
+            'error' => 'Invalid or empty `to` email',
+        ], 422);
+    }
+
+    $subject = 'SMTP test '.now()->format('Y-m-d H:i:s');
+    $body = "SMTP test message from wrap.shop\n".'Host: '.env('MAIL_HOST').' Port: '.env('MAIL_PORT');
+
+    try {
+        \Illuminate\Support\Facades\Mail::raw($body, function ($m) use ($to, $subject) {
+            $m->to($to)->subject($subject);
+        });
+
+        return response()->json([
+            'ok' => true,
+            'sent_to' => $to,
+            'mail' => [
+                'host' => env('MAIL_HOST'),
+                'port' => (int) env('MAIL_PORT'),
+                'encryption' => env('MAIL_ENCRYPTION'),
+            ],
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'ok' => false,
+            'sent_to' => $to,
+            'mail' => [
+                'host' => env('MAIL_HOST'),
+                'port' => (int) env('MAIL_PORT'),
+                'encryption' => env('MAIL_ENCRYPTION'),
+            ],
+            'error' => $e->getMessage(),
+        ], 503);
+    }
+})->name('mail-debug.send');
 
 // Тест синхронізації цін і залишку одного товару через MOY_SKLAD_TOKEN (Bearer). Захист: ?token= той самий, що SCHEDULER_TOKEN (якщо заданий).
 Route::get('/moysklad/bearer-sync-one-product', MoySkladBearerSyncController::class)->name('moysklad.bearer-sync-one-product');
@@ -267,6 +372,7 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
     Route::post('/webhook/create', [CommandRunnerController::class, 'webhookCreate']);
     Route::post('/custom-command', [CommandRunnerController::class, 'runCustomCommand']);
     Route::post('/sync-prices-stock', [CommandRunnerController::class, 'syncPricesAndStock']);
+    Route::post('/sync-product-categories', [CommandRunnerController::class, 'syncProductCategories']);
 });
 Route::get('/slug-generate', function () {
     $products = Product::all();
@@ -438,12 +544,25 @@ Route::group([
 
     // Категорії та SEO-сторінки фільтрів: /catalog/{path} щоб не перехоплювати /login, /cart, /api, /admin тощо
     Route::get('/catalog/{path}', [ProductController::class, 'categoryOrSeoFilter'])
-        ->where('path', '[a-z0-9\-/]+')
+        ->where('path', '[\p{L}\p{N}_\-/]+')
         ->name('products.category');
 
     // 301 редірект старих URL (/uk/plivki, /uk/plivki/kolir-chornyj) → /uk/catalog/... (SEO: зберегти індекс)
     // Має бути останнім у групі, щоб не перехоплювати /login, /cart, /account тощо
     Route::get('/{path}', function (string $path) {
+        // Та сама логіка, що в RedirectMiddleware: якщо є запис у БД — одразу на to_url (без проміжного /catalog/)
+        $normalized = Redirect::normalizePath(request()->getPathInfo());
+        $dbRedirect = Redirect::findActiveForNormalizedPath($normalized);
+        if ($dbRedirect !== null) {
+            $target = $dbRedirect->to_url;
+            if (! str_starts_with($target, 'http://') && ! str_starts_with($target, 'https://')) {
+                $target = url($target);
+            }
+            if ($target !== request()->fullUrl()) {
+                return redirect()->to($target, $dbRedirect->status_code);
+            }
+        }
+
         $url = route('products.category', ['path' => $path]);
         $query = request()->getQueryString();
         if ($query !== null && $query !== '') {
@@ -451,5 +570,5 @@ Route::group([
         }
 
         return redirect()->to($url, 301);
-    })->where('path', '[a-z0-9\-/]+');
+    })->where('path', '[\p{L}\p{N}_\-/]+');
 });

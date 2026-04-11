@@ -14,6 +14,7 @@ use App\Nova\Consultation;
 use App\Nova\CustomBlock;
 use App\Nova\DeliveryOption;
 use App\Nova\Faq;
+//use App\Nova\HomeBlock;
 use App\Nova\Implementation;
 use App\Nova\News;
 use App\Nova\NewsCategory;
@@ -106,6 +107,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
             // Контент (виды, «звуки», новини, FAQ тощо)
             if (in_array($role, ['admin', 'content_manager'], true)) {
                 $menu[] = MenuSection::make('Контент', [
+//                    MenuItem::resource(HomeBlock::class),
                     MenuItem::resource(Banner::class),
                     MenuItem::resource(ProductBanner::class),
                     MenuItem::resource(CustomBlock::class),
@@ -137,12 +139,18 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                 ])->icon('link')->collapsable();
             }
 
-            // Ниже — только для админа
+            // Приватність — тільки адмін
             if ($role === 'admin') {
                 $menu[] = MenuSection::resource(PrivacyPolicy::class)->icon('shield-check');
+            }
 
+            // Налаштування — адмін та контент‑менеджер
+            if (in_array($role, ['admin', 'content_manager'], true)) {
                 $menu[] = MenuSection::resource(Setting::class)->icon('cog');
+            }
 
+            // Ниже — только для админа
+            if ($role === 'admin') {
                 $menu[] = MenuSection::make('Команди', [
                     MenuItem::externalLink('Виконати команди', '/nova-vendor/command-runner'),
                 ])->icon('terminal')->collapsable();

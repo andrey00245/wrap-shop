@@ -222,6 +222,26 @@
                 <div class="alert alert-error" id="sync-prices-stock-error"></div>
             </div>
 
+            <!-- Категорії товарів з МС (лише category_id) -->
+            <div class="command-card" style="border: 2px solid #6f42c1;">
+                <h3>📁 Категорії товарів з МойСклад</h3>
+                <p>Оновлює лише <strong>category_id</strong> з атрибута «Категорія сайту» (один запит GET на товар). Повний синк картки не запускається.</p>
+                <p style="font-size:0.8rem;color:#718096;">Після натискання джоби ставляться <strong>одразу</strong> (не чекають cron). Таблиця <code>jobs</code> — лише при <code>QUEUE_CONNECTION=database</code>; при <code>sync</code> виконання в тому ж запиті. Частота до API — <code>MoySkladRemapHttp</code>, <code>MOY_SKLAD_REMAP_DELAY_MS</code>.</p>
+                <div class="form-group">
+                    <label for="sync-cat-chunk">Розмір батчу / chunk (1–500, за замовчуванням як SCHEDULE_PRICE_SYNC_BATCH):</label>
+                    <input type="number" id="sync-cat-chunk" value="100" min="1" max="500" step="1">
+                </div>
+                <div class="form-group">
+                    <label for="sync-cat-limit">Ліміт товарів (0 = усі):</label>
+                    <input type="number" id="sync-cat-limit" value="0" min="0" step="1">
+                </div>
+                <button class="btn btn-primary" onclick="runSyncProductCategories(this)">
+                    Оновити категорії з МС
+                </button>
+                <div class="alert alert-success" id="sync-product-categories-success"></div>
+                <div class="alert alert-error" id="sync-product-categories-error"></div>
+            </div>
+
             <!-- Оновлення товарів (закоментовано - потребує queue worker) -->
             <!--
             <div class="command-card">
@@ -356,6 +376,47 @@
                 }
             } catch (error) {
                 showAlert('sitemap', 'Помилка з\'єднання: ' + error.message, false);
+            } finally {
+                setLoading(btn, false);
+            }
+        }
+
+        async function runSyncProductCategories(btn) {
+            const chunk = Math.min(500, Math.max(1, parseInt(document.getElementById('sync-cat-chunk').value, 10) || 100));
+            const limit = Math.max(0, parseInt(document.getElementById('sync-cat-limit').value, 10) || 0);
+            const msg = limit === 0
+                ? 'Оновити категорії для всіх товарів з МС? Запуститься ланцюжок джоб (потрібен queue:work).'
+                : ('Оновити категорії лише для ' + limit + ' товарів?');
+            if (!confirm(msg)) {
+                return;
+            }
+            setLoading(btn, true);
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const response = await fetch('/nova-vendor/command-runner/sync-product-categories', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ chunk, limit })
+                });
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    showAlert('sync-product-categories', 'Сервер повернув не JSON. Спробуйте з консолі: php artisan products:sync-categories-from-moysklad', false);
+                    return;
+                }
+                if (data.success) {
+                    showAlert('sync-product-categories', data.message + (data.output ? '\n' + data.output : ''), true);
+                } else {
+                    showAlert('sync-product-categories', data.message || 'Помилка', false);
+                }
+            } catch (error) {
+                showAlert('sync-product-categories', 'Помилка: ' + error.message, false);
             } finally {
                 setLoading(btn, false);
             }

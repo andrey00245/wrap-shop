@@ -8,6 +8,7 @@ return [
     'total' => 'Кінцева сума',
     'total-description' => 'УВАГА! Даний товар продається кратно: :step<br>Мінімальна кількість для замовлення: :min',
     'technical-specifications' => 'Технічні характеристики',
+    'article' => 'Артикул',
     'quantity' => 'Кількість',
     'add-to-cart' => 'Купити',
     'back' => 'Назад',

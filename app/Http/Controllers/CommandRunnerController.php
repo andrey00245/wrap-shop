@@ -395,6 +395,29 @@ class CommandRunnerController extends Controller
                 ]);
             }
 
+            // Лише category_id з МС — одразу Artisan (ланцюжок джоб у БД/Redis), без очікування cron schedule:run
+            if (preg_match('/^products:sync-categories-from-moysklad(?:\s|$)/', $command)) {
+                $chunk = (int) config('app.schedule_price_sync_batch', 100);
+                $chunk = max(1, min(500, $chunk));
+                $limit = 0;
+                if (preg_match('/--chunk=(\d+)/', $command, $m)) {
+                    $chunk = max(1, min(500, (int) $m[1]));
+                }
+                if (preg_match('/--limit=(\d+)/', $command, $m)) {
+                    $limit = max(0, (int) $m[1]);
+                }
+                $output = $this->runProductCategoriesArtisanSync($chunk, $limit, 'custom-artisan', auth()->user()?->email);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => $limit === 0
+                        ? 'Ланцюжок джоб поставлено в чергу (перевірте таблицю jobs при QUEUE_CONNECTION=database). Запустіть queue:work.'
+                        : 'Команда синхронізації з лімітом виконана (див. output).',
+                    'command' => $command,
+                    'output' => $output !== '' ? $output : null,
+                ]);
+            }
+
             Log::info('Executing custom Artisan command', [
                 'command' => $command,
                 'user' => auth()->user()?->email ?? 'unknown',
@@ -453,5 +476,86 @@ class CommandRunnerController extends Controller
                 'message' => 'Помилка: '.$e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Оновлення лише category_id з атрибута «Категорія сайту» в МойСклад (без повного синку картки).
+     * Виконується одразу через Artisan (без очікування cron). limit=0 — Bus::chain джоб; limit>0 — синхронний прохід у цьому запиті.
+     */
+    public function syncProductCategories(Request $request): JsonResponse
+    {
+        try {
+            $defaultChunk = (int) config('app.schedule_price_sync_batch', 100);
+            $chunk = (int) $request->input('chunk', $defaultChunk);
+            $chunk = max(1, min(500, $chunk));
+            $limit = (int) $request->input('limit', 0);
+
+            $output = $this->runProductCategoriesArtisanSync($chunk, $limit, 'command-runner-ui', auth()->user()?->email);
+
+            $queueConn = (string) config('queue.default', 'sync');
+            $msg = $limit === 0
+                ? 'Ланцюжок джоб поставлено в чергу. Перевірте таблицю jobs при QUEUE_CONNECTION=database і запустіть queue:work. API МС: MoySkladRemapHttp, MOY_SKLAD_REMAP_DELAY_MS.'
+                : 'Синхронізація з лімітом виконана в цьому запиті (великий limit може таймаутитись — краще з консолі).';
+            if ($limit === 0 && $queueConn === 'sync') {
+                $msg .= ' Зараз QUEUE_CONNECTION=sync — джоби виконуються в цьому ж запиті, таблиця jobs не використовується.';
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'output' => $output !== '' ? $output : null,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Помилка постановки синхронізації категорій товарів', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Помилка: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * limit=0 — тільки dispatch ланцюжка джоб (швидко); limit>0 — повний прохід artisan у поточному процесі.
+     *
+     * @param  string  $via  джерело виклику (для логів)
+     */
+    private function runProductCategoriesArtisanSync(int $chunk, int $limit, string $via = 'unknown', ?string $userEmail = null): string
+    {
+        $chunk = max(1, min(500, $chunk));
+        $limit = max(0, $limit);
+
+        Log::info('CommandRunner: старт artisan синхронізації категорій товарів (МС)', [
+            'via' => $via,
+            'user' => $userEmail ?? auth()->user()?->email ?? 'guest',
+            'chunk' => $chunk,
+            'limit' => $limit,
+            'queue_connection' => config('queue.default'),
+        ]);
+
+        if ($limit === 0) {
+            Artisan::call('products:dispatch-category-sync-jobs', [
+                '--batch' => $chunk,
+            ]);
+        } else {
+            Artisan::call('products:sync-categories-from-moysklad', [
+                '--chunk' => $chunk,
+                '--limit' => $limit,
+            ]);
+        }
+
+        $out = trim(Artisan::output());
+
+        Log::info('CommandRunner: artisan синхронізації категорій завершено', [
+            'via' => $via,
+            'chunk' => $chunk,
+            'limit' => $limit,
+            'artisan_output' => $out !== '' ? $out : null,
+        ]);
+
+        return $out;
     }
 }

@@ -2,11 +2,8 @@
 {{--  <img loading="lazy" src="{{asset('assets/img/about.webp')}}" title="Wrap-Shop" alt="Wrap-Shop" width="1512"--}}
 {{--       height="549">--}}
 
-      <video class="home-about-video" width="1512" height="549" muted loop playsinline preload="none"
-          @if(file_exists(public_path('assets/img/about.webp')))
-          poster="{{ asset('assets/img/about.webp') }}"
-          @endif>
-          <source type="video/mp4" data-src="{{ asset('assets/video/video_short_compr_1000.mp4') }}">
+      <video width="1512" loading="lazy" height="549" autoplay muted loop>
+          <source src="{{asset('assets/video/video_short_compr_1000.mp4')}}" type="video/mp4">
           Your browser does not support the video tag.
         </video>
 
@@ -117,8 +114,8 @@
 <script src="{{asset('third-party/splide/js/splide.min.js')}}"></script>
 <script src="{{asset('third-party/fancybox/jquery.fancybox.min.js')}}"></script>
 <script src="{{asset('third-party/intlTelInput/js/intlTelInput.js')}}"></script>
-<script src="{{ mix('build/js/app.js') }}" defer></script>
-<script src="{{ mix('build/js/auth.js') }}" defer></script>
+<script src="{{mix('build/js/app.js')}}" type="text/javascript"></script>
+<script src="{{mix('build/js/auth.js')}}" type="text/javascript"></script>
 
 @stack('scripts')
 

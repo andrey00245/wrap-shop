@@ -141,7 +141,7 @@ return [
     'schedule_price_sync_batch' => max(1, min(500, (int) env('SCHEDULE_PRICE_SYNC_BATCH', 100))),
 
     /**
-     * Обмеження навантаження на JSON API МойСклад (ціни/залишки та інші GET remap).
+     * Обмеження навантаження на JSON API МойСклад (ціни/залишки, синк category_id, інші GET remap).
      *
      * @see https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-ogranicheniq
      */

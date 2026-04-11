@@ -83,6 +83,12 @@
                 <div class="params-title-mobil">{{__('product-show.technical-specifications')}}</div>
                 <div class="params">
                     <div class="list flex-column">
+                        @if(!empty($product->article))
+                            <div class="item flex-justify">
+                                {{ __('product-show.article') }}
+                                <span class="label">{{ $product->article }}</span>
+                            </div>
+                        @endif
                         @foreach($product->getProductAttributes() as $attribute)
                             @php
                                 $skipFields = ['master_qualification','room_temperature','store_terms'];

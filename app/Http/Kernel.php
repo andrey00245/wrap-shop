@@ -3,20 +3,19 @@
 namespace App\Http;
 
 use App\Http\Middleware\CartMiddleware;
-use App\Http\Middleware\RedirectMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
 {
     /**
      * Массив глобальных middleware классов.
+     * У Laravel 11 глобальний стек зазвичай перезаписується з bootstrap/app.php (withMiddleware).
      *
      * @var array
      */
     protected $middleware = [
         \Illuminate\Http\Middleware\HandleCors::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        RedirectMiddleware::class,
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,

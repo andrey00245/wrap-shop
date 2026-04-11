@@ -85,17 +85,10 @@ class OrderController extends Controller
 
             Auth::login($user);
 
-            try {
-                $user->notify(new TemporaryPasswordNotification(
-                    $user->email,
-                    $password
-                ));
-            } catch (\Exception $e) {
-                \Log::error('Notification send error: ' . $e->getMessage(), [
-                    'user_id' => $user->id,
-                    'trace' => $e->getTraceAsString(),
-                ]);
-            }
+            // Тимчасово вимкнено SMTP-надсилання пароля, щоб не блокувати checkout таймаутами.
+            \Log::info('Temporary password email skipped (SMTP disabled temporarily).', [
+                'user_id' => $user->id,
+            ]);
         }
 
         $totalSum = 0;

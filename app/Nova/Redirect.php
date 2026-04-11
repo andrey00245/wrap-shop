@@ -43,7 +43,7 @@ class Redirect extends Resource
 
             Text::make('Звідки (from_url)', 'from_url')
                 ->rules('required', 'string', 'max:2048')
-                ->help('Відносний шлях без домена. Наприклад: /staryj-url або /staryj-url?utm=1'),
+                ->help('Відносний шлях без домена, без UTM. Зберігайте як на старому сайті (часто без /catalog/), напр. /ru/plenki-1/... — якщо хтось зайде з /ru/catalog/plenki-1/..., редирект теж знайдеться автоматично.'),
 
             Text::make('Куди (to_url)', 'to_url')
                 ->rules('required', 'string', 'max:2048')

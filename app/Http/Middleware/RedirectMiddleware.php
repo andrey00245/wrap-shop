@@ -21,7 +21,11 @@ class RedirectMiddleware
             return $next($request);
         }
 
-        $path = $request->getRequestUri(); // путь + query, напр. /old-path?utm=1
+        // Тільки path (без ?query): інакше збіг з БД ламається, якщо в from_url немає UTM
+        $path = $request->getPathInfo();
+        if ($path === '') {
+            $path = '/';
+        }
         $normalizedPath = Redirect::normalizePath($path);
 
         // Игнорируем Nova и служебные префиксы
@@ -40,11 +44,7 @@ class RedirectMiddleware
             return $next($request);
         }
 
-        /** @var \App\Models\Redirect|null $redirect */
-        $redirect = Redirect::query()
-            ->where('is_active', true)
-            ->where('from_url', $normalizedPath)
-            ->first();
+        $redirect = Redirect::findActiveForNormalizedPath($normalizedPath);
 
         if (! $redirect) {
             return $next($request);

@@ -48,47 +48,9 @@ class MoySkladSyncService
         $clientEmail = trim((string) ($order->email ?? ''));
         $cleanPhone = self::sanitizePhoneNumber($order->phone);
 
-        // Ищем контрагента: email -> phone~local(0XXXXXXXXX) -> phone~intl(380XXXXXXXXX) -> phone~+intl(+380XXXXXXXXX) -> phone~last9
-        $response = null;
-        $tryFilters = [];
-        if ($clientEmail !== '') {
-            $tryFilters[] = 'email=' . $clientEmail;
-        }
+        $existing = self::findCounterpartyFirstRow($clientEmail, $cleanPhone);
 
-        // local UA format first: 0XXXXXXXXX (e.g., 0937953126)
-        $localPhone = $cleanPhone;
-        if (strpos($cleanPhone, '380') === 0 && strlen($cleanPhone) >= 12) {
-            $localPhone = '0' . substr($cleanPhone, 3);
-        }
-        $intlPhone = $cleanPhone;              // 380XXXXXXXXX
-        $plusIntlPhone = '+'.$intlPhone;       // +380XXXXXXXXX
-        $last9 = substr($cleanPhone, -9);      // XXXXXXX123 (9 цифр)
-
-        $tryFilters[] = 'phone~' . $localPhone;
-        $tryFilters[] = 'phone~' . $intlPhone;
-        $tryFilters[] = 'phone~' . $plusIntlPhone;
-        if ($last9 && strlen($last9) === 9) {
-            $tryFilters[] = 'phone~' . $last9;
-        }
-
-        foreach ($tryFilters as $filter) {
-            $response = Http::withBasicAuth(
-                config('app.my_store.username'),
-                config('app.my_store.password')
-            )
-                ->withHeaders([
-                    'Accept-Encoding' => 'gzip',
-                ])->get('https://api.moysklad.ru/api/remap/1.2/entity/counterparty', [
-                    'filter' => $filter,
-                ]);
-
-            if ($response->successful() && count($response->json('rows') ?? []) > 0) {
-                break;
-            }
-        }
-
-        if ($response->successful() && count($response->json('rows')) > 0) {
-            $existing = $response->json('rows')[0];
+        if ($existing !== null) {
             $counterpartyMeta = $existing['meta'];
 
             if (!isset($counterpartyMeta['href'])) {
@@ -122,24 +84,23 @@ class MoySkladSyncService
             ];
 
             if ($order->novaposhta_warehouse_ref && $order->shipping_address) {
+                $npValue = self::resolveNpCustomEntityValue(
+                    (string) $order->novaposhta_warehouse_ref,
+                    self::normalizeNpCounterpartyName((string) $order->shipping_address)
+                );
                 $attributes[] = [
                     "meta" => [
                         "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3999ff42-6610-11f0-0a80-0462002ad32f",
                         "type" => "attributemetadata",
                         "mediaType" => "application/json"
                     ],
-                    "value" => [
-                        "meta" => [
-                            "href" => "https://api.moysklad.ru/api/remap/1.2/entity/customentity/710e5a69-63be-11f0-0a80-03cc0016c7e1/{$order->novaposhta_warehouse_ref}",
-                            "type" => "customentity",
-                            "mediaType" => "application/json"
-                        ],
-                        "id" => $order->novaposhta_warehouse_ref,
-                        "name" => is_array($order->shipping_address)
-                            ? implode(', ', $order->shipping_address)
-                            : (string) $order->shipping_address,
-                    ]
+                    "value" => $npValue
                 ];
+            }
+
+            $updatePayload = ['attributes' => $attributes];
+            if ($clientEmail !== '') {
+                $updatePayload['email'] = $clientEmail;
             }
 
             $updateResponse = Http::withBasicAuth(
@@ -147,9 +108,7 @@ class MoySkladSyncService
                 config('app.my_store.password'))
                     ->withHeaders([
                         'Accept-Encoding' => 'gzip',
-                    ])->put($counterpartyMeta['href'], [
-                    'attributes' => $attributes
-                ]);
+                    ])->put($counterpartyMeta['href'], $updatePayload);
 
             if ($updateResponse->failed()) {
                 Log::error('Не удалось обновить атрибуты контрагента', [
@@ -185,23 +144,17 @@ class MoySkladSyncService
             ];
 
             if ($order->novaposhta_warehouse_ref && $order->shipping_address) {
+                $npValue = self::resolveNpCustomEntityValue(
+                    (string) $order->novaposhta_warehouse_ref,
+                    self::normalizeNpCounterpartyName((string) $order->shipping_address)
+                );
                 $attributes[] = [
                     "meta" => [
                         "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3999ff42-6610-11f0-0a80-0462002ad32f",
                         "type" => "attributemetadata",
                         "mediaType" => "application/json"
                     ],
-                    "value" => [
-                        "meta" => [
-                            "href" => "https://api.moysklad.ru/api/remap/1.2/entity/customentity/710e5a69-63be-11f0-0a80-03cc0016c7e1/{$order->novaposhta_warehouse_ref}",
-                            "type" => "customentity",
-                            "mediaType" => "application/json"
-                        ],
-                        "id" => $order->novaposhta_warehouse_ref,
-                        "name" => is_array($order->shipping_address)
-                            ? implode(', ', $order->shipping_address)
-                            : (string) $order->shipping_address,
-                    ]
+                    "value" => $npValue
                 ];
             }
 
@@ -391,29 +344,19 @@ class MoySkladSyncService
      */
     public static function updateCounterpartyDelivery(Order $order): void
     {
-        if (!$order->email) {
-            Log::warning("Не удалось обновить контрагента для заказа #{$order->id} - отсутствует email");
-            return;
-        }
-
         try {
-            // Получаем контрагента по email
-            $response = Http::withBasicAuth(
-                config('app.my_store.username'),
-                config('app.my_store.password')
-            )
-                ->withHeaders([
-                    'Accept-Encoding' => 'gzip',
-                ])->get('https://api.moysklad.ru/api/remap/1.2/entity/counterparty', [
-                    'filter' => 'email=' . $order->email,
+            $clientEmail = trim((string) ($order->email ?? ''));
+            $cleanPhone = self::sanitizePhoneNumber($order->phone);
+            $existing = self::findCounterpartyFirstRow($clientEmail, $cleanPhone);
+
+            if ($existing === null) {
+                Log::warning("Контрагент не найден для заказа #{$order->id} (email/телефон)", [
+                    'email' => $clientEmail,
                 ]);
 
-            if (!$response->successful() || count($response->json('rows')) === 0) {
-                Log::warning("Контрагент не найден для заказа #{$order->id} с email: {$order->email}");
                 return;
             }
 
-            $existing = $response->json('rows')[0];
             $counterpartyMeta = $existing['meta'];
 
             if (!isset($counterpartyMeta['href'])) {
@@ -461,20 +404,17 @@ class MoySkladSyncService
 
                 // Если есть warehouse_ref, обновляем его
                 if ($order->novaposhta_warehouse_ref) {
+                    $npValue = self::resolveNpCustomEntityValue(
+                        (string) $order->novaposhta_warehouse_ref,
+                        self::normalizeNpCounterpartyName((string) $order->shipping_address)
+                    );
                     $attributes[] = [
                         "meta" => [
                             "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/attributes/3999ff42-6610-11f0-0a80-0462002ad32f",
                             "type" => "attributemetadata",
                             "mediaType" => "application/json"
                         ],
-                        "value" => [
-                            "meta" => [
-                                "href" => "https://api.moysklad.ru/api/remap/1.2/entity/customentity/710e5a69-63be-11f0-0a80-03cc0016c7e1/{$order->novaposhta_warehouse_ref}",
-                                "type" => "customentity",
-                                "mediaType" => "application/json"
-                            ],
-                            "id" => $order->novaposhta_warehouse_ref,
-                        ]
+                        "value" => $npValue
                     ];
                 }
 
@@ -496,9 +436,10 @@ class MoySkladSyncService
                     'Accept-Encoding' => 'gzip',
                     'Content-Type' => 'application/json'
                 ])
-                ->put($counterpartyMeta['href'], [
-                    'attributes' => $attributes
-                ]);
+                ->put($counterpartyMeta['href'], array_filter([
+                    'attributes' => $attributes,
+                    'email' => $clientEmail !== '' ? $clientEmail : null,
+                ]));
 
             if ($updateResponse->successful()) {
                 Log::info("Контрагент успешно обновлен для заказа #{$order->id}");
@@ -514,6 +455,73 @@ class MoySkladSyncService
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * Фільтри API МС для телефону: спочатку +380 та 380 (як у картці), далі 0XX, останні 9 цифр.
+     *
+     * @return list<string>
+     */
+    private static function counterpartyPhoneFilterValues(string $cleanPhone): array
+    {
+        $digits = preg_replace('/\D/u', '', $cleanPhone) ?? '';
+        if ($digits === '') {
+            return [];
+        }
+
+        $intlPhone = $digits;
+        $localPhone = $digits;
+        if (strpos($digits, '380') === 0 && strlen($digits) >= 12) {
+            $localPhone = '0'.substr($digits, 3);
+        }
+
+        $plusIntl = '+'.$intlPhone;
+        $last9 = strlen($digits) >= 9 ? substr($digits, -9) : '';
+
+        $filters = [
+            'phone~'.$plusIntl,
+            'phone~'.$intlPhone,
+            'phone~'.$localPhone,
+        ];
+        if ($last9 !== '' && strlen($last9) === 9) {
+            $filters[] = 'phone~'.$last9;
+        }
+
+        return array_values(array_unique($filters));
+    }
+
+    /**
+     * Пошук контрагента: email → варіанти телефону.
+     *
+     * @return array<string, mixed>|null
+     */
+    private static function findCounterpartyFirstRow(string $clientEmail, string $cleanPhone): ?array
+    {
+        $tryFilters = [];
+        if ($clientEmail !== '') {
+            $tryFilters[] = 'email='.$clientEmail;
+        }
+        foreach (self::counterpartyPhoneFilterValues($cleanPhone) as $phoneFilter) {
+            $tryFilters[] = $phoneFilter;
+        }
+
+        foreach ($tryFilters as $filter) {
+            $response = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            )
+                ->withHeaders([
+                    'Accept-Encoding' => 'gzip',
+                ])->get('https://api.moysklad.ru/api/remap/1.2/entity/counterparty', [
+                    'filter' => $filter,
+                ]);
+
+            if ($response->successful() && count($response->json('rows') ?? []) > 0) {
+                return $response->json('rows')[0];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -646,27 +654,13 @@ class MoySkladSyncService
         $clientEmail = trim($consultation->email ?? '');
         $cleanPhone = self::sanitizePhoneNumber($consultation->phone);
 
-        // Ищем контрагента: email -> phone~local(0XXXXXXXXX) -> phone~intl(380XXXXXXXXX) -> phone~+intl(+380XXXXXXXXX) -> phone~last9
         $response = null;
         $tryFilters = [];
         if ($clientEmail !== '') {
             $tryFilters[] = 'email=' . $clientEmail;
         }
-
-        // local UA format first: 0XXXXXXXXX (e.g., 0937953126)
-        $localPhone = $cleanPhone;
-        if (strpos($cleanPhone, '380') === 0 && strlen($cleanPhone) >= 12) {
-            $localPhone = '0' . substr($cleanPhone, 3);
-        }
-        $intlPhone = $cleanPhone;              // 380XXXXXXXXX
-        $plusIntlPhone = '+'.$intlPhone;       // +380XXXXXXXXX
-        $last9 = substr($cleanPhone, -9);      // XXXXXXX123 (9 цифр)
-
-        $tryFilters[] = 'phone~' . $localPhone;
-        $tryFilters[] = 'phone~' . $intlPhone;
-        $tryFilters[] = 'phone~' . $plusIntlPhone;
-        if ($last9 && strlen($last9) === 9) {
-            $tryFilters[] = 'phone~' . $last9;
+        foreach (self::counterpartyPhoneFilterValues($cleanPhone) as $phoneFilter) {
+            $tryFilters[] = $phoneFilter;
         }
 
         foreach ($tryFilters as $filter) {
@@ -877,6 +871,109 @@ class MoySkladSyncService
         }
 
         return $digits; // на всякий случай
+    }
+
+    /**
+     * МС может хранить несколько текстовых вариантов для одного ref.
+     * Нормализуем подпись НП и убираем хвост "(місто, адреса)", если он продублирован.
+     */
+    private static function normalizeNpCounterpartyName(string $shippingAddress): string
+    {
+        $value = trim($shippingAddress);
+        if ($value === '') {
+            return $value;
+        }
+
+        // Для кейса вида: "Обухів, Поштомат ...": прибираємо префікс міста.
+        if (preg_match('/^[^,]+,\s*(Поштомат.+)$/u', $value, $m)) {
+            $value = trim($m[1]);
+        }
+
+        // Для кейса вида: "... (ТІЛЬКИ ДЛЯ МЕШКАНЦІВ) (Обухів, Київська, ...)"
+        if (str_contains($value, 'Поштомат') && preg_match('/^(.+?)\s+\(([^()]*)\)\s*$/u', $value, $m)) {
+            $base = trim($m[1]);
+            $tail = mb_strtolower(trim($m[2]), 'UTF-8');
+            if (
+                str_starts_with($tail, 'обух') ||
+                str_starts_with($tail, 'київ') ||
+                str_starts_with($tail, 'киев')
+            ) {
+                return $base;
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Пытаемся подтянуть value из справочника МС по ref НП:
+     * 1) прямой GET по id (если id МС совпадает с ref НП),
+     * 2) поиск по externalCode,
+     * 3) поиск по code.
+     * Если не нашли — fallback на локально собранный meta+name.
+     *
+     * @return array{meta: array<string, string>, name: string}
+     */
+    private static function resolveNpCustomEntityValue(string $npRef, string $fallbackName): array
+    {
+        $dictId = '710e5a69-63be-11f0-0a80-03cc0016c7e1';
+        $base = "https://api.moysklad.ru/api/remap/1.2/entity/customentity/{$dictId}";
+
+        $direct = Http::withBasicAuth(
+            config('app.my_store.username'),
+            config('app.my_store.password')
+        )->withHeaders([
+            'Accept-Encoding' => 'gzip',
+        ])->get("{$base}/{$npRef}");
+
+        if ($direct->successful() && is_array($direct->json())) {
+            $row = $direct->json();
+            if (!empty($row['meta']['href'])) {
+                return [
+                    'meta' => [
+                        'href' => (string) $row['meta']['href'],
+                        'type' => 'customentity',
+                        'mediaType' => 'application/json',
+                    ],
+                    'name' => (string) ($row['name'] ?? $fallbackName),
+                ];
+            }
+        }
+
+        foreach (['externalCode', 'code'] as $field) {
+            $resp = Http::withBasicAuth(
+                config('app.my_store.username'),
+                config('app.my_store.password')
+            )->withHeaders([
+                'Accept-Encoding' => 'gzip',
+            ])->get($base, [
+                'filter' => "{$field}={$npRef}",
+                'limit' => 1,
+            ]);
+
+            if ($resp->successful()) {
+                $row = $resp->json('rows.0');
+                if (is_array($row) && !empty($row['meta']['href'])) {
+                    return [
+                        'meta' => [
+                            'href' => (string) $row['meta']['href'],
+                            'type' => 'customentity',
+                            'mediaType' => 'application/json',
+                        ],
+                        'name' => (string) ($row['name'] ?? $fallbackName),
+                    ];
+                }
+            }
+        }
+
+        return [
+            'meta' => [
+                'href' => "{$base}/{$npRef}",
+                'type' => 'customentity',
+                'mediaType' => 'application/json',
+            ],
+            'name' => $fallbackName,
+        ];
     }
 
 }

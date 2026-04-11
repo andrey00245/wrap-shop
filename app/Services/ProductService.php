@@ -226,6 +226,39 @@ class ProductService
     }
 
     /**
+     * Оновлює лише поле category_id з атрибута «Категорія сайту» в МойСклад (один GET /entity/product/{id}).
+     * HTTP — через {@see fetchProductFromMoySklad} → {@see MoySkladRemapHttp} (пауза між запитами, ретраї 429), як у {@see syncProductPricesAndStock}.
+     * Логіка поля — {@see processCategoriesFromWebhook}.
+     */
+    public function syncProductSiteCategoryFromMoySklad(Product $product): bool
+    {
+        if (empty($product->external_id)) {
+            Log::warning('Синхронізація категорії: у товару немає external_id', ['product_id' => $product->id]);
+
+            return false;
+        }
+
+        $productData = $this->fetchProductFromMoySklad($product->external_id);
+        if (! $productData || empty($productData['attributes']) || ! is_array($productData['attributes'])) {
+            return false;
+        }
+
+        try {
+            $this->processCategoriesFromWebhook($productData['attributes'], $product);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('Синхронізація категорії з МС: помилка', [
+                'product_id' => $product->id,
+                'external_id' => $product->external_id,
+                'message' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
      * Оновлення цін і залишку одного товару через Bearer (MOY_SKLAD_TOKEN).
      * Основний синк лишається на Basic Auth — цей метод лише для тесту / окремого роута.
      *

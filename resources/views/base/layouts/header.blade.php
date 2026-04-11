@@ -80,7 +80,11 @@
             </div>
             <div class="head-phone-mobil">
                 <div class="title">{{__('header_footer.phone')}}</div>
-                <a href="tel:+380660003202"><span>+38</span> 066 000 32 02</a>
+                @php
+                    $phoneRaw = $settings->phone ?? '';
+                    $phoneView = $settings->phone_view ?? $phoneRaw;
+                @endphp
+                <a href="{{ $phoneRaw ? ('tel:' . $phoneRaw) : '#' }}">{!! $phoneView ?: '#' !!}</a>
             </div>
             <div class="head-buttons">
                 <div class="general-popup-btn button search far fa-search"

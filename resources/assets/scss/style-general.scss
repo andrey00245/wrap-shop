@@ -1363,10 +1363,29 @@ body::-webkit-scrollbar {
             display: none;
             padding: 10px 12px 0 12px;
             border-top: 1px solid $mod-product-default-aditional-border;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 0 28px;
 
             .additional-info {
-                margin-right: 28px;
+                margin-right: 0;
                 text-align: left;
+            }
+
+            /* Одна колонка — по центру блоку */
+            &:has(> .additional-info:only-child) {
+                justify-content: center;
+                align-items: center;
+
+                .additional-info {
+                    text-align: center;
+                }
+
+                .additional-title,
+                .additional-text {
+                    text-align: center !important;
+                }
             }
         }
 
@@ -1385,9 +1404,10 @@ body::-webkit-scrollbar {
     text-align: center;
     text-transform: uppercase;
     display: -webkit-box;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-height: 1.2;
 }
 
 .error {
@@ -1754,10 +1774,16 @@ body::-webkit-scrollbar {
 
     min-height: 45px;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
     overflow: hidden;
     line-height: 1.2;
+}
+
+@media screen and (min-width: 992px) {
+    .product-default .name {
+        font-size: 14px;
+    }
 }
 
 .product-default.product-list .name {
@@ -4536,9 +4562,7 @@ table .notify-quantity {
             }
 
             .hover-additional-info {
-                .additional-info {
-                    margin-right: 10px;
-                }
+                gap: 0 10px;
             }
         }
     }

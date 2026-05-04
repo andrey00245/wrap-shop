@@ -167,7 +167,7 @@ return [
 
                 'insert' => [
                     'types' => ['gif', 'png', 'jpg', 'jpeg', 'webp'],
-                    'size'  => 1500 // kb, nullable
+                    'size'  => (int) env('NOVA_MAX_IMAGE_UPLOAD_KB', 15360) // kb (синхронно з nova-media-library.max_upload_kb)
                 ]
             ],
 

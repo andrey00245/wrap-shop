@@ -102,9 +102,17 @@ return [
         'mark_super' => 'Super',
         'loading' => 'Loading',
         'send_review' => 'Send review',
-        'success_message' => 'Thank you for your review. It has been submitted to the administrator for spam check and will be published soon.',
+        'product_optional' => 'Product (optional)',
+        'product_empty' => 'Review about Wrap.Shop platform',
+        'photo' => 'Photo (optional)',
+        'photo_select' => 'Choose photo',
+        'photo_empty' => 'No file selected',
+        'photo_drop_hint' => 'Upload photo',
+        'success_message' => 'Thank you for your review.',
         'error_message' => 'Error sending review.',
         'validation' => [
+            'product_required' => 'Select a product',
+            'product_invalid' => 'Selected product is invalid.',
             'name_required' => 'Please enter your name.',
             'name_string' => 'Name must be text.',
             'name_max' => 'Name is too long (maximum 255 characters).',
@@ -114,6 +122,9 @@ return [
             'rating_required' => 'Please select a rating.',
             'rating_integer' => 'Rating must be a number.',
             'rating_between' => 'Please select a rating from 1 to 5.',
+            'photo_uploaded' => 'Photo upload failed. Check the file size and try again.',
+            'photo_image' => 'Upload a valid image file.',
+            'photo_max' => 'Photo must be at most 15 MB.',
         ],
     ]
 

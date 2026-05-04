@@ -33,11 +33,21 @@
 {{--    @include('base.components.3m-color-wrap')--}}
 {{--    @include('base.components.yellotools')--}}
     @include('base.components.custom-blocks')
+    @include('base.components.home-blocks', ['onlyTypes' => ['categories', 'kits']])
     @include('base.components.latest')
+    @include('base.components.home-color-films-static')
+    @include('base.components.home-reviews')
+    @include('base.components.home-blocks', ['onlyTypes' => ['products']])
+    @include('base.components.home-news')
     @include('base.components.examples-of-work')
+    @include('base.components.home-blocks', ['onlyTypes' => ['banner']])
+    @include('base.components.home-youtube-cards')
+    @include('base.components.home-faq')
+    @include('base.components.home-brands')
+    @include('base.components.categories-slider')
 
     @push('scripts')
-      <script src="{{mix('build/js/sliders.js')}}"></script>
+      <script src="{{ mix('build/js/sliders.js') }}" defer></script>
     @endpush
   </div>
 @endsection

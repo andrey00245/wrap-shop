@@ -1,33 +1,31 @@
-<div class="splide home-category flex-justify wrap" id="slideCategory">
-    <div class="splide__track">
-        <ul class="splide__list">
-            @foreach($mainCategories as $mainCategory)
-                <li class="splide__slide swiper-slide home-banner-item">
-                    <a href="{{ route('products.category', ['path' => $mainCategory->slugEn]) }}"
-                       class="swiper-slide home-category-item flex-justify" title="">
-                        <figure class="img flex-center">
-                            <img
-                                loading="lazy"
-                                src="{{$mainCategory->getPreviewImage()}}"
-                                srcset=""
-                                alt="{{$mainCategory->name}}"
-                                title="{{$mainCategory->name}}"
-                                width="260"
-                                height="160">
-                        </figure>
-                        <div class="right">
-                            <div class="name">{{$mainCategory->name}}</div>
-                            <div class="link button"><i
-                                    class="fas fa-chevron-right"></i>{{__('general-translate.view')}}</div>
-                        </div>
-                    </a>
-                </li>
-            @endforeach
+<nav class="home-category wrap" aria-label="{{ __('header_footer.catalog_products') }}">
+    <ul class="home-category__list">
+        @foreach($mainCategories as $mainCategory)
+            @php
+                $categoryPath = $mainCategory->catalogPath(app()->getLocale());
+                $categoryIcon = $mainCategory->getPreviewImage();
+                if (!filled($categoryIcon)) {
+                    $categoryIcon = $mainCategory->getImage();
+                }
+            @endphp
 
-        </ul>
-    </div>
+            @continue(!filled($categoryPath))
 
-    <div class="splide__arrows home-category-buttons"></div>
-</div>
-
-
+            <li class="home-category__cell">
+                <a href="{{ route('products.category', ['path' => $categoryPath]) }}"
+                   class="home-category-item"
+                   title="{{ $mainCategory->name }}">
+                    <figure class="home-category-item__icon flex-center">
+                        <img
+                            loading="lazy"
+                            src="{{ filled($categoryIcon) ? $categoryIcon : asset('assets/img/logo.svg') }}"
+                            alt="{{ $mainCategory->name }}"
+                            width="48"
+                            height="48">
+                    </figure>
+                    <span class="home-category-item__title">{{ $mainCategory->name }}</span>
+                </a>
+            </li>
+        @endforeach
+    </ul>
+</nav>

@@ -693,6 +693,63 @@
         @endif
     </section>
 
+    <section class="product-range wrap" data-tonirovka-range>
+        <div class="product-range__inner box-left-image-right-text">
+            <div class="box-left-image-right-text__img tonirovka-fon">
+                <img class="tonirovka-back"
+                     src="https://south.art/wp-content/themes/southart-new-theme/images/tonirovka-back.png"
+                     alt="{{ __('product-show.range_window_preview_alt') }}">
+            </div>
+
+            <div class="product-range__content">
+                <h2 class="product-range__title">{{ __('product-show.range_title') }}</h2>
+                <p class="product-range__subtitle">{{ __('product-show.range_subtitle') }}</p>
+
+                <div class="product-range__card">
+                    <div class="product-range__film-name" data-film-title>CR 40</div>
+                    <div class="product-range__metrics">
+                        <div class="product-range__metric">
+                            <span class="product-range__metric-value" data-light-value>86%</span>
+                            <span class="product-range__metric-label">{{ __('product-show.range_metric_light') }}</span>
+                        </div>
+                        <div class="product-range__metric">
+                            <span class="product-range__metric-value" data-solar-value>34%</span>
+                            <span class="product-range__metric-label">{{ __('product-show.range_metric_solar') }}</span>
+                        </div>
+                        <div class="product-range__metric">
+                            <span class="product-range__metric-value" data-uv-value>90%</span>
+                            <span class="product-range__metric-label">{{ __('product-show.range_metric_uv') }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-range__slider-wrap">
+                    <div class="product-range__labels">
+                        <button type="button" class="product-range__label is-active" data-level="1" data-film="CR 40">CR 40</button>
+                        <button type="button" class="product-range__label" data-level="2" data-film="CR 50">CR 50</button>
+                        <button type="button" class="product-range__label" data-level="3" data-film="CR 60">CR 60</button>
+                        <button type="button" class="product-range__label" data-level="4" data-film="CR 70">CR 70</button>
+                        <button type="button" class="product-range__label" data-level="5" data-film="CR 90">CR 90</button>
+                    </div>
+
+                    <div class="product-range__slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content">
+                        <div class="product-range__slider-fill" data-slider-fill></div>
+                        <div class="product-range__points">
+                            <span class="product-range__point" data-point-level="1"></span>
+                            <span class="product-range__point" data-point-level="2"></span>
+                            <span class="product-range__point" data-point-level="3"></span>
+                            <span class="product-range__point" data-point-level="4"></span>
+                            <span class="product-range__point" data-point-level="5"></span>
+                        </div>
+                        <input type="range" min="1" max="5" step="1" value="1" class="product-range__slider-input" data-slider-input>
+                    </div>
+
+                    <div class="product-range__hint">{{ __('product-show.range_slider_hint') }}</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     @include('base.components.recommendations')
     {{-- @include('base.components.examples-of-work') --}}
     @include('base.components.consult-popup')
@@ -703,6 +760,71 @@
         {{--        <script src="{{asset('js/jquery/swiper/js/swiper.jquery.min.js')}}"></script>--}}
         <script src="{{mix('build/js/productShow.js')}}"></script>
         <script src="{{asset('third-party/lazyloadmin.js')}}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const root = document.querySelector('[data-tonirovka-range]');
+                if (!root) {
+                    return;
+                }
+
+                const slider = root.querySelector('[data-slider-input]');
+                const sliderFill = root.querySelector('[data-slider-fill]');
+                const overlay = root.querySelector('.tonirovka-back');
+                const filmTitle = root.querySelector('[data-film-title]');
+                const lightValue = root.querySelector('[data-light-value]');
+                const solarValue = root.querySelector('[data-solar-value]');
+                const uvValue = root.querySelector('[data-uv-value]');
+                const labels = Array.from(root.querySelectorAll('.product-range__label'));
+                const points = Array.from(root.querySelectorAll('.product-range__point'));
+
+                const opacities = [0.39, 0.5, 0.6, 0.69, 0.86];
+                const metrics = [
+                    {light: '86%', solar: '34%', uv: '90%'},
+                    {light: '65%', solar: '42%', uv: '92%'},
+                    {light: '51%', solar: '48%', uv: '94%'},
+                    {light: '38%', solar: '55%', uv: '96%'},
+                    {light: '20%', solar: '62%', uv: '99%'},
+                ];
+
+                const syncView = function () {
+                    const level = Math.min(5, Math.max(1, Number(slider.value)));
+                    const idx = level - 1;
+                    const progress = (idx / 4) * 100;
+
+                    root.style.setProperty('--tonirovka-opacity', String(opacities[idx]));
+                    overlay.style.opacity = String(opacities[idx]);
+                    sliderFill.style.width = progress + '%';
+
+                    labels.forEach(function (btn) {
+                        btn.classList.toggle('is-active', Number(btn.dataset.level) === level);
+                    });
+                    points.forEach(function (point) {
+                        point.classList.toggle('is-active', Number(point.dataset.pointLevel) === level);
+                    });
+
+                    const activeLabel = labels.find((btn) => Number(btn.dataset.level) === level);
+                    if (activeLabel) {
+                        filmTitle.textContent = activeLabel.dataset.film || activeLabel.textContent.trim();
+                    }
+
+                    const metric = metrics[idx];
+                    lightValue.textContent = metric.light;
+                    solarValue.textContent = metric.solar;
+                    uvValue.textContent = metric.uv;
+                };
+
+                labels.forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        slider.value = btn.dataset.level;
+                        syncView();
+                    });
+                });
+
+                slider.addEventListener('input', syncView);
+                slider.addEventListener('change', syncView);
+                syncView();
+            });
+        </script>
     @endpush
     <style>
         .volume {

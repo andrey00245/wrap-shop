@@ -2,7 +2,7 @@
 
 namespace App\Nova;
 
-use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
+use App\Nova\Fields\Images;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
@@ -37,7 +37,7 @@ class Banner extends Resource
      * @var array
      */
     public static $search = [
-        'id', 'url',
+        'id', 'url', 'nav_title',
     ];
 
     /**
@@ -52,10 +52,19 @@ class Banner extends Resource
             ID::make()->sortable(),
             Images::make( 'Фото','main')
                 ->conversionOnIndexView('preview'),
-            Text::make('Силка','url')
+            Text::make('Силка банера','url')
                 ->displayUsing(function ($value) {
                     return $value ? (strlen($value) > 50 ? substr($value, 0, 50) . '...' : $value) : '';
                 }),
+            Text::make('Назва в навігації', 'nav_title')
+                ->help('Короткий текст під банером: Новини, Знижка до 50%, Захисне скло тощо.')
+                ->rules('nullable', 'max:255'),
+            Text::make('Текст кнопки', 'button_text')
+                ->help('Наприклад: Перейти до каталогу. Якщо порожньо — кнопка не показується.')
+                ->rules('nullable', 'max:255'),
+            Text::make('Силка кнопки', 'button_url')
+                ->help('Якщо порожньо — для кнопки використається силка банера.')
+                ->rules('nullable', 'max:255'),
 
             Number::make('Позиція','position')->sortable(),
             Boolean::make('Активний','is_active')->sortable(),

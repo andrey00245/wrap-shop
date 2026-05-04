@@ -336,6 +336,123 @@ $(document).ready(function () {
         });
     });
 
+    $('#home-review-form').on('submit', function (e) {
+        e.preventDefault();
+
+        const form = this;
+        const submitBtn = $('#home-review-submit');
+        const alertBox = $('#home-review-alert');
+        const originalBtnText = submitBtn.text();
+        const ratingChecked = form.querySelector('input[name="rating"]:checked');
+
+        alertBox.empty();
+        if (!ratingChecked) {
+            alertBox.html(`
+                <div class="alert alert-danger">
+                    <ul class="mb-0"><li>${window.wrapReviewRatingRequiredText || 'Select rating.'}</li></ul>
+                </div>
+            `);
+            return;
+        }
+
+        submitBtn.prop('disabled', true).text(`${window.wrapReviewLoadingText || 'Loading'}...`);
+
+        const formData = new FormData(form);
+
+        $.ajax({
+            url: form.action,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'Accept': 'application/json'
+            },
+            success: function () {
+                alertBox.html(`
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> ${window.wrapReviewSuccessText || 'Review sent successfully.'}
+                    </div>
+                `);
+                form.reset();
+                const photoName = document.getElementById('home-review-photo-name');
+                if (photoName) {
+                    photoName.textContent = window.wrapReviewPhotoEmptyText || '';
+                }
+            },
+            error: function (xhr) {
+                const messages = [];
+                const errors = xhr?.responseJSON?.errors || null;
+
+                if (errors) {
+                    Object.values(errors).forEach((fieldErrors) => {
+                        (fieldErrors || []).forEach((msg) => messages.push(msg));
+                    });
+                } else if (xhr?.responseJSON?.message) {
+                    messages.push(xhr.responseJSON.message);
+                } else {
+                    messages.push(window.wrapReviewErrorText || 'Error sending review.');
+                }
+
+                alertBox.html(`
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">${messages.map((msg) => `<li>${msg}</li>`).join('')}</ul>
+                    </div>
+                `);
+            },
+            complete: function () {
+                submitBtn.prop('disabled', false).text(originalBtnText);
+            }
+        });
+    });
+
+    (function initHomeReviewDropzone() {
+        const dropzone = document.getElementById('home-review-dropzone');
+        const input = document.getElementById('home-review-photo');
+        const photoName = document.getElementById('home-review-photo-name');
+
+        if (!dropzone || !input || !photoName) {
+            return;
+        }
+
+        const updateName = () => {
+            photoName.textContent = (input.files && input.files.length > 0)
+                ? input.files[0].name
+                : (window.wrapReviewPhotoEmptyText || '');
+        };
+
+        dropzone.addEventListener('click', () => input.click());
+        input.addEventListener('change', updateName);
+
+        ['dragenter', 'dragover'].forEach((evt) => {
+            dropzone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('is-dragover');
+            });
+        });
+
+        ['dragleave', 'dragend', 'drop'].forEach((evt) => {
+            dropzone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('is-dragover');
+            });
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer?.files;
+            if (!files || files.length === 0) {
+                return;
+            }
+
+            const dt = new DataTransfer();
+            dt.items.add(files[0]);
+            input.files = dt.files;
+            updateName();
+        });
+    })();
+
 });
 
 

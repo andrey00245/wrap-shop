@@ -16,7 +16,7 @@ class HomeBlock extends Resource
 {
     public static $model = \App\Models\HomeBlock::class;
 
-    public static $title = 'id';
+    public static $title = 'title_for_nova';
 
     public static $search = [
         'id',
@@ -50,9 +50,8 @@ class HomeBlock extends Resource
                 ->options([
                     HomeBlockType::Categories->value => 'Категорії',
                     HomeBlockType::Kits->value => 'Набори (kits)',
-                    HomeBlockType::Products->value => 'Товари',
+                    HomeBlockType::Products->value => 'Сезонні товари',
                     HomeBlockType::Banner->value => 'Банер',
-                    HomeBlockType::Custom->value => 'Власний / інше',
                 ])
                 ->rules('required')
                 ->displayUsingLabels(),

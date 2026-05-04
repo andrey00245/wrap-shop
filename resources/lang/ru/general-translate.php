@@ -1,4 +1,5 @@
 <?php
+
 return [
     'leaders_of_sales' => '<span class="colord">Лидеры</span> продаж',
     'latest' => '<span class="colord">Новые</span> поступления',
@@ -9,6 +10,7 @@ return [
     'show_more' => 'Показать больше',
 
     'sales_hit' => 'Хит продаж',
+    'home_block_categories_sr_only' => 'Категории товаров',
     'all' => 'Все',
     'view' => 'Смотреть',
 
@@ -16,8 +18,8 @@ return [
         'code' => 'Код: ',
         'add_to_cart' => 'Купить',
         'remove' => 'Удалить',
-        'add_wishlist' => 'Добавить в закладки'
+        'add_wishlist' => 'Добавить в закладки',
 
-    ]
+    ],
 
 ];

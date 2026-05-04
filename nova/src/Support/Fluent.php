@@ -13,10 +13,10 @@ class Fluent extends \Illuminate\Support\Fluent
     /**
      * Fill the model with an array of attributes.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  iterable<string, mixed>  $attributes
      * @return $this
      */
-    public function fill(array $attributes)
+    public function fill($attributes)
     {
         foreach ($attributes as $key => $value) {
             $attribute = Str::replace('->', '.', $key);

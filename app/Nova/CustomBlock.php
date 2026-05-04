@@ -3,7 +3,7 @@
 namespace App\Nova;
 
 use App\Nova\Fields\NovaTabTranslatable;
-use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
+use App\Nova\Fields\Images;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;

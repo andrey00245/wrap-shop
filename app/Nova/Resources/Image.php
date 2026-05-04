@@ -25,8 +25,8 @@ class Image extends Resource
                 ->sortable(),
 
             ImageUpload::make(trans('File'), 'image')
-                ->rules('required', 'mimes:jpg,jpeg,png,gif,webp', 'max:5000')
-                ->help(trans(':size Megabyte Max FileSize.', ['size' => 5])),
+                ->rules('required', 'mimes:jpg,jpeg,png,gif,webp', 'max:'.(int) config('nova-media-library.max_upload_kb', 15360))
+                ->help(trans(':size Megabyte Max FileSize.', ['size' => 15])),
 
             Text::make(trans('Filename'), 'file_name')
                 ->onlyOnDetail()

@@ -14,7 +14,8 @@ use App\Nova\Consultation;
 use App\Nova\CustomBlock;
 use App\Nova\DeliveryOption;
 use App\Nova\Faq;
-//use App\Nova\HomeBlock;
+use App\Nova\HomeBlock;
+use App\Nova\HomeBrand;
 use App\Nova\Implementation;
 use App\Nova\News;
 use App\Nova\NewsCategory;
@@ -32,6 +33,7 @@ use App\Nova\Setting;
 use App\Nova\User;
 use App\Nova\VideoCategory;
 use App\Nova\VideoReview;
+use App\Nova\YoutubeChannelCard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
@@ -107,7 +109,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
             // Контент (виды, «звуки», новини, FAQ тощо)
             if (in_array($role, ['admin', 'content_manager'], true)) {
                 $menu[] = MenuSection::make('Контент', [
-//                    MenuItem::resource(HomeBlock::class),
+                    MenuItem::resource(HomeBlock::class),
                     MenuItem::resource(Banner::class),
                     MenuItem::resource(ProductBanner::class),
                     MenuItem::resource(CustomBlock::class),
@@ -118,8 +120,10 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                     MenuItem::resource(BlogPost::class),
                     MenuItem::resource(BlogComment::class),
                     MenuItem::resource(Faq::class),
+                    MenuItem::resource(HomeBrand::class),
                     MenuItem::resource(VideoCategory::class),
                     MenuItem::resource(VideoReview::class),
+                    MenuItem::resource(YoutubeChannelCard::class),
                 ])->icon('document-text')->collapsable();
             }
 

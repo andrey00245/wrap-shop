@@ -1,5 +1,8 @@
 export function productSliderInitialization(id) {
     const $block = $('#' + id);
+    if (! $block.length || ! $block.find('.splide').length) {
+        return;
+    }
     const $allItems = $block.find('.home-products-item');
     const totalItems = $allItems.length;
 

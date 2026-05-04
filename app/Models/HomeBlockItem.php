@@ -27,19 +27,22 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
         'sort_on_has_many' => true,
     ];
 
-    public array $translatable = ['custom_title'];
+    public array $translatable = ['custom_title', 'custom_tagline'];
 
     protected $fillable = [
         'home_block_id',
         'category_id',
+        'product_id',
         'tile_size',
         'custom_title',
+        'custom_tagline',
         'sort_order',
     ];
 
     protected $casts = [
         'tile_size' => HomeBlockItemTileSize::class,
         'custom_title' => 'array',
+        'custom_tagline' => 'array',
         'sort_order' => 'integer',
     ];
 
@@ -84,6 +87,11 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
         return $this->belongsTo(Category::class);
     }
 
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
     public function quickLinks(): HasMany
     {
         return $this->hasMany(HomeBlockItemQuickLink::class)->orderBy('sort_order');
@@ -96,6 +104,7 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
 
     public function registerMediaCollections(): void
     {
+        $this->addMediaCollection('custom_image')->singleFile();
         $this->addMediaCollection('custom')->singleFile();
     }
 
@@ -103,7 +112,7 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
     {
         $this
             ->addMediaConversion('tile_large')
-            ->performOnCollections('custom')
+            ->performOnCollections('custom_image', 'custom')
             ->width(720)
             ->height(1080)
             ->format('webp')
@@ -111,7 +120,7 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
 
         $this
             ->addMediaConversion('tile_small')
-            ->performOnCollections('custom')
+            ->performOnCollections('custom_image', 'custom')
             ->width(640)
             ->height(400)
             ->format('webp')
@@ -126,14 +135,32 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
             return $custom;
         }
 
+        $productName = $this->product?->getName();
+        if (filled($productName)) {
+            return $productName;
+        }
+
         return $this->category?->getTranslation('name', $locale)
             ?? $this->category?->getTranslation('name', 'uk')
             ?? '';
     }
 
+    public function displayTagline(?string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+        $custom = $this->getTranslation('custom_tagline', $locale);
+        if (filled($custom)) {
+            return $custom;
+        }
+
+        return (string) ($this->product?->category?->getTranslation('name', $locale)
+            ?? $this->product?->category?->getTranslation('name', 'uk')
+            ?? '');
+    }
+
     public function tileImageUrl(bool $large = false): string
     {
-        $media = $this->getFirstMedia('custom');
+        $media = $this->getFirstMedia('custom_image') ?? $this->getFirstMedia('custom');
         if ($media !== null) {
             $conversion = $large ? 'tile_large' : 'tile_small';
             if ($media->hasGeneratedConversion($conversion)) {
@@ -144,6 +171,9 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
         }
 
         $fromCategory = $this->category?->getPreviewImage();
+        if (filled($this->product?->getPreviewImage())) {
+            return $this->product->getPreviewImage();
+        }
 
         return filled($fromCategory) ? $fromCategory : self::tileFallbackImageUrl();
     }

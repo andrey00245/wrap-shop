@@ -1,4 +1,5 @@
 <?php
+
 return [
     'leaders_of_sales' => '<span class="colord">Leaders</span> of sales',
     'latest' => '<span class="colord">New</span> arrivals',
@@ -9,6 +10,7 @@ return [
     'show_more' => 'Show more',
 
     'sales_hit' => 'The best seller',
+    'home_block_categories_sr_only' => 'Product categories',
     'all' => 'All',
     'view' => 'View',
 
@@ -16,6 +18,6 @@ return [
         'code' => 'Code: ',
         'add_to_cart' => 'Add to cart',
         'remove' => 'Remove',
-        'add_wishlist' => 'Add to Wish List'
-    ]
+        'add_wishlist' => 'Add to Wish List',
+    ],
 ];

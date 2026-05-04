@@ -25,3 +25,7 @@ yarn-error.log
 /public/fonts/
 /public/images/
 /.composer-home
+
+# Local MCP credentials (never commit tokens)
+/.cursor/mcp.json
+/.ai/mcp/mcp.json

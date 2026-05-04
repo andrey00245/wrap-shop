@@ -5,7 +5,7 @@ namespace App\Nova;
 use App\Nova\Actions\TranslateProductContent;
 use App\Nova\Fields\NovaTabTranslatable;
 use App\Nova\Filters\TranslatedStatusFilter;
-use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
+use App\Nova\Fields\Images;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Laravel\Nova\Fields\BelongsTo;

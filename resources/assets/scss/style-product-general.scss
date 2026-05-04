@@ -1082,11 +1082,11 @@
     margin-left: auto;
     margin-right: auto;
     position: relative;
-    
+
     // Стрелки слайдера по центру видео (вертикально)
     #product-video-slider {
         position: relative;
-        
+
         .splide__arrows {
             position: absolute !important;
             top: 0 !important;
@@ -1097,7 +1097,7 @@
             height: 100% !important;
             pointer-events: none !important;
             margin: 0 !important;
-            
+
             .splide__arrow,
             button.splide__arrow {
                 position: absolute !important;
@@ -1107,12 +1107,12 @@
                 z-index: 1000 !important;
                 pointer-events: auto !important;
                 margin: 0 !important;
-                
+
                 &.splide__arrow--prev {
                     left: 10px !important;
                     right: auto !important;
                 }
-                
+
                 &.splide__arrow--next {
                     right: 10px !important;
                     left: auto !important;
@@ -1120,30 +1120,30 @@
             }
         }
     }
-    
+
     .product-video-slide {
         position: relative;
-        
+
         .product-video-slide-wrapper {
             position: relative;
             width: 100%;
             padding-bottom: 45%; // Высота 80% от стандартного соотношения (56.25% * 0.8)
             overflow: hidden;
             border-radius: 10px;
-            
+
             .product-video-youtube-container {
                 position: absolute;
                 top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
-                
+
                 .product-video-youtube-thumbnail {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
                 }
-                
+
                 .product-video-youtube-iframe {
                     position: absolute;
                     top: 0;
@@ -1152,14 +1152,14 @@
                     height: 100%;
                     border: none;
                 }
-                
+
                 .product-video-youtube-play-btn {
                     position: absolute;
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
                     z-index: 10;
-                    
+
                     &.home-about-play,
                     & {
                         .button {
@@ -1172,7 +1172,7 @@
             }
         }
     }
-    
+
     @media screen and (max-width: 767px) {
         margin-left: -15px;
         margin-right: -15px;
@@ -1180,43 +1180,43 @@
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
-        
+
         #product-video-slider {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
             width: 100% !important;
-            
+
             .splide__track {
                 display: block !important;
                 visibility: visible !important;
                 width: 100% !important;
             }
-            
+
             .splide__list {
                 display: flex !important;
                 visibility: visible !important;
                 width: 100% !important;
             }
         }
-        
+
         .product-video-slide {
             display: block !important;
             visibility: visible !important;
             width: 100% !important;
-            
+
             .product-video-slide-wrapper {
                 padding-bottom: 56.25%;
                 display: block !important;
                 visibility: visible !important;
                 width: 100% !important;
-                
+
                 .product-video-youtube-container {
                     display: block !important;
                     visibility: visible !important;
                     width: 100% !important;
                     height: 100% !important;
-                    
+
                     .product-video-youtube-thumbnail {
                         display: block !important;
                         visibility: visible !important;
@@ -1224,7 +1224,7 @@
                         height: 100% !important;
                         object-fit: cover !important;
                     }
-                    
+
                     .product-video-youtube-play-btn {
                         display: flex !important;
                         visibility: visible !important;
@@ -1233,13 +1233,13 @@
                 }
             }
         }
-        
+
         // Стрелки слайдера на мобильной версии
         .splide__arrows {
             display: flex !important;
             visibility: visible !important;
             opacity: 1 !important;
-            
+
             .splide__arrow {
                 display: flex !important;
                 visibility: visible !important;
@@ -1251,18 +1251,18 @@
                 color: #fff !important;
                 z-index: 1000 !important;
                 backdrop-filter: blur(5px);
-                
+
                 svg {
                     fill: #fff !important;
                 }
-                
+
                 &:hover {
                     background-color: rgba(0, 0, 0, 0.7) !important;
                     border-color: rgba(255, 255, 255, 0.5) !important;
                 }
             }
         }
-        
+
         // Пагинация на мобильной версии
         .splide__pagination {
             display: flex !important;
@@ -1270,14 +1270,14 @@
             opacity: 1 !important;
             bottom: 10px !important;
             z-index: 1000 !important;
-            
+
             .splide__pagination__page {
                 width: 8px !important;
                 height: 8px !important;
                 background-color: rgba(255, 255, 255, 0.5) !important;
                 opacity: 1 !important;
                 visibility: visible !important;
-                
+
                 &.is-active {
                     background-color: rgba(255, 255, 255, 1) !important;
                 }
@@ -1293,7 +1293,7 @@
     margin-left: auto;
     margin-right: auto;
     position: relative;
-    
+
     video {
         width: 100%;
         max-width: 1000px; // Уменьшили размер блока
@@ -1303,7 +1303,7 @@
         border-radius: 10px;
         display: block;
     }
-    
+
     // Исправляем размер кнопки play
     .home-about-play {
         .button {
@@ -1332,7 +1332,7 @@
         height: 32px;
         font-size: 10px;
     }
-    
+
     .product-page-video {
         margin-bottom: 30px;
         margin-left: -15px;
@@ -1341,73 +1341,73 @@
         overflow: hidden;
         justify-content: center;
         display: flex;
-        
+
         video {
             max-width: 90%;
             height: 250px;
             width: 100%;
             object-fit: cover;
-            
+
             // Скрываем стандартные элементы управления HTML5 видео на мобильных
             &::-webkit-media-controls {
                 display: none !important;
             }
-            
+
             &::-webkit-media-controls-enclosure {
                 display: none !important;
             }
-            
+
             &::-webkit-media-controls-panel {
                 display: none !important;
             }
-            
+
             &::-webkit-media-controls-play-button {
                 display: none !important;
             }
-            
+
             &::-webkit-media-controls-start-playback-button {
                 display: none !important;
             }
-            
+
             &::-moz-media-controls {
                 display: none !important;
             }
-            
+
             &::media-controls {
                 display: none !important;
             }
         }
     }
-    
+
     // На десктопе показываем controls когда они включены
     @media (min-width: 768px) {
         .product-page-video video.product-video-player[controls] {
             &::-webkit-media-controls {
                 display: flex !important;
             }
-            
+
             &::-webkit-media-controls-enclosure {
                 display: flex !important;
             }
-            
+
             &::-webkit-media-controls-panel {
                 display: flex !important;
             }
-            
+
             &::-webkit-media-controls-play-button {
                 display: inline-block !important;
             }
-            
+
             &::-moz-media-controls {
                 display: block !important;
             }
-            
+
             &::media-controls {
                 display: block !important;
             }
         }
     }
-    
+
     // Модальное окно с видео и попапом товара для мобильных
     // На десктопе полностью скрываем все элементы модального окна
     @media (min-width: 768px) {
@@ -1449,7 +1449,7 @@
             border: none !important;
         }
     }
-    
+
     // Стили для мобильных устройств
     @media (max-width: 767px) {
         #product-video-modal.product-video-modal {
@@ -1463,14 +1463,14 @@
             opacity: 0;
             transition: opacity 0.3s ease;
             visibility: hidden;
-            
+
             &.active {
                 display: block !important;
                 opacity: 1 !important;
                 visibility: visible !important;
                 pointer-events: auto !important;
             }
-            
+
             .product-video-modal-overlay {
                 position: absolute;
                 top: 0;
@@ -1482,7 +1482,7 @@
                 pointer-events: auto !important;
                 cursor: pointer;
             }
-            
+
             .product-video-modal-container {
                 position: relative;
                 width: 100%;
@@ -1491,7 +1491,7 @@
                 flex-direction: column;
                 z-index: 10 !important;
             }
-            
+
             .product-video-modal-video {
                 position: relative;
                 width: 100%;
@@ -1505,7 +1505,7 @@
                 justify-content: center;
                 padding: 20px;
                 box-sizing: border-box;
-                
+
                 // Создаем отдельный слой для кнопки закрытия, который будет выше iframe
                 &::after {
                     content: '';
@@ -1517,7 +1517,7 @@
                     z-index: 1000;
                     pointer-events: none; // Пропускаем клики, но создаем контекст
                 }
-                
+
                 // Прозрачный overlay поверх всего видео для блокировки кликов на iframe
                 // Но пропускает клики на кнопку закрытия и стрелки слайдера
                 &::after {
@@ -1531,7 +1531,7 @@
                     pointer-events: none;
                     background: transparent;
                 }
-                
+
                 // Блокируем overlay когда кнопка закрытия активна или когда класс blocking-iframe установлен
                 &:has(.product-video-modal-close:hover)::after,
                 &:has(.product-video-modal-close:active)::after,
@@ -1539,7 +1539,7 @@
                     pointer-events: auto;
                     z-index: 9998;
                 }
-                
+
                 // Кнопка закрытия должна быть выше всех элементов, включая кнопки слайдера
                 .product-video-modal-close {
                     position: absolute !important;
@@ -1549,31 +1549,31 @@
                     transform: translateZ(0);
                     will-change: transform;
                 }
-                
+
                 .splide__arrow {
                     position: absolute !important;
                     z-index: 1000 !important;
                     transform: translateY(-50%) translateZ(0) !important;
                     will-change: transform;
                 }
-                
+
                 // Слайдер YouTube видео в модальном окне
                 #product-video-modal-slider {
                     width: 100%;
                     height: 100%;
                     position: relative;
                     z-index: 1 !important; // Ниже кнопки закрытия
-                    
+
                     .splide__track {
                         height: 100%;
                         z-index: 1 !important;
                     }
-                    
+
                     .splide__list {
                         height: 100%;
                         z-index: 1 !important;
                     }
-                    
+
                     // Стрелки слайдера в модальном окне - делаем их видимыми и правильно позиционируем
                     .splide__arrows {
                         position: absolute !important;
@@ -1588,7 +1588,7 @@
                         opacity: 1 !important;
                         pointer-events: none !important;
                         margin: 0 !important;
-                        
+
                         .splide__arrow {
                             position: absolute !important;
                             top: 50% !important;
@@ -1604,13 +1604,13 @@
                             visibility: visible !important;
                             pointer-events: auto !important;
                             backdrop-filter: blur(5px);
-                            
+
                             // Блокируем взаимодействие с iframe при наведении на кнопку
                             &:hover,
                             &:active,
                             &:focus {
                                 z-index: 10000 !important;
-                                
+
                                 // Блокируем все iframe в слайдере при взаимодействии с кнопкой
                                 ~ * iframe,
                                 + * iframe,
@@ -1619,7 +1619,7 @@
                                     pointer-events: none !important;
                                 }
                             }
-                            
+
                             // Блокируем iframe при клике на кнопку
                             &::before {
                                 content: '';
@@ -1631,28 +1631,28 @@
                                 z-index: 9999;
                                 pointer-events: auto;
                             }
-                            
+
                             svg {
                                 fill: #fff !important;
                             }
-                            
+
                             &.splide__arrow--prev {
                                 left: 10px !important;
                                 right: auto !important;
                             }
-                            
+
                             &.splide__arrow--next {
                                 right: 10px !important;
                                 left: auto !important;
                             }
-                            
+
                             &:hover {
                                 background-color: rgba(0, 0, 0, 0.7) !important;
                                 border-color: rgba(255, 255, 255, 0.5) !important;
                             }
                         }
                     }
-                    
+
                     // Пагинация слайдера
                     .splide__pagination {
                         display: flex !important;
@@ -1660,29 +1660,29 @@
                         opacity: 1 !important;
                         bottom: 10px !important;
                         z-index: 1000 !important;
-                        
+
                         .splide__pagination__page {
                             width: 8px !important;
                             height: 8px !important;
                             background-color: rgba(255, 255, 255, 0.5) !important;
                             opacity: 1 !important;
                             visibility: visible !important;
-                            
+
                             &.is-active {
                                 background-color: rgba(255, 255, 255, 1) !important;
                             }
                         }
                     }
-                    
+
                     .product-video-modal-slide {
                         height: 100%;
-                        
+
                         .product-video-youtube-iframe-container {
                             position: relative;
                             width: 100%;
                             height: 100%;
                             padding-bottom: 0; // Убираем padding, используем высоту контейнера
-                            
+
                             // Индикатор загрузки
                             .product-video-loading-spinner {
                                 position: absolute;
@@ -1697,12 +1697,12 @@
                                 background-color: rgba(0, 0, 0, 0.8);
                                 z-index: 10;
                                 transition: opacity 0.3s ease;
-                                
+
                                 &.hidden {
                                     opacity: 0;
                                     pointer-events: none;
                                 }
-                                
+
                                 .spinner {
                                     width: 50px;
                                     height: 50px;
@@ -1712,20 +1712,20 @@
                                     animation: spin 1s linear infinite;
                                     margin-bottom: 15px;
                                 }
-                                
+
                                 p {
                                     color: #ffffff;
                                     font-size: 14px;
                                     margin: 0;
                                 }
                             }
-                            
+
                             @keyframes spin {
                                 to {
                                     transform: rotate(360deg);
                                 }
                             }
-                            
+
                             .product-video-youtube-iframe {
                                 position: absolute;
                                 top: 0;
@@ -1738,7 +1738,7 @@
                             }
                         }
                     }
-                    
+
                     // Блокируем iframe когда пользователь взаимодействует с кнопками навигации
                     .splide__arrows:hover ~ * .product-video-youtube-iframe,
                     .splide__arrows:active ~ * .product-video-youtube-iframe,
@@ -1746,13 +1746,13 @@
                     .splide__arrow:active ~ * .product-video-youtube-iframe {
                         pointer-events: none !important;
                     }
-                    
+
                     // Блокируем pointer-events для iframe, когда пользователь взаимодействует с кнопками
                     &:has(.splide__arrow:hover) .product-video-youtube-iframe {
                         pointer-events: none !important;
                     }
                 }
-                
+
                 .product-video-modal-close {
                     position: absolute !important;
                     top: 60px !important;
@@ -1774,7 +1774,7 @@
                     // Создаем новый stacking context
                     transform: translateZ(0);
                     will-change: transform;
-                    
+
                     // Блокируем iframe при взаимодействии с кнопкой закрытия
                     &:hover,
                     &:active,
@@ -1783,13 +1783,13 @@
                         background-color: rgba(0, 0, 0, 0.9) !important;
                         border-color: rgba(255, 255, 255, 0.8) !important;
                     }
-                    
+
                     &:hover {
                         background-color: rgba(0, 0, 0, 0.9) !important;
                         border-color: rgba(255, 255, 255, 0.8) !important;
                     }
                 }
-                
+
                 // Блокируем все iframe когда кнопка закрытия активна
                 &:has(.product-video-modal-close:hover) .product-video-youtube-iframe,
                 &:has(.product-video-modal-close:active) .product-video-youtube-iframe,
@@ -1797,14 +1797,14 @@
                     pointer-events: none !important;
                     z-index: 1 !important;
                 }
-                
+
                 &:has(.product-video-modal-close:hover) .product-video-youtube-iframe-container::before,
                 &:has(.product-video-modal-close:active) .product-video-youtube-iframe-container::before,
                 &:has(.product-video-modal-close:focus) .product-video-youtube-iframe-container::before {
                     pointer-events: auto !important;
                     z-index: 9999 !important;
                 }
-                
+
                 .product-video-modal-player {
                     width: 100%;
                     height: 100%;
@@ -1812,7 +1812,7 @@
                     border-radius: 10px;
                 }
             }
-            
+
             .product-video-modal-sidebar {
                 width: 100%;
                 background-color: #1a1a1a;
@@ -1822,15 +1822,15 @@
                 transform: translateY(100%);
                 transition: transform 0.4s ease;
             }
-            
+
             &.active .product-video-modal-sidebar {
                 transform: translateY(0);
             }
-            
+
             .product-video-modal-content {
                 padding: 20px;
                 color: #ffffff;
-                
+
                 .product-video-modal-title {
                     font-size: 18px;
                     font-weight: 700;
@@ -1838,18 +1838,18 @@
                     color: #ffffff;
                     line-height: 1.3;
                 }
-                
+
                 .product-video-modal-price {
                     font-size: 24px;
                     font-weight: 700;
                     margin-bottom: 15px;
                     color: $mod-main-color;
-                    
+
                     .only-price {
                         color: $mod-main-color;
                     }
                 }
-                
+
                 .product-video-modal-description {
                     font-size: 14px;
                     line-height: 1.6;
@@ -1858,17 +1858,17 @@
                     max-height: 150px;
                     overflow-y: auto;
                 }
-                
+
                 .product-video-modal-actions {
                     display: flex;
                     flex-direction: column;
                     gap: 18px;
-                    
+
                     // Фолбек: если где-то перебивается flex/gap — все равно делаем отступ между кнопками
                     > * + * {
                         margin-top: 18px !important;
                     }
-                    
+
                     .product-video-modal-back {
                         width: 100%;
                         padding: 15px 20px;
@@ -1880,18 +1880,18 @@
                         text-transform: uppercase;
                         cursor: pointer;
                         transition: all 0.3s ease;
-                        
+
                         &:hover {
                             background-color: rgba(128, 128, 128, 0.4);
                             border-color: rgba(128, 128, 128, 0.6);
                             color: #ffffff;
                         }
-                        
+
                         i {
                             margin-right: 8px; // Стрелка перед текстом "Назад"
                         }
                     }
-                    
+
                     .product-video-modal-cart {
                         width: 100%;
                         padding: 15px 20px;
@@ -1903,12 +1903,12 @@
                         text-transform: uppercase;
                         cursor: pointer;
                         transition: all 0.3s ease;
-                        
+
                         &:hover {
                             background-color: darken($mod-main-color, 10%);
                             border-color: darken($mod-main-color, 10%);
                         }
-                        
+
                         i {
                             margin-right: 8px;
                         }
@@ -1916,7 +1916,7 @@
                 }
             }
         }
-        
+
         body.modal-open {
             overflow: hidden;
         }
@@ -1985,7 +1985,7 @@
         height: 100% !important;
         z-index: 9999 !important;
     }
-    
+
     // Более специфичные правила для элементов внутри модального окна
     #product-video-modal.product-video-modal.active .product-video-modal-overlay,
     #product-video-modal.product-video-modal.active .product-video-modal-container,
@@ -2019,7 +2019,7 @@
     opacity: 0;
     transition: opacity 0.3s ease;
     visibility: hidden;
-    
+
     &.active {
         display: flex;
         opacity: 1;
@@ -2027,7 +2027,7 @@
         align-items: center;
         justify-content: center;
     }
-    
+
     .product-video-modal-desktop-overlay {
         position: absolute;
         top: 0;
@@ -2036,13 +2036,13 @@
         height: 100%;
         background-color: rgba(0, 0, 0, 0.9);
     }
-    
+
     .product-video-modal-desktop-container {
         position: relative;
         width: 90%;
         max-width: 1200px;
         z-index: 10;
-        
+
         .product-video-modal-desktop-close {
             position: absolute;
             top: -50px;
@@ -2060,13 +2060,13 @@
             justify-content: center;
             z-index: 11;
             transition: all 0.3s ease;
-            
+
             &:hover {
                 background-color: rgba(255, 255, 255, 0.3);
                 border-color: rgba(255, 255, 255, 0.5);
             }
         }
-        
+
         // Контейнер для YouTube iframe
         .product-video-youtube-iframe-container {
             position: relative;
@@ -2076,7 +2076,7 @@
             overflow: hidden;
             border-radius: 10px;
             background-color: #000;
-            
+
             .product-video-youtube-iframe {
                 position: absolute;
                 top: 0;
@@ -2086,7 +2086,7 @@
                 border: none;
             }
         }
-        
+
         .product-video-modal-desktop-player {
             width: 100%;
             height: auto;
@@ -2228,7 +2228,7 @@
 .product-page-video-slider#product-video-slider,
 #product-video-slider.product-page-video-slider {
     position: relative;
-    
+
     .splide__arrows {
         position: absolute !important;
         top: 0 !important;
@@ -2239,7 +2239,7 @@
         height: 100% !important;
         pointer-events: none !important;
         margin: 0 !important;
-        
+
         .splide__arrow,
         button.splide__arrow {
             position: absolute !important;
@@ -2249,12 +2249,12 @@
             z-index: 1000 !important;
             pointer-events: auto !important;
             margin: 0 !important;
-            
+
             &.splide__arrow--prev {
                 left: 10px !important;
                 right: auto !important;
             }
-            
+
             &.splide__arrow--next {
                 right: 10px !important;
                 left: auto !important;
@@ -2298,12 +2298,12 @@
     transform: translateY(-50%) !important;
     z-index: 1000 !important;
     pointer-events: auto !important;
-    
+
     &.splide__arrow--prev {
         left: 10px !important;
         right: auto !important;
     }
-    
+
     &.splide__arrow--next {
         right: 10px !important;
         left: auto !important;
@@ -2411,4 +2411,252 @@ button.splide__arrow.splide__arrow--prev,
 #product-video-modal-slider .splide__arrow.splide__arrow--prev {
     z-index: 1000 !important;
     pointer-events: auto !important;
+}
+
+/* Product details: tint visual helper block (before similar products) */
+.product-range {
+    margin: 24px auto 36px;
+}
+
+.product-range__inner {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: none !important;
+    border-radius: 10px;
+    padding: 22px;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 24px;
+    align-items: center;
+}
+
+.box-left-image-right-text__img.tonirovka-fon {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    background-image: url('https://south.art/wp-content/themes/southart-new-theme/images/tonirovka-fon.png');
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    background-position: 49% 50%;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.60);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to bottom,
+            $mod-card-bg 0%,
+            rgba(0, 0, 0, 0) 24px,
+            rgba(0, 0, 0, 0) calc(100% - 24px),
+            $mod-card-bg 100%
+        );
+        pointer-events: none;
+        z-index: 3;
+    }
+}
+
+.tonirovka-back {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: var(--tonirovka-opacity, 0.39);
+    transition: opacity 0.18s linear;
+    pointer-events: none;
+    z-index: 2;
+    mix-blend-mode: normal;
+    filter: none;
+}
+
+.product-range__title {
+    margin: 0 0 8px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.product-range__subtitle {
+    margin: 0 0 14px;
+    color: $mod-claim-text;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.product-range__card {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 14px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.product-range__film-name {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.product-range__metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.product-range__metric-value {
+    display: block;
+    color: $mod-main-color;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.product-range__metric-label {
+    display: block;
+    margin-top: 3px;
+    color: $mod-claim-text;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.product-range__slider-wrap {
+    margin-top: 8px;
+}
+
+.product-range__labels {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.product-range__label {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: $mod-claim-text;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &.is-active {
+        color: $mod-main-color;
+    }
+}
+
+.product-range__slider {
+    position: relative;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.product-range__slider-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    border-radius: inherit;
+    background: $mod-main-color;
+}
+
+.product-range__points {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+}
+
+.product-range__point {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.52);
+    transform: translateY(0);
+    transition: all 0.2s ease;
+
+    &.is-active {
+        background: $mod-main-color;
+        border-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 0 0 4px rgba(255, 206, 28, 0.22);
+        transform: scale(1.08);
+    }
+}
+
+.product-range__slider-input {
+    position: absolute;
+    inset: -8px 0 -8px 0;
+    width: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.product-range__hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: $mod-claim-text;
+    text-align: center;
+}
+
+@media screen and (max-width: 1023px) {
+    .product-range__inner {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .product-range {
+        margin: 18px auto 28px;
+    }
+
+    .product-range__inner {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .box-left-image-right-text__img.tonirovka-fon {
+        min-height: 220px;
+        background-size: 190% auto;
+        background-position: 32% 52%;
+    }
+
+    .product-range__title {
+        font-size: 18px;
+    }
+
+    .product-range__film-name {
+        font-size: 18px;
+    }
+
+    .product-range__metric-value {
+        font-size: 18px;
+    }
+
+    .product-range__label {
+        font-size: 12px;
+    }
+
+    .product-range__point {
+        width: 10px;
+        height: 10px;
+    }
 }

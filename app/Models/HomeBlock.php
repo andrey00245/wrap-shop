@@ -66,4 +66,15 @@ class HomeBlock extends Model
             default => HomeBlockLayout::LeftBig,
         };
     }
+
+    public function getTitleForNovaAttribute(): string
+    {
+        $title = $this->getTranslation('title', 'uk')
+            ?: $this->getTranslation('title', app()->getLocale())
+            ?: '';
+
+        $title = trim(strip_tags((string) $title));
+
+        return $title !== '' ? $title : '#'.$this->id;
+    }
 }

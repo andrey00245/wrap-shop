@@ -3,6 +3,7 @@
 use App\Http\Middleware\RedirectCanonicalWithoutIndexPhp;
 use App\Http\Middleware\RedirectIfNotAuthenticated;
 use App\Http\Middleware\RedirectMiddleware;
+use App\Http\Middleware\RedirectStripTrailingSlash;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,9 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Редиректи з БД — у глобальному стеку: інакше при «немає маршруту» (404) група web не виконується
+        // і RedirectMiddleware взагалі не викликається (наприклад, коли ->where('path', ...) не збігається з URI).
+        $middleware->prepend(RedirectMiddleware::class);
+
         $middleware->api(prepend: [
-            // Редиректы должны отрабатывать до остальных обработчиков
-            RedirectMiddleware::class,
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Illuminate\Session\Middleware\StartSession::class,
@@ -25,8 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->web(prepend: [
             RedirectCanonicalWithoutIndexPhp::class,
-            // Редиректы должны отрабатывать до остальных обработчиков
-            RedirectMiddleware::class,
+            RedirectStripTrailingSlash::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \App\Http\Middleware\CartMiddleware::class,
             //            \App\Http\Middleware\RedirectIfNotAuthenticated::class,

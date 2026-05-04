@@ -47,7 +47,7 @@ class Banner extends Model implements HasMedia
         /** Вебп для головного слайдера (~розмір у верстці) — менший за preview_webp, краще для LCP */
         $this
             ->addMediaConversion('hero')
-            ->fit(Fit::Crop, 1312, 450)
+            ->fit(Fit::Crop, 1325, 450)
             ->format('webp')
             ->quality(82)
             ->nonQueued();
@@ -68,12 +68,12 @@ class Banner extends Model implements HasMedia
         $media = $this->getFirstMedia('main');
 
         if ($media) {
-            if ($media->hasGeneratedConversion('preview_webp')) {
-                return $media->getUrl('preview_webp');
+            if ($url = $this->getExistingConversionUrl($media, 'preview_webp')) {
+                return $url;
             }
 
-            if ($media->hasGeneratedConversion('preview')) {
-                return $media->getUrl('preview');
+            if ($url = $this->getExistingConversionUrl($media, 'preview')) {
+                return $url;
             }
 
             // Если нет конверсий, возвращаем оригинальный URL
@@ -95,18 +95,31 @@ class Banner extends Model implements HasMedia
             return '';
         }
 
-        if ($media->hasGeneratedConversion('hero')) {
-            return $media->getUrl('hero');
+        if ($url = $this->getExistingConversionUrl($media, 'hero')) {
+            return $url;
         }
 
-        if ($media->hasGeneratedConversion('preview_webp')) {
-            return $media->getUrl('preview_webp');
+        if ($url = $this->getExistingConversionUrl($media, 'preview_webp')) {
+            return $url;
         }
 
-        if ($media->hasGeneratedConversion('preview')) {
-            return $media->getUrl('preview');
+        if ($url = $this->getExistingConversionUrl($media, 'preview')) {
+            return $url;
         }
 
         return $media->getUrl();
+    }
+
+    private function getExistingConversionUrl(Media $media, string $conversion): ?string
+    {
+        if (! $media->hasGeneratedConversion($conversion)) {
+            return null;
+        }
+
+        $path = $media->getPath($conversion);
+
+        return $path && is_file($path)
+            ? $media->getUrl($conversion)
+            : null;
     }
 }

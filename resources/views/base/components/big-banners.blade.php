@@ -2,8 +2,14 @@
     <div class="splide__track">
         <ul class="splide__list">
             @foreach($banners as $i => $banner)
+                @php
+                    $slideUrl = trim((string) ($banner->url ?? ''));
+                    $buttonText = trim((string) ($banner->button_text ?? ''));
+                    $buttonUrl = trim((string) ($banner->button_url ?? '')) ?: $slideUrl;
+                    $bannerLabel = trim((string) ($banner->nav_title ?? $banner->title ?? '')) ?: 'Банер ' . ($i + 1);
+                @endphp
                 <li class="splide__slide swiper-slide home-banner-item">
-                    <a href="{{ $banner->url }}">
+                    <div class="home-banner__media">
                         <img
                             @if ($i === 0)
                             fetchpriority="high"
@@ -12,22 +18,28 @@
                             loading="lazy"
                             decoding="async"
                             @endif
-                            src="{{ $banner->getPreviewImage() }}"
-                            width="1312"
+                            src="{{ $banner->getHeroImageUrl() }}"
+                            width="1325"
                             height="450"
-                            alt="{{ $banner->title ?? '#' }}"
-                            title="{{ $banner->title ?? '' }}">
-                    </a>
+                            alt="{{ $bannerLabel }}"
+                            title="{{ $bannerLabel }}">
+
+                        @if($slideUrl !== '')
+                            <a href="{{ $slideUrl }}" class="home-banner__full-link" aria-label="{{ $bannerLabel }}"></a>
+                        @endif
+
+                        @if($buttonText !== '' && $buttonUrl !== '')
+                            <a href="{{ $buttonUrl }}" class="home-banner__button">{{ $buttonText }}</a>
+                        @endif
+                    </div>
                 </li>
             @endforeach
         </ul>
     </div>
 
 
-    <div class="home-banner-bott flex-justify">
+    <div class="home-banner-bott">
         <ul class="splide__pagination"></ul>
-        <div class="splide__arrows home-slide-buttons">
-        </div>
     </div>
 
 </div>

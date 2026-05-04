@@ -79,6 +79,9 @@
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
+        ],
+        "serve:local": [
+            "@php -d upload_max_filesize=128M -d post_max_size=132M -d memory_limit=512M artisan serve --port=${LOCAL_PORT:-8002}"
         ]
     },
     "extra": {

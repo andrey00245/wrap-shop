@@ -3,7 +3,7 @@
 namespace App\Nova;
 
 use App\Nova\Fields\NovaTabTranslatable;
-use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
+use App\Nova\Fields\Images;
 use Illuminate\Http\Request;
 use Kongulov\NovaTabTranslatable\TranslatableTabToRowTrait;
 use Laravel\Nova\Fields\BelongsTo;

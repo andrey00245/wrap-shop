@@ -36,11 +36,18 @@
             </div>
         @endif
         @if($cartItemsCount > 0)
+            @php
+                $checkoutHasLongFilmRolls = collect($cartItems)->contains(function ($i) {
+                    $product = is_array($i) ? ($i['product'] ?? null) : $i->product;
+                    $qty = is_array($i) ? ($i['quantity'] ?? 0) : $i->quantity;
+                    return $product && $product->getRollSize() && (float) $qty >= 1;
+                });
+            @endphp
             <div class="simple-content">
                 <div id="simplecheckout_form_0">
-                    <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm" data-has-long-film="{{ collect($cartItems)->contains(function($i){ return $i['product']->getRollSize() && $i['quantity'] >= 1; }) ? '1' : '0' }}">
+                    <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm" data-has-long-film="{{ $checkoutHasLongFilmRolls ? '1' : '0' }}">
                         @csrf
-                        <for class="simplecheckout">
+                        <div class="simplecheckout">
                             <div class="simplecheckout-step" style="display: flex;">
                                 <div class="simplecheckout-left-column flex-justify">
                                     @guest
@@ -144,7 +151,7 @@
                                                                         <span class="radio-label">{{__('checkout.nova_poshta_branch')}}</span>
                                                                     </label>
                                                                 </div>
-                                                                <div class="radio" id="locker-radio" style="{{ collect($cartItems)->contains(function($i){ return $i['product']->getRollSize() && $i['quantity'] >= 1; }) ? 'display: none;' : '' }}">
+                                                                <div class="radio" id="locker-radio" style="{{ $checkoutHasLongFilmRolls ? 'display: none;' : '' }}">
                                                                     <label for="novaposhta_locker" class="custom-radio">
                                                                         <input type="radio" data-onchange="reloadAll"
                                                                                name="nova_poshta_type" value="locker"
@@ -225,13 +232,6 @@
                                                             @error('city')
                                                             <div class="error">{{ $message }}</div>
                                                             @enderror
-                                                            <div style="display:none;"
-                                                                 data-for="shipping_address_address_1"
-                                                                 data-for-type="text"
-                                                                 data-rule="notEmpty"
-                                                                 class="simplecheckout-error-text simplecheckout-rule"
-                                                                 data-not-empty="1" data-required="true">{{__('checkout.this_field_required')}}
-                                                            </div>
                                                         </div>
 
                                                         <!-- Поле для доставки по Киеву -->
@@ -266,7 +266,7 @@
                                                             <div class="error">{{ $message }}</div>
                                                             @enderror
                                                             <div style="display:none;"
-                                                                 data-for="shipping_address_address_1"
+                                                                 data-for="shipping_address"
                                                                  data-for-type="text"
                                                                  data-rule="notEmpty"
                                                                  class="simplecheckout-error-text simplecheckout-rule"
@@ -322,7 +322,7 @@
                                             <div class="input-fields-wrapper">
                                                 <p class="title"><span>03</span> {{__('checkout.payment')}}</p>
 
-                                                <div class="simplecheckout-block-content" id="simplecheckout_shipping"
+                                                <div class="simplecheckout-block-content" id="simplecheckout_payment"
                                                      style="overflow: visible;">
                                                     <div class="radio">
                                                         <label for="cash" class="custom-radio">
@@ -350,15 +350,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            @if ($errors->any())
-                                                <div class="alert alert-danger">
-                                                    <ul>
-                                                        @foreach ($errors->all() as $error)
-                                                            <li>{{ $error }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                            @endif
                                             <div class="input-group">
                                                 <label for="comment">{{__('checkout.want_leave_comment')}}</label>
                                                 <input name="comment" id="comment" placeholder="{{__('checkout.comment')}}"
@@ -411,7 +402,7 @@
                                                             <a
                                                                 href="{{route('products.show', ['product' => $item['product']->slugEn])}}"><img
                                                                     loading="lazy"
-                                                                    src="{{$item['product']->getMedia('images')[0]->getUrl('preview')}}"
+                                                                    src="{{ optional($item['product']->getMedia('images')->first())->getUrl('preview_webp') ?? asset('assets/img/no-image.png') }}"
                                                                     alt="{{$item['product']->name}}"
                                                                     title="{{$item['product']->name}}"
                                                                     class="img-thumbnail"></a>
@@ -491,7 +482,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </for>
+                        </div>
                     </form>
                 </div>
             </div>

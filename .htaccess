@@ -1,0 +1,12 @@
+# Якщо Document Root у хостингу = корінь проєкту (де лежить artisan), а не папка public/,
+# усі запити треба направити в public/ — інакше читається ЦЕЙ файл, а public/.htaccess не працює.
+# Найкраще: у панелі встановіть Document Root на .../public — тоді цей файл можна ігнорувати.
+
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

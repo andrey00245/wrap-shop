@@ -1,4 +1,5 @@
 <?php
+
 return [
     'show_products' => [
         'one' => 'Show <b class="ocf-btn-label">:count</b> product',
@@ -28,5 +29,10 @@ return [
     'in_wishlist' => 'In wishlist',
     'lin_m_and_more' => ':count lin. m. and more',
     'show_next' => 'Show next',
-    'in_stock' => 'In stock only'
+    'in_stock' => 'In stock only',
+    'catalog_breadcrumb' => 'Catalog',
+    'catalog_h1' => 'Catalog',
+    'catalog_meta_title' => 'Product catalog | Wrap.Shop',
+    'catalog_meta_description' => 'Full Wrap.Shop range: films, tools, accessories. Delivery across Ukraine.',
+    'catalog_keywords' => 'catalog, Wrap.Shop store, car films, detailing, Ukraine delivery',
 ];

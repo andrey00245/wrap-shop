@@ -1,0 +1,452 @@
+[
+    {
+        "id": 168,
+        "name_uk": "Плівки",
+        "parent_id": null,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Автомобільні плівки, тонування, вініл"
+    },
+    {
+        "id": 169,
+        "name_uk": "Декоративні вінілові плівки",
+        "parent_id": 168,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Автомобільні плівки, тонування, вініл"
+    },
+    {
+        "id": 170,
+        "name_uk": "Матеріали для детейлінгу авто",
+        "parent_id": null,
+        "google_category_id": "499977",
+        "google_category_name": "Vehicles & Parts > Vehicle Care & Detailing",
+        "comment": "Догляд за авто, детейлінг"
+    },
+    {
+        "id": 171,
+        "name_uk": "Салон",
+        "parent_id": 170,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 172,
+        "name_uk": "Засоби для шкіри",
+        "parent_id": 171,
+        "google_category_id": "499977",
+        "google_category_name": "Vehicles & Parts > Vehicle Care & Detailing",
+        "comment": "Догляд за авто, детейлінг"
+    },
+    {
+        "id": 173,
+        "name_uk": "Тюнінг",
+        "parent_id": null,
+        "google_category_id": "2743",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts > Vehicle Exterior Accessories",
+        "comment": "Тюнінг та зовнішній вигляд авто"
+    },
+    {
+        "id": 174,
+        "name_uk": "Авто обвіси",
+        "parent_id": 173,
+        "google_category_id": "2743",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts > Vehicle Exterior Accessories",
+        "comment": "Тюнінг та зовнішній вигляд авто"
+    },
+    {
+        "id": 175,
+        "name_uk": "Плівки для автомобільних вікон",
+        "parent_id": 168,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Автомобільні плівки, тонування, вініл"
+    },
+    {
+        "id": 176,
+        "name_uk": "Тонувальна плівка",
+        "parent_id": 175,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Автомобільні плівки, тонування, вініл"
+    },
+    {
+        "id": 177,
+        "name_uk": "Інструменти / розхідники",
+        "parent_id": null,
+        "google_category_id": "3780",
+        "google_category_name": "Hardware > Tools",
+        "comment": "Інструменти та допоміжні матеріали"
+    },
+    {
+        "id": 178,
+        "name_uk": "Ракеля / Вигонки",
+        "parent_id": 177,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 179,
+        "name_uk": "Захисні покриття",
+        "parent_id": 170,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 180,
+        "name_uk": "Для кузову авто",
+        "parent_id": 179,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 181,
+        "name_uk": "Захисні антигравійні плівки",
+        "parent_id": 168,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Автомобільні плівки, тонування, вініл"
+    },
+    {
+        "id": 182,
+        "name_uk": "Merch",
+        "parent_id": null,
+        "google_category_id": "1604",
+        "google_category_name": "Apparel & Accessories > Clothing",
+        "comment": "Одяг, мерч, аксесуари"
+    },
+    {
+        "id": 183,
+        "name_uk": "Одяг",
+        "parent_id": 182,
+        "google_category_id": "1604",
+        "google_category_name": "Apparel & Accessories > Clothing",
+        "comment": "Одяг, мерч, аксесуари"
+    },
+    {
+        "id": 184,
+        "name_uk": "Для тканини",
+        "parent_id": 179,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 185,
+        "name_uk": "Диски",
+        "parent_id": 173,
+        "google_category_id": "2743",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts > Vehicle Exterior Accessories",
+        "comment": "Тюнінг та зовнішній вигляд авто"
+    },
+    {
+        "id": 186,
+        "name_uk": "Зовнішній вигляд авто",
+        "parent_id": 170,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 187,
+        "name_uk": "Очисники",
+        "parent_id": 186,
+        "google_category_id": "499977",
+        "google_category_name": "Vehicles & Parts > Vehicle Care & Detailing",
+        "comment": "Догляд за авто, детейлінг"
+    },
+    {
+        "id": 188,
+        "name_uk": "Полірування",
+        "parent_id": 170,
+        "google_category_id": "499977",
+        "google_category_name": "Vehicles & Parts > Vehicle Care & Detailing",
+        "comment": "Догляд за авто, детейлінг"
+    },
+    {
+        "id": 189,
+        "name_uk": "Круги",
+        "parent_id": 188,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 190,
+        "name_uk": "Спойлери",
+        "parent_id": 173,
+        "google_category_id": "2743",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts > Vehicle Exterior Accessories",
+        "comment": "Тюнінг та зовнішній вигляд авто"
+    },
+    {
+        "id": 191,
+        "name_uk": "Пасти",
+        "parent_id": 188,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 192,
+        "name_uk": "Леза та ножі",
+        "parent_id": 177,
+        "google_category_id": "3780",
+        "google_category_name": "Hardware > Tools",
+        "comment": "Інструменти та допоміжні матеріали"
+    },
+    {
+        "id": 193,
+        "name_uk": "Матеріали для шумоізоляції авто",
+        "parent_id": null,
+        "google_category_id": "2740",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts > Vehicle Noise Control Components",
+        "comment": "Шумо- та віброізоляція авто"
+    },
+    {
+        "id": 194,
+        "name_uk": "Шумо ізоляція",
+        "parent_id": 193,
+        "google_category_id": "2740",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts > Vehicle Noise Control Components",
+        "comment": "Шумо- та віброізоляція авто"
+    },
+    {
+        "id": 195,
+        "name_uk": "Аксесуари",
+        "parent_id": 170,
+        "google_category_id": "3680",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories > Vehicle Accessories",
+        "comment": "Автоаксесуари та допоміжні товари"
+    },
+    {
+        "id": 196,
+        "name_uk": "Щітки",
+        "parent_id": 195,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 197,
+        "name_uk": "Освітлювальні прилади",
+        "parent_id": 177,
+        "google_category_id": "3780",
+        "google_category_name": "Hardware > Tools",
+        "comment": "Інструменти та допоміжні матеріали"
+    },
+    {
+        "id": 198,
+        "name_uk": "Для гуми",
+        "parent_id": 179,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 199,
+        "name_uk": "Розпилювачі",
+        "parent_id": 177,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 200,
+        "name_uk": "Кольорові захисні антигравійні плівки",
+        "parent_id": 168,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Автомобільні плівки, тонування, вініл"
+    },
+    {
+        "id": 201,
+        "name_uk": "Гель для оклейки плівки",
+        "parent_id": 177,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Автомобільні плівки, тонування, вініл"
+    },
+    {
+        "id": 202,
+        "name_uk": "Антивандальна плівка",
+        "parent_id": 175,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Автомобільні плівки, тонування, вініл"
+    },
+    {
+        "id": 203,
+        "name_uk": "Мікрофібри",
+        "parent_id": 195,
+        "google_category_id": "3680",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories > Vehicle Accessories",
+        "comment": "Автоаксесуари та допоміжні товари"
+    },
+    {
+        "id": 204,
+        "name_uk": "Шампунь та піна для мийки",
+        "parent_id": 186,
+        "google_category_id": "499977",
+        "google_category_name": "Vehicles & Parts > Vehicle Care & Detailing",
+        "comment": "Догляд за авто, детейлінг"
+    },
+    {
+        "id": 205,
+        "name_uk": "Професійні електроприлади",
+        "parent_id": 177,
+        "google_category_id": "3780",
+        "google_category_name": "Hardware > Tools",
+        "comment": "Інструменти та допоміжні матеріали"
+    },
+    {
+        "id": 206,
+        "name_uk": "Вібро ізоляція",
+        "parent_id": 193,
+        "google_category_id": "2740",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts > Vehicle Noise Control Components",
+        "comment": "Шумо- та віброізоляція авто"
+    },
+    {
+        "id": 207,
+        "name_uk": "Скотч",
+        "parent_id": 177,
+        "google_category_id": "3780",
+        "google_category_name": "Hardware > Tools",
+        "comment": "Інструменти та допоміжні матеріали"
+    },
+    {
+        "id": 208,
+        "name_uk": "Для дисків",
+        "parent_id": 179,
+        "google_category_id": "2743",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts > Vehicle Exterior Accessories",
+        "comment": "Тюнінг та зовнішній вигляд авто"
+    },
+    {
+        "id": 209,
+        "name_uk": "Знежирювачі",
+        "parent_id": 186,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 210,
+        "name_uk": "Рукавички та сумки",
+        "parent_id": 177,
+        "google_category_id": "1604",
+        "google_category_name": "Apparel & Accessories > Clothing",
+        "comment": "Одяг, мерч, аксесуари"
+    },
+    {
+        "id": 211,
+        "name_uk": "Хімчистка салона",
+        "parent_id": 171,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 212,
+        "name_uk": "Засоби для пластику",
+        "parent_id": 171,
+        "google_category_id": "499977",
+        "google_category_name": "Vehicles & Parts > Vehicle Care & Detailing",
+        "comment": "Догляд за авто, детейлінг"
+    },
+    {
+        "id": 215,
+        "name_uk": "Для скла",
+        "parent_id": 179,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 216,
+        "name_uk": "Аплікатори",
+        "parent_id": 195,
+        "google_category_id": "3680",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories > Vehicle Accessories",
+        "comment": "Автоаксесуари та допоміжні товари"
+    },
+    {
+        "id": 217,
+        "name_uk": "Готові дизайни та плівка для друку",
+        "parent_id": 168,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Автомобільні плівки, тонування, вініл"
+    },
+    {
+        "id": 218,
+        "name_uk": "Матеріали для друку",
+        "parent_id": 217,
+        "google_category_id": "2839",
+        "google_category_name": "Office Supplies > Printing Supplies",
+        "comment": "Матеріали для друку, плівки для дизайну"
+    },
+    {
+        "id": 219,
+        "name_uk": "Для пластику",
+        "parent_id": 179,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 220,
+        "name_uk": "Антибітум та мошка",
+        "parent_id": 186,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 221,
+        "name_uk": "Шумопоглинаючі матеріали",
+        "parent_id": 193,
+        "google_category_id": "2740",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts > Vehicle Noise Control Components",
+        "comment": "Шумо- та віброізоляція авто"
+    },
+    {
+        "id": 222,
+        "name_uk": "Багатошарові матеріали",
+        "parent_id": 193,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 223,
+        "name_uk": "Антистатичні серветки",
+        "parent_id": 177,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Загальна категорія авто товарів"
+    },
+    {
+        "id": 224,
+        "name_uk": "Антискрип",
+        "parent_id": 193,
+        "google_category_id": "2740",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts > Vehicle Noise Control Components",
+        "comment": "Шумо- та віброізоляція авто"
+    },
+    {
+        "id": 228,
+        "name_uk": "Антигравійна плівка для скла",
+        "parent_id": 175,
+        "google_category_id": "3679",
+        "google_category_name": "Vehicles & Parts > Vehicle Parts & Accessories",
+        "comment": "Автомобільні плівки, тонування, вініл"
+    }
+]
+
+

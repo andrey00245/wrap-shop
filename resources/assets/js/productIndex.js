@@ -48,20 +48,28 @@ $(document).ready(function () {
         const sortOpenBtn = $('.category-sort-open')
         const sortCloseBtn = $('.category-right-top .category-sort-close')
 
-        filterOpenBtn[0].onclick = () => {
-            filterContainer.addClass('ocf-mobile-active')
+        if (filterOpenBtn.length && filterOpenBtn[0]) {
+            filterOpenBtn[0].onclick = () => {
+                filterContainer.addClass('ocf-mobile-active')
+            }
         }
 
-        sortOpenBtn[0].onclick = () => {
-            sortContainer.addClass('active')
+        if (sortOpenBtn.length && sortOpenBtn[0]) {
+            sortOpenBtn[0].onclick = () => {
+                sortContainer.addClass('active')
+            }
         }
 
-        filterCloseBtn[0].onclick = () => {
-            filterContainer.removeClass('ocf-mobile-active')
+        if (filterCloseBtn.length && filterCloseBtn[0]) {
+            filterCloseBtn[0].onclick = () => {
+                filterContainer.removeClass('ocf-mobile-active')
+            }
         }
 
-        sortCloseBtn[0].onclick = () => {
-            sortContainer.removeClass('active')
+        if (sortCloseBtn.length && sortCloseBtn[0]) {
+            sortCloseBtn[0].onclick = () => {
+                sortContainer.removeClass('active')
+            }
         }
     }
 
@@ -612,71 +620,116 @@ $(document).ready(function () {
 
     let loading = false;
     const productList = document.querySelector('.category-products');
-    const urlParams = new URLSearchParams(window.location.search);
-    let currentPage = parseInt(urlParams.get('page')) || 1;
-    let paginationItems = document.querySelector('.category-pagination .pagination');
-    currentPage += 1;
     const showMore = $('#ss_showmore');
+    const paginationHost = document.querySelector('.category-pagination');
 
-    window.addEventListener('scroll', () => {
-        if (loading) return;
+    if (productList && showMore.length) {
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentPage = parseInt(urlParams.get('page'), 10) || 1;
+        currentPage += 1;
 
-        showMore.show();
-        const rect = productList.getBoundingClientRect();
-        const isVisible = rect.bottom <= window.innerHeight + 1500;
+        let paginationItems = document.querySelector('.category-pagination .pagination');
 
-        if (isVisible) {
+        function ensurePaginationUl() {
+            if (paginationItems) {
+                return paginationItems;
+            }
+            if (!paginationHost) {
+                return null;
+            }
+            const ul = document.createElement('ul');
+            ul.className = 'flex-center pagination';
+            paginationHost.appendChild(ul);
+            paginationItems = ul;
+
+            return ul;
+        }
+
+        function onCategoryScrollForLoadMore() {
+            if (loading) {
+                return;
+            }
+
+            const rect = productList.getBoundingClientRect();
+            const isVisible = rect.bottom <= window.innerHeight + 1500;
+            if (!isVisible) {
+                return;
+            }
+
             loading = true;
+            showMore.show();
 
             const newParams = new URLSearchParams(window.location.search);
-            newParams.set('page', currentPage);
+            newParams.set('page', String(currentPage));
 
             fetch(window.location.pathname + '?' + newParams.toString(), {
+                cache: 'no-store',
+                credentials: 'same-origin',
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.html.trim().length === 0) {
-                        window.removeEventListener('scroll', this);
-                        document.getElementById('ss_showmore').style.display = 'none';
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('HTTP ' + response.status);
+                    }
+
+                    return response.json();
+                })
+                .then((data) => {
+                    const html = data && data.html != null ? String(data.html) : '';
+                    const lastPage = data && data.lastPage != null ? parseInt(data.lastPage, 10) : 1;
+
+                    if (!html.trim()) {
+                        window.removeEventListener('scroll', onCategoryScrollForLoadMore);
+                        const el = document.getElementById('ss_showmore');
+                        if (el) {
+                            el.style.display = 'none';
+                        }
+
                         return;
                     }
 
-                    productList.insertAdjacentHTML('beforeend', data.html);
+                    productList.insertAdjacentHTML('beforeend', html);
                     imageSliderInProduct('category-products-item');
-
                     currentPage++;
 
-                    paginationItems.innerHTML = '';
-                    getPagination(currentPage - 1, data.lastPage).forEach(function (el){
-                        newParams.set('page', String(el));
-                        const pageItem = document.createElement('li');
-                        let innerPage;
+                    const ul = ensurePaginationUl();
+                    if (ul) {
+                        ul.innerHTML = '';
+                        getPagination(currentPage - 1, lastPage).forEach(function (el) {
+                            newParams.set('page', String(el));
+                            const pageItem = document.createElement('li');
+                            let innerPage;
 
-                        if (el === currentPage - 1) {
-                            pageItem.className = 'active';
-                            innerPage = document.createElement('span');
-                            innerPage.innerText = String(el)
-                        } else {
-                            innerPage = document.createElement('a');
-                            innerPage.innerText = String(el)
-                            innerPage.setAttribute('href', window.location.pathname + '?' + newParams);
-                        }
-                        pageItem.appendChild(innerPage);
-                        paginationItems.appendChild(pageItem)
-                    })
+                            if (el === currentPage - 1) {
+                                pageItem.className = 'active';
+                                innerPage = document.createElement('span');
+                                innerPage.innerText = String(el);
+                            } else {
+                                innerPage = document.createElement('a');
+                                innerPage.innerText = String(el);
+                                innerPage.setAttribute('href', window.location.pathname + '?' + newParams.toString());
+                            }
+                            pageItem.appendChild(innerPage);
+                            ul.appendChild(pageItem);
+                        });
+                    }
 
+                    newParams.set('page', String(currentPage - 1));
+                    window.history.replaceState(null, '', window.location.pathname + '?' + newParams.toString());
+                })
+                .catch(() => {
+                    /* мережева / не-JSON відповідь — не лишаємо UI у стані «завантаження» */
+                })
+                .finally(() => {
                     loading = false;
-
-                    newParams.set('page', currentPage - 1);
-                    const newUrl = window.location.pathname + '?' + newParams.toString();
-                    window.history.replaceState(null, '', newUrl);
+                    showMore.hide();
                 });
         }
 
-    });
+        window.addEventListener('scroll', onCategoryScrollForLoadMore);
+    }
 
     document.addEventListener('click', function(e) {
         const link = e.target.closest('a');

@@ -48,12 +48,12 @@
                                                         <div class="hide"
                                                              data-src="{{$image->getUrl()}}"
                                                              data-fancybox="gallery{{$product->id}}"
-                                                             data-caption="{{$product->name}}"></div>
+                                                             data-caption="{{$product->getName()}}"></div>
                                                     @endif
                                                     <img loading="lazy"
-                                                         src="{{$image->getUrl('preview')}}"
-                                                         alt="{{$product->name}}"
-                                                         title="{{$product->name}}"
+                                                         src="{{$image->getUrl('preview_webp')}}"
+                                                         alt="{{$product->getName()}}"
+                                                         title="{{$product->getName()}}"
                                                          class="swiper-lazy swiper-lazy-loaded"
                                                          width="310" height="310">
                                                 </li>
@@ -66,7 +66,7 @@
                         <div class="product-default-texts-wrapper">
                             <div class="category">{{$product->category->name}}</div>
                             <a href="{{route('products.show', ['product'=>$product->slugEn])}}"
-                               title="{{$product->name}}" class="name">{{$product->name}}</a>
+                               title="{{$product->getName()}}" class="name">{{$product->getName()}}</a>
                             <div class="bottom flex-center">
                                 <div class="price">{{number_format($product->getPrice())}} ₴<span
                                         class="price-unit-xvr"></span></div>

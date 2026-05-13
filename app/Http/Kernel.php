@@ -9,6 +9,7 @@ class Kernel extends HttpKernel
 {
     /**
      * Массив глобальных middleware классов.
+     * У Laravel 11 глобальний стек зазвичай перезаписується з bootstrap/app.php (withMiddleware).
      *
      * @var array
      */
@@ -17,9 +18,8 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \Illuminate\Auth\Middleware\Authenticate::class,
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        CartMiddleware::class
+        CartMiddleware::class,
     ];
 
     /**
@@ -32,14 +32,12 @@ class Kernel extends HttpKernel
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \Illuminate\Auth\Middleware\Authenticate::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
         'api' => [
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\Auth\Middleware\Authenticate::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];

@@ -97,7 +97,7 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-  'google_map_key' => env('GOOGLE_MAP_KEY',''),
+    'google_map_key' => env('GOOGLE_MAP_KEY', ''),
 
     'key' => env('APP_KEY'),
 
@@ -126,7 +126,39 @@ return [
     ],
 
     'my_store' => [
-        'username' => env('MOY_SKLAD_USERNAME', 'default_username'),
-        'password' => env('MOY_SKLAD_PASSWORD', 'default_password'),
-    ]
+        'username' => env('MOY_SKLAD_USERNAME', ''),
+        'password' => env('MOY_SKLAD_PASSWORD', ''),
+        /** Bearer-токен JSON API (лише для тестового роута /moysklad/bearer-sync-one-product) */
+        'token' => env('MOY_SKLAD_TOKEN', ''),
+        /** ID товару в БД для тесту синку без product_id в URL (напр. MOY_SKLAD_BEARER_TEST_PRODUCT_ID=333) */
+        'bearer_test_product_id' => env('MOY_SKLAD_BEARER_TEST_PRODUCT_ID'),
+    ],
+
+    /** Query `token` для /moysklad/bearer-sync-one-product (можна окремо від cron) */
+    'moysklad_bearer_sync_secret' => env('MOY_SKLAD_BEARER_SYNC_SECRET', ''),
+
+    /** Розмір батчу для джоб синку цін/залишків (products:dispatch-price-sync-jobs) */
+    'schedule_price_sync_batch' => max(1, min(500, (int) env('SCHEDULE_PRICE_SYNC_BATCH', 100))),
+
+    /**
+     * Обмеження навантаження на JSON API МойСклад (ціни/залишки, синк category_id, інші GET remap).
+     *
+     * @see https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-ogranicheniq
+     */
+    'moysklad_remap' => [
+        'delay_ms_between_requests' => max(0, min(5000, (int) env('MOY_SKLAD_REMAP_DELAY_MS', 120))),
+        'timeout_seconds' => max(10, min(180, (int) env('MOY_SKLAD_REMAP_TIMEOUT', 90))),
+        'max_retries_429' => max(0, min(30, (int) env('MOY_SKLAD_429_MAX_RETRIES', 8))),
+        'retry_backoff_base_seconds' => max(1, min(60, (int) env('MOY_SKLAD_429_BACKOFF_BASE', 3))),
+    ],
+
+    /** Сторінка пошуку та превью: скільки hits забирати з Algolia за один запит (макс. 50) */
+    'algolia_search_max_hits' => max(1, min(50, (int) env('ALGOLIA_SEARCH_MAX_HITS', 50))),
+
+    /**
+     * Algolia typoTolerance для каталогу: strict (дефолт, менше «чужих» карток), min, true, false.
+     *
+     * @see https://www.algolia.com/doc/api-reference/api-parameters/typoTolerance/
+     */
+    'algolia_search_typo_tolerance' => env('ALGOLIA_SEARCH_TYPO_TOLERANCE', 'strict'),
 ];

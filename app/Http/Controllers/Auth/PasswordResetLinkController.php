@@ -3,24 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\ReportAvailability;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
-use Illuminate\View\View;
 
 class PasswordResetLinkController extends Controller
 {
     /**
-     * Display the password reset link request view.
+     * Редирект на головну з відкриттям модалки відновлення пароля.
      */
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('auth.forgot-password');
+        return redirect()->to(route('index').'?modal=forgot');
     }
 
     /**
@@ -35,7 +30,7 @@ class PasswordResetLinkController extends Controller
             'phone' => ['nullable', 'string'],
         ]);
 
-        if (!$request->filled('email') && !$request->filled('phone')) {
+        if (! $request->filled('email') && ! $request->filled('phone')) {
             $message = __('auth.enter_email_or_phone');
 
             if ($request->ajax()) {
@@ -51,7 +46,7 @@ class PasswordResetLinkController extends Controller
         if ($request->filled('phone')) {
             $user = \App\Models\User::where('phone', $request->input('phone'))->first();
 
-            if (!$user) {
+            if (! $user) {
                 $message = __('auth.user_not_found_or_no_email');
 
                 if ($request->ajax()) {
@@ -69,7 +64,6 @@ class PasswordResetLinkController extends Controller
             // Обновляем пароль пользователя
             $user->password = Hash::make($newPassword);
             $user->save();
-
 
             $this->sendNewPasswordSms($user->phone, $newPassword);
 

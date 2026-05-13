@@ -52,7 +52,10 @@ class Banner extends Resource
             ID::make()->sortable(),
             Images::make( 'Фото','main')
                 ->conversionOnIndexView('preview'),
-            Text::make('Силка','url'),
+            Text::make('Силка','url')
+                ->displayUsing(function ($value) {
+                    return $value ? (strlen($value) > 50 ? substr($value, 0, 50) . '...' : $value) : '';
+                }),
 
             Number::make('Позиція','position')->sortable(),
             Boolean::make('Активний','is_active')->sortable(),

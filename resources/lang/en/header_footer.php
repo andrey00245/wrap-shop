@@ -19,6 +19,7 @@ return [
   'subscribe' => 'Subscribe and be in the topic!',
   'subscribe_btn' => 'Sending',
   'all_rights_reserved' => 'All rights reserved. © :year',
+  'films_in_other_cities' => 'Films in other cities',
 
   'home' => 'Home'
 

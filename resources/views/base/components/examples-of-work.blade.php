@@ -3,12 +3,16 @@
   <div class="wrap">
     <div class="home-products-top flex-justify">
       <h2 class="home-title">{{__('general-translate.our_realizations')}}</h2>
-      <a class="show-more-examples desktop" href="javascript:void(0)"><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</a>
+      <a class="show-more-examples desktop" href="{{route('implementations')}}" title="{{__('general-translate.show_more')}}"><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</a>
     </div>
     <div class="examples-wrapper">
         @foreach($exampleWorks as $works)
                 <div class="example-of-work">
-                    <img class="image-example" src="{{$works->getImage()}}" alt="{{$works->title}}">
+                    <img class="image-example"
+                         src="{{$works->getPreviewImage()}}"
+                         alt="{{$works->title}}"
+                         width="640"
+                         height="360">
                     <div class="middle-content-wrapper">
                 <span class="car-name">{{$works->title}}
                     <svg style="margin-left: 5px" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -16,14 +20,17 @@
                     </svg>
                 </span>
                         <span class="date">{{$works->getData()}}</span>
-                        {!! $works->descriptions !!}
                     </div>
                     <div class="example-product">
                         <a class="product-link" href="{{route('products.show', ['product'=>$works->product->slugEn])}}">
-                            <img class="image-product" src="{{$works->product->getImage()}}" alt="{{$works->product->name}}">
+                            <img class="image-product"
+                                 src="{{$works->product->getPreviewImage()}}"
+                                 alt="{{$works->product->getName()}}"
+                                 width="310"
+                                 height="310">
                             <div class="text-wrapper">
                                 <span class="title-product">{{$works->product->category->name}}</span>
-                                <span class="name-product">{{$works->product->name}}</span>
+                                <span class="name-product">{{$works->product->getName()}}</span>
                             </div>
                         </a>
                     </div>
@@ -35,7 +42,7 @@
 {{--        </a>--}}
 {{--      </div>--}}
     </div>
-      <a class="show-more-examples mobile" href="javascript:void(0)"><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</a>
+      <a class="show-more-examples mobile" href="{{route('implementations')}}" title="{{__('general-translate.show_more')}}"><i class="fas fa-chevron-right"></i>{{__('general-translate.show_more')}}</a>
 
   </div>
 </section>

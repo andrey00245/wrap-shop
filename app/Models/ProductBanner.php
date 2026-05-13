@@ -33,16 +33,19 @@ class ProductBanner extends Model implements HasMedia
 
         if ($media->collection_name === 'vertical') {
             $this->addMediaConversion('preview_vertical')
-//                ->width(316)
-//                ->height(545)
-                ->quality(100) // можно до 100, но будет весить больше
+                ->width(654)          // 327 * 2
+                ->height(1120)        // 560 * 2
+                ->format('webp')       // или 'jpg' если текст лучше
+                ->quality(100)         // хороший баланс качество/вес
                 ->nonQueued();
         }
 
+        // Горизонтальная
         if ($media->collection_name === 'horizontal') {
             $this->addMediaConversion('preview_horizontal')
-//                ->width(978)
-//                ->height(188)
+                ->width(936)          // 468 * 2
+                ->height(316)         // 158 * 2
+                ->format('webp')       // или 'jpg' для лучшего текста
                 ->quality(100)
                 ->nonQueued();
         }

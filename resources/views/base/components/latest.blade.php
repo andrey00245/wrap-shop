@@ -38,7 +38,7 @@
                             <div
                                 class="image">
                                 <i class="far fa-search-plus colord"
-                                   data-src="{{$product->getMedia('images')->first()->getUrl()}}"
+                                   data-src="{{$product->getPreviewImage()}}"
                                    data-fancybox="latest{{$product->id}}" data-caption="{{$product->getName()}}"></i>
                                 <a href="{{route('products.show', ['product'=>$product->slugEn])}}"
                                    title="{{$product->getName()}}">
@@ -50,12 +50,12 @@
                                                         <div class="hide"
                                                              data-src="{{$image->getUrl()}}"
                                                              data-fancybox="latest{{$product->id}}"
-                                                             data-caption="{{$product->name}}"></div>
+                                                             data-caption="{{$product->getName()}}"></div>
                                                     @endif
                                                     <li class="splide__slide"
                                                         role="group">
                                                         <img loading="lazy"
-                                                             src="{{$image->getUrl('preview')}}"
+                                                             src="{{$image->getUrl('preview_webp')}}"
                                                              alt="{{$product->getName()}}"
                                                              title="{{$product->getName()}}"
                                                              width="310" height="310">

@@ -12,11 +12,17 @@ class RedirectIfNotAuthenticated
     /**
      * Handle an incoming request.
      *
-     * @param \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() && $request->path() !== '/') {
+        // Safety guard: this middleware is intended only for /account pages.
+        // If it is accidentally applied globally, do not break public pages.
+        if (! str_starts_with('/'.ltrim($request->path(), '/'), '/account')) {
+            return $next($request);
+        }
+
+        if (! Auth::check() && $request->path() !== '/') {
             return redirect('/');
         }
 

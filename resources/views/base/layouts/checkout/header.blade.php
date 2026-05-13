@@ -27,12 +27,16 @@
       </div>
 
       <div class="head-social flex-center">
-        <a href="#" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
-        <a href="#" title="Instagram" target="_blank" class="fab fa-instagram"></a>
+        <a href="{{ $settings->telegram ?? '#' }}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
+        <a href="{{ $settings->instagram ?? '#' }}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
       </div>
       <div class="head-phone flex-center">
         <div class="title">{{__('header_footer.phone')}}</div>
-        <a href="tel:+380660003202"><span>+38</span> 066 000 32 02</a>
+        @php
+          $phoneRaw = $settings->phone ?? '';
+          $phoneView = $settings->phone_view ?? $phoneRaw;
+        @endphp
+        <a href="{{ $phoneRaw ? ('tel:' . $phoneRaw) : '#' }}">{!! $phoneView ?: '#' !!}</a>
       </div>
 
       <div class="head-buttons">

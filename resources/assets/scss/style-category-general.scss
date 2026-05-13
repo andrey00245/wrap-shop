@@ -24,6 +24,10 @@
     color: rgba(255, 255, 255, 0.71);
 }
 
+.category-breadcrumbs .button:hover {
+    color: $mod-main-color;
+}
+
 .category-breadcrumbs .button i {
     margin: 2px 8px 0 0;
 }
@@ -104,6 +108,13 @@
     color: #fff;
     border: 1px solid $mod-main-color;
     background: rgba(255, 255, 255, 0.01);
+}
+
+.category-child-nav ul a.active {
+    color: #fff;
+    border: 1px solid #fff;
+    background: #fff;
+    color: #000;
 }
 
 .category-content {
@@ -545,6 +556,104 @@
     margin-top: -173px;
     height: -webkit-fill-available;
     object-fit: cover;
+}
+
+/* Rich text (CKEditor) under category listing: reset pasted table layout */
+.category-seo-content {
+    padding-top: 20px;
+    padding-bottom: 60px;
+
+    .category-main-content + .category-seo-text {
+        margin-top: 24px;
+    }
+
+    .category-seo-text,
+    .category-main-content {
+        color: $mod-text-color;
+        font-size: 15px;
+        line-height: 1.55;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin: 1.2em 0 0.6em;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+
+        p {
+            margin: 0 0 12px;
+        }
+
+        ul,
+        ol {
+            margin: 0 0 12px;
+            padding-left: 1.3em;
+        }
+
+        figure.table {
+            display: block;
+            width: 100%;
+            margin: 16px 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            display: table;
+            width: 100%;
+            max-width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            table-layout: auto;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tbody {
+            display: table-row-group;
+        }
+
+        tfoot {
+            display: table-footer-group;
+        }
+
+        tr {
+            display: table-row;
+        }
+
+        th,
+        td {
+            display: table-cell;
+            vertical-align: top;
+            border: 1px solid $mod-product-default-border;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        th {
+            font-weight: 600;
+            background: rgba(128, 128, 128, 0.12);
+        }
+
+        img,
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        a {
+            color: $mod-main-color;
+            text-decoration: underline;
+        }
+    }
 }
 
 [data-loader='arrow-circle'] {

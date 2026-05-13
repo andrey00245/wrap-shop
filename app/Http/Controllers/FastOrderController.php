@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FastOrder;
+use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,24 +22,41 @@ class FastOrderController extends Controller
             'total_price' => 'required|numeric|min:0',
         ]);
 
-        $fastOrder = FastOrder::create([
-            'product_id' => $validated['product_id'],
-            'quantity' => $validated['quantity'],
-            'name' => $validated['name'],
-            'phone' => $validated['phone'],
-            'email' => $validated['email'],
-            'comment' => $validated['comment'],
-            'total_price' => $validated['total_price'],
+        // Получаем продукт
+        $product = Product::findOrFail($validated['product_id']);
+
+        // Разделяем имя на имя и фамилию
+        $nameParts = explode(' ', trim($validated['name']), 2);
+        $firstName = $nameParts[0];
+        $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
+
+        // Создаем обычный заказ
+        $order = Order::create([
             'user_id' => Auth::id(),
+            'phone' => $validated['phone'],
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $validated['email'] ?? '',
+            'shipping_method' => '', // Быстрый заказ - пустая доставка
+            'comment' => $validated['comment'] ?? '',
             'status' => 'new',
+            'is_fast_order' => true, // Флаг быстрого заказа
+            'total' => $validated['total_price'],
         ]);
 
-        \App\Services\MoySkladSyncService::sendOrder($fastOrder);
+        // Добавляем продукт к заказу
+        $order->products()->attach($product->id, [
+            'quantity' => $validated['quantity'],
+            'price' => $validated['total_price'] / $validated['quantity'], // Цена за единицу
+        ]);
+
+        // Отправляем в МойСклад
+        \App\Services\MoySkladSyncService::sendOrder($order);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Ваш заказ принят. Спасибо!',
-            'fast_order' => $fastOrder,
+            'order' => $order,
         ]);
     }
 }

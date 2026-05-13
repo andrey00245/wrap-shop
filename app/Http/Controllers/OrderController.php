@@ -74,6 +74,7 @@ class OrderController extends Controller
         // Проверка для неавторизованных пользователей
         if (!Auth::check()) {
             $password = Str::random(8);
+
             $user = User::create([
                 'name' => $validated['first-name'],
                 'last_name' => $validated['last-name'],
@@ -81,8 +82,13 @@ class OrderController extends Controller
                 'phone' => $validated['phone'],
                 'password' => Hash::make($password),
             ]);
+
             Auth::login($user);
-            $user->notify(new TemporaryPasswordNotification($user->email, $password));
+
+            // Тимчасово вимкнено SMTP-надсилання пароля, щоб не блокувати checkout таймаутами.
+            \Log::info('Temporary password email skipped (SMTP disabled temporarily).', [
+                'user_id' => $user->id,
+            ]);
         }
 
         $totalSum = 0;
@@ -103,7 +109,7 @@ class OrderController extends Controller
         // Определяем адрес доставки в зависимости от типа
         if ($request->input('shipping_method') === 'novaposhta') {
             $novaPoshtaType = $request->input('nova_poshta_type');
-            
+
             \Log::info('Nova Poshta заказ', [
                 'shipping_method' => $request->input('shipping_method'),
                 'nova_poshta_type' => $novaPoshtaType,
@@ -116,7 +122,7 @@ class OrderController extends Controller
                 $order->shipping_address = Arr::get($validated,'locker_address');
                 // Для почтоматов нужно сохранить ID почтомата
                 $order->novaposhta_warehouse_ref = $request->input('locker_warehouse_ref');
-                
+
                 \Log::info('Сохранение почтомата', [
                     'nova_poshta_type' => $novaPoshtaType,
                     'locker_address' => Arr::get($validated,'locker_address'),
@@ -179,10 +185,10 @@ class OrderController extends Controller
 
         if ($order->payment_method === 'online') {
             \App\Services\MoySkladSyncService::sendOrder($order);
-            
+
             // Обновляем данные контрагента при изменении типа доставки
             \App\Services\MoySkladSyncService::updateCounterpartyDelivery($order);
-            
+
             $wfpService = new \App\Services\WayForPayService();
             $formData = $wfpService->generatePaymentData($order);
             $order->update(['payment_status' => 'pending']);
@@ -191,7 +197,7 @@ class OrderController extends Controller
         }
 
         \App\Services\MoySkladSyncService::sendOrder($order);
-        
+
         // Обновляем данные контрагента при изменении типа доставки
         \App\Services\MoySkladSyncService::updateCounterpartyDelivery($order);
 

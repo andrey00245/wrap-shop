@@ -3,10 +3,18 @@
         <ul class="splide__list">
             @foreach($mainCategories as $mainCategory)
                 <li class="splide__slide swiper-slide home-banner-item">
-                    <a href="{{ route('products.category', ['category' => $mainCategory->slugEn]) }}"
+                    <a href="{{ route('products.category', ['path' => $mainCategory->slugEn]) }}"
                        class="swiper-slide home-category-item flex-justify" title="">
-                        <figure class="img flex-center"><img loading="lazy" src="{{$mainCategory->getImage()}}"
-                                                             srcset="" alt="" title=""></figure>
+                        <figure class="img flex-center">
+                            <img
+                                loading="lazy"
+                                src="{{$mainCategory->getPreviewImage()}}"
+                                srcset=""
+                                alt="{{$mainCategory->name}}"
+                                title="{{$mainCategory->name}}"
+                                width="260"
+                                height="160">
+                        </figure>
                         <div class="right">
                             <div class="name">{{$mainCategory->name}}</div>
                             <div class="link button"><i

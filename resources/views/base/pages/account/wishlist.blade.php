@@ -14,7 +14,7 @@
                         <div class="top flex-justify">
                             <div class="sku">{{__('general-translate.product_card.code')}} {{$wishlist->code}}</div>
                             <div class="wishlist">
-                                <a href="{{route('wishlist.delete', ['product'=>$wishlist->id])}}"
+                                <a href="{{ route('wishlist.delete', ['product' => $wishlist->slugEn]) }}"
                                    title="{{__('general-translate.product_card.remove')}}"
                                    class="fal fa-times"></a>
                             </div>
@@ -24,7 +24,7 @@
                         <div
                             class="image default-products-images">
                             <i class="far fa-search-plus colord"
-                               data-src="{{$wishlist->getMedia('images')->first()->getUrl()}}"
+                               data-src="{{$wishlist->getPreviewImage()}}"
                                data-fancybox="products{{$wishlist->id}}" data-caption="{{$wishlist->name}}"></i>
                             <a class="image-link" href="{{route('products.show', ['product'=>$wishlist->slugEn])}}"
                                title="{{$wishlist->name}}">
@@ -40,7 +40,7 @@
                                                              data-caption="{{$wishlist->name}}"></div>
                                                     @endif
                                                     <img loading="lazy"
-                                                         src="{{$image->getUrl('preview')}}"
+                                                         src="{{$image->getUrl('preview_webp')}}"
                                                          alt="{{$wishlist->name}}"
                                                          title="{{$wishlist->name}}"
                                                          class="swiper-lazy swiper-lazy-loaded"

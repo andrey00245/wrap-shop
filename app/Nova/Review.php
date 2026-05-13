@@ -5,6 +5,7 @@ namespace App\Nova;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
@@ -57,6 +58,10 @@ class Review extends Resource
             Textarea::make('Відгук', 'text')->alwaysShow(),
             Number::make('Оцінка', 'rating')->min(1)->max(5)->step(1)->sortable(),
             Boolean::make('Активний', 'is_active')->sortable(),
+            DateTime::make('Дата створення', 'created_at')
+                ->sortable()
+                ->default(now())
+                ->help('Можна змінити дату створення відгуку'),
         ];
     }
 

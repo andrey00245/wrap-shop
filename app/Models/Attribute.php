@@ -25,25 +25,26 @@ class Attribute extends Model
         'external_id',
         'field_name',
         'name',
+        'is_visible',
     ];
 
     protected $casts = [
         'name' => 'json',
+        'is_visible' => 'boolean',
     ];
 
-
-  public function productsVisible($categoryId): BelongsToMany
-  {
-    return $this->belongsToMany(Product::class, 'products_attributes', 'attribute_id', 'product_id')
-      ->where('category_id', $categoryId)
-      ->whereHas('media')
-      ->whereHas('prices', function ($query) {
-        $query->where('type_id', DB::table('price_types')
-          ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
-          ->value('id'))
-          ->where('price', '>', 0);
-      })->withPivot('value');
-  }
+    public function productsVisible($categoryId): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'products_attributes', 'attribute_id', 'product_id')
+            ->where('category_id', $categoryId)
+            ->whereHas('media')
+            ->whereHas('prices', function ($query) {
+                $query->where('type_id', DB::table('price_types')
+                    ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
+                    ->value('id'))
+                    ->where('price', '>', 0);
+            })->withPivot('value');
+    }
 
     /**
      * Attributes.
@@ -63,28 +64,29 @@ class Attribute extends Model
         $searchCategories = collect();
 
         if (request()->get('category_id')) {
-            if (request()->get('category_id') === "0"){
+            if (request()->get('category_id') === '0') {
                 $searchCategories = Category::all()->pluck('id');
-            }
-            else {
-                if(request()->get('sub_category') === "true"){
+            } else {
+                if (request()->get('sub_category') === 'true') {
 
-                    $searchCategories->push((int)request()->get('category_id'));
+                    $searchCategories->push((int) request()->get('category_id'));
                     $searchCategory = Category::query()->where('id', request()->get('category_id'))
                         ->first()
                         ->getAllChildren()
                         ->pluck('id');
                     $searchCategories = $searchCategories->merge($searchCategory)->values();
-                }
-                else{
-                    $searchCategories->push((int)request()->get('category_id'));
+                } else {
+                    $searchCategories->push((int) request()->get('category_id'));
                 }
             }
         }
 
-        $currentCategory = null;
+        $currentCategoryIds = null;
         if ($category !== null) {
-            $currentCategory = $category->isParent() ? $category->children()->pluck('id') : [$category->id];
+            // Для категорії з підкатегоріями беремо всі нащадки, інакше — тільки поточну
+            $currentCategoryIds = $category->hasChildren()
+                ? $category->allDescendantIds()
+                : [$category->id];
         }
 
         $columns = ['name'];
@@ -94,6 +96,9 @@ class Attribute extends Model
             $columns[] = 'descriptions';
         }
 
+        $restrictSearchToAlgoliaIds = request()->routeIs('search')
+            && request()->attributes->has('algolia_search_product_ids');
+
         $result = $this->attributesValues()
             ->whereHas('prices', function ($query) {
                 $query->where('type_id', DB::table('price_types')
@@ -102,46 +107,87 @@ class Attribute extends Model
                     ->where('price', '>', 0);
             })
             ->whereHas('media')
-            ->when($currentCategory !== null, function ($query) use ($currentCategory) {
-                return $query->whereIn('category_id', $currentCategory);
+            ->when($currentCategoryIds !== null, function ($query) use ($currentCategoryIds) {
+                return $query->whereIn('category_id', $currentCategoryIds);
             })
             ->when($searchCategories->isNotEmpty(), function ($query) use ($searchCategories) {
                 return $query->whereIn('category_id', $searchCategories);
             })
-            ->when($searchValue, function ($query) use ($columns, $searchValue) {
-                $query->whereLikeInsensitive($columns, $searchValue);
-            })
+            ->when(
+                $restrictSearchToAlgoliaIds,
+                function ($query) {
+                    $ids = request()->attributes->get('algolia_search_product_ids');
+                    if (! is_array($ids) || $ids === []) {
+                        $query->whereRaw('0 = 1');
+
+                        return;
+                    }
+                    $ids = array_values(array_unique(array_map('intval', $ids)));
+                    $query->whereIn('products.id', $ids);
+                },
+                function ($query) use ($columns, $searchValue) {
+                    if ($searchValue) {
+                        $query->whereLikeInsensitive($columns, $searchValue);
+                    }
+                }
+            )
 
             ->get()
             ->map(function ($product) {
-                return data_get(json_decode($product->pivot->value), App::getLocale());
+                $rawValue = $product->pivot->value;
+
+                // Пытаемся прочитать как JSON {uk: "...", ru: "...", ...}
+                $decoded = json_decode($rawValue, true);
+
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    $locale = App::getLocale();
+
+                    // Берём значение для поточного локалю, або перше доступне
+                    return $decoded[$locale] ?? reset($decoded) ?? null;
+                }
+
+                // Старий формат: у pivot->value збережений просто рядок типу "3M"
+                return $rawValue;
             })
             ->filter()
             ->unique();
+
         return $result;
     }
 
-    public function getDefaultProductsCount($attributeId, $value) {
-       $category = request()->route()->parameter('subsubcategory')
-           ?? request()->route()->parameter('subcategory')
-           ?? request()->route()->parameter('category');
+    public function getDefaultProductsCount($attributeId, $value)
+    {
+        $category = request()->route()->parameter('subsubcategory')
+            ?? request()->route()->parameter('subcategory')
+            ?? request()->route()->parameter('category');
 
         $productIds = ProductAttribute::query()
             ->where('attribute_id', $attributeId)
             ->whereJsonContains('value->'.App::getLocale(), $value)
-           ->pluck('product_id')->toArray();
+            ->pluck('product_id')
+            ->toArray();
 
-      return Product::query()
-          ->whereIn('id', $productIds)
-          ->whereHas('media')
-          ->whereIn('category_id', $category->isParent() ? $category->children()->pluck('id') : [$category->id])
-          ->whereHas('prices', function ($query) {
-              $query->where('type_id', function ($subQuery) {
-                  $subQuery->select('id')
-                      ->from('price_types')
-                      ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-              })->where('price', '>', 0);
-          })->count();
+        $categoryIds = [];
+        if ($category) {
+            $categoryIds = $category->hasChildren()
+                ? $category->allDescendantIds()
+                : [$category->id];
+        }
+
+        return Product::query()
+            ->where('is_active', 1)
+            ->whereIn('id', $productIds)
+            ->when(! empty($categoryIds), function ($query) use ($categoryIds) {
+                $query->whereIn('category_id', $categoryIds);
+            })
+            ->whereHas('media')
+            ->whereHas('prices', function ($query) {
+                $query->where('type_id', function ($subQuery) {
+                    $subQuery->select('id')
+                        ->from('price_types')
+                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+                })->where('price', '>', 0);
+            })->count();
     }
 
     /**

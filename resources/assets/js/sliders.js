@@ -1,6 +1,7 @@
 import {
     productSliderInitialization,
     productSliderInitializationClass,
+    customBlockSliderInitialization,
     popupSliderInitialization,
     imageSliderInProduct
 } from "./sliderInitialization";
@@ -9,9 +10,17 @@ $(document).ready(function () {
     productSliderInitialization('homeBestseller');
     productSliderInitialization('homeLatest');
     productSliderInitializationClass('customBlocks');
+    
+    // Инициализация каждого кастомного блока отдельно
+    $('.customBlocks').each(function() {
+        const blockId = $(this).attr('id');
+        if (blockId) {
+            customBlockSliderInitialization(blockId);
+        }
+    });
 });
 
-new Splide('#topBannersSlider', {
+const topBannersSplide = new Splide('#topBannersSlider', {
     autoplay: true,
     interval: 3000,
     type: 'loop',
@@ -23,7 +32,19 @@ new Splide('#topBannersSlider', {
         prev  : 'splide__arrow--prev home-banner-prev',
         next  : 'splide__arrow--next home-banner-next',
     },
-}).mount();
+});
+
+topBannersSplide.mount();
+
+// Защита от дублирования точек пагинации (если слайдер по каким‑то причинам инициализируется дважды)
+(function fixTopBannersPagination() {
+    const realCount = topBannersSplide.length; // реальное количество слайдов
+    const $dots = $('#topBannersSlider .splide__pagination li');
+
+    if ($dots.length > realCount) {
+        $dots.slice(realCount).remove();
+    }
+})();
 
 
 new Splide('#slideCategory', {

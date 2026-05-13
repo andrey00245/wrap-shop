@@ -1,4 +1,5 @@
 <?php
+
 return [
     'show_products' => [
         'one' => 'Показати <b class="ocf-btn-label">:count</b> товар',
@@ -28,5 +29,10 @@ return [
     'in_wishlist' => 'В закладки',
     'lin_m_and_more' => ':count м.п. і більше',
     'show_next' => 'Показати наступні',
-    'in_stock' => 'Тільки в наявності'
+    'in_stock' => 'Тільки в наявності',
+    'catalog_breadcrumb' => 'Каталог',
+    'catalog_h1' => 'Каталог',
+    'catalog_meta_title' => 'Каталог товарів | Wrap.Shop',
+    'catalog_meta_description' => 'Увесь асортимент Wrap.Shop: плівки, інструменти, аксесуари. Доставка по Україні.',
+    'catalog_keywords' => 'каталог, інтернет-магазин Wrap.Shop, плівки для авто, детейлінг, доставка Україна',
 ];

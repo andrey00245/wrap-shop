@@ -1,0 +1,58 @@
+@import "variables";
+
+$mod-main-color: $main-color-light;
+$reviews-card-header-bg: #E6E6E6;
+
+@import "style-reviews-general";
+
+/* Світла тема в стилі блогу (Articles): картка з обводкою #E6E6E6, хедер як .article-content */
+.reviews-card {
+  background: #fff;
+  border: 1px solid #E6E6E6;
+  backdrop-filter: none;
+}
+
+.reviews-summary__stars,
+.reviews-page__title .highlight {
+  color: $main-color-light;
+}
+
+.reviews-card__avatar {
+  background: $main-color-light;
+  color: #fff;
+}
+
+.reviews-card__name {
+  color: #1a1a1a;
+}
+
+.reviews-card__product {
+  color: #444;
+}
+
+.reviews-card__product-link {
+  color: $main-color-light;
+
+  &:hover {
+    color: darken($main-color-light, 12%);
+  }
+}
+
+/* Скролбар і текст у блоці відгуку — у тон світлої теми */
+.reviews-card__text {
+  color: #666;
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.35);
+  }
+}

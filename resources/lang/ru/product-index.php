@@ -1,4 +1,5 @@
 <?php
+
 return [
     'show_products' => [
         'one' => 'Показать <b class="ocf-btn-label">:count</b> товар',
@@ -30,5 +31,10 @@ return [
     'in_wishlist' => 'В закладки',
     'lin_m_and_more' => ':count м.п. и больше',
     'show_next' => 'Показать следующие',
-    'in_stock' => 'In stock only'
+    'in_stock' => 'In stock only',
+    'catalog_breadcrumb' => 'Каталог',
+    'catalog_h1' => 'Каталог',
+    'catalog_meta_title' => 'Каталог товаров | Wrap.Shop',
+    'catalog_meta_description' => 'Весь ассортимент Wrap.Shop: плёнки, инструменты, аксессуары. Доставка по Украине.',
+    'catalog_keywords' => 'каталог, интернет-магазин Wrap.Shop, плёнки для авто, детейлинг, доставка Украина',
 ];

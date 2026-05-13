@@ -2,21 +2,20 @@
 
 namespace App\Providers;
 
-use App\Models\Banner;
 use App\Models\BestSeller;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductBanner;
 use App\Models\Setting;
+use App\Observers\MediaObserver;
 use App\Observers\ProductObserver;
+use App\Translation\SafeFileLoader;
+use Firebase\JWT\JWT;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use SocialiteProviders\Manager\SocialiteWasCalled;
-use Laravel\Socialite\Facades\Socialite;
-use App\Services\Apple\CustomAppleProvider;
-use Illuminate\Support\Facades\Config;
-use Firebase\JWT\JWT;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->extend('translation.loader', function ($loader, $app) {
+            return new SafeFileLoader($app['files'], $app['path.lang']);
+        });
     }
 
     /**
@@ -32,7 +34,27 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $privateKey = file_get_contents(storage_path('AuthKey_' . env('APPLE_KEY_ID') . '.p8'));
+        // Подавляем PHP Notice/Warning для Broken pipe через error handler
+        set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+            // Подавляем ошибки Broken pipe
+            if (str_contains($errstr, 'file_put_contents') &&
+                (str_contains($errstr, 'Broken pipe') ||
+                 str_contains($errstr, 'errno=32'))) {
+                return true; // Подавляем ошибку
+            }
+
+            // Подавляем ошибки из server.php
+            if (str_contains($errfile, 'server.php') &&
+                (str_contains($errstr, 'Broken pipe') ||
+                 str_contains($errstr, 'errno=32'))) {
+                return true; // Подавляем ошибку
+            }
+
+            // Возвращаем false для других ошибок, чтобы они обрабатывались стандартным образом
+            return false;
+        }, E_WARNING | E_NOTICE);
+
+        $privateKey = file_get_contents(storage_path('AuthKey_'.env('APPLE_KEY_ID').'.p8'));
 
         $payload = [
             'iss' => env('APPLE_TEAM_ID'),
@@ -51,10 +73,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Product::observe(ProductObserver::class);
+        Media::observe(MediaObserver::class);
 
         /**
-       * @var Setting $settings
-       */
+         * @var Setting $settings
+         */
         $settings = Setting::query()->first();
 
         // Получаем продукты-лидеры продаж из новой таблицы best_sellers
@@ -73,7 +96,21 @@ class AppServiceProvider extends ServiceProvider
             ->with('product')
             ->orderBy('sort_order', 'asc')
             ->get()
-            ->pluck('product');
+            ->pluck('product')
+            ->filter()
+            ->sort(function (?Product $a, ?Product $b): int {
+                if ($a === null || $b === null) {
+                    return 0;
+                }
+                $sa = $a->stock > 0 ? 0 : 1;
+                $sb = $b->stock > 0 ? 0 : 1;
+                if ($sa !== $sb) {
+                    return $sa <=> $sb;
+                }
+
+                return $a->id <=> $b->id;
+            })
+            ->values();
 
         $instruments = Product::query()
             ->where('is_active', true)
@@ -84,15 +121,21 @@ class AppServiceProvider extends ServiceProvider
                         ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
                 })->where('price', '>', 0);
             })->whereHas('category', function (\Illuminate\Database\Eloquent\Builder $query) {
-                    $query->whereJsonContains('slug->en', 'instrumenti-rozxidniki');
-                })
+                $query->whereJsonContains('slug->en', 'instrumenti-rozxidniki');
+            })
+            ->orderByInStockFirst()
+            ->orderByDesc('id')
             ->take(10)->get();
 
+        // Окремі запити: один builder з ->with() мутував би обидва варіанти
         $mainCategories = Category::query()
-            ->whereNull('parent_id');
+            ->whereNull('parent_id')
+            ->get();
 
-        $productCategories = $mainCategories
-            ->with('children');
+        $productCategories = Category::query()
+            ->whereNull('parent_id')
+            ->with('children')
+            ->get();
 
         $productBanners = ProductBanner::query()
             ->where('is_active', true)
@@ -103,8 +146,8 @@ class AppServiceProvider extends ServiceProvider
             'settings' => $settings,
             'products' => $products,
             'instruments' => $instruments,
-            'mainCategories' => $mainCategories->get(),
-            'productCategories' => $productCategories->get(),
+            'mainCategories' => $mainCategories,
+            'productCategories' => $productCategories,
             'productBanners' => $productBanners,
         ]);
     }

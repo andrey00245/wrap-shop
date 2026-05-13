@@ -2,7 +2,7 @@
 
 namespace App\Nova;
 
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
+use App\Nova\Fields\NovaTabTranslatable;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
@@ -32,16 +32,29 @@ class NewsCategory extends Resource
     /**
      * The columns that should be searched.
      *
-     * @var array
+     * @var array<int, string>
      */
     public static $search = [
-        'id', 'name'
+        'id',
     ];
+
+    /**
+     * @return array<int, string>
+     */
+    public static function searchableColumns()
+    {
+        $locales = config('tab-translatable.locales', ['uk', 'ru', 'en']);
+        $columns = ['id'];
+        foreach ($locales as $locale) {
+            $columns[] = "name->{$locale}";
+        }
+
+        return $columns;
+    }
 
     /**
      * Get the fields displayed by the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function fields(NovaRequest $request)
@@ -49,10 +62,10 @@ class NewsCategory extends Resource
         return [
             ID::make()->sortable(),
             NovaTabTranslatable::make([
-                Text::make('Назва','name'),
+                Text::make('Назва', 'name'),
             ])->setTitle('Назва'),
 
-            HasMany::make('Новини','news',News::class),
+            HasMany::make('Новини', 'news', News::class),
         ];
     }
 }

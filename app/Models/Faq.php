@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\EloquentSortable\SortableTrait;
 use Spatie\Translatable\HasTranslations;
 
@@ -44,5 +45,13 @@ class Faq extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('order');
+    }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'category_faq')
+            ->withPivot('sort_order')
+            ->orderBy('pivot_sort_order')
+            ->orderBy('categories.id');
     }
 }

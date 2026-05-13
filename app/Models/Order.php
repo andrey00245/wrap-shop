@@ -16,9 +16,19 @@ class Order extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'total',
+        'user_id',
+        'phone',
+        'first_name',
+        'last_name',
+        'email',
         'shipping_method',
+        'payment_method',
+        'comment',
+        'shipping_address',
+        'city',
+        'status',
+        'is_fast_order',
+        'total',
         'novaposhta_warehouse_ref',
         'moysklad_id',
         'payment_status',

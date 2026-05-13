@@ -2,17 +2,13 @@
 
 namespace App\Nova;
 
-
-use App\Models\Product;
-use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Status;
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Number;
-use Laravel\Nova\Fields\BelongsTo;
-use Laravel\Nova\Fields\Textarea;
-use Laravel\Nova\Fields\Select;
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
+use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
 use WesselPerik\StatusField\StatusField;
 
 class FastOrder extends Resource
@@ -20,6 +16,7 @@ class FastOrder extends Resource
     public static $model = 'App\\Models\\FastOrder';
 
     public static $title = 'id';
+
     public static $search = ['id', 'name', 'phone', 'email'];
 
     public static function label()
@@ -96,14 +93,14 @@ class FastOrder extends Resource
                 ])
                 ->exceptOnForms(),
 
-             Select::make('Status')
-                 ->options([
-                     'new' => 'Новий',
-                     'in_progress' => 'В процесі',
-                     'completed' => 'Завершено',
-                 ])
-                 ->onlyOnForms()
-                 ->rules('required')
+            Select::make('Status')
+                ->options([
+                    'new' => 'Новий',
+                    'in_progress' => 'В процесі',
+                    'completed' => 'Завершено',
+                ])
+                ->onlyOnForms()
+                ->rules('required'),
         ];
     }
 

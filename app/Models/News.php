@@ -16,8 +16,8 @@ use Spatie\Translatable\HasTranslations;
 class News extends Model implements HasMedia
 {
     use HasFactory,
-        InteractsWithMedia,
-        HasTranslations;
+        HasTranslations,
+        InteractsWithMedia;
 
     protected $translatable = ['title', 'read_time', 'description', 'slug'];
 
@@ -28,44 +28,91 @@ class News extends Model implements HasMedia
         'description' => 'json',
     ];
 
-  protected static function booted()
-  {
-    static::saving(function ($news) {
-      static::generateSlug($news);
-    });
+    protected static function booted(): void
+    {
+        static::saving(function (News $news) {
+            if (! $news->isDirty('title')) {
+                return;
+            }
+            $news->setTranslations(
+                'slug',
+                array_merge(
+                    $news->getTranslations('slug'),
+                    $news->generateSlugsFromTitle()
+                )
+            );
+        });
+    }
 
-    static::creating(function ($news) {
-      static::generateSlug($news);
-    });
-  }
+    protected function generateSlugsFromTitle(): array
+    {
+        $slugs = [];
+        $titles = $this->getTranslations('title');
+        $locales = $this->getTranslatableLocales();
 
-  public static function generateSlug(News $model){
-    $model->slug = [
-      'en' => Str::slug($model->getTranslation('title', 'en')),
-      'uk' => Str::slug($model->getTranslation('title', 'uk')),
-      'ru' => Str::slug($model->getTranslation('title', 'ru'))
-    ];
-  }
+        foreach ($locales as $locale) {
+            if (! empty($titles[$locale])) {
+                $slugs[$locale] = Str::slug($titles[$locale]);
+            }
+        }
+        $slugs = array_filter($slugs);
+        $fallback = (string) reset($slugs);
+        foreach ($locales as $locale) {
+            if (empty($slugs[$locale]) && $fallback !== '') {
+                $slugs[$locale] = $fallback;
+            }
+        }
 
-  public function getSlugEnAttribute()
-  {
-    return $this->getTranslation('slug', 'en');
-  }
+        return $slugs;
+    }
 
-  public function scopeActive(Builder $query): Builder
-  {
-    return $query->where('is_active', true);
-  }
+    protected function getTranslatableLocales(): array
+    {
+        return config('tab-translatable.locales', ['uk', 'ru', 'en']);
+    }
 
-      public function registerMediaConversions(?Media $media = null): void
-      {
-          $this
-              ->addMediaConversion('preview')
-              ->width(683)
-              ->height(201)
-              ->format('jpg')
-              ->nonQueued();
-      }
+    public function getSlugEnAttribute(): ?string
+    {
+        $slug = $this->getTranslation('slug', 'en');
+        if ($slug !== null && $slug !== '') {
+            return $slug;
+        }
+        $all = $this->getTranslations('slug');
+        $first = (string) reset($all);
+        if ($first !== '') {
+            return $first;
+        }
+        $generated = $this->generateSlugsFromTitle();
+        if ($generated !== []) {
+            $this->setTranslations('slug', array_merge($this->getTranslations('slug'), $generated));
+            $this->saveQuietly();
+
+            return (string) reset($generated);
+        }
+
+        return null;
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this
+            ->addMediaConversion('preview_webp')
+            ->width(683)
+            ->height(201)
+            ->format('webp')
+            ->nonQueued();
+
+        $this
+            ->addMediaConversion('preview')
+            ->width(683)
+            ->height(201)
+            ->nonQueued();
+    }
 
     public function registerMediaCollections(): void
     {

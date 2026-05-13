@@ -24,14 +24,6 @@
 @include('base.components.report-availability-popup')
 
 <footer class="footer">
-  <div class="seo-wrapper">
-    <div class="seo-content">
-      <h2>{{$settings->slogan_title ?? ''}}</h2>
-      {!! $settings->slogan_desc ?? '' !!}
-    </div>
-    <span class="seo-btn show"><i class="fas fa-chevron-right"></i>{{__('header_footer.read_more')}}</span>
-    <span class="seo-btn collapse" style="display: none"><i class="fas fa-chevron-right"></i>{{__('header_footer.read_less')}}</span>
-  </div>
   <div class="ellipse orange"></div>
   <div class="wrap flex-justify">
     <div class="foot-info">
@@ -44,8 +36,8 @@
       <ul class="footer-cat">
         @foreach($mainCategories as $category)
           <li>
-            <a href="{{route('products.category', ['category' => $category->slugEn])}}" title="{{$category->name}}">
-              <figure><img loading="lazy" src="{{$category->getImage()}}" srcset="{{$category->getImage()}}"
+            <a href="{{route('products.category', ['path' => $category->slugEn])}}" title="{{$category->name}}">
+              <figure><img loading="lazy" src="{{$category->getPreviewImage()}}" srcset="{{$category->getPreviewImage()}}"
                            alt="{{$category->name}}" title="{{$category->name}}" width="180" height="140"></figure>
               <div>
                 <div class="name">{{$category->name}}</div>

@@ -68,6 +68,11 @@ class Consultation extends Resource
             BelongsTo::make('Продукт','product',Product::class)
             ->sortable()
                 ->rules('required', 'integer', 'exists:products,id'),
+
+            Text::make('ID в МойСклад','moysklad_id')
+            ->sortable()
+                ->rules('nullable', 'string')
+                ->help('ID заказа в системе МойСклад'),
         ];
     }
 

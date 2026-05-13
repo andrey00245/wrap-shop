@@ -26,6 +26,6 @@ yarn-error.log
 /public/images/
 /.composer-home
 
-# Local MCP credentials (never commit tokens)
+# Local MCP (IDE config, may contain secrets)
 /.cursor/mcp.json
-/.ai/mcp/mcp.json
+/.ai/mcp/

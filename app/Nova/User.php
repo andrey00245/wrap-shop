@@ -4,6 +4,8 @@ namespace App\Nova;
 
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Password;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -64,6 +66,23 @@ class User extends Resource
                 ->rules('required', 'email', 'max:254')
                 ->creationRules('unique:users,email')
                 ->updateRules('unique:users,email,{{resourceId}}'),
+
+            Select::make('Роль', 'role')
+                ->options([
+                    'admin' => 'Admin',
+                    'content_manager' => 'Content manager',
+                    'user' => 'User',
+                ])
+                ->displayUsingLabels()
+                ->rules('required')
+                ->sortable()
+                ->default('user'),
+
+            Password::make('Пароль', 'password')
+                ->onlyOnForms()
+                ->creationRules('required', 'string', 'min:8')
+                ->updateRules('nullable', 'string', 'min:8'),
+
             BelongsToMany::make('Вішліст', 'wishlists', Product::class)
         ];
     }

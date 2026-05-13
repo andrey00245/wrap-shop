@@ -143,6 +143,7 @@ class CartController extends Controller
                 'cartItems' => $html,
                 'cartItemsCount' => $cartItems->count(),
                 'sum' => $sum,
+                'has_long_film_rolls' => $this->cartHasLongFilmRolls($cartItems),
             ]);
         }
 
@@ -168,7 +169,23 @@ class CartController extends Controller
             'cartItems' => $html,
             'cartItemsCount' => count($cartItems),
             'sum' => $sum,
+            'has_long_film_rolls' => $this->cartHasLongFilmRolls($cartItems),
         ]);
+    }
+
+    /**
+     * Та сама умова, що data-has-long-film на checkout: рулонна плівка від 1 м.п.
+     *
+     * @param  \Illuminate\Support\Collection|array<int, mixed>  $cartItems
+     */
+    private function cartHasLongFilmRolls($cartItems): bool
+    {
+        return collect($cartItems)->contains(function ($i) {
+            $product = is_array($i) ? ($i['product'] ?? null) : $i->product;
+            $qty = is_array($i) ? ($i['quantity'] ?? 0) : $i->quantity;
+
+            return $product && $product->getRollSize() && (float) $qty >= 1;
+        });
     }
 
     public function remove(Request $request, $productId)

@@ -3,7 +3,7 @@
         <td class="image">
             <a href="{{route('products.show', ['product' => $item['product']->slugEn])}}">
                 <img loading="lazy"
-                     src="{{$item['product']->getMedia('images')[0]->getUrl('preview')}}"
+                     src="{{ optional($item['product']->getMedia('images')->first())->getUrl('preview_webp') ?? asset('assets/img/no-image.png') }}"
                      alt="{{$item['product']->name}}"
                      title="{{$item['product']->name}}"
                      class="img-thumbnail">

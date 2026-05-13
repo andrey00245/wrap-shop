@@ -10,18 +10,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Laravel\Scout\Searchable;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
-use Spatie\Image\Enums\Fit;
-use Illuminate\Support\Facades\File;
 
 /**
  * @method static Builder whereLikeInsensitive(string $column, string $value)
+ *
  * @property $code
  * @property $external_code
  * @property $external_id
@@ -41,13 +44,16 @@ class Product extends Model implements HasMedia
 {
     use HasFactory,
         HasTranslations,
-        InteractsWithMedia;
+        InteractsWithMedia,
+        Searchable;
 
     public array $translatable = [
         'name',
         'descriptions',
         'banner_title',
-        'slug'
+        'slug',
+        'meta_title',
+        'meta_description',
     ];
 
     /**
@@ -69,21 +75,33 @@ class Product extends Model implements HasMedia
         'slug',
         'descriptions',
         'banner_title',
-        'stock'
+        'banner_title',
+        'meta_title',
+        'meta_description',
+        'stock',
+    ];
+
+    protected $attributes = [
+        'stock' => 0,
+        'name' => '{"en":"","ru":"","uk":""}',
+        'descriptions' => '{"en":"","ru":"","uk":""}',
+        'banner_title' => '{"en":"","ru":"","uk":""}',
+        'meta_title' => '{"en":"","ru":"","uk":""}',
+        'meta_description' => '{"en":"","ru":"","uk":""}',
     ];
 
     protected $casts = [
         'banner_title' => 'json',
-        'slug'         => 'json',
-        'name'         => 'json',
+        'slug' => 'json',
+        'name' => 'json',
         'descriptions' => 'json',
+        'meta_title' => 'json',
+        'meta_description' => 'json',
+        'stock' => 'float',
     ];
 
     /**
-     * @param $query
-     * @param $column
-     * @param $value
-     * @return Builder
+     * @param  $column
      */
     public function scopeWhereLikeInsensitive($query, array $columns, string $value): Builder
     {
@@ -99,9 +117,9 @@ class Product extends Model implements HasMedia
             foreach ($columns as $column) {
                 $outerQuery->orWhere(function ($innerQuery) use ($column, $allKeywords) {
                     foreach ($allKeywords as $keyword) {
-                        if (!empty($keyword)) {
-                            $innerQuery->orWhereRaw("LOWER(products.{$column}) LIKE ?", ['%' . $keyword . '%'])
-                                ->orWhereRaw("LOWER(products.{$column}) LIKE ?", [$keyword . '%']);
+                        if (! empty($keyword)) {
+                            $innerQuery->orWhereRaw("LOWER(products.{$column}) LIKE ?", ['%'.$keyword.'%'])
+                                ->orWhereRaw("LOWER(products.{$column}) LIKE ?", [$keyword.'%']);
                         }
                     }
                 });
@@ -111,6 +129,124 @@ class Product extends Model implements HasMedia
         return $query;
     }
 
+    /**
+     * Розгортання значення атрибута (JSON / переклади) у плоский список рядків для Algolia.
+     *
+     * @return array<int, string>
+     */
+    protected static function flattenAttributeValueStringsForSearch(mixed $raw): array
+    {
+        if ($raw === null || $raw === '') {
+            return [];
+        }
+        if (is_string($raw)) {
+            $t = trim($raw);
+
+            return $t === '' ? [] : [$t];
+        }
+        if (! is_array($raw)) {
+            return [];
+        }
+        $out = [];
+        foreach ($raw as $v) {
+            $out = array_merge($out, self::flattenAttributeValueStringsForSearch($v));
+        }
+
+        return array_values(array_unique($out));
+    }
+
+    /**
+     * Данные, которые отправляются в Algolia (Laravel Scout).
+     */
+    public function toSearchableArray(): array
+    {
+        // Подгружаем связи, которые нужны для индекса
+        $this->loadMissing(['category', 'attributes']);
+
+        // Не використовувати $this->attributes у циклі — це внутрішній масив колонок Model::$attributes, не зв'язок attributes().
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Attribute> $catalogAttributes */
+        $catalogAttributes = $this->getRelation('attributes');
+
+        // Переводы названия продукта
+        $nameTranslations = method_exists($this, 'getTranslations')
+            ? $this->getTranslations('name')
+            : (array) $this->name;
+
+        // Переводы названия категории
+        $categoryNameTranslations = [];
+        if ($this->category && method_exists($this->category, 'getTranslations')) {
+            $categoryNameTranslations = $this->category->getTranslations('name');
+        }
+
+        // Бренд как строка
+        $brandValue = $this->getBrand();
+        if (is_array($brandValue)) {
+            $brandValue = implode(' ', array_filter($brandValue));
+        }
+
+        // Видимі значення атрибутів (відтінок, структура тощо) — щоб знаходити «зелений», «сатинова» без цих слів у назві
+        $excludeAttributeFields = [
+            'name', 'application', 'purpose', 'benefits',
+            'default_quantity', 'master_qualification', 'store_terms', 'warranty',
+            'quantity_step', 'min_order_quantity', 'first_stock', 'second_stock', 'third_stock', 'under_order',
+        ];
+        $attributeValueStrings = [];
+        foreach ($catalogAttributes as $attr) {
+            if (! $attr->is_visible || in_array($attr->field_name, $excludeAttributeFields, true)) {
+                continue;
+            }
+            $raw = $attr->pivot->value ?? null;
+            foreach (self::flattenAttributeValueStringsForSearch($raw) as $piece) {
+                $attributeValueStrings[] = $piece;
+            }
+        }
+
+        $searchableText = mb_strtolower(implode(' ', array_filter(array_merge(
+            array_values($nameTranslations),
+            array_values($categoryNameTranslations),
+            [(string) $this->code, (string) $this->article, (string) $brandValue],
+            $attributeValueStrings,
+        ))));
+
+        return [
+            'id' => $this->id,
+            'code' => $this->code,
+            'article' => $this->article,
+            'name' => $nameTranslations,
+            'category_id' => $this->category_id,
+            'category' => $categoryNameTranslations,
+            'brand' => $brandValue,
+            /** Усі мови назви/категорії, код, артикул, бренд + значення видимих атрибутів (після зміни — scout:import) */
+            'searchable_text' => $searchableText,
+        ];
+    }
+
+    /**
+     * Ограничиваем, какие товары попадают в индекс поиска.
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return (bool) $this->is_active && $this->media()->exists();
+    }
+
+    /**
+     * Один Scout-запит для /search, попапу та get-count: узгоджені параметри Algolia (typoTolerance тощо).
+     */
+    public static function scoutCatalogSearchQuery(string $query, ?int $take = null): \Laravel\Scout\Builder
+    {
+        $take ??= (int) config('app.algolia_search_max_hits', 50);
+        $raw = config('app.algolia_search_typo_tolerance', 'strict');
+        $typoTolerance = match (strtolower(trim((string) $raw))) {
+            'true', '1', 'yes' => true,
+            'false', '0', 'no' => false,
+            'min' => 'min',
+            default => 'strict',
+        };
+
+        return static::search($query)->take($take)->options([
+            'typoTolerance' => $typoTolerance,
+        ]);
+    }
 
     protected static function toTranslit(string $text): string
     {
@@ -149,7 +285,6 @@ class Product extends Model implements HasMedia
     }
 
     /**
-     * @return bool
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
@@ -161,6 +296,7 @@ class Product extends Model implements HasMedia
         if (session()?->has('wishlist')) {
             return in_array($this->id, session()?->get('wishlist', []), true);
         }
+
         return false;
     }
 
@@ -172,6 +308,12 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Category::class);
     }
 
+    public function blogPosts(): BelongsToMany
+    {
+        return $this->belongsToMany(BlogPost::class, 'blog_post_product')
+            ->withPivot('sort_order');
+    }
+
     /**
      * Wishlists.
      */
@@ -180,23 +322,58 @@ class Product extends Model implements HasMedia
         return $this->belongsToMany(User::class, 'wishlists');
     }
 
-    /**
-     * @param Media|null $media
-     */
     public function registerMediaConversions(?Media $media = null): void
     {
-        $this
-            ->addMediaConversion('preview')
-            ->fit(Fit::Crop, 310, 310) // Указываем корректный enum
-            ->format('png')
-            ->quality(100) // Улучшение качества
-            ->nonQueued();
+        $conversions = MediaConversions::getConversionsConfig();
+
+        foreach ($conversions as $conversionName => $config) {
+            $conversion = $this->addMediaConversion($conversionName);
+
+            if ($config['width'] && $config['height']) {
+                $conversion->width($config['width'])->height($config['height']);
+            }
+
+            if ($config['quality']) {
+                $conversion->quality($config['quality']);
+            }
+
+            if ($config['sharpen']) {
+                $conversion->sharpen($config['sharpen']);
+            }
+
+            if ($config['format']) {
+                $conversion->format($config['format']);
+            }
+
+            // Используем contain для правильного масштабирования без искажений
+            if (isset($config['fit'])) {
+                $conversion->fit(Fit::Contain);
+            }
+
+            $conversion->optimize();
+
+            foreach ($config['collections'] as $collection) {
+                $conversion->performOnCollections($collection);
+            }
+
+            $conversion->nonQueued();
+        }
+
+        // Конвертация видео для мобильных устройств (легкая версия)
+        // ВАЖНО: Для работы конвертации видео нужен ffmpeg и пакет php-ffmpeg/php-ffmpeg
+        // Пока что используем оригинальное видео, но структура готова для будущей конвертации
+        // Конвертация видео будет реализована через отдельный Job или внешний сервис
+        // TODO: Реализовать конвертацию видео через ffmpeg в отдельном Job
+        // - mobile: 720p, битрейт ~2Mbps
+        // - desktop: 1080p, битрейт ~5Mbps
     }
 
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images');
         $this->addMediaCollection('banner_images');
+        // Видео теперь загружаются через YouTube ссылки (ProductVideo модель)
+        // $this->addMediaCollection('videos')->singleFile();
     }
 
     /**
@@ -226,8 +403,13 @@ class Product extends Model implements HasMedia
     }
 
     /**
-     * @return BelongsTo
+     * YouTube видео
      */
+    public function youtubeVideos(): HasMany
+    {
+        return $this->hasMany(ProductVideo::class)->orderBy('sort_order');
+    }
+
     public function purpose(): BelongsTo
     {
         return $this->belongsTo(Purpose::class);
@@ -244,12 +426,42 @@ class Product extends Model implements HasMedia
     public function getPrice()
     {
         return $this->prices()->whereHas('type', function ($query) {
-                $query->where('price_types.external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-            })->value('price') * self::getCurrencyRate();
+            $query->where('price_types.external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+        })->value('price') * self::getCurrencyRate();
     }
 
-    public function getImage(): string
+    public function getImage(?string $conversion = null): string
     {
+        if ($conversion) {
+            $media = $this->getFirstMedia('images');
+            if ($media) {
+                return $media->getUrl($conversion);
+            }
+        }
+
+        return $this->getFirstMediaUrl('images');
+    }
+
+    public function getPreviewImage(): string
+    {
+        $media = $this->getFirstMedia('images');
+        if ($media) {
+            // Сначала пробуем preview_webp
+            if ($media->hasGeneratedConversion('preview_webp')) {
+                return $media->getUrl('preview_webp');
+            }
+
+            // Если preview_webp нет, пробуем gallery
+            if ($media->hasGeneratedConversion('gallery')) {
+                return $media->getUrl('gallery');
+            }
+
+            // Если gallery нет, пробуем preview
+            if ($media->hasGeneratedConversion('preview')) {
+                return $media->getUrl('preview');
+            }
+        }
+
         return $this->getFirstMediaUrl('images');
     }
 
@@ -258,9 +470,131 @@ class Product extends Model implements HasMedia
         return $this->getMedia('banner_images');
     }
 
+    public function getVideos()
+    {
+        return $this->getMedia('videos');
+    }
+
+    /**
+     * Получить все YouTube видео продукта
+     */
+    public function getYoutubeVideos()
+    {
+        return $this->youtubeVideos;
+    }
+
+    /**
+     * Проверить, есть ли YouTube видео.
+     * Безопасно возвращает false, если таблица product_videos отсутствует (миграция не выполнена).
+     */
+    public function hasYoutubeVideos(): bool
+    {
+        try {
+            return $this->youtubeVideos()->count() > 0;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Получить URL видео для мобильных устройств (легкая версия)
+     * Если конверсия не существует, возвращает оригинал
+     */
+    public function getMobileVideoUrl(): ?string
+    {
+        $video = $this->getFirstMedia('videos');
+        if (! $video) {
+            return null;
+        }
+
+        // Пытаемся получить легкую версию для мобильных
+        if ($video->hasGeneratedConversion('mobile')) {
+            return $video->getUrl('mobile');
+        }
+
+        // Если конверсии нет, возвращаем оригинал
+        return $video->getUrl();
+    }
+
+    /**
+     * Получить URL видео для десктопа (качественная версия)
+     * Если конверсия не существует, возвращает оригинал
+     */
+    public function getDesktopVideoUrl(): ?string
+    {
+        $video = $this->getFirstMedia('videos');
+        if (! $video) {
+            return null;
+        }
+
+        // Пытаемся получить качественную версию для десктопа
+        if ($video->hasGeneratedConversion('desktop')) {
+            return $video->getUrl('desktop');
+        }
+
+        // Если конверсии нет, возвращаем оригинал
+        return $video->getUrl();
+    }
+
+    /**
+     * Получить первое видео
+     */
+    public function getFirstVideo()
+    {
+        return $this->getFirstMedia('videos');
+    }
+
+    /**
+     * Получить постер (первый кадр) видео
+     * Если постер не существует, возвращает null
+     */
+    public function getVideoPoster(): ?string
+    {
+        $video = $this->getFirstMedia('videos');
+        if (! $video) {
+            return null;
+        }
+
+        // Проверяем существование файла постера напрямую
+        // Job создает постер в: storage/app/public/media-library/conversions/{id}/poster_{file_name}.jpg
+        // И сохраняет в: storage/app/public/{id}/poster/{file_name}.jpg
+        $originalPath = $video->getPath();
+
+        // Вариант 1: Постер в директории медиа (после saveConversion)
+        $posterDirectory = dirname($originalPath).'/poster';
+        $posterFileName = pathinfo($video->file_name, PATHINFO_FILENAME).'.jpg';
+        $posterPath = $posterDirectory.'/'.$posterFileName;
+
+        // Вариант 2: Постер в директории конверсий (временный путь)
+        $conversionsPath = storage_path('app/public/media-library/conversions/'.$video->id);
+        $conversionsPosterPath = $conversionsPath.'/poster_'.pathinfo($video->file_name, PATHINFO_FILENAME).'.jpg';
+
+        // Проверяем оба варианта
+        if (file_exists($posterPath)) {
+            // Возвращаем публичный URL
+            $publicPath = str_replace(storage_path('app/public'), '', $posterPath);
+
+            return asset('storage'.$publicPath);
+        } elseif (file_exists($conversionsPosterPath)) {
+            // Если постер еще в директории конверсий, перемещаем его
+            if (! is_dir($posterDirectory)) {
+                mkdir($posterDirectory, 0755, true);
+            }
+            if (copy($conversionsPosterPath, $posterPath)) {
+                $publicPath = str_replace(storage_path('app/public'), '', $posterPath);
+
+                return asset('storage'.$publicPath);
+            }
+        }
+
+        // Если постер не создан, возвращаем null (будет использован fallback)
+        return null;
+    }
+
     public function getProductAttributes()
     {
         return $this->attributes()
+            ->where('is_visible', true) // Показываем только видимые атрибуты
             ->whereNotIn('field_name', [
                 'name',
                 'application',
@@ -275,12 +609,33 @@ class Product extends Model implements HasMedia
                 'first_stock',
                 'second_stock',
                 'third_stock',
-                'under_order'
+                'under_order',
             ])
             ->get();
     }
 
-    public static function getCountProducts($categories, $request, $selectedFilterValues, $arrAttr = null)
+    /**
+     * Чи збігається значення атрибута товара з масивом значень фільтра (регістр і пробіли ігноруються).
+     */
+    public static function attributeValueMatchesFilter(mixed $productValue, array $filterValues): bool
+    {
+        $normalize = fn (string $v): string => mb_strtolower(trim((string) $v));
+        $filterNormalized = array_map($normalize, array_map('strval', $filterValues));
+        $productValues = is_array($productValue) ? array_values($productValue) : [$productValue];
+        $productFlat = array_filter(array_map(fn ($v) => is_scalar($v) ? (string) $v : null, $productValues));
+        foreach ($productFlat as $pv) {
+            if (in_array($normalize($pv), $filterNormalized, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, int>|null  $restrictSearchProductIds  Якщо задано (пошук через Algolia) — лічильники лише по цих id, без SQL LIKE.
+     */
+    public static function getCountProducts($categories, $request, $selectedFilterValues, $arrAttr = null, ?Collection $restrictSearchProductIds = null)
     {
         if ($request->get('filters')) {
             $responseArray['attributes_count'] = $request->get('filters');
@@ -296,13 +651,13 @@ class Product extends Model implements HasMedia
         };
 
         if ($request->get('min_price') && $request->get('max_price')) {
-            if ((int)$request->get('min_price') !== 0 && (int)$request->get('max_price') !== 0) {
+            if ((int) $request->get('min_price') !== 0 && (int) $request->get('max_price') !== 0) {
                 $withPrice = function ($query) use ($request) {
                     $query->where('type_id', DB::table('price_types')
                         ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e')
                         ->value('id'))
-                        ->where('price', '>=', (int)$request->get('min_price') / Product::getCurrencyRate())
-                        ->where('price', '<=', (int)$request->get('max_price') / Product::getCurrencyRate());
+                        ->where('price', '>=', (int) $request->get('min_price') / Product::getCurrencyRate())
+                        ->where('price', '<=', (int) $request->get('max_price') / Product::getCurrencyRate());
                 };
             }
         }
@@ -311,7 +666,8 @@ class Product extends Model implements HasMedia
 
         if ($request->get('search')) {
 
-            $columns = ['name'];
+            // Як на сторінці пошуку (SearchController): name + code, опційно descriptions
+            $columns = ['name', 'code'];
             $searchValue = $request->get('search');
             $includeDescription = $request->boolean('description');
             if ($includeDescription) {
@@ -319,10 +675,24 @@ class Product extends Model implements HasMedia
             }
 
             $products = self::query()
+                ->where('is_active', 1)
                 ->whereIn('category_id', $categories)
-                ->when($searchValue, function ($query) use ($columns, $searchValue) {
-                    $query->whereLikeInsensitive($columns, $searchValue);
-                })
+                ->when(
+                    $restrictSearchProductIds !== null,
+                    function ($query) use ($restrictSearchProductIds) {
+                        if ($restrictSearchProductIds->isEmpty()) {
+                            $query->whereRaw('0 = 1');
+
+                            return;
+                        }
+                        $query->whereIn('id', $restrictSearchProductIds->all());
+                    },
+                    function ($query) use ($columns, $searchValue) {
+                        if ($searchValue) {
+                            $query->whereLikeInsensitive($columns, $searchValue);
+                        }
+                    }
+                )
                 ->whereHas('attributes')
                 ->whereHas('media')
                 ->whereHas('prices', $withPrice)
@@ -332,6 +702,7 @@ class Product extends Model implements HasMedia
                 ->get();
         } else {
             $productsQuery = self::query()
+                ->where('is_active', 1)
                 ->whereIn('category_id', $categories)
                 ->whereHas('attributes')
                 ->whereHas('media')
@@ -342,9 +713,10 @@ class Product extends Model implements HasMedia
 
             if ($request->filled('in_stock')) {
                 $productsQuery = $productsQuery->where('stock', '>', 0)
-                     ->whereDoesntHave('attributes', function ($subQ) {
-                            $subQ->where('field_name', 'under_order');
-                        });
+                    ->whereDoesntHave('attributes', function ($subQ) {
+                        $subQ->where('field_name', 'under_order')
+                            ->where('value', 'так');
+                    });
             }
 
             $products = $productsQuery->get();
@@ -352,44 +724,52 @@ class Product extends Model implements HasMedia
 
         $selectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
             foreach ($selectedFilterValues as $key => $filterValues) {
-                $matchingValues = [];
+                $matched = false;
                 foreach ($product->products_attributes as $products_attribute) {
-                    if ($products_attribute->field_name === $key) {
-                        $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
+                    if ($products_attribute->field_name === $key && self::attributeValueMatchesFilter($products_attribute->value, $filterValues)) {
+                        $matched = true;
+                        break;
                     }
                 }
-                if (empty($matchingValues)) {
+                if (! $matched) {
                     return false;
                 }
             }
+
             return $product;
         });
 
-        if (empty($selectedFilterValues) && (int)$request->get('min_price') === 0 && (int)$request->get('max_price') === 0) {
+        if (empty($selectedFilterValues) && (int) $request->get('min_price') === 0 && (int) $request->get('max_price') === 0) {
             $responseArray['total_count'] = __('product-index.select_filters');
         } else {
-            $responseArray['total_count'] = __('product-index.show_products.' . Pluralize::getDeclension($selectedProducts->count(), App::getLocale()), ['count' => $selectedProducts->count()]);
+            $responseArray['total_count'] = __('product-index.show_products.'.Pluralize::getDeclension($selectedProducts->count(), App::getLocale()), ['count' => $selectedProducts->count()]);
         }
 
         $nonSelectedProducts = $products->filter(function ($product) use ($selectedFilterValues) {
             foreach ($selectedFilterValues as $key => $filterValues) {
-                $matchingValues = [];
+                if (! is_array($filterValues)) {
+                    continue;
+                }
+                $matched = false;
                 foreach ($product->products_attributes as $products_attribute) {
-                    if ($products_attribute->field_name === $key) {
-                        $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
+                    if ($products_attribute->field_name === $key
+                        && self::attributeValueMatchesFilter($products_attribute->value, $filterValues)) {
+                        $matched = true;
+                        break;
                     }
                 }
-                if (empty($matchingValues)) {
+                if (! $matched) {
                     return $product;
                 }
             }
+
             return false;
         });
 
         foreach ($responseArray['attributes_count'] as $key_i => $item) {
             foreach ($item as $key_j => $attribute) {
-                if (!array_key_exists('count', (array)$responseArray['attributes_count'][$key_i][$key_j])) {
-                    (array)$responseArray['attributes_count'][$key_i][$key_j]['count'] = 0;
+                if (! array_key_exists('count', (array) $responseArray['attributes_count'][$key_i][$key_j])) {
+                    (array) $responseArray['attributes_count'][$key_i][$key_j]['count'] = 0;
                 }
             }
         }
@@ -397,8 +777,8 @@ class Product extends Model implements HasMedia
         foreach ($selectedProducts as $product) {
             foreach ($product->products_attributes as $products_attribute) {
                 if (array_key_exists($products_attribute->field_name, $responseArray['attributes_count'])) {
-                    if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]["count"])) {
-                        ++$responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'];
+                    if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'])) {
+                        $responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count']++;
                     }
                 }
             }
@@ -409,7 +789,7 @@ class Product extends Model implements HasMedia
             $valArr = [];
             foreach ($selectedFilterValues as $keyI => $selectedFilterValue) {
                 $testArr[] = $keyI;
-                if (!is_array($selectedFilterValue)) {
+                if (! is_array($selectedFilterValue)) {
                     continue;
                 }
                 foreach ($selectedFilterValue as $filterValue) {
@@ -422,7 +802,7 @@ class Product extends Model implements HasMedia
 
             foreach ($product->products_attributes as $products_attribute) {
                 if (in_array($products_attribute->field_name, $testArr, true)) {
-                    if (in_array($products_attribute->value, $valArr, true)) {
+                    if (self::attributeValueMatchesFilter($products_attribute->value, $valArr)) {
                         $tempAddCount++;
                     } else {
                         $tempField = $products_attribute->field_name;
@@ -433,8 +813,8 @@ class Product extends Model implements HasMedia
             if ($tempAddCount === count($testArr) - 1) {
                 foreach ($product->products_attributes as $products_attribute) {
                     if ($products_attribute->field_name === $tempField) {
-                        if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]["count"])) {
-                            ++$responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'];
+                        if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'])) {
+                            $responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count']++;
                         }
                     }
                 }
@@ -445,10 +825,11 @@ class Product extends Model implements HasMedia
         $sortParams = [];
         $search = [];
         $prices = [];
+        $newUrl = '';
 
         if ($referer) {
             $parsedUrl = parse_url($referer);
-            $newUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $parsedUrl['path'];
+            $newUrl = ($parsedUrl['scheme'] ?? '').'://'.($parsedUrl['host'] ?? '').($parsedUrl['path'] ?? '');
 
             if (isset($parsedUrl['query'])) {
                 parse_str($parsedUrl['query'], $queryParams);
@@ -457,11 +838,7 @@ class Product extends Model implements HasMedia
             }
         }
 
-        if (empty($newUrl)) {
-            $newUrl = '';
-        }
-
-        if (preg_match('/\b' . preg_quote(route('search'), '/') . '\b/u', request()->header('referer'))) {
+        if ($referer !== null && $referer !== '' && preg_match('/\b'.preg_quote(route('search'), '/').'\b/u', $referer)) {
             if ($request->get('search')) {
                 $search = ['search' => $request->get('search')];
             }
@@ -476,8 +853,7 @@ class Product extends Model implements HasMedia
             }
         }
 
-
-        if ((int)$request->get('min_price') !== 0 && (int)$request->get('max_price') !== 0) {
+        if ((int) $request->get('min_price') !== 0 && (int) $request->get('max_price') !== 0) {
             $prices = [
                 'min_price' => $request->get('min_price'),
                 'max_price' => $request->get('max_price'),
@@ -490,13 +866,12 @@ class Product extends Model implements HasMedia
             $inStock = [
                 'in_stock' => $request->get('in_stock'),
             ];
-            $merged = array_merge($merged,$inStock);
+            $merged = array_merge($merged, $inStock);
         }
 
-        if (http_build_query($merged) !== ""){
-            $responseArray['new_url'] = $newUrl . '?' . http_build_query($merged);
-        }
-        else {
+        if (http_build_query($merged) !== '') {
+            $responseArray['new_url'] = $newUrl.'?'.http_build_query($merged);
+        } else {
             $responseArray['new_url'] = $newUrl;
         }
 
@@ -546,21 +921,21 @@ class Product extends Model implements HasMedia
 
     public function getStock(): float
     {
-        return (float)$this->stock;
+        return (float) $this->stock;
     }
 
     public function getSmallPrice(): float
     {
         return $this->prices()->whereHas('type', function ($query) {
-                $query->where('price_types.external_id', 'bb2a9b0f-26f6-11ee-0a80-0f50000d072f');
-            })->value('price') * self::getCurrencyRate();
+            $query->where('price_types.external_id', 'bb2a9b0f-26f6-11ee-0a80-0f50000d072f');
+        })->value('price') * self::getCurrencyRate();
     }
 
     public function getBigPrice(): float
     {
         return $this->prices()->whereHas('type', function ($query) {
-                $query->where('price_types.external_id', 'bb2a9b91-26f6-11ee-0a80-0f50000d0730');
-            })->value('price') * self::getCurrencyRate();
+            $query->where('price_types.external_id', 'bb2a9b91-26f6-11ee-0a80-0f50000d0730');
+        })->value('price') * self::getCurrencyRate();
     }
 
     public function getWarranty()
@@ -598,10 +973,10 @@ class Product extends Model implements HasMedia
         return round($price / self::getCurrencyRate(), 0);
     }
 
-//    public function customBlocks()
-//    {
-//        return $this->belongsToMany(CustomBlock::class);
-//    }
+    //    public function customBlocks()
+    //    {
+    //        return $this->belongsToMany(CustomBlock::class);
+    //    }
 
     public function getMinOrderCount()
     {
@@ -653,11 +1028,11 @@ class Product extends Model implements HasMedia
 
         if ($this->getRollSize()) {
 
-            if ($count >= $this->getSecondStock() && $count <= $this->getThirdStock()){
+            if ($count >= $this->getSecondStock() && $count <= $this->getThirdStock()) {
                 $productPrice = $this->getSmallPrice();
             }
 
-            if ($count >= $this->getThirdStock() ){
+            if ($count >= $this->getThirdStock()) {
                 $productPrice = $this->getBigPrice();
             }
 
@@ -667,9 +1042,28 @@ class Product extends Model implements HasMedia
         return $productPrice * $count;
     }
 
+    /**
+     * Возвращает цену за единицу в UAH с учётом количества (ценовые пороги).
+     */
+    public function getUnitPriceForQuantity(int $count): float
+    {
+        $unitPrice = $this->getPrice();
+
+        if ($this->getRollSize()) {
+            if ($count >= $this->getThirdStock()) {
+                $unitPrice = $this->getBigPrice();
+            } elseif ($count >= $this->getSecondStock() && $count <= $this->getThirdStock()) {
+                $unitPrice = $this->getSmallPrice();
+            }
+        }
+
+        return $unitPrice;
+    }
+
     public static function getCurrencyRate()
     {
         $currency = Setting::query()->value('currency');
+
         return $currency ?? 42;
     }
 
@@ -733,9 +1127,9 @@ class Product extends Model implements HasMedia
         $productAttributes = $this->products_attributes()->get();
         foreach ($productAttributes as $attribute) {
             $value = $attribute->value;
-            
+
             // Если значение не является массивом (не переведено), пропускаем
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 continue;
             }
 
@@ -755,5 +1149,4 @@ class Product extends Model implements HasMedia
 
         return true;
     }
-
 }

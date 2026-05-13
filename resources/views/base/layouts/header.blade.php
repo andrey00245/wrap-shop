@@ -1,3 +1,7 @@
+@php
+    /** Глобальні змінні з View::share інколи недоступні у вкладених view (напр. Nova / нестандартний рендер) */
+    $productCategories = $productCategories ?? collect();
+@endphp
 <header class="header ">
     <div class="general-popup head-top row" id="menu-popup">
         <div class="head-top-wrap flex-justify wrap">
@@ -14,11 +18,14 @@
             </div>
 
             <form class="head-theme flex-center" action="{{route('change-theme')}}" method="post"
-                  enctype="multipart/form-data" id="form-theme">
+                  enctype="multipart/form-data" id="form-theme" aria-label="{{ __('general-translate.theme_switcher') }}">
                 @csrf
-                <button class="button theme-select {{$theme === 'dark' ?: 'active'}} fas fa-sun" type="submit"></button>
+                <button class="button theme-select {{$theme === 'dark' ?: 'active'}} fas fa-sun"
+                        type="submit"
+                        aria-label="{{ __('general-translate.switch_to_light_theme') }}"></button>
                 <button class="button theme-select {{$theme === 'light' ?: 'active'}} far fa-moon"
-                        type="submit"></button>
+                        type="submit"
+                        aria-label="{{ __('general-translate.switch_to_dark_theme') }}"></button>
             </form>
 
             <nav class="head-menu">
@@ -62,7 +69,7 @@
                         @endforeach
                     </ul>
                 </div>
-                <x-category-sub-menu-mobile :category="$category"/>
+                <x-category-sub-menu-mobile :productCategories="$productCategories"/>
             </nav>
 
             <div class="head-logo">
@@ -73,7 +80,11 @@
             </div>
             <div class="head-phone-mobil">
                 <div class="title">{{__('header_footer.phone')}}</div>
-                <a href="tel:+380660003202"><span>+38</span> 066 000 32 02</a>
+                @php
+                    $phoneRaw = $settings->phone ?? '';
+                    $phoneView = $settings->phone_view ?? $phoneRaw;
+                @endphp
+                <a href="{{ $phoneRaw ? ('tel:' . $phoneRaw) : '#' }}">{!! $phoneView ?: '#' !!}</a>
             </div>
             <div class="head-buttons">
                 <div class="general-popup-btn button search far fa-search"

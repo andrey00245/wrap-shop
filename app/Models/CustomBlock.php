@@ -21,7 +21,7 @@ class CustomBlock extends Model implements HasMedia, Sortable
     protected $translatable = ['name'];
 
     public $sortable = [
-        'order_column_name' => 'sort_order',
+        'order_column_name'  => 'sort_order',
         'sort_when_creating' => true,
     ];
 
@@ -34,12 +34,31 @@ class CustomBlock extends Model implements HasMedia, Sortable
         return $this->getFirstMediaUrl('main');
     }
 
+    public function getPreviewImage(): string
+    {
+        $media = $this->getFirstMedia('main');
+
+        if ($media) {
+            if ($media->hasGeneratedConversion('preview_webp')) {
+                return $media->getUrl('preview_webp');
+            }
+
+            if ($media->hasGeneratedConversion('preview')) {
+                return $media->getUrl('preview');
+            }
+
+            return $media->getUrl();
+        }
+
+        return '';
+    }
+
     public function products()
     {
         return $this->belongsToMany(Product::class)
             ->using(CustomBlockProduct::class)
             ->withPivot('sort_order')
-            ->orderBy('pivot_sort_order'); // Чтобы сразу выдавать отсортированный список
+            ->orderBy('pivot_sort_order');
     }
 
     public function registerMediaConversions(?Media $media = null): void
@@ -48,7 +67,14 @@ class CustomBlock extends Model implements HasMedia, Sortable
             ->addMediaConversion('preview')
             ->width(683)
             ->height(201)
-            ->format('jpg')
+            ->nonQueued();
+
+        $this
+            ->addMediaConversion('preview_webp')
+            ->width(624)       // 312 * 2
+            ->height(1068)     // 534 * 2
+            ->format('webp')
+            ->quality(85)     
             ->nonQueued();
     }
 

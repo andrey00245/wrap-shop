@@ -2,15 +2,15 @@
 
 namespace App\Nova;
 
+use App\Nova\Fields\NovaTabTranslatable;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Kongulov\NovaTabTranslatable\TranslatableTabToRowTrait;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
-use Laravel\Nova\Fields\Trix;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Mostafaznv\NovaCkEditor\CkEditor;
 
 class Category extends Resource
 {
@@ -37,37 +37,36 @@ class Category extends Resource
     /**
      * Get the fields displayed by the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function fields(NovaRequest $request)
     {
         return [
             NovaTabTranslatable::make([
-                Text::make('Назва','name'),
-                Text::make('Slug','slug'),
+                Text::make('Назва', 'name'),
+                Text::make('Slug', 'slug'),
             ])->setTitle('Основна інформація'),
 
             NovaTabTranslatable::make([
-                Text::make('Meta Title','meta_title')
+                Text::make('Meta Title', 'meta_title')
                     ->help('Заголовок для SEO (до 60 символів)')
                     ->hideFromIndex(),
-                Textarea::make('Meta Description','meta_description')
+                Textarea::make('Meta Description', 'meta_description')
                     ->rows(3)
                     ->help('Опис для SEO (до 160 символів)'),
-                Text::make('Meta Keywords','meta_keywords')
+                Text::make('Meta Keywords', 'meta_keywords')
                     ->help('Ключові слова через кому')
                     ->hideFromIndex(),
-                Text::make('H1','h1')
+                Text::make('H1', 'h1')
                     ->help('Заголовок H1 на сторінці категорії')
                     ->hideFromIndex(),
             ])->setTitle('SEO налаштування'),
 
             NovaTabTranslatable::make([
-                Trix::make('Контент','content')
+                CkEditor::make('Контент', 'content')
                     ->help('Основний контент категорії')
                     ->hideFromIndex(),
-                Trix::make('SEO текст','seo_text')
+                CkEditor::make('SEO текст', 'seo_text')
                     ->help('Додатковий SEO текст внизу сторінки')
                     ->hideFromIndex(),
             ])->setTitle('Контент'),
@@ -81,8 +80,8 @@ class Category extends Resource
             HasMany::make('Під Категорія', 'children', self::class),
             HasMany::make('Продукти', 'products', Product::class),
 
-            Images::make('Фото','main')
-                ->conversionOnIndexView('preview'),
+            Images::make('Фото', 'main')
+                ->withMeta(['style' => 'border: 1px solid #ddd; background: #f5f5f5; padding: 5px;']),
         ];
     }
 }

@@ -20,7 +20,7 @@
                 <div
                     class="image default-products-images">
                     <i class="far fa-search-plus colord"
-                       data-src="{{$viewedProduct->getMedia('images')->first()->getUrl()}}"
+                       data-src="{{$viewedProduct->getPreviewImage()}}"
                        data-fancybox="products{{$viewedProduct->id}}" data-caption="{{$viewedProduct->name}}"></i>
                     <a class="image-link" href="{{route('products.show', ['product'=>$viewedProduct->slugEn])}}"
                        title="{{$viewedProduct->name}}">
@@ -36,7 +36,7 @@
                                                      data-caption="{{$viewedProduct->name}}"></div>
                                             @endif
                                             <img loading="lazy"
-                                                 src="{{$image->getUrl('preview')}}"
+                                                 src="{{$image->getUrl('preview_webp')}}"
                                                  alt="{{$viewedProduct->name}}"
                                                  title="{{$viewedProduct->name}}"
                                                  class="swiper-lazy swiper-lazy-loaded"

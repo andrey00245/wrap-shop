@@ -28,16 +28,16 @@ class TranslateProductContent extends Action
                     return Action::danger("Відсутні початкові дані для перекладу у продукту #{$product->id}");
                 }
 
-//                // Переводим основные поля продукта
-//                $product->name = [
-//                    'ru' => $translator->translate($originalName, 'русский'),
-//                    'en' => $translator->translate($originalName, 'английский'),
-//                ];
-//
-//                $product->descriptions = [
-//                    'ru' => $translator->translate($originalDescription, 'русский'),
-//                    'en' => $translator->translate($originalDescription, 'английский'),
-//                ];
+                // Переводим основные поля продукта
+                $product->name = [
+                    'ru' => $translator->translate($originalName, 'русский'),
+                    'en' => $translator->translate($originalName, 'английский'),
+                ];
+
+                $product->descriptions = [
+                    'ru' => $translator->translate($originalDescription, 'русский'),
+                    'en' => $translator->translate($originalDescription, 'английский'),
+                ];
 
                 $product->save();
 
@@ -66,12 +66,24 @@ class TranslateProductContent extends Action
                 }
 
 
-                // Переводим значение атрибута
-                $translatedValue = [
-                    'uk' => $originalValue, // Оригинальное значение на украинском
-                    'ru' => $translator->translate($originalValue, 'русский'),
-                    'en' => $translator->translate($originalValue, 'английский'),
-                ];
+                    // Определяем, нужно ли переводить (бренд/артикул/латиница и т.п.)
+                $fieldName = optional($productAttribute->attribute)->field_name;
+                $nonTranslatableFields = ['brand', 'series', 'article', 'code'];
+
+                if (in_array($fieldName, $nonTranslatableFields, true) || $this->shouldSkipTranslation($originalValue)) {
+                    $translatedValue = [
+                        'uk' => $originalValue,
+                        'ru' => $originalValue,
+                        'en' => $originalValue,
+                    ];
+                } else {
+                    // Переводим значение атрибута
+                    $translatedValue = [
+                        'uk' => $originalValue,
+                        'ru' => $translator->translate($originalValue, 'русский'),
+                        'en' => $translator->translate($originalValue, 'английский'),
+                    ];
+                }
 
 
                 // Обновляем значение атрибута через pivot таблицу
@@ -81,7 +93,7 @@ class TranslateProductContent extends Action
 
                 if ($updated) {
                     dump("✅ Updated attribute {$productAttribute->attribute_id} with value: " . json_encode($translatedValue));
-                    
+
                     // Проверяем, что данные действительно сохранились
                     $product->refresh();
                     $updatedAttribute = $product->attributes()->where('attribute_id', $productAttribute->attribute_id)->first();
@@ -97,5 +109,21 @@ class TranslateProductContent extends Action
                 \Log::warning("Ошибка перевода атрибута {$productAttribute->id}: " . $e->getMessage());
             }
         }
+    }
+
+    private function shouldSkipTranslation($text): bool
+    {
+        if (!is_string($text)) return true;
+        $trimmed = trim($text);
+        if ($trimmed === '') return true;
+        // Если строка латиницей/цифрами/символами брендов — не переводим (Yellotools, 3M, Avery Dennison, тощо)
+        if (preg_match('/^[A-Za-z0-9 .\-\_\+\&\/#]+$/u', $trimmed)) {
+            return true;
+        }
+        // Если выглядит как артикул/код (содержит цифры и заглавные латинские без пробелов)
+        if (preg_match('/^[A-Z0-9\-\_]+$/', $trimmed)) {
+            return true;
+        }
+        return false;
     }
 }

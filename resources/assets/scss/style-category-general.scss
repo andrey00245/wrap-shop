@@ -24,6 +24,10 @@
     color: rgba(255, 255, 255, 0.71);
 }
 
+.category-breadcrumbs .button:hover {
+    color: $mod-main-color;
+}
+
 .category-breadcrumbs .button i {
     margin: 2px 8px 0 0;
 }
@@ -104,6 +108,13 @@
     color: #fff;
     border: 1px solid $mod-main-color;
     background: rgba(255, 255, 255, 0.01);
+}
+
+.category-child-nav ul a.active {
+    color: #fff;
+    border: 1px solid #fff;
+    background: #fff;
+    color: #000;
 }
 
 .category-content {

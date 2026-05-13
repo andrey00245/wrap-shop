@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
 
 class SearchController extends Controller
 {
@@ -36,7 +35,7 @@ class SearchController extends Controller
             ]);
         }
 
-        if (!array_key_exists('search', $selectedFilterValues)) {
+        if (! array_key_exists('search', $selectedFilterValues)) {
             return view('base.pages.products.search-base', [
                 'categories' => $categories,
             ]);
@@ -44,19 +43,19 @@ class SearchController extends Controller
         $searchCategories = collect();
 
         if (request()->get('category_id')) {
-            if (request()->get('category_id') === "0") {
+            if (request()->get('category_id') === '0') {
                 $searchCategories = Category::all()->pluck('id');
             } else {
-                if (request()->get('sub_category') === "true") {
+                if (request()->get('sub_category') === 'true') {
 
-                    $searchCategories->push((int)request()->get('category_id'));
+                    $searchCategories->push((int) request()->get('category_id'));
                     $searchCategory = Category::query()->where('id', request()->get('category_id'))
                         ->first()
                         ->getAllChildren()
                         ->pluck('id');
                     $searchCategories = $searchCategories->merge($searchCategory)->values();
                 } else {
-                    $searchCategories->push((int)request()->get('category_id'));
+                    $searchCategories->push((int) request()->get('category_id'));
                 }
             }
         }
@@ -80,7 +79,7 @@ class SearchController extends Controller
             && in_array($sortDirection, $this->availableSortDirection, true)
         ) {
             $sortBy = request()->get('sort_by') === 'name'
-                ? 'products.name->' . App::getLocale()
+                ? 'products.name->'.App::getLocale()
                 : $sortBy;
         } else {
             $sortBy = 'id';
@@ -93,10 +92,47 @@ class SearchController extends Controller
             $columns[] = 'descriptions';
         }
 
+        // Используем Algolia (Scout), если включен драйвер и не запрошен поиск по описанию
+        $useAlgolia = config('scout.driver') === 'algolia'
+            && ! empty($searchValue)
+            && ! $includeDescription;
+
+        $searchIds = null;
+        if ($useAlgolia) {
+            $searchIds = Product::scoutCatalogSearchQuery($searchValue)->keys();
+        }
+
+        // Для фільтрів на /search: значення атрибутів мають будуватись по тих самих товарах, що й Algolia (не лише name/code у SQL).
+        if ($useAlgolia && $searchIds !== null) {
+            $request->attributes->set(
+                'algolia_search_product_ids',
+                $searchIds->isEmpty() ? [] : $searchIds->map(fn ($id) => (int) $id)->unique()->values()->all()
+            );
+        } else {
+            $request->attributes->remove('algolia_search_product_ids');
+        }
+
+        $useAlgoliaRelevanceOrder = $useAlgolia
+            && $searchIds !== null
+            && ! $searchIds->isEmpty()
+            && ! $request->filled('sort_by');
 
         $products = Product::query()
-            ->when($searchValue, function ($query) use ($columns, $searchValue) {
-                $query->whereLikeInsensitive($columns, $searchValue);
+            ->where('products.is_active', 1)
+            ->when($useAlgolia, function ($query) use ($searchIds) {
+                // Algolia keys() повертає Collection — empty() для об'єкта не працює
+                if ($searchIds->isEmpty()) {
+                    $query->whereRaw('0 = 1');
+
+                    return;
+                }
+
+                $query->whereIn('products.id', $searchIds);
+            }, function ($query) use ($columns, $searchValue) {
+                // Фоллбэк на старый SQL‑поиск
+                if (! empty($searchValue)) {
+                    $query->whereLikeInsensitive($columns, $searchValue);
+                }
             })
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->join('price_types', 'product_prices.type_id', '=', 'price_types.id')
@@ -119,19 +155,30 @@ class SearchController extends Controller
                 'products.is_active',
                 'products.name',
                 'products.descriptions',
+                'products.meta_title',
+                'products.meta_description',
                 'products.category_id',
                 'products.created_at',
                 'products.updated_at',
                 'products.stock',
                 'products.banner_title')
-            ->orderBy($sortBy, $sortDirection)
+            ->when(! $useAlgoliaRelevanceOrder, function ($query) use ($sortBy, $sortDirection) {
+                $query->orderBy($sortBy, $sortDirection);
+            })
             ->with([
                 'products_attributes' => function ($query) {
                     $query->join('attributes', 'products_attributes.attribute_id', '=', 'attributes.id');
-                }
+                },
             ]);
 
         $productWithOutFilters = $products->get();
+
+        if ($useAlgoliaRelevanceOrder) {
+            $idOrder = array_flip($searchIds->map(fn ($id) => (int) $id)->values()->all());
+            $productWithOutFilters = $productWithOutFilters
+                ->sortBy(fn (Product $p) => $idOrder[$p->id] ?? PHP_INT_MAX)
+                ->values();
+        }
 
         $maxPrice = $productWithOutFilters->max('price') * Product::getCurrencyRate();
         $minPrice = $productWithOutFilters->min('price') * Product::getCurrencyRate();
@@ -140,6 +187,12 @@ class SearchController extends Controller
                 ->where('product_prices.price', '>=', request()->get('min_price') / Product::getCurrencyRate())
                 ->where('product_prices.price', '<=', request()->get('max_price') / Product::getCurrencyRate())
                 ->get();
+            if ($useAlgoliaRelevanceOrder) {
+                $idOrder = array_flip($searchIds->map(fn ($id) => (int) $id)->values()->all());
+                $productWithFilters = $productWithFilters
+                    ->sortBy(fn (Product $p) => $idOrder[$p->id] ?? PHP_INT_MAX)
+                    ->values();
+            }
         } else {
             $productWithFilters = $productWithOutFilters;
         }
@@ -152,17 +205,23 @@ class SearchController extends Controller
 
         $productWithFilters = $productWithFilters->filter(function ($product) use ($selectedFilterValues) {
             foreach ($selectedFilterValues as $key => $filterValues) {
-                $matchingValues = [];
+                if (! is_array($filterValues)) {
+                    continue;
+                }
+                $matched = false;
                 foreach ($product->products_attributes as $products_attribute) {
-                    if ($products_attribute->field_name === $key) {
-                        $matchingValues = array_intersect($filterValues, (array)$products_attribute->value);
+                    if ($products_attribute->field_name === $key
+                        && Product::attributeValueMatchesFilter($products_attribute->value, $filterValues)) {
+                        $matched = true;
+                        break;
                     }
                 }
-                if (empty($matchingValues)) {
+                if (! $matched) {
                     return false;
                 }
             }
-            return $product;
+
+            return true;
         });
 
         $perPage = 30;
@@ -186,72 +245,106 @@ class SearchController extends Controller
             $categories = $categories->pluck('id');
         }
 
-        $responseArray = Product::getCountProducts($categories, $request, $selectedFilterValues, $attributesArray);
+        $restrictSearchIds = ($useAlgolia && $searchIds !== null) ? $searchIds : null;
+        $responseArray = Product::getCountProducts($categories, $request, $selectedFilterValues, $attributesArray, $restrictSearchIds);
 
-        if(request()->ajax()){
+        if (request()->ajax()) {
             return [
                 'lastPage' => $products->lastPage(),
                 'html' => view('base.pages.products.ajax-product-list', compact('products'))->render(),
             ];
         }
 
-        $paginationPages = PaginationPages::getPages(max(1, (int)$request->query('page', 1)), $products->lastPage());
+        $paginationPages = PaginationPages::getPages(max(1, (int) $request->query('page', 1)), $products->lastPage());
 
         return view('base.pages.products.search', [
-            'products'      => $products,
-            'pages'         => $paginationPages,
-            'minPrice'      => $minPrice,
-            'maxPrice'      => $maxPrice,
-            'attributes'    => $attributes->flatten()->unique('field_name') ?? collect(),
+            'products' => $products,
+            'pages' => $paginationPages,
+            'minPrice' => $minPrice,
+            'maxPrice' => $maxPrice,
+            'attributes' => $attributes->flatten()->unique('field_name') ?? collect(),
             'responseArray' => $responseArray,
         ]);
     }
-
 
     public function popupSearch(Request $request)
     {
         $columns = ['name', 'code'];
         $search = $request->get('search');
 
-        $products = Product::query()
-            ->whereHas('prices', function ($query) {
-                $query->where('type_id', function ($subQuery) {
-                    $subQuery->select('id')
-                        ->from('price_types')
-                        ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
-                })->where('price', '>', 0);
-            })
-            ->whereHas('media')
-            ->whereHas('category')
-            ->with(['media'])
-            ->where(function ($query) use ($columns, $search) {
-                $query->whereLikeInsensitive($columns, $search)
-                    ->orWhereHas('attributes', function ($attrQuery) use ($search) {
-                        $keywords = preg_split('/\s+/', mb_strtolower($search), -1, PREG_SPLIT_NO_EMPTY);
-                        $allKeywords = [];
+        $useAlgolia = config('scout.driver') === 'algolia' && ! empty($search);
 
-                        foreach ($keywords as $word) {
-                            $allKeywords[] = $word;
-                            $allKeywords[] = Product::toTranslit($word);
-                        }
+        if ($useAlgolia) {
+            // Берем id товаров из Algolia с учетом релевантности (->all() для implode/whereIn)
+            $ids = Product::scoutCatalogSearchQuery($search)->keys()->all();
 
-                        $locales = ['uk', 'ru', 'en'];
+            $productsQuery = Product::query()
+                ->where('is_active', 1)
+                ->whereHas('prices', function ($query) {
+                    $query->where('type_id', function ($subQuery) {
+                        $subQuery->select('id')
+                            ->from('price_types')
+                            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+                    })->where('price', '>', 0);
+                })
+                ->whereHas('media')
+                ->whereHas('category')
+                ->with(['media']);
 
-                        $attrQuery->where(function ($innerQuery) use ($allKeywords, $locales) {
-                            foreach ($locales as $locale) {
-                                foreach ($allKeywords as $keyword) {
-                                    if (!empty($keyword)) {
-                                        $innerQuery->orWhereRaw(
-                                            "LOWER(JSON_UNQUOTE(JSON_EXTRACT(value, '$.\"$locale\"'))) LIKE ?",
-                                            ['%' . $keyword . '%']
-                                        );
+            if (! empty($ids)) {
+                $idsList = implode(',', $ids);
+                $productsQuery
+                    ->whereIn('id', $ids)
+                    ->orderByRaw("FIELD(id, {$idsList})");
+            } else {
+                // Явно возвращаем пустой результат
+                $productsQuery->whereRaw('0 = 1');
+            }
+
+            $products = $productsQuery->get();
+        } else {
+            // Старый SQL‑вариант поиска как фоллбэк
+            $products = Product::query()
+                ->where('is_active', 1)
+                ->whereHas('prices', function ($query) {
+                    $query->where('type_id', function ($subQuery) {
+                        $subQuery->select('id')
+                            ->from('price_types')
+                            ->where('external_id', 'bb2a9a14-26f6-11ee-0a80-0f50000d072e');
+                    })->where('price', '>', 0);
+                })
+                ->whereHas('media')
+                ->whereHas('category')
+                ->with(['media'])
+                ->where(function ($query) use ($columns, $search) {
+                    $query->whereLikeInsensitive($columns, $search)
+                        ->orWhereHas('attributes', function ($attrQuery) use ($search) {
+                            $keywords = preg_split('/\s+/', mb_strtolower($search), -1, PREG_SPLIT_NO_EMPTY);
+                            $allKeywords = [];
+
+                            foreach ($keywords as $word) {
+                                $allKeywords[] = $word;
+                                $allKeywords[] = Product::toTranslit($word);
+                            }
+
+                            $locales = ['uk', 'ru', 'en'];
+
+                            $attrQuery->where(function ($innerQuery) use ($allKeywords, $locales) {
+                                foreach ($locales as $locale) {
+                                    foreach ($allKeywords as $keyword) {
+                                        if (! empty($keyword)) {
+                                            $innerQuery->orWhereRaw(
+                                                "LOWER(JSON_UNQUOTE(JSON_EXTRACT(value, '$.\"$locale\"'))) LIKE ?",
+                                                ['%'.$keyword.'%']
+                                            );
+                                        }
                                     }
                                 }
-                            }
+                            });
                         });
-                    });
-            })
-            ->get();
+                })
+                ->get();
+        }
 
         return response()->json([
             'data' => [
@@ -261,8 +354,7 @@ class SearchController extends Controller
                 ])->render(),
                 'link' => route('search', ['search' => $search]),
                 'total_count' => $products->count(),
-            ]
+            ],
         ]);
     }
-
 }

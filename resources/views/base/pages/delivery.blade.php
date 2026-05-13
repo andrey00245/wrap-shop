@@ -50,34 +50,34 @@
     <div class="page-payment-tab">
       <div class="item active" id="tab0">
         <ul class="list flex-justify">
-          <li>
-            <span class="name"><img loading="lazy" src="{{asset('assets/img/icons/payment-3.png')}}" alt="{{__('shipping_and_payment.privat_24_by_QR_code.title')}}" title="{{__('shipping_and_payment.privat_24_by_QR_code.title')}}">{{__('shipping_and_payment.privat_24_by_QR_code.title')}}</span>
-            {!!__('shipping_and_payment.privat_24_by_QR_code.description')!!}
-          </li>
-          <li>
-            <span class="name"><img loading="lazy" src="{{asset('assets/img/icons/payment-2.png')}}" alt="{{__('shipping_and_payment.by_visa_mastercard.title')}}" title="{{__('shipping_and_payment.by_visa_mastercard.title')}}">{{__('shipping_and_payment.by_visa_mastercard.title')}}</span>
-            {!!__('shipping_and_payment.by_visa_mastercard.description')!!}
-          </li>
-          <li>
-            <span class="name"><img loading="lazy" src="{{asset('assets/img/icons/payment-1.png')}}" alt="{{__('shipping_and_payment.cash_on_delivery.title')}}" title="{{__('shipping_and_payment.cash_on_delivery.title')}}">{{__('shipping_and_payment.cash_on_delivery.title')}}</span>
-            {!!__('shipping_and_payment.cash_on_delivery.description')!!}
-          </li>
+          @foreach(\App\Models\PaymentOption::active()->ordered()->get() as $payment)
+            <li>
+              <span class="name">
+                <img loading="lazy" 
+                     src="{{$payment->getImage() ?: asset('assets/img/icons/payment-1.png')}}" 
+                     alt="{{$payment->name}}" 
+                     title="{{$payment->name}}">
+                {{$payment->name}}
+              </span>
+              {!! $payment->description !!}
+            </li>
+          @endforeach
         </ul>
       </div>
       <div class="item" id="tab1">
         <ul class="list flex-justify">
-          <li>
-            <span class="name"><img loading="lazy" src="{{asset('assets/img/icons/delivery-2.png')}}" alt="{{__('shipping_and_payment.delivery_nova_poshta.title')}}" title="{{__('shipping_and_payment.delivery_nova_poshta.title')}}">{{__('shipping_and_payment.delivery_nova_poshta.title')}}</span>
-            {!!__('shipping_and_payment.delivery_nova_poshta.description')!!}
-          </li>
-          <li>
-            <span class="name"><img loading="lazy" src="{{asset('assets/img/icons/delivery-3.png')}}" alt="{{__('shipping_and_payment.address_delivery.title')}}" title="{{__('shipping_and_payment.address_delivery.title')}}">{{__('shipping_and_payment.address_delivery.title')}}</span>
-            {!!__('shipping_and_payment.address_delivery.description')!!}
-          </li>
-          <li>
-            <span class="name"><img loading="lazy" src="{{asset('assets/img/icons/delivery-1.png')}}" alt="{{__('shipping_and_payment.pickup.title')}}" title="{{__('shipping_and_payment.pickup.title')}}">{{__('shipping_and_payment.pickup.title')}}</span>
-            {!! __('shipping_and_payment.pickup.description') !!}
-          </li>
+          @foreach(\App\Models\DeliveryOption::active()->ordered()->get() as $delivery)
+            <li>
+              <span class="name">
+                <img loading="lazy" 
+                     src="{{$delivery->getImage() ?: asset('assets/img/icons/delivery-1.png')}}" 
+                     alt="{{$delivery->name}}" 
+                     title="{{$delivery->name}}">
+                {{$delivery->name}}
+              </span>
+              {!! $delivery->description !!}
+            </li>
+          @endforeach
         </ul>
       </div>
     </div>

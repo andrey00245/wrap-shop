@@ -36,20 +36,11 @@
         <ul class="flex-center">
             <li><a href="{{route('index')}}" title="{{__('header_footer.home')}}"
                    class="button">{{__('header_footer.home')}}</a></li>
-            @php
-                $category = $product->category;
-                $parents[] = $category;
-
-                while ($category->parent) {
-                    $parents[] = $category->parent;
-                    $category = $category->parent;
-                }
-                $reversedParents = array_reverse($parents);
-
-                foreach ($reversedParents as $parent) {
-                    echo '<li><a href="'.route('products.category', ['category' => $parent->slug]).'" title="'.$parent->name.'" class="button">'.$parent->name.'</a></li>';
-                }
-            @endphp
+            @foreach($productCategoryBreadcrumbs ?? [] as $breadcrumb)
+                <li>
+                    <a href="{{ $breadcrumb['url'] }}" title="{{ $breadcrumb['name'] }}" class="button">{{ $breadcrumb['name'] }}</a>
+                </li>
+            @endforeach
         </ul>
     </nav>
 
@@ -78,7 +69,9 @@
                             </div>
                         </div>
 
-                        <div class="count">{{ '('.$count.')' }}</div>
+                        @if($count > 0)
+                            <div class="count">({{ $count }})</div>
+                        @endif
                     </div>
 
                     <div class="reviews-open button general-popup-btn" data-popup="review-popup" data-product-id="{{ $product->id }}">
@@ -90,11 +83,23 @@
                 <div class="params-title-mobil">{{__('product-show.technical-specifications')}}</div>
                 <div class="params">
                     <div class="list flex-column">
+                        @if(!empty($product->article))
+                            <div class="item flex-justify">
+                                {{ __('product-show.article') }}
+                                <span class="label">{{ $product->article }}</span>
+                            </div>
+                        @endif
                         @foreach($product->getProductAttributes() as $attribute)
+                            @php
+                                $skipFields = ['master_qualification','room_temperature','store_terms'];
+                            @endphp
+                            @if(in_array($attribute->field_name ?? '', $skipFields, true))
+                                @continue
+                            @endif
                             @php
                                 $value = $attribute->pivot->value;
                             @endphp
-                            <div class="item flex-justify">{{ $attribute->name }} <span class="label">{{$value}}</span>
+                            <div class="item flex-justify">{{ $attribute->name }} <span class="label">{!! $value !!}</span>
                             </div>
                         @endforeach
                     </div>
@@ -112,7 +117,6 @@
                     </div>
                 @endif
 
-
                 <div id="product-slider" class="splide product-images-slider">
                     <div class="splide__track">
                         <ul class="splide__list">
@@ -124,7 +128,7 @@
                                         href="{{$image->getUrl()}}"
                                         title="{{$product->getName()}}"
                                         role="group">
-                                        <img loading="lazy" src="{{$image->getUrl()}}"
+                                        <img loading="lazy" src="{{App\Helpers\MediaHelper::getGalleryImageUrl($image)}}"
                                              title="{{$product->getName()}}"
                                              alt="{{$product->getName()}}">
                                     </a>
@@ -143,10 +147,10 @@
                         <ul class="splide__list">
                             @foreach($product->getMedia('images') as $key => $image)
                                 <li class="splide__slide">
-                                    <img data-src="{{$image->getUrl('preview')}}"
+                                    <img data-src="{{App\Helpers\MediaHelper::getThumbnailUrl($image)}}"
                                          title="{{$product->getName()}}"
                                          alt="{{$product->getName()}}"
-                                         src="{{$image->getUrl('preview')}}">
+                                         src="{{App\Helpers\MediaHelper::getThumbnailUrl($image)}}">
                                 </li>
                             @endforeach
                         </ul>
@@ -160,19 +164,19 @@
                 </div>
                 <div class="center flex-justify">
                     @php
-                        $count= $product->getStock();
+                        $count = $product->getStock();
                         $secondStock = $product->getSecondStock();
                         $thirdStock = $product->getThirdStock();
                     @endphp
                     <div class="left">
                         <div class="info flex-center">
                             <div class="availability">
-                                @if($product->getUnderOrder())
-                                    <i class="fas fa-times nonstock"></i>{{ __('product-show.under_order') }}
-                                @elseif($count == 0)
-                                    <i class="fas fa-times nonstock"></i>{{ __('product-show.out-of-stock') }}
-                                @else
+                                @if($count > 0)
                                     <i class="fas fa-check"></i>{{ __('product-show.in-stock') }}
+                                @elseif($product->getUnderOrder())
+                                    <i class="fas fa-times nonstock"></i>{{ __('product-show.under_order') }}
+                                @else
+                                    <i class="fas fa-times nonstock"></i>{{ __('product-show.out-of-stock') }}
                                 @endif
                             </div>
                         </div>
@@ -237,7 +241,7 @@
                             </div>
                         @endif
 
-                        @if($product->getRollSize())
+                        @if($product->getRollSize() && $count > $product->getSecondStock())
                             <ul class="product-discounts">
                                 @if($product->getSecondStock() && $product->getSecondStock() <= $count)
                                     <li>
@@ -312,9 +316,26 @@
                                 <div class="default">
                                     <div class="top-wrapper">
                                         <span class="text-total-summ">{{__('product-show.total')}}</span>
-                                        <span class="text-discount">
+                                        @php
+                                            // Определяем следующий достижимый порог скидки для показа сообщения
+                                            $showDiscountMessage = false;
+                                            if ($secondStock && $count >= $secondStock && $product->getPrice() != $product->getSmallPrice()) {
+                                                // Если второй порог достижим и даёт скидку
+                                                $showDiscountMessage = true;
+                                            } elseif ($thirdStock && $count >= $thirdStock && $product->getSmallPrice() != $product->getBigPrice()) {
+                                                // Если третий порог достижим и даёт скидку (и второго нет или он уже достигнут)
+                                                $showDiscountMessage = true;
+                                            }
+                                        @endphp
+                                        @if($showDiscountMessage)
+                                            <span class="text-discount">
                                               {!! __('product-show.discont-text')  !!}
                                             </span>
+                                        @else
+                                            <span class="text-discount" style="display: none;">
+                                              {!! __('product-show.discont-text')  !!}
+                                            </span>
+                                        @endif
                                     </div>
                                     <span class="autocalc-product-price"><span class="total-price">0.00</span> ₴</span>
                                 </div>
@@ -439,23 +460,196 @@
             </div>
         @endif
 
+        @if($product->hasYoutubeVideos() || $product->getVideos()->count() > 0)
+            @php
+                $youtubeVideos = $product->getYoutubeVideos();
+                $hasYoutube = $youtubeVideos->count() > 0;
+                
+                // Для обратной совместимости - если есть старое видео, но нет YouTube
+                $oldVideo = null;
+                $originalVideoUrl = null;
+                $posterImage = $product->getPreviewImage() ?: $product->getImage();
+                
+                if (!$hasYoutube && $product->getVideos()->count() > 0) {
+                    $oldVideo = $product->getFirstVideo();
+                    $mobileVideoUrl = $product->getMobileVideoUrl();
+                    $desktopVideoUrl = $product->getDesktopVideoUrl();
+                    $originalVideoUrl = $oldVideo ? $oldVideo->getUrl() : null;
+                    $posterImage = $product->getVideoPoster() ?: $posterImage;
+                }
+            @endphp
+            
+            @if($hasYoutube)
+                {{-- Слайдер YouTube видео --}}
+                <section class="home-about product-page-video product-page-video-slider">
+                    <div id="product-video-slider" class="splide">
+                        <div class="splide__track">
+                            <div class="splide__list">
+                                @foreach($youtubeVideos as $index => $youtubeVideo)
+                                    <div class="splide__slide product-video-slide" data-youtube-id="{{$youtubeVideo->youtube_id}}" data-youtube-url="{{$youtubeVideo->youtube_url}}">
+                                        <div class="product-video-slide-wrapper">
+                                            <div class="product-video-youtube-container" data-youtube-id="{{$youtubeVideo->youtube_id}}">
+                                                <img src="{{$youtubeVideo->getThumbnailUrl()}}" alt="Video thumbnail" class="product-video-youtube-thumbnail">
+                                                <div class="home-about-play button product-video-play-btn product-video-youtube-play-btn" 
+                                                     data-youtube-id="{{$youtubeVideo->youtube_id}}"
+                                                     data-youtube-url="{{$youtubeVideo->youtube_url}}"
+                                                     data-product-name="{{$product->getName()}}"
+                                                     data-product-price="{{number_format($product->getPrice(), 2, '.', '')}}"
+                                                     data-product-description="{{strip_tags($product->descriptions ?? '')}}"
+                                                     data-product-id="{{$product->id}}"
+                                                     data-product-stock="{{$product->getStock()}}">
+                                                    <i class="far fa-play button colord"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                {{-- Модальное окно с YouTube видео слайдером для мобильных --}}
+                <div id="product-video-modal" class="product-video-modal">
+                    <div class="product-video-modal-overlay"></div>
+                    <div class="product-video-modal-container">
+                        {{-- Слайдер YouTube видео по центру --}}
+                        <div class="product-video-modal-video">
+                            <div id="product-video-modal-slider" class="splide">
+                                <div class="splide__track">
+                                    <div class="splide__list">
+                                        @foreach($youtubeVideos as $youtubeVideo)
+                                            <div class="splide__slide product-video-modal-slide">
+                                                <div class="product-video-youtube-iframe-container" 
+                                                     data-youtube-id="{{$youtubeVideo->youtube_id ?: \App\Models\ProductVideo::extractYoutubeId($youtubeVideo->youtube_url)}}"
+                                                     data-youtube-url="{{$youtubeVideo->youtube_url}}">
+                                                    {{-- Индикатор загрузки --}}
+                                                    <div class="product-video-loading-spinner">
+                                                        <div class="spinner"></div>
+                                                        <p>{{__('product-show.loading-video')}}</p>
+                                                    </div>
+                                                    <iframe 
+                                                        class="product-video-youtube-iframe"
+                                                        src=""
+                                                        frameborder="0" 
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                        allowfullscreen>
+                                                    </iframe>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- Попап с информацией о товаре справа --}}
+                        <div class="product-video-modal-sidebar">
+                            <div class="product-video-modal-content">
+                                <h2 class="product-video-modal-title"></h2>
+                                <div class="product-video-modal-price"></div>
+                                <div class="product-video-modal-description"></div>
+                                <div class="product-video-modal-actions">
+                                    <button type="button" id="product-video-modal-back-btn" class="product-video-modal-back button">
+                                        <i class="fas fa-chevron-left"></i> {{__('product-show.back')}}
+                                    </button>
+                                    <button type="button" id="product-video-modal-cart-btn" class="product-video-modal-cart button colord"
+                                            data-product-id="{{$product->id}}"
+                                            data-product-quantity="{{$product->getDefaultQuantity()}}">
+                                        <i class="fas fa-chevron-right"></i>{{__('product-show.add-to-cart')}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                {{-- Старое видео (для обратной совместимости) --}}
+                <section class="home-about product-page-video">
+                    <video 
+                        id="product-video-player"
+                        class="product-video-player"
+                        width="1200"
+                        height="400"
+                        loop
+                        playsinline
+                        preload="none"
+                        loading="lazy"
+                        poster="{{$posterImage}}"
+                        data-mobile-video="{{$mobileVideoUrl ?? ''}}" 
+                        data-desktop-video="{{$desktopVideoUrl ?? ''}}" 
+                        data-original-video="{{$originalVideoUrl}}">
+                        <source src="{{$originalVideoUrl}}" type="{{$oldVideo->mime_type ?? 'video/mp4'}}">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="home-about-play button product-video-play-btn" 
+                         data-src="{{$originalVideoUrl}}" 
+                         data-product-name="{{$product->getName()}}"
+                         data-product-price="{{number_format($product->getPrice(), 2, '.', '')}}"
+                         data-product-description="{{strip_tags($product->descriptions ?? '')}}"
+                         data-product-id="{{$product->id}}"
+                         data-product-stock="{{$product->getStock()}}">
+                        <i class="far fa-play button colord"></i>
+                    </div>
+                </section>
+                
+                {{-- Модальное окно с видео и попапом товара для мобильных --}}
+                <div id="product-video-modal" class="product-video-modal">
+                    <div class="product-video-modal-overlay"></div>
+                    <div class="product-video-modal-container">
+                        {{-- Видео по центру --}}
+                        <div class="product-video-modal-video">
+                            <video 
+                                id="product-video-modal-player"
+                                class="product-video-modal-player"
+                                controls
+                                playsinline
+                                preload="auto">
+                                <source src="{{$originalVideoUrl}}" type="{{$oldVideo->mime_type ?? 'video/mp4'}}">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        
+                        {{-- Попап с информацией о товаре справа --}}
+                        <div class="product-video-modal-sidebar">
+                            <div class="product-video-modal-content">
+                                <h2 class="product-video-modal-title"></h2>
+                                <div class="product-video-modal-price"></div>
+                                <div class="product-video-modal-description"></div>
+                                <div class="product-video-modal-actions">
+                                    <button type="button" id="product-video-modal-back-btn" class="product-video-modal-back button">
+                                        <i class="fas fa-chevron-left"></i> {{__('product-show.back')}}
+                                    </button>
+                                    <button type="button" id="product-video-modal-cart-btn" class="product-video-modal-cart button colord"
+                                            data-product-id="{{$product->id}}"
+                                            data-product-quantity="{{$product->getDefaultQuantity()}}">
+                                        <i class="fas fa-chevron-right"></i>{{__('product-show.add-to-cart')}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endif
+
         <div class="product-page-info flex-justify wrap">
             <div class="item">
                 @if($product->descriptions)
-                    <div class="title">{{__('product-show.description')}}</div>
+                    <h2 class="title">{{__('product-show.description')}}</h2>
                     <div class="text">{!! $product->descriptions !!}</div>
                 @endif
             </div>
             @if($product->getBenefits())
                 <div class="item width-33">
-                    <div class="title">{{__('product-show.advantages')}}</div>
+                    <h2 class="title">{{__('product-show.advantages')}}</h2>
                     <div class="text">{!! $product->getBenefits() !!}
                     </div>
                 </div>
             @endif
             @if($product->getApplication())
                 <div class="item width-33">
-                    <div class="title">{{__('product-show.application')}}</div>
+                    <h2 class="title">{{__('product-show.application')}}</h2>
                     <div class="text">{!! $product->getApplication() !!}
                     </div>
                 </div>
@@ -500,7 +694,7 @@
     </section>
 
     @include('base.components.recommendations')
-    @include('base.components.examples-of-work')
+    {{-- @include('base.components.examples-of-work') --}}
     @include('base.components.consult-popup')
     @include('base.components.fast-order-popup')
     @include('base.components.reviews-popup')

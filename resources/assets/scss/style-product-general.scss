@@ -1073,6 +1073,247 @@
     }
 }
 
+// Слайдер YouTube видео
+.product-page-video-slider {
+    margin-top: 0;
+    margin-bottom: 50px;
+    width: 90%; // Ширина 90%
+    max-width: 900px; // Максимальная ширина для десктопа
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    
+    // Стрелки слайдера по центру видео (вертикально)
+    #product-video-slider {
+        position: relative;
+        
+        .splide__arrows {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            pointer-events: none !important;
+            margin: 0 !important;
+            
+            .splide__arrow,
+            button.splide__arrow {
+                position: absolute !important;
+                top: 50% !important;
+                bottom: auto !important;
+                transform: translateY(-50%) !important;
+                z-index: 1000 !important;
+                pointer-events: auto !important;
+                margin: 0 !important;
+                
+                &.splide__arrow--prev {
+                    left: 10px !important;
+                    right: auto !important;
+                }
+                
+                &.splide__arrow--next {
+                    right: 10px !important;
+                    left: auto !important;
+                }
+            }
+        }
+    }
+    
+    .product-video-slide {
+        position: relative;
+        
+        .product-video-slide-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 45%; // Высота 80% от стандартного соотношения (56.25% * 0.8)
+            overflow: hidden;
+            border-radius: 10px;
+            
+            .product-video-youtube-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                
+                .product-video-youtube-thumbnail {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+                
+                .product-video-youtube-iframe {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    border: none;
+                }
+                
+                .product-video-youtube-play-btn {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    z-index: 10;
+                    
+                    &.home-about-play,
+                    & {
+                        .button {
+                            width: 91px !important; // Исправляем размер кнопки (91x90)
+                            height: 90px !important;
+                            min-width: 91px !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    @media screen and (max-width: 767px) {
+        margin-left: -15px;
+        margin-right: -15px;
+        width: calc(100% + 30px);
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        
+        #product-video-slider {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: 100% !important;
+            
+            .splide__track {
+                display: block !important;
+                visibility: visible !important;
+                width: 100% !important;
+            }
+            
+            .splide__list {
+                display: flex !important;
+                visibility: visible !important;
+                width: 100% !important;
+            }
+        }
+        
+        .product-video-slide {
+            display: block !important;
+            visibility: visible !important;
+            width: 100% !important;
+            
+            .product-video-slide-wrapper {
+                padding-bottom: 56.25%;
+                display: block !important;
+                visibility: visible !important;
+                width: 100% !important;
+                
+                .product-video-youtube-container {
+                    display: block !important;
+                    visibility: visible !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    
+                    .product-video-youtube-thumbnail {
+                        display: block !important;
+                        visibility: visible !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        object-fit: cover !important;
+                    }
+                    
+                    .product-video-youtube-play-btn {
+                        display: flex !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                    }
+                }
+            }
+        }
+        
+        // Стрелки слайдера на мобильной версии
+        .splide__arrows {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            
+            .splide__arrow {
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                width: 40px !important;
+                height: 40px !important;
+                background-color: rgba(0, 0, 0, 0.5) !important;
+                border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                color: #fff !important;
+                z-index: 1000 !important;
+                backdrop-filter: blur(5px);
+                
+                svg {
+                    fill: #fff !important;
+                }
+                
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.7) !important;
+                    border-color: rgba(255, 255, 255, 0.5) !important;
+                }
+            }
+        }
+        
+        // Пагинация на мобильной версии
+        .splide__pagination {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            bottom: 10px !important;
+            z-index: 1000 !important;
+            
+            .splide__pagination__page {
+                width: 8px !important;
+                height: 8px !important;
+                background-color: rgba(255, 255, 255, 0.5) !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                
+                &.is-active {
+                    background-color: rgba(255, 255, 255, 1) !important;
+                }
+            }
+        }
+    }
+}
+
+.product-page-video {
+    margin-top: 0;
+    margin-bottom: 50px;
+    max-width: 1000px; // Уменьшили размер блока
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    
+    video {
+        width: 100%;
+        max-width: 1000px; // Уменьшили размер блока
+        height: auto;
+        max-height: 400px;
+        object-fit: cover;
+        border-radius: 10px;
+        display: block;
+    }
+    
+    // Исправляем размер кнопки play
+    .home-about-play {
+        .button {
+            width: 91px !important;
+            height: 90px !important;
+            min-width: 91px !important;
+        }
+    }
+}
+
 @media screen and (max-width: 767px) {
     .product-page-example {
         margin-bottom: 30px;
@@ -1090,6 +1331,770 @@
         width: 32px;
         height: 32px;
         font-size: 10px;
+    }
+    
+    .product-page-video {
+        margin-bottom: 30px;
+        margin-left: -15px;
+        margin-right: -15px;
+        width: calc(100% + 30px);
+        overflow: hidden;
+        justify-content: center;
+        display: flex;
+        
+        video {
+            max-width: 90%;
+            height: 250px;
+            width: 100%;
+            object-fit: cover;
+            
+            // Скрываем стандартные элементы управления HTML5 видео на мобильных
+            &::-webkit-media-controls {
+                display: none !important;
+            }
+            
+            &::-webkit-media-controls-enclosure {
+                display: none !important;
+            }
+            
+            &::-webkit-media-controls-panel {
+                display: none !important;
+            }
+            
+            &::-webkit-media-controls-play-button {
+                display: none !important;
+            }
+            
+            &::-webkit-media-controls-start-playback-button {
+                display: none !important;
+            }
+            
+            &::-moz-media-controls {
+                display: none !important;
+            }
+            
+            &::media-controls {
+                display: none !important;
+            }
+        }
+    }
+    
+    // На десктопе показываем controls когда они включены
+    @media (min-width: 768px) {
+        .product-page-video video.product-video-player[controls] {
+            &::-webkit-media-controls {
+                display: flex !important;
+            }
+            
+            &::-webkit-media-controls-enclosure {
+                display: flex !important;
+            }
+            
+            &::-webkit-media-controls-panel {
+                display: flex !important;
+            }
+            
+            &::-webkit-media-controls-play-button {
+                display: inline-block !important;
+            }
+            
+            &::-moz-media-controls {
+                display: block !important;
+            }
+            
+            &::media-controls {
+                display: block !important;
+            }
+        }
+    }
+    
+    // Модальное окно с видео и попапом товара для мобильных
+    // На десктопе полностью скрываем все элементы модального окна
+    @media (min-width: 768px) {
+        #product-video-modal,
+        #product-video-modal *,
+        .product-video-modal,
+        .product-video-modal *,
+        .product-video-modal-overlay,
+        .product-video-modal-container,
+        .product-video-modal-video,
+        #product-video-modal-player,
+        .product-video-modal-player,
+        .product-video-modal-close,
+        .product-video-modal-sidebar,
+        .product-video-modal-content,
+        .product-video-modal-title,
+        .product-video-modal-price,
+        .product-video-modal-description,
+        .product-video-modal-actions,
+        .product-video-modal-cart,
+        #product-video-modal-slider,
+        #product-video-modal-slider *,
+        #product-video-modal-slider .splide__pagination,
+        #product-video-modal-slider .splide__pagination * {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            position: absolute !important;
+            top: -9999px !important;
+            left: -9999px !important;
+            width: 0 !important;
+            height: 0 !important;
+            max-width: 0 !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+        }
+    }
+    
+    // Стили для мобильных устройств
+    @media (max-width: 767px) {
+        #product-video-modal.product-video-modal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 9999 !important;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            visibility: hidden;
+            
+            &.active {
+                display: block !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                pointer-events: auto !important;
+            }
+            
+            .product-video-modal-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9);
+                z-index: 1 !important;
+                pointer-events: auto !important;
+                cursor: pointer;
+            }
+            
+            .product-video-modal-container {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                z-index: 10 !important;
+            }
+            
+            .product-video-modal-video {
+                position: relative;
+                width: 100%;
+                flex: 0 0 auto;
+                height: 50vh;
+                max-height: 400px;
+                z-index: 1;
+                min-height: 300px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                box-sizing: border-box;
+                
+                // Создаем отдельный слой для кнопки закрытия, который будет выше iframe
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100px; // Область сверху, где находится кнопка закрытия
+                    z-index: 1000;
+                    pointer-events: none; // Пропускаем клики, но создаем контекст
+                }
+                
+                // Прозрачный overlay поверх всего видео для блокировки кликов на iframe
+                // Но пропускает клики на кнопку закрытия и стрелки слайдера
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 9998;
+                    pointer-events: none;
+                    background: transparent;
+                }
+                
+                // Блокируем overlay когда кнопка закрытия активна или когда класс blocking-iframe установлен
+                &:has(.product-video-modal-close:hover)::after,
+                &:has(.product-video-modal-close:active)::after,
+                &.blocking-iframe::after {
+                    pointer-events: auto;
+                    z-index: 9998;
+                }
+                
+                // Кнопка закрытия должна быть выше всех элементов, включая кнопки слайдера
+                .product-video-modal-close {
+                    position: absolute !important;
+                    z-index: 1001 !important; // Выше кнопок слайдера (z-index: 1000) и iframe
+                    pointer-events: auto !important;
+                    // Создаем новый stacking context, как у кнопок слайдера
+                    transform: translateZ(0);
+                    will-change: transform;
+                }
+                
+                .splide__arrow {
+                    position: absolute !important;
+                    z-index: 1000 !important;
+                    transform: translateY(-50%) translateZ(0) !important;
+                    will-change: transform;
+                }
+                
+                // Слайдер YouTube видео в модальном окне
+                #product-video-modal-slider {
+                    width: 100%;
+                    height: 100%;
+                    position: relative;
+                    z-index: 1 !important; // Ниже кнопки закрытия
+                    
+                    .splide__track {
+                        height: 100%;
+                        z-index: 1 !important;
+                    }
+                    
+                    .splide__list {
+                        height: 100%;
+                        z-index: 1 !important;
+                    }
+                    
+                    // Стрелки слайдера в модальном окне - делаем их видимыми и правильно позиционируем
+                    .splide__arrows {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        bottom: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        display: flex !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                        pointer-events: none !important;
+                        margin: 0 !important;
+                        
+                        .splide__arrow {
+                            position: absolute !important;
+                            top: 50% !important;
+                            bottom: auto !important;
+                            transform: translateY(-50%) !important;
+                            z-index: 1000 !important;
+                            width: 40px !important;
+                            height: 40px !important;
+                            background-color: rgba(0, 0, 0, 0.5) !important;
+                            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                            color: #fff !important;
+                            opacity: 1 !important;
+                            visibility: visible !important;
+                            pointer-events: auto !important;
+                            backdrop-filter: blur(5px);
+                            
+                            // Блокируем взаимодействие с iframe при наведении на кнопку
+                            &:hover,
+                            &:active,
+                            &:focus {
+                                z-index: 10000 !important;
+                                
+                                // Блокируем все iframe в слайдере при взаимодействии с кнопкой
+                                ~ * iframe,
+                                + * iframe,
+                                ~ * .product-video-youtube-iframe,
+                                + * .product-video-youtube-iframe {
+                                    pointer-events: none !important;
+                                }
+                            }
+                            
+                            // Блокируем iframe при клике на кнопку
+                            &::before {
+                                content: '';
+                                position: absolute;
+                                top: -50%;
+                                left: -50%;
+                                width: 200%;
+                                height: 200%;
+                                z-index: 9999;
+                                pointer-events: auto;
+                            }
+                            
+                            svg {
+                                fill: #fff !important;
+                            }
+                            
+                            &.splide__arrow--prev {
+                                left: 10px !important;
+                                right: auto !important;
+                            }
+                            
+                            &.splide__arrow--next {
+                                right: 10px !important;
+                                left: auto !important;
+                            }
+                            
+                            &:hover {
+                                background-color: rgba(0, 0, 0, 0.7) !important;
+                                border-color: rgba(255, 255, 255, 0.5) !important;
+                            }
+                        }
+                    }
+                    
+                    // Пагинация слайдера
+                    .splide__pagination {
+                        display: flex !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                        bottom: 10px !important;
+                        z-index: 1000 !important;
+                        
+                        .splide__pagination__page {
+                            width: 8px !important;
+                            height: 8px !important;
+                            background-color: rgba(255, 255, 255, 0.5) !important;
+                            opacity: 1 !important;
+                            visibility: visible !important;
+                            
+                            &.is-active {
+                                background-color: rgba(255, 255, 255, 1) !important;
+                            }
+                        }
+                    }
+                    
+                    .product-video-modal-slide {
+                        height: 100%;
+                        
+                        .product-video-youtube-iframe-container {
+                            position: relative;
+                            width: 100%;
+                            height: 100%;
+                            padding-bottom: 0; // Убираем padding, используем высоту контейнера
+                            
+                            // Индикатор загрузки
+                            .product-video-loading-spinner {
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                justify-content: center;
+                                background-color: rgba(0, 0, 0, 0.8);
+                                z-index: 10;
+                                transition: opacity 0.3s ease;
+                                
+                                &.hidden {
+                                    opacity: 0;
+                                    pointer-events: none;
+                                }
+                                
+                                .spinner {
+                                    width: 50px;
+                                    height: 50px;
+                                    border: 4px solid rgba(255, 255, 255, 0.2);
+                                    border-top-color: $mod-main-color;
+                                    border-radius: 50%;
+                                    animation: spin 1s linear infinite;
+                                    margin-bottom: 15px;
+                                }
+                                
+                                p {
+                                    color: #ffffff;
+                                    font-size: 14px;
+                                    margin: 0;
+                                }
+                            }
+                            
+                            @keyframes spin {
+                                to {
+                                    transform: rotate(360deg);
+                                }
+                            }
+                            
+                            .product-video-youtube-iframe {
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                border: none;
+                                z-index: 1 !important; // Ниже кнопок навигации (z-index: 1000)
+                                pointer-events: auto; // Разрешаем взаимодействие с видео
+                            }
+                        }
+                    }
+                    
+                    // Блокируем iframe когда пользователь взаимодействует с кнопками навигации
+                    .splide__arrows:hover ~ * .product-video-youtube-iframe,
+                    .splide__arrows:active ~ * .product-video-youtube-iframe,
+                    .splide__arrow:hover ~ * .product-video-youtube-iframe,
+                    .splide__arrow:active ~ * .product-video-youtube-iframe {
+                        pointer-events: none !important;
+                    }
+                    
+                    // Блокируем pointer-events для iframe, когда пользователь взаимодействует с кнопками
+                    &:has(.splide__arrow:hover) .product-video-youtube-iframe {
+                        pointer-events: none !important;
+                    }
+                }
+                
+                .product-video-modal-close {
+                    position: absolute !important;
+                    top: 60px !important;
+                    right: 15px !important;
+                    width: 40px;
+                    height: 40px;
+                    background-color: rgba(0, 0, 0, 0.7) !important;
+                    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+                    border-radius: 50%;
+                    color: #ffffff !important;
+                    font-size: 18px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1001 !important; // Выше слоя ::after (z-index: 1000) и кнопок слайдера
+                    pointer-events: auto !important;
+                    transition: all 0.3s ease;
+                    // Создаем новый stacking context
+                    transform: translateZ(0);
+                    will-change: transform;
+                    
+                    // Блокируем iframe при взаимодействии с кнопкой закрытия
+                    &:hover,
+                    &:active,
+                    &:focus {
+                        z-index: 10001 !important;
+                        background-color: rgba(0, 0, 0, 0.9) !important;
+                        border-color: rgba(255, 255, 255, 0.8) !important;
+                    }
+                    
+                    &:hover {
+                        background-color: rgba(0, 0, 0, 0.9) !important;
+                        border-color: rgba(255, 255, 255, 0.8) !important;
+                    }
+                }
+                
+                // Блокируем все iframe когда кнопка закрытия активна
+                &:has(.product-video-modal-close:hover) .product-video-youtube-iframe,
+                &:has(.product-video-modal-close:active) .product-video-youtube-iframe,
+                &:has(.product-video-modal-close:focus) .product-video-youtube-iframe {
+                    pointer-events: none !important;
+                    z-index: 1 !important;
+                }
+                
+                &:has(.product-video-modal-close:hover) .product-video-youtube-iframe-container::before,
+                &:has(.product-video-modal-close:active) .product-video-youtube-iframe-container::before,
+                &:has(.product-video-modal-close:focus) .product-video-youtube-iframe-container::before {
+                    pointer-events: auto !important;
+                    z-index: 9999 !important;
+                }
+                
+                .product-video-modal-player {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                    border-radius: 10px;
+                }
+            }
+            
+            .product-video-modal-sidebar {
+                width: 100%;
+                background-color: #1a1a1a;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                max-height: 50vh;
+                overflow-y: auto;
+                transform: translateY(100%);
+                transition: transform 0.4s ease;
+            }
+            
+            &.active .product-video-modal-sidebar {
+                transform: translateY(0);
+            }
+            
+            .product-video-modal-content {
+                padding: 20px;
+                color: #ffffff;
+                
+                .product-video-modal-title {
+                    font-size: 18px;
+                    font-weight: 700;
+                    margin-bottom: 15px;
+                    color: #ffffff;
+                    line-height: 1.3;
+                }
+                
+                .product-video-modal-price {
+                    font-size: 24px;
+                    font-weight: 700;
+                    margin-bottom: 15px;
+                    color: $mod-main-color;
+                    
+                    .only-price {
+                        color: $mod-main-color;
+                    }
+                }
+                
+                .product-video-modal-description {
+                    font-size: 14px;
+                    line-height: 1.6;
+                    color: rgba(255, 255, 255, 0.8);
+                    margin-bottom: 20px;
+                    max-height: 150px;
+                    overflow-y: auto;
+                }
+                
+                .product-video-modal-actions {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 18px;
+                    
+                    // Фолбек: если где-то перебивается flex/gap — все равно делаем отступ между кнопками
+                    > * + * {
+                        margin-top: 18px !important;
+                    }
+                    
+                    .product-video-modal-back {
+                        width: 100%;
+                        padding: 15px 20px;
+                        font-size: 16px;
+                        border-radius: 10px;
+                        background-color: rgba(128, 128, 128, 0.3);
+                        border: 1px solid rgba(128, 128, 128, 0.5);
+                        color: rgba(255, 255, 255, 0.9);
+                        text-transform: uppercase;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        
+                        &:hover {
+                            background-color: rgba(128, 128, 128, 0.4);
+                            border-color: rgba(128, 128, 128, 0.6);
+                            color: #ffffff;
+                        }
+                        
+                        i {
+                            margin-right: 8px; // Стрелка перед текстом "Назад"
+                        }
+                    }
+                    
+                    .product-video-modal-cart {
+                        width: 100%;
+                        padding: 15px 20px;
+                        font-size: 16px;
+                        border-radius: 10px;
+                        background-color: $mod-main-color;
+                        border: 1px solid $mod-main-color;
+                        color: #ffffff;
+                        text-transform: uppercase;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        
+                        &:hover {
+                            background-color: darken($mod-main-color, 10%);
+                            border-color: darken($mod-main-color, 10%);
+                        }
+                        
+                        i {
+                            margin-right: 8px;
+                        }
+                    }
+                }
+            }
+        }
+        
+        body.modal-open {
+            overflow: hidden;
+        }
+    }
+}
+
+// Дополнительные правила для скрытия модального окна на десктопе (в конце файла для максимальной специфичности)
+@media (min-width: 768px) {
+    #product-video-modal,
+    #product-video-modal *,
+    #product-video-modal *::before,
+    #product-video-modal *::after,
+    .product-video-modal,
+    .product-video-modal *,
+    .product-video-modal *::before,
+    .product-video-modal *::after,
+    .product-video-modal-overlay,
+    .product-video-modal-container,
+    .product-video-modal-container *,
+    .product-video-modal-video,
+    .product-video-modal-video *,
+    #product-video-modal-player,
+    .product-video-modal-player,
+    .product-video-modal-close,
+    .product-video-modal-sidebar,
+    .product-video-modal-sidebar *,
+    .product-video-modal-content,
+    .product-video-modal-content *,
+    .product-video-modal-title,
+    .product-video-modal-price,
+    .product-video-modal-description,
+    .product-video-modal-actions,
+    .product-video-modal-actions *,
+    .product-video-modal-cart {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        max-width: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        font-size: 0 !important;
+        line-height: 0 !important;
+    }
+}
+
+// Правила для мобильных устройств (после правил для десктопа, чтобы перекрыть их)
+@media (max-width: 767px) {
+    #product-video-modal.product-video-modal.active {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 9999 !important;
+    }
+    
+    // Более специфичные правила для элементов внутри модального окна
+    #product-video-modal.product-video-modal.active .product-video-modal-overlay,
+    #product-video-modal.product-video-modal.active .product-video-modal-container,
+    #product-video-modal.product-video-modal.active .product-video-modal-video,
+    #product-video-modal.product-video-modal.active .product-video-modal-sidebar,
+    #product-video-modal.product-video-modal.active .product-video-modal-content,
+    #product-video-modal.product-video-modal.active .product-video-modal-title,
+    #product-video-modal.product-video-modal.active .product-video-modal-price,
+    #product-video-modal.product-video-modal.active .product-video-modal-description,
+    #product-video-modal.product-video-modal.active .product-video-modal-actions,
+    #product-video-modal.product-video-modal.active .product-video-modal-cart,
+    #product-video-modal.product-video-modal.active .product-video-modal-close,
+    #product-video-modal.product-video-modal.active .product-video-modal-player {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 1000 !important;
+        pointer-events: auto !important;
+    }
+}
+
+// Модальное окно для десктопа с видео и controls
+.product-video-modal-desktop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    visibility: hidden;
+    
+    &.active {
+        display: flex;
+        opacity: 1;
+        visibility: visible;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .product-video-modal-desktop-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+    }
+    
+    .product-video-modal-desktop-container {
+        position: relative;
+        width: 90%;
+        max-width: 1200px;
+        z-index: 10;
+        
+        .product-video-modal-desktop-close {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 11;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.3);
+                border-color: rgba(255, 255, 255, 0.5);
+            }
+        }
+        
+        // Контейнер для YouTube iframe
+        .product-video-youtube-iframe-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; // 16:9 aspect ratio
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            background-color: #000;
+            
+            .product-video-youtube-iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+        }
+        
+        .product-video-modal-desktop-player {
+            width: 100%;
+            height: auto;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 10px;
+            background-color: #000;
+        }
     }
 }
 
@@ -1218,10 +2223,192 @@
     }
 }
 
+// Дополнительные стили для исправления проблем со слайдером YouTube видео
+// Стрелки по центру видео (вертикально)
+.product-page-video-slider#product-video-slider,
+#product-video-slider.product-page-video-slider {
+    position: relative;
+    
+    .splide__arrows {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        pointer-events: none !important;
+        margin: 0 !important;
+        
+        .splide__arrow,
+        button.splide__arrow {
+            position: absolute !important;
+            top: 50% !important;
+            bottom: auto !important;
+            transform: translateY(-50%) !important;
+            z-index: 1000 !important;
+            pointer-events: auto !important;
+            margin: 0 !important;
+            
+            &.splide__arrow--prev {
+                left: 10px !important;
+                right: auto !important;
+            }
+            
+            &.splide__arrow--next {
+                right: 10px !important;
+                left: auto !important;
+            }
+        }
+    }
+}
+
+// Размер кнопки play
+.product-page-video-slider .product-video-youtube-play-btn.home-about-play.button,
+.product-page-video .home-about-play.button,
+.product-page-video-slider .home-about-play.button {
+    .button,
+    & {
+        width: 91px !important;
+        height: 90px !important;
+        min-width: 91px !important;
+    }
+}
+
 .input-group-quantity-default-xvr {
     span {
         &.input-group-btn {
             display: flex;
         }
     }
+}
+
+// КРИТИЧЕСКИ ВАЖНО: Переопределение стрелок для YouTube слайдера
+// Должно быть в конце файла для максимальной специфичности
+.splide#product-video-slider .splide__arrows button.splide__arrow,
+#product-video-slider.splide .splide__arrows button.splide__arrow,
+.product-page-video-slider .splide#product-video-slider .splide__arrows button,
+.product-page-video-slider #product-video-slider .splide__arrows button,
+.splide#product-video-slider .splide__arrows .splide__arrow,
+#product-video-slider.splide .splide__arrows .splide__arrow,
+.product-page-video-slider .splide#product-video-slider .splide__arrows .splide__arrow,
+.product-page-video-slider #product-video-slider .splide__arrows .splide__arrow {
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+    z-index: 1000 !important;
+    pointer-events: auto !important;
+    
+    &.splide__arrow--prev {
+        left: 10px !important;
+        right: auto !important;
+    }
+    
+    &.splide__arrow--next {
+        right: 10px !important;
+        left: auto !important;
+    }
+}
+
+// Специфичные стили для стрелок в модальном окне
+#product-video-modal #product-video-modal-slider .splide__arrows .splide__arrow,
+#product-video-modal #product-video-modal-slider .splide__arrows button.splide__arrow,
+#product-video-modal #product-video-modal-slider .splide__arrows .splide__arrow--prev,
+#product-video-modal #product-video-modal-slider .splide__arrows .splide__arrow--next,
+#product-video-modal.product-video-modal.active #product-video-modal-slider .splide__arrows .splide__arrow,
+#product-video-modal.product-video-modal.active #product-video-modal-slider .splide__arrows button.splide__arrow,
+#product-video-modal.product-video-modal.active #product-video-modal-slider .splide__arrows .splide__arrow--prev,
+#product-video-modal.product-video-modal.active #product-video-modal-slider .splide__arrows .splide__arrow--next {
+    z-index: 1000 !important;
+    pointer-events: auto !important;
+}
+
+// Максимально специфичные стили для кнопки закрытия модального окна
+#product-video-modal .product-video-modal-close,
+#product-video-modal.product-video-modal.active .product-video-modal-close,
+.product-video-modal.product-video-modal.active .product-video-modal-close,
+#product-video-modal.product-video-modal .product-video-modal-close {
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+    position: absolute !important;
+}
+
+#product-video-modal .product-video-modal-overlay,
+#product-video-modal.product-video-modal.active .product-video-modal-overlay {
+    z-index: 1 !important;
+    pointer-events: auto !important;
+    position: absolute !important;
+}
+
+#product-video-modal .product-video-modal-container,
+#product-video-modal.product-video-modal.active .product-video-modal-container {
+    z-index: 10 !important;
+    position: relative !important;
+}
+
+// Максимально специфичные стили для кнопки закрытия - должна быть выше всех элементов YouTube
+// На мобилке используем absolute, на десктопе fixed
+@media (max-width: 767px) {
+    #product-video-modal .product-video-modal-close,
+    #product-video-modal.product-video-modal.active .product-video-modal-close,
+    .product-video-modal.product-video-modal.active .product-video-modal-close,
+    #product-video-modal.product-video-modal .product-video-modal-close,
+    #product-video-modal .product-video-modal-video .product-video-modal-close,
+    #product-video-modal.product-video-modal.active .product-video-modal-video .product-video-modal-close,
+    .product-video-modal.product-video-modal.active .product-video-modal-video .product-video-modal-close {
+        z-index: 10000 !important;
+        pointer-events: auto !important;
+        position: absolute !important;
+        top: 60px !important;
+        right: 15px !important;
+        background-color: rgba(0, 0, 0, 0.7) !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        color: #ffffff !important;
+    }
+}
+
+@media (min-width: 768px) {
+    #product-video-modal .product-video-modal-close,
+    #product-video-modal.product-video-modal.active .product-video-modal-close,
+    .product-video-modal.product-video-modal.active .product-video-modal-close,
+    #product-video-modal.product-video-modal .product-video-modal-close,
+    #product-video-modal .product-video-modal-video .product-video-modal-close,
+    #product-video-modal.product-video-modal.active .product-video-modal-video .product-video-modal-close,
+    .product-video-modal.product-video-modal.active .product-video-modal-video .product-video-modal-close {
+        z-index: 999999 !important;
+        pointer-events: auto !important;
+        position: fixed !important;
+        top: 25px !important;
+        right: 25px !important;
+    }
+}
+
+// Блокируем все iframe когда кнопка закрытия активна
+#product-video-modal.product-video-modal.active .product-video-modal-close:hover ~ * iframe,
+#product-video-modal.product-video-modal.active .product-video-modal-close:active ~ * iframe,
+#product-video-modal.product-video-modal.active .product-video-modal-close:focus ~ * iframe,
+#product-video-modal.product-video-modal.active .product-video-modal-video .product-video-modal-close:hover ~ * iframe,
+#product-video-modal.product-video-modal.active .product-video-modal-video .product-video-modal-close:active ~ * iframe {
+    pointer-events: none !important;
+    z-index: 1 !important;
+}
+
+// Блокируем все iframe когда модальное окно закрывается
+#product-video-modal.closing-modal iframe,
+#product-video-modal.closing-modal .product-video-youtube-iframe {
+    pointer-events: none !important;
+    z-index: 1 !important;
+}
+
+// Максимально специфичные стили для всех стрелок слайдера
+.splide__arrow.splide__arrow--next,
+.splide__arrow.splide__arrow--prev,
+button.splide__arrow.splide__arrow--next,
+button.splide__arrow.splide__arrow--prev,
+#product-video-slider .splide__arrow.splide__arrow--next,
+#product-video-slider .splide__arrow.splide__arrow--prev,
+#product-video-modal-slider .splide__arrow.splide__arrow--next,
+#product-video-modal-slider .splide__arrow.splide__arrow--prev {
+    z-index: 1000 !important;
+    pointer-events: auto !important;
 }

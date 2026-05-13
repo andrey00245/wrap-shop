@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -12,10 +13,13 @@ use Illuminate\Support\Facades\Hash;
 class RegisteredUserController extends Controller
 {
     /**
-     * @param Request $request
-     *
-     * @return mixed
+     * Редирект на головну з відкриттям модалки реєстрації.
      */
+    public function create(): RedirectResponse
+    {
+        return redirect()->to(route('index').'?modal=register');
+    }
+
     public function store(Request $request): mixed
     {
         $request->validate([
@@ -27,11 +31,11 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
-            'name'      => $request->name,
+            'name' => $request->name,
             'last_name' => $request->last_name,
-            'email'     => $request->email,
-            'phone'     => $request->phone,
-            'password'  => Hash::make($request->password),
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
         ]);
 
         event(new Registered($user));
@@ -39,7 +43,7 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         return response()->json([
-            'redirect_url' => route('account', absolute: false)
+            'redirect_url' => route('account', absolute: false),
         ]);
     }
 }

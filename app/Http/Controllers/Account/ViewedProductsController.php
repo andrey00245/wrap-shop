@@ -10,7 +10,10 @@ class ViewedProductsController extends Controller
 {
   public function index(){
     session()->get('viewProducts', []);
-    $viewedProducts = Product::query()->whereIn('id', session()->get('viewProducts', []))->get();
+    $viewedProducts = Product::query()
+        ->where('is_active', 1)
+        ->whereIn('id', session()->get('viewProducts', []))
+        ->get();
     return view('base.pages.account.viewed-products', [
       'viewedProducts' => $viewedProducts
     ]);

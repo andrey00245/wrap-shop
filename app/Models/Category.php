@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -12,8 +13,25 @@ use Spatie\Translatable\HasTranslations;
 class Category extends Model implements HasMedia
 {
     use HasFactory,
-        InteractsWithMedia,
-        HasTranslations;
+        HasTranslations,
+        InteractsWithMedia;
+
+    protected static function booted(): void
+    {
+        static::saving(function (Category $category) {
+            if (! $category->isDirty('name')) {
+                return;
+            }
+
+            $category->setTranslations(
+                'slug',
+                array_merge(
+                    $category->getTranslations('slug'),
+                    $category->generateSlugsFromName()
+                )
+            );
+        });
+    }
 
     protected $translatable = ['name', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'h1', 'content', 'seo_text'];
 
@@ -51,7 +69,13 @@ class Category extends Model implements HasMedia
             ->addMediaConversion('preview')
             ->width(310)
             ->height(310)
-            ->format('png')
+            ->nonQueued();
+
+        $this
+            ->addMediaConversion('preview_webp')
+            ->width(310)
+            ->height(310)
+            ->format('webp')
             ->nonQueued();
     }
 
@@ -85,7 +109,7 @@ class Category extends Model implements HasMedia
 
     public function getSlugEnAttribute()
     {
-      return $this->getTranslation('slug', 'en');
+        return $this->getTranslation('slug', 'en');
     }
 
     public function products()
@@ -103,6 +127,30 @@ class Category extends Model implements HasMedia
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
+    /**
+     * Сегменти URL каталогу від кореня до цієї категорії: plivki/kolorovi-plivky
+     */
+    public function catalogPath(?string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+        $chain = [];
+        $cursor = $this;
+        while ($cursor) {
+            $chain[] = $cursor;
+            $cursor = $cursor->parent;
+        }
+        $chain = array_reverse($chain);
+        $segments = [];
+        foreach ($chain as $c) {
+            $slug = $c->getTranslation('slug', $locale) ?: $c->getTranslation('slug', 'en');
+            if ($slug !== null && $slug !== '') {
+                $segments[] = $slug;
+            }
+        }
+
+        return implode('/', $segments);
+    }
+
     public function getNameUkAttribute()
     {
         return $this->getTranslation('name', 'uk');
@@ -110,16 +158,45 @@ class Category extends Model implements HasMedia
 
     public function getImage(): string
     {
-       return $this->getFirstMediaUrl('main');
+        return $this->getFirstMediaUrl('main');
+    }
+
+    public function getPreviewImage(): string
+    {
+        $media = $this->getFirstMedia('main');
+        if ($media && $media->hasGeneratedConversion('preview_webp')) {
+            return $media->getUrl('preview_webp');
+        }
+
+        return $this->getFirstMediaUrl('main');
     }
 
     public function isParent(): bool
     {
-       return is_null($this->parent_id);
+        return is_null($this->parent_id);
     }
 
     public function hasChildren(): bool
     {
         return $this->children()->exists();
+    }
+
+    protected function generateSlugsFromName(): array
+    {
+        $slugs = [];
+        $names = $this->getTranslations('name');
+
+        foreach ($this->getTranslatableLocales() as $locale) {
+            if (! empty($names[$locale])) {
+                $slugs[$locale] = Str::slug($names[$locale]);
+            }
+        }
+
+        return array_filter($slugs);
+    }
+
+    protected function getTranslatableLocales(): array
+    {
+        return config('tab-translatable.locales', ['uk', 'ru', 'en']);
     }
 }

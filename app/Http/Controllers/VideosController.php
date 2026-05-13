@@ -6,6 +6,7 @@ use App\Models\Video;
 use App\Models\VideoCategory;
 use App\Models\VideoReview;
 use Illuminate\View\View;
+use function ZipStream\addDirectory;
 
 class VideosController extends Controller
 {
@@ -34,8 +35,10 @@ class VideosController extends Controller
      *
      * @return View
      */
-    public function show(VideoCategory $category): View
+    public function show($id): View
     {
+        $category = VideoCategory::findOrFail($id);
+
         $videos = VideoReview::query()
             ->where('category_id', $category->id)
             ->where('is_active', true)
@@ -48,7 +51,8 @@ class VideosController extends Controller
 
         return view('base.pages.videoreviews', compact(
                 'videos',
-                'categories'
+                'categories',
+                'category'
             )
         );
     }

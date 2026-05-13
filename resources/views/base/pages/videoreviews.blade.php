@@ -49,9 +49,9 @@
   <div id="page-video" class="page-default wrap">
     <h1 class="default-title">{{__('video-reviews.title')}}</h1>
     <nav class="page-default-nav flex-center">
-      <a href="{{route('videoreviews')}}" class="button ocdw_blog-list-group-item {{request()->route('category') ? '' : 'active'}}" title="{{__('video-reviews.title')}}">{{__('video-reviews.all')}}</a>
+      <a href="{{route('videoreviews')}}" class="button ocdw_blog-list-group-item {{request()->route('id') ? '' : 'active'}}" title="{{__('video-reviews.title')}}">{{__('video-reviews.all')}}</a>
         @foreach($categories as $category)
-      <a href="{{route('videos.show', ['category' => $category->id])}}" class="button ocdw_blog-list-group-item {{request()->route('category') && request()->route('category')->id === $category->id ? 'active' : ''}}" title="{{$category->name}}">{{$category->name}}</a>
+      <a href="{{route('videos.show', ['id' => $category->id])}}" class="button ocdw_blog-list-group-item {{request()->route('id') && request()->route('id') == $category->id ? 'active' : ''}}" title="{{$category->name}}">{{$category->name}}</a>
         @endforeach
     </nav>
     <div class="page-video row">

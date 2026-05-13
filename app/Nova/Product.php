@@ -3,11 +3,11 @@
 namespace App\Nova;
 
 use App\Nova\Actions\TranslateProductContent;
+use App\Nova\Fields\NovaTabTranslatable;
 use App\Nova\Filters\TranslatedStatusFilter;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
@@ -38,7 +38,6 @@ class Product extends Resource
     {
         return 'Продукти';
     }
-
 
     public function authorizedToReplicate(Request $request)
     {
@@ -90,15 +89,15 @@ class Product extends Resource
             });
     }
 
-//    public static function searchable(Request $request)
-//    {
-//        $query = parent::searchable($request);
-//
-//        // Фильтруем только те товары, которые имеют атрибут "volume"
-//        return $query->whereHas('attributes', function ($q) {
-//            $q->where('field_name', 'volume');
-//        });
-//    }
+    //    public static function searchable(Request $request)
+    //    {
+    //        $query = parent::searchable($request);
+    //
+    //        // Фильтруем только те товары, которые имеют атрибут "volume"
+    //        return $query->whereHas('attributes', function ($q) {
+    //            $q->where('field_name', 'volume');
+    //        });
+    //    }
 
     public function fields(Request $request)
     {
@@ -113,32 +112,53 @@ class Product extends Resource
     {
         return [
             NovaTabTranslatable::make([
-                Text::make('Назва', 'name'),
+                Text::make('Назва', 'name')
+                    ->rules('required', 'string', 'max:255')
+                    ->help('Обовʼязкове поле'),
                 CkEditor::make('Опис', 'descriptions')
                     ->nullable(),
+                Text::make('Meta Title', 'meta_title')
+                    ->help('Ручний meta title для товару. Якщо заповнений — шаблон не використовується.')
+                    ->hideFromIndex(),
+                Textarea::make('Meta Description', 'meta_description')
+                    ->rows(3)
+                    ->help('Ручний meta description для товару. Якщо заповнений — шаблон не використовується.')
+                    ->hideFromIndex(),
             ])->hideFromIndex(),
 
             Text::make('Назва', 'name')
                 ->displayUsing(function ($value) {
-                    return Str::limit($value, 50) . (strlen($value) > 50 ? '...' : '');
+                    return Str::limit($value, 50).(strlen($value) > 50 ? '...' : '');
                 })
                 ->onlyOnIndex()
                 ->nullable(),
 
-            BelongsTo::make('Категория','category',Category::class)->nullable(),
+            BelongsTo::make('Категорія', 'category', Category::class)->nullable(),
 
-            Text::make('Арикул', 'article')
+            Text::make('Артикул', 'article')
                 ->nullable(),
 
+            Text::make('Внешний код', 'external_code')
+                ->sortable()
+                ->rules('nullable', 'string', 'max:255')
+                ->help('Необовʼязкове поле')
+                ->hideFromIndex(),
+
             Text::make('Код', 'code')
-                ->sortable(),
+                ->sortable()
+                ->rules('nullable', 'string', 'max:255')
+                ->help('Необовʼязкове поле'),
 
             Images::make('Фото', 'images')
-                ->conversionOnIndexView('preview'),
+                ->conversionOnIndexView('preview_webp'),
 
-            Number::make('Кількість','stock')
-                ->sortable(),
-            Boolean::make('Активний','is_active')
+            Number::make('Кількість', 'stock')
+                ->sortable()
+                ->rules('required', 'numeric', 'min:0')
+                ->step(0.01)
+                ->default(0)
+                ->help('Обовʼязкове поле'),
+            Boolean::make('Активний', 'is_active')
                 ->sortable(),
             Boolean::make('Перекладено', function () {
                 return $this->is_translated;
@@ -147,14 +167,14 @@ class Product extends Resource
                 ->falseValue(false)
                 ->sortable()
                 ->onlyOnIndex(),
-            HasMany::make('Типи Цін','prices',ProductPrices::class),
+            HasMany::make('Типи Цін', 'prices', ProductPrices::class),
             BelongsToMany::make('Атрибуты', 'attributes', Attribute::class)
                 ->fields(function () {
                     return [
                         NovaTabTranslatable::make([
                             CkEditor::make('Значение', 'value')
                                 ->rules('required'),
-                        ])
+                        ]),
                     ];
                 }),
 
@@ -167,25 +187,27 @@ class Product extends Resource
                     return $this->hasVolumeAttribute();
                 })
                 ->searchable()
-                ->hideFromIndex()
+                ->hideFromIndex(),
         ];
     }
 
-    protected function Banners() {
+    protected function Banners()
+    {
         return [
             NovaTabTranslatable::make([
                 Text::make('Назва', 'banner_title'),
             ])->hideFromIndex(),
             Images::make('Фото Вигляду', 'banner_images')
-                ->conversionOnIndexView('preview')
-            ->hideFromIndex(),
+                ->conversionOnIndexView('preview_webp')
+                ->hideFromIndex(),
+            HasMany::make('YouTube Відео', 'youtubeVideos', ProductVideo::class)
+                ->hideFromIndex(),
         ];
     }
 
     /**
      * Get the cards available for the request.
      *
-     * @param \Laravel\Nova\Http\Requests\NovaRequest $request
      *
      * @return array
      */
@@ -197,21 +219,19 @@ class Product extends Resource
     /**
      * Get the filters available for the resource.
      *
-     * @param \Laravel\Nova\Http\Requests\NovaRequest $request
      *
      * @return array
      */
     public function filters(NovaRequest $request)
     {
         return [
-            new TranslatedStatusFilter(),
+            new TranslatedStatusFilter,
         ];
     }
 
     /**
      * Get the lenses available for the resource.
      *
-     * @param \Laravel\Nova\Http\Requests\NovaRequest $request
      *
      * @return array
      */
@@ -223,14 +243,13 @@ class Product extends Resource
     /**
      * Get the actions available for the resource.
      *
-     * @param \Laravel\Nova\Http\Requests\NovaRequest $request
      *
      * @return array
      */
     public function actions(NovaRequest $request)
     {
         return [
-            new TranslateProductContent(),
+            new TranslateProductContent,
         ];
     }
 }

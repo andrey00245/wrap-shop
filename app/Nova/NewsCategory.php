@@ -2,7 +2,7 @@
 
 namespace App\Nova;
 
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
+use App\Nova\Fields\NovaTabTranslatable;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
@@ -35,13 +35,12 @@ class NewsCategory extends Resource
      * @var array
      */
     public static $search = [
-        'id', 'name'
+        'id', 'name',
     ];
 
     /**
      * Get the fields displayed by the resource.
      *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
      * @return array
      */
     public function fields(NovaRequest $request)
@@ -49,10 +48,10 @@ class NewsCategory extends Resource
         return [
             ID::make()->sortable(),
             NovaTabTranslatable::make([
-                Text::make('Назва','name'),
+                Text::make('Назва', 'name'),
             ])->setTitle('Назва'),
 
-            HasMany::make('Новини','news',News::class),
+            HasMany::make('Новини', 'news', News::class),
         ];
     }
 }

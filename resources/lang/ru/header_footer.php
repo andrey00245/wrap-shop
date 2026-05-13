@@ -17,6 +17,7 @@ return [
   'subscribe' => 'Оформите подписку и будьте в теме!',
   'subscribe_btn' => 'Отправить',
   'all_rights_reserved' => 'Все права защищены. © :year',
+  'films_in_other_cities' => 'Пленки в других городах',
 
   'home' => 'Главная'
 

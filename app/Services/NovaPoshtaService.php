@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
-use Psy\Util\Str;
-use function Doctrine\DBAL\Query\orderBy;
 
 class NovaPoshtaService
 {
@@ -54,10 +52,16 @@ class NovaPoshtaService
     }
 
     /**
-     * Получить отделения по городу
+     * Отделения по городу.
+     *
+     * @param  bool  $cargoOnly  Плівка від 1 м.п. — лише вантажні відділення НП (ліміт у довіднику 200/1100 кг тощо).
      */
-    public function getWarehouses(string $cityRef)
+    public function getWarehouses(?string $cityRef, bool $cargoOnly = false): array
     {
+        if ($cityRef === null || $cityRef === '') {
+            return [];
+        }
+
         try {
             $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
                 'apiKey'           => $this->apiKey,
@@ -75,19 +79,36 @@ class NovaPoshtaService
                 $locale = app()->getLocale();
                 // Если данные есть, продолжаем маппинг
                 if (!empty($data['data'])) {
-                    $warehouses = collect($data['data'])->filter(function ($warehouse) {
-                        return $warehouse['CategoryOfWarehouse'] === 'Branch' || $warehouse['CategoryOfWarehouse'] === 'Store';
-                    })->map(function ($warehouse) use($locale) {
+                    $rows = collect($data['data'])->filter(function ($warehouse) {
+                        return ($warehouse['CategoryOfWarehouse'] ?? '') === 'Branch'
+                            || ($warehouse['CategoryOfWarehouse'] ?? '') === 'Store';
+                    });
+
+                    if ($cargoOnly) {
+                        $filtered = $rows->filter(fn (array $w) => $this->isCargoWarehouse($w));
+                        if ($filtered->isEmpty() && $rows->isNotEmpty()) {
+                            \Log::warning('Nova Poshta: cargo_only відфільтрував усі відділення, повертаємо повний список Branch/Store', [
+                                'cityRef' => $cityRef,
+                                'before' => $rows->count(),
+                            ]);
+                            $filtered = $rows;
+                        }
+                        $rows = $filtered;
+                    }
+
+                    return $rows->map(function ($warehouse) use ($locale) {
+                        $baseName = $locale === 'ru'
+                            ? (string) ($warehouse['DescriptionRu'] ?? '')
+                            : (string) ($warehouse['Description'] ?? '');
+
                         return [
                             'id' => $warehouse['Ref'], // уникальный идентификатор склада
-                            'name' => $locale === 'ru' ? $warehouse['DescriptionRu'] : $warehouse['Description'],
+                            'name' => $this->warehouseDisplayName($warehouse, $baseName, $locale),
                             'address' => $warehouse['ShortAddress'], // короткий адрес
                             'city' => $warehouse['CityDescription'], // город
                             'region' =>  $locale === 'ru' ?  $warehouse['SettlementAreaDescriptionRu']: $warehouse['SettlementAreaDescription'], // область
                         ];
-                    });
-
-                    return $warehouses->toArray(); // Возвращаем результат
+                    })->values()->all();
                 } else {
                     return [];
                 }
@@ -98,6 +119,89 @@ class NovaPoshtaService
         } catch (\Exception $e) {
             return [];
         }
+    }
+
+    /**
+     * Назва для UI: у API часто короткий Description, у Google/на вивісках — «Вантажне відділення №1 (до 1100 кг)».
+     * Доповнюємо з PlaceMaxWeightAllowed та позначкою вантажного класу, якщо цього немає в тексті з НП.
+     */
+    private function warehouseDisplayName(array $w, string $baseName, string $locale): string
+    {
+        $name = $baseName;
+        $lower = mb_strtolower($name);
+
+        $pw = $this->parseNpScalar($w['PlaceMaxWeightAllowed'] ?? null);
+
+        $hasKgInText = (bool) preg_match('/\d{2,4}\s*кг/u', $name);
+        $hasCargoWords = str_contains($lower, 'вантаж')
+            || str_contains($lower, 'грузов')
+            || str_contains($lower, 'груз')
+            || str_contains($lower, 'cargo');
+        $hasCargoLimitInText = $hasKgInText
+            || str_contains($lower, '200')
+            || str_contains($lower, '1100')
+            || str_contains($lower, '1000');
+
+        if ($pw !== null && $pw >= 45 && ! $hasKgInText) {
+            $kg = (int) round($pw);
+            $name .= match ($locale) {
+                'ru' => " (до {$kg} кг)",
+                'en' => " (up to {$kg} kg)",
+                default => " (до {$kg} кг)",
+            };
+        }
+
+        if ($this->isCargoWarehouse($w) && ! $hasCargoWords && ! $hasCargoLimitInText) {
+            if ($locale === 'ru' && preg_match('/^Отделение\s+/u', $name)) {
+                $name = preg_replace('/^Отделение\s+/u', 'Грузовое отделение ', $name, 1);
+            } elseif ($locale !== 'ru' && preg_match('/^Відділення\s+/u', $name)) {
+                $name = preg_replace('/^Відділення\s+/u', 'Вантажне відділення ', $name, 1);
+            }
+        }
+
+        return $name;
+    }
+
+    /**
+     * Вантажне відділення для рулонної плівки: Place → Total (лише якщо place немає) → текст опису.
+     */
+    private function isCargoWarehouse(array $w): bool
+    {
+        $pw = $this->parseNpScalar($w['PlaceMaxWeightAllowed'] ?? null);
+
+        if ($pw !== null) {
+            return $pw >= 200;
+        }
+
+        $tw = $this->parseNpScalar($w['TotalMaxWeightAllowed'] ?? null);
+
+        if ($tw !== null) {
+            return $tw >= 200;
+        }
+
+        $text = mb_strtolower(
+            (string) ($w['Description'] ?? '').' '.(string) ($w['DescriptionRu'] ?? ''),
+            'UTF-8'
+        );
+
+        return str_contains($text, '200')
+            || str_contains($text, '1100')
+            || str_contains($text, 'вантаж')
+            || str_contains($text, 'груз');
+    }
+
+    private function parseNpScalar(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        $normalized = str_replace([' ', ','], ['', '.'], (string) $value);
+        if (! is_numeric($normalized)) {
+            return null;
+        }
+        $n = (float) $normalized;
+
+        return is_finite($n) ? $n : null;
     }
 
     /**
@@ -113,21 +217,10 @@ class NovaPoshtaService
             
             if ($timeSinceLastRequest < 0.5) {
                 $sleepTime = 0.5 - $timeSinceLastRequest;
-                \Log::info('NovaPoshta API - задержка между запросами', [
-                    'sleep_time' => $sleepTime,
-                    'time_since_last_request' => $timeSinceLastRequest
-                ]);
                 usleep($sleepTime * 1000000); // Конвертируем в микросекунды
             }
             
             $lastRequestTime = microtime(true);
-            
-            \Log::info('NovaPoshta API - запрос почтоматов', [
-                'cityRef' => $cityRef,
-                'apiKey' => substr($this->apiKey, 0, 10) . '...',
-                'apiKey_length' => strlen($this->apiKey),
-                'apiKey_empty' => empty($this->apiKey)
-            ]);
             
             $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
                 'apiKey'           => $this->apiKey,
@@ -138,25 +231,9 @@ class NovaPoshtaService
                 ]
             ]);
 
-            \Log::info('NovaPoshta API - ответ почтоматов', [
-                'status' => $response->status(),
-                'successful' => $response->successful(),
-                'body_length' => strlen($response->body()),
-                'body_preview' => substr($response->body(), 0, 500)
-            ]);
-
             if ($response->successful()) {
                 $data = $response->json();
                 $locale = app()->getLocale();
-
-                \Log::info('NovaPoshta API - данные почтоматов', [
-                    'has_data' => !empty($data['data']),
-                    'data_count' => !empty($data['data']) ? count($data['data']) : 0,
-                    'locale' => $locale,
-                    'response_structure' => array_keys($data),
-                    'success' => $data['success'] ?? 'not_set',
-                    'errors' => $data['errors'] ?? 'not_set'
-                ]);
 
                 // Проверяем на ошибку "Too many requests"
                 if (isset($data['success']) && $data['success'] === false && 
@@ -188,23 +265,9 @@ class NovaPoshtaService
                 if (!empty($data['data'])) {
                     $allWarehouses = collect($data['data']);
                     
-                    // Логируем все категории складов для отладки
-                    $categories = $allWarehouses->pluck('CategoryOfWarehouse')->unique()->values()->toArray();
-                    \Log::info('NovaPoshta API - категории складов', [
-                        'categories' => $categories,
-                        'total_warehouses' => $allWarehouses->count()
-                    ]);
-                    
                     $postomatWarehouses = $allWarehouses->filter(function ($warehouse) {
                         return $warehouse['CategoryOfWarehouse'] === 'Postomat';
                     });
-                    
-                    \Log::info('NovaPoshta API - фильтрация почтоматов', [
-                        'total_warehouses' => $allWarehouses->count(),
-                        'postomat_warehouses' => $postomatWarehouses->count(),
-                        'first_warehouse' => $allWarehouses->first(),
-                        'postomat_categories' => $postomatWarehouses->pluck('CategoryOfWarehouse')->unique()->values()->toArray()
-                    ]);
                     
                     $postMachines = $postomatWarehouses->map(function ($warehouse) use ($locale) {
                         return [
@@ -223,13 +286,6 @@ class NovaPoshtaService
                     foreach ($result as $index => $item) {
                         $resultObject[$index] = $item;
                     }
-                    
-                    \Log::info('NovaPoshta API - результат почтоматов', [
-                        'result_count' => count($resultObject),
-                        'is_array' => is_array($resultObject),
-                        'is_object' => is_object($resultObject),
-                        'first_item' => !empty($resultObject) ? reset($resultObject) : null
-                    ]);
                     
                     return $resultObject;
                 } else {

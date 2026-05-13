@@ -2,11 +2,8 @@
 
 namespace App\Nova;
 
-use App\Models\Language;
-use Illuminate\Http\Request;
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
+use App\Nova\Fields\NovaTabTranslatable;
 use Laravel\Nova\Fields\Boolean;
-use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Trix;
@@ -53,10 +50,10 @@ class Faq extends Resource
                     ->hideFromIndex(),
             ])->hideFromIndex(),
 
-
             Text::make('Вопрос (Українська)', function () {
                 $question = $this->question ?? '';
-                return mb_strlen($question) > 80 ? mb_substr($question, 0, 80) . '...' : $question;
+
+                return mb_strlen($question) > 80 ? mb_substr($question, 0, 80).'...' : $question;
             })
                 ->onlyOnIndex()
                 ->hideFromDetail()

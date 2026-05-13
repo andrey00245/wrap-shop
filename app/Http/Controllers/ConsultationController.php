@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Consultation;
+use App\Services\MoySkladSyncService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ConsultationController extends Controller
 {
@@ -18,6 +20,16 @@ class ConsultationController extends Controller
         ]);
 
         $consultation = Consultation::create($validated);
+
+        // Отправляем консультацию в МойСклад
+        try {
+            MoySkladSyncService::sendConsultation($consultation);
+        } catch (\Exception $e) {
+            Log::error('Помилка відправки консультації в МойСклад', [
+                'consultation_id' => $consultation->id,
+                'error' => $e->getMessage()
+            ]);
+        }
 
         // Возвращаем успешный ответ
         return response()->json([

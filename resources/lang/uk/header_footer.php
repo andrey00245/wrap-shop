@@ -1,25 +1,26 @@
 <?php
+
 return [
-  'catalog_products' => 'Каталог товарів',
-  'video_reviews' => 'Відеоогляди',
-  'delivery' => 'Доставка',
-  'news' => 'Новини',
-  'about_us' => 'Про нас',
-  'contact_us' => 'Контакти',
-  'offers' => 'Оферта',
-  'phone' => 'Телефон',
+    'catalog_products' => 'Каталог товарів',
+    'video_reviews' => 'Відеоогляди',
+    'delivery' => 'Доставка',
+    'news' => 'Новини',
+    'about_us' => 'Про нас',
+    'contact_us' => 'Контакти',
+    'offers' => 'Оферта',
+    'store_reviews' => 'Відгуки клієнтів',
+    'phone' => 'Телефон',
 
-  'read_more' => 'Читати більше',
-  'read_less' => 'Згорнути',
-  'phone_notice' => 'Введіть номер телефону в міжнародному форматі, наприклад +380xxxxxxxxxxx',
-  'information' => 'Інформація',
-  'our_office' => 'Наш офіс',
-  'subscribe' => 'Оформіть підписку та будьте в темі!',
-  'subscribe_btn' => 'Відправити',
-  'all_rights_reserved' => 'Всі права захищені. © :year',
+    'read_more' => 'Читати більше',
+    'read_less' => 'Згорнути',
+    'phone_notice' => 'Введіть номер телефону в міжнародному форматі, наприклад +380xxxxxxxxxxx',
+    'information' => 'Інформація',
+    'our_office' => 'Наш офіс',
+    'subscribe' => 'Оформіть підписку та будьте в темі!',
+    'subscribe_btn' => 'Відправити',
+    'all_rights_reserved' => 'Всі права захищені. © :year',
+    'films_in_other_cities' => 'Плівки в інших містах',
 
-  'home' => 'Головна'
-
+    'home' => 'Головна',
 
 ];
-?>

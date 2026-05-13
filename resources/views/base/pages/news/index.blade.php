@@ -70,12 +70,20 @@
         @if(Route::currentRouteName() === 'news.index')
           @foreach($categories as $category)
             @foreach($category->news as $new)
+              @php
+                $mainMedia = $new->getMedia('main')->first();
+                $newsUrl = ($new->slugEn && $new->category?->slugEn)
+                  ? route('news.show', ['news_category' => $new->category->slugEn, 'news' => $new->slugEn])
+                  : route('news.index');
+              @endphp
               <a class="item"
-                 href="{{route('news.show', ['news_category' => $new->category->slugEn, 'news' => $new->slugEn])}}"
+                 href="{{ $newsUrl }}"
                  title="{{$new->title}}">
-                <img src="{{$new->getMedia('main')[0]->getUrl('preview')}}" title="{{$new->title}}"
-                     alt="{{$new->title}}"
-                     class="img-responsive">
+                @if($mainMedia)
+                  <img src="{{ $mainMedia->getUrl('preview_webp') }}" title="{{$new->title}}"
+                       alt="{{$new->title}}"
+                       class="img-responsive">
+                @endif
                 <div class="caption">
                   <div class="description"><i class="fal fa-book-open button"></i>{{$new->read_time}}</div>
                   <div class="name">{{$new->title}}</div>
@@ -85,12 +93,20 @@
           @endforeach
         @else
           @foreach($news_category->news as $new)
+            @php
+              $mainMedia = $new->getMedia('main')->first();
+              $newsUrl = ($new->slugEn && $new->category?->slugEn)
+                ? route('news.show', ['news_category' => $new->category->slugEn, 'news' => $new->slugEn])
+                : route('news.index');
+            @endphp
             <a class="item"
-               href="{{route('news.show', ['news_category' => $new->category->slugEn, 'news' => $new->slugEn])}}"
+               href="{{ $newsUrl }}"
                title="{{$new->title}}">
-              <img src="{{$new->getMedia('main')[0]->getUrl('preview')}}" title="{{$new->title}}"
-                   alt="{{$new->title}}"
-                   class="img-responsive">
+              @if($mainMedia)
+                <img src="{{ $mainMedia->getUrl('preview_webp') }}" title="{{$new->title}}"
+                     alt="{{$new->title}}"
+                     class="img-responsive">
+              @endif
               <div class="caption">
                 <div class="description"><i class="fal fa-book-open button"></i>{{$new->read_time}}</div>
                 <div class="name">{{$new->title}}</div>

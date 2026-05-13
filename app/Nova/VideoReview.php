@@ -2,15 +2,14 @@
 
 namespace App\Nova;
 
+use App\Nova\Fields\NovaTabTranslatable;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
-use Laravel\Nova\Fields\Boolean;
-use Mostafaznv\NovaVideo\Video as VideoField;
-use Mostafaznv\NovaVideo\Enums\NovaVideoMode;
 use Illuminate\Http\Request;
-use Kongulov\NovaTabTranslatable\NovaTabTranslatable;
 use Kongulov\NovaTabTranslatable\TranslatableTabToRowTrait;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Text;
+use Mostafaznv\NovaVideo\Video as VideoField;
 
 class VideoReview extends Resource
 {
@@ -38,13 +37,13 @@ class VideoReview extends Resource
     {
         return [
             NovaTabTranslatable::make([
-                Text::make('Назва', 'title')
+                Text::make('Назва', 'title'),
             ])->hideFromIndex(),
 
-            BelongsTo::make('Категорія','category',VideoCategory::class),
-            Images::make('Фото','image'),
+            BelongsTo::make('Категорія', 'category', VideoCategory::class),
+            Images::make('Фото', 'image'),
             VideoField::make('Відео', 'video'),
-            Boolean::make('Активний','is_active'),
+            Boolean::make('Активний', 'is_active'),
         ];
     }
 }

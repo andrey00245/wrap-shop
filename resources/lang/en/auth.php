@@ -19,4 +19,5 @@ return [
     'enter_email_or_phone' => 'Enter your email or phone number.',
     'user_not_found_or_no_email' => 'User with this phone number not found or missing email.',
     'sms_password_sent' => 'A new password has been sent via SMS.',
+    'use_header_form' => 'Please use the login or registration form in the site header.',
 ];

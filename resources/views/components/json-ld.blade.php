@@ -3,7 +3,8 @@
     $currentUrl = url()->current();
     $siteName = 'Wrap.Shop';
     $siteDescription = 'Інтернет-магазин плівок для автомобілів, матеріалів для детейлінгу та тюнінгу';
-    
+    $isHome = \Illuminate\Support\Facades\Route::currentRouteName() === 'index';
+
     if ($locale === 'ru') {
         $siteDescription = 'Интернет-магазин пленок для автомобилей, материалов для детейлинга и тюнинга';
     } elseif ($locale === 'en') {
@@ -40,29 +41,72 @@
                 "{{ $image->getUrl() }}"{{ $key < $product->getMedia('images')->count() - 1 ? ',' : '' }}
             @endforeach
         ],
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "{{ $average ?? 0 }}",
-            "reviewCount": "{{ $count ?? 0 }}"
-        }
+      "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ min($average ?? 1, 5) }}",
+    "reviewCount": "{{ $count ?? 0 }}"
+       }
     }
     </script>
 @elseif(isset($category))
-    {{-- Category JSON-LD --}}
+    {{-- Category JSON-LD (CollectionPage) --}}
+    @php
+        $categoryDescription = $category->content ?? $category->seo_text ?? ($category->name . ' - ' . $siteDescription);
+        $categoryDescription = strip_tags($categoryDescription);
+
+        $categoryFaqs = \App\Models\Faq::active()
+            ->ordered()
+            ->get();
+
+        $categoryFaqJson = null;
+        if ($categoryFaqs->isNotEmpty()) {
+            $categoryFaqJson = [
+                '@context' => 'https://schema.org',
+                '@type' => 'FAQPage',
+                'mainEntity' => $categoryFaqs->map(function (\App\Models\Faq $faq) use ($locale) {
+                    return [
+                        '@type' => 'Question',
+                        'name' => $faq->getTranslation('question', $locale),
+                        'acceptedAnswer' => [
+                            '@type' => 'Answer',
+                            'text' => strip_tags($faq->getTranslation('answer', $locale)),
+                        ],
+                    ];
+                })->toArray(),
+            ];
+        }
+    @endphp
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
         "name": "{{ $category->name }}",
-        "description": "{{ $category->name }} - {{ $siteDescription }}",
+        "description": "{{ $categoryDescription }}",
         "url": "{{ $currentUrl }}",
+        "about": {
+            "@type": "Thing",
+            "name": "{{ $category->name }}"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "{{ $siteName }}",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{{ url('assets/img/logo.png') }}"
+            }
+        },
         "mainEntity": {
             "@type": "ItemList",
             "name": "{{ $category->name }}",
-            "description": "Товари в категорії {{ $category->name }}"
+            "description": "{{ $locale === 'ru' ? 'Товары в категории' : ($locale === 'en' ? 'Products in category' : 'Товари в категорії') }} {{ $category->name }}"
         }
     }
     </script>
+    @if($categoryFaqJson)
+        <script type="application/ld+json">
+            {!! json_encode($categoryFaqJson, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+        </script>
+    @endif
 @elseif(isset($news))
     {{-- News Article JSON-LD --}}
     <script type="application/ld+json">
@@ -100,7 +144,7 @@
         "logo": "{{ url('assets/img/logo.png') }}",
         "contactPoint": {
             "@type": "ContactPoint",
-            "telephone": "+38-066-000-32-02",
+            "telephone": "{{ $settings?->phone_view ?: ($settings?->phone ?: '+38-066-000-32-02') }}",
             "contactType": "customer service",
             "areaServed": "UA",
             "availableLanguage": ["Ukrainian", "Russian", "English"]
@@ -117,4 +161,34 @@
         ]
     }
     </script>
+    @php
+        $homeFaqJson = null;
+        if ($isHome) {
+            $homeFaqs = \App\Models\Faq::active()
+                ->ordered()
+                ->get();
+
+            if ($homeFaqs->isNotEmpty()) {
+                $homeFaqJson = [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'FAQPage',
+                    'mainEntity' => $homeFaqs->map(function (\App\Models\Faq $faq) use ($locale) {
+                        return [
+                            '@type' => 'Question',
+                            'name' => $faq->getTranslation('question', $locale),
+                            'acceptedAnswer' => [
+                                '@type' => 'Answer',
+                                'text' => strip_tags($faq->getTranslation('answer', $locale)),
+                            ],
+                        ];
+                    })->toArray(),
+                ];
+            }
+        }
+    @endphp
+    @if($homeFaqJson)
+        <script type="application/ld+json">
+            {!! json_encode($homeFaqJson, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+        </script>
+    @endif
 @endif

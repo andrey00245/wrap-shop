@@ -1,16 +1,30 @@
 @extends('base.layouts.app')
+
+@php
+    $searchHasPage = request()->filled('page') && (int) request()->get('page') > 1;
+    $searchHasSortFilters = request()->hasAny([
+        'sort_by', 'sort_direction', 'sort', 'order', 'ocf', 'min_price', 'max_price', 'in_stock',
+    ]);
+    $searchAllowedKeys = ['search', 'category_id', 'description', 'sub_category', 'page', 'path'];
+    $searchQueryExtra = request()->except($searchAllowedKeys);
+    $searchHasAttributeFilters = count(array_filter($searchQueryExtra, fn ($v) => $v !== null && $v !== '')) > 0;
+    $searchNoindex = $searchHasPage || $searchHasSortFilters || $searchHasAttributeFilters;
+@endphp
+@section('robots', $searchNoindex ? 'noindex,follow' : __('seo.default_robots'))
+
+@push('styles')
+    @if($theme === 'dark')
+        <link rel="stylesheet" href="{{mix('build/css/all-dark.css')}}">
+        <link rel="stylesheet" href="{{mix('build/css/style-category-dark.css')}}">
+    @else
+        <link rel="stylesheet" href="{{mix('build/css/all-light.css')}}">
+        <link rel="stylesheet" href="{{mix('build/css/style-category-light.css')}}">
+    @endif
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"/>
+    @include('base.pages.products.partials.is-stock-switch-styles')
+@endpush
+
 @section('content')
-
-    @push('styles')
-        @if($theme === 'dark')
-            <link rel="stylesheet" href="{{mix('build/css/all-dark.css')}}">
-            <link rel="stylesheet" href="{{mix('build/css/style-category-dark.css')}}">
-        @else
-            <link rel="stylesheet" href="{{mix('build/css/all-light.css')}}">
-            <link rel="stylesheet" href="{{mix('build/css/style-category-light.css')}}">
-        @endif
-
-    @endpush
     <section class="category-page row">
         <div class="category-top">
             <img class="products-background" src="{{asset('assets/img/search-page/background.jpg')}}" alt="background">
@@ -39,8 +53,6 @@
                 </div>
                 <div class="ocf-container ocf-theme-light ocf-mobile-1 ocf-mobile-left ocf-vertical ocf-left"
                      id="ocf-module-1">
-                    <link rel="stylesheet" href="">
-
                     <div class="ocf-content">
                         <div class="ocf-header">
                             {{__('product-index.filter')}}
@@ -65,7 +77,7 @@
                                               unset($urlWithoutPrices['max_price']);
                                               unset($urlWithoutPrices['min_price']);
                                               echo
-                                              '<button type="button" onclick="location = \''.URL::current() . '?' . http_build_query($urlWithoutPrices).'\'" class="ocf-selected-discard" title="'. __("product-index.price_from_to", ["min" => $queryParams['min_price'], "max" => $queryParams['max_price']]) .'">
+                                              '<button type="button" onclick="location = \''.(http_build_query($urlWithoutPrices) === '' ? URL::current() : URL::current() . '?' . http_build_query($urlWithoutPrices)).'\'" class="ocf-selected-discard" title="'. __("product-index.price_from_to", ["min" => $queryParams['min_price'], "max" => $queryParams['max_price']]) .'">
                                                 <span class="ocf-selected-value-name">'. __("product-index.price_from_to", ["min" => $queryParams['min_price'], "max" => $queryParams['max_price']]) .'</span>
                                                 <i class="ocf-icon ocf-times"></i>
                                               </button>';
@@ -157,6 +169,27 @@
                                 </div>
                                 @foreach($attributes as $attribute)
                                     @if($attribute->field_name === 'main_shade')
+                                        @php
+                                            $mainShadePivotValues = $attribute->getPivotValue();
+                                            $mainShadeHasVisibleOption = false;
+                                            foreach ($mainShadePivotValues as $_msVal) {
+                                                $_msCount = $responseArray['attributes_count'][$attribute->field_name][$_msVal]['count'] ?? 0;
+                                                $_msSelectedValues = array_key_exists($attribute->field_name, request()->query())
+                                                    ? array_map(
+                                                        fn ($v) => mb_strtolower(trim((string) $v)),
+                                                        (array) request()->query()[$attribute->field_name]
+                                                    )
+                                                    : [];
+                                                $_msSelected = in_array(mb_strtolower(trim((string) $_msVal)), $_msSelectedValues, true) ? 'ocf-selected' : '';
+                                                if ($_msCount > 0 || $_msSelected !== '') {
+                                                    $mainShadeHasVisibleOption = true;
+                                                    break;
+                                                }
+                                            }
+                                        @endphp
+                                        @unless($mainShadeHasVisibleOption)
+                                            @continue
+                                        @endunless
                                         <div class="ocf-filter ocf-open ocf-dropdown">
                                             <div class="ocf-filter-body">
                                                 <div class="ocf-filter-header" data-ocf="expand">
@@ -172,16 +205,24 @@
                                                     <div class="ocf-value-list">
                                                         <div class="ocf-scroll-y">
                                                             <div class="ocf-value-list-body">
-                                                                @foreach($attribute->getPivotValue() as $value)
+                                                                @foreach($mainShadePivotValues as $value)
                                                                     @php
-                                                                        $count = $responseArray['attributes_count'][$attribute->field_name][$value]['count'];
-                                                                        $selected = array_key_exists($attribute->field_name, request()->query()) ? (in_array($value, request()->query()[$attribute->field_name]) ? 'ocf-selected' : '') : ''
+                                                                        $count = $responseArray['attributes_count'][$attribute->field_name][$value]['count'] ?? 0;
+                                                                        $selectedValues = array_key_exists($attribute->field_name, request()->query())
+                                                                            ? array_map(
+                                                                                fn ($v) => mb_strtolower(trim((string) $v)),
+                                                                                (array) request()->query()[$attribute->field_name]
+                                                                            )
+                                                                            : [];
+                                                                        $currentNormalized = mb_strtolower(trim((string) $value));
+                                                                        $selected = in_array($currentNormalized, $selectedValues, true) ? 'ocf-selected' : '';
+                                                                        $showOption = $count > 0 || $selected !== '';
                                                                     @endphp
+                                                                    @if($showOption)
                                                                     <button type="button"
                                                                             class="ocf-value ocf-checkbox filterProducts {{$selected}}"
                                                                             data-filter="{{$value}}"
-                                                                            data-filter-type="{{$attribute->field_name}}"
-                                                                        {{$count === 0 && $selected ==='' ? 'disabled' : ''}}>
+                                                                            data-filter-type="{{$attribute->field_name}}">
 
                                     <span class="ocf-value-color"
                                           style="background-color: {{__('colors.' . $value)}};"></span>
@@ -189,9 +230,10 @@
                                                                         <span class="ocf-value-name">{{$value}}</span>
                                                                         <span class="ocf-value-append">
                                       <span
-                                          class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$responseArray['attributes_count'][$attribute->field_name][$value]['count']}}</span>
+                                          class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$count}}</span>
                                     </span>
                                                                     </button>
+                                                                    @endif
                                                                 @endforeach
                                                             </div>
                                                         </div>
@@ -203,6 +245,27 @@
                                 @endforeach
                                 @foreach($attributes as $attribute)
                                     @if($attribute->field_name !== 'main_shade')
+                                        @php
+                                            $attrPivotValues = $attribute->getPivotValue();
+                                            $attrHasVisibleOption = false;
+                                            foreach ($attrPivotValues as $_avVal) {
+                                                $_avCount = $responseArray['attributes_count'][$attribute->field_name][$_avVal]['count'] ?? 0;
+                                                $_avSelectedValues = array_key_exists($attribute->field_name, request()->query())
+                                                    ? array_map(
+                                                        fn ($v) => mb_strtolower(trim((string) $v)),
+                                                        (array) request()->query()[$attribute->field_name]
+                                                    )
+                                                    : [];
+                                                $_avSelected = in_array(mb_strtolower(trim((string) $_avVal)), $_avSelectedValues, true) ? 'ocf-selected' : '';
+                                                if ($_avCount > 0 || $_avSelected !== '') {
+                                                    $attrHasVisibleOption = true;
+                                                    break;
+                                                }
+                                            }
+                                        @endphp
+                                        @unless($attrHasVisibleOption)
+                                            @continue
+                                        @endunless
                                         <div class="ocf-filter ocf-dropdown" id="ocf-filter-86-2-1">
                                             <div class="ocf-filter-body">
                                                 <div class="ocf-filter-header" data-ocf="expand">
@@ -220,24 +283,33 @@
 
                                                     <div class="ocf-value-list">
                                                         <div class="ocf-value-list-body">
-                                                            @foreach($attribute->getPivotValue() as $value)
+                                                            @foreach($attrPivotValues as $value)
                                                                 @php
-                                                                    $count = $responseArray['attributes_count'][$attribute->field_name][$value]['count'];
-                                                                    $selected = array_key_exists($attribute->field_name, request()->query()) ? (in_array($value, request()->query()[$attribute->field_name]) ? 'ocf-selected' : '') : ''
+                                                                    $count = $responseArray['attributes_count'][$attribute->field_name][$value]['count'] ?? 0;
+                                                                    $selectedValues = array_key_exists($attribute->field_name, request()->query())
+                                                                        ? array_map(
+                                                                            fn ($v) => mb_strtolower(trim((string) $v)),
+                                                                            (array) request()->query()[$attribute->field_name]
+                                                                        )
+                                                                        : [];
+                                                                    $currentNormalized = mb_strtolower(trim((string) $value));
+                                                                    $selected = in_array($currentNormalized, $selectedValues, true) ? 'ocf-selected' : '';
+                                                                    $showOption = $count > 0 || $selected !== '';
                                                                 @endphp
+                                                                @if($showOption)
                                                                 <button type="button"
                                                                         class="ocf-value ocf-checkbox filterProducts {{$selected}}"
                                                                         data-filter="{{$value}}"
-                                                                        data-filter-type="{{$attribute->field_name}}"
-                                                                    {{$count === 0 && $selected ==='' ? 'disabled' : ''}}>
+                                                                        data-filter-type="{{$attribute->field_name}}">
                                                                     <span
                                                                         class="ocf-value-input ocf-value-input-checkbox"></span>
                                                                     <span class="ocf-value-name">{{$value}}</span>
                                                                     <span class="ocf-value-append">
                                       <span
-                                          class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$responseArray['attributes_count'][$attribute->field_name][$value]['count']}}</span>
+                                          class="ocf-value-count">{{array_key_exists($attribute->field_name, request()->query()) ? '+' : ''}}{{$count}}</span>
                                   </span>
                                                                 </button>
+                                                                @endif
                                                             @endforeach
                                                         </div>
                                                     </div>
@@ -416,10 +488,10 @@
                             <div
                                 class="image default-products-images">
                                 <i class="far fa-search-plus colord"
-                                   data-src="{{$product->getMedia('images')->first()->getUrl()}}"
-                                   data-fancybox="products{{$product->id}}" data-caption="{{$product->name}}"></i>
+                                   data-src="{{$product->getPreviewImage()}}"
+                                   data-fancybox="products{{$product->id}}" data-caption="{{$product->getName()}}"></i>
                                 <a class="image-link" href="{{route('products.show', ['product'=>$product->slugEn])}}"
-                                   title="{{$product->name}}">
+                                   title="{{$product->getName()}}">
                                     <div class="splide products-images">
                                         <div class="splide__track">
                                             <ul class="splide__list">
@@ -429,12 +501,12 @@
                                                             <div class="hide"
                                                                  data-src="{{$image->getUrl()}}"
                                                                  data-fancybox="products{{$product->id}}"
-                                                                 data-caption="{{$product->name}}"></div>
+                                                                 data-caption="{{$product->getName()}}"></div>
                                                         @endif
                                                         <img loading="lazy"
-                                                             src="{{$image->getUrl('preview')}}"
-                                                             alt="{{$product->name}}"
-                                                             title="{{$product->name}}"
+                                                             src="{{$image->getUrl('preview_webp')}}"
+                                                             alt="{{$product->getName()}}"
+                                                             title="{{$product->getName()}}"
                                                              class="swiper-lazy swiper-lazy-loaded"
                                                              width="310" height="310">
                                                     </li>
@@ -518,12 +590,10 @@
             </div>
         </div>
     </section>
-
-    @push('scripts')
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"></script>
-        <script src="{{mix('build/js/productIndex.js')}}"></script>
-    @endpush
-    @push('styles')
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css"/>
-    @endpush
 @endsection
+
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"></script>
+    <script src="{{mix('build/js/productIndex.js')}}"></script>
+    @include('base.pages.products.partials.is-stock-switch-script')
+@endpush

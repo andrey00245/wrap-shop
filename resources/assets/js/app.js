@@ -216,6 +216,7 @@ function telInputInitialization() {
 
 $(document).ready(function () {
     popupsOpenClose()
+    openAuthModalFromUrl()
     $('#popup-consultation').on('submit', function (e) {
         e.preventDefault()
         var name = $('#name').val().trim();
@@ -268,7 +269,7 @@ $(document).ready(function () {
             product_id: $('#fast-order-product-id').val(),
             quantity: $('#input-quantity').val(),
             name: $('#fast_order_name').val(),
-            phone: $(this).find('input[name="phone"][type="hidden"]').val(),
+            phone: $(this).find('input[name="phone"][type="hidden"]').val() || $('#fast_order_phone').val(),
             email: $('#fast_order_email').val(),
             comment: $('#fast_order_comment').val(),
             total_price: $('#fast-order-popup .total-price').text(),
@@ -434,9 +435,10 @@ function popupSearchHandler(dropdownMenu, event) {
 }
 
 function popupsOpenClose(){
-    const closeBtns = document.querySelectorAll('.general-popup .popup-close')
     const popups = document.querySelectorAll('.general-popup');
-    document.querySelector('body').addEventListener('click', function(event) {
+    const body = document.querySelector('body');
+
+    body.addEventListener('click', function(event) {
         const button = event.target.closest('.general-popup-btn')
         if (button) {
             closeAllPopups(popups)
@@ -445,12 +447,18 @@ function popupsOpenClose(){
         }
     })
 
-    closeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            btn.closest('.general-popup').classList.remove('active');
-            btn.closest('.general-popup').setAttribute('data-step', '1')
-            clearText()
-        });
+    body.addEventListener('click', function (event) {
+        const closeBtn = event.target.closest('.general-popup .popup-close');
+        if (!closeBtn) {
+            return;
+        }
+
+        const popup = closeBtn.closest('.general-popup');
+        if (popup) {
+            popup.classList.remove('active');
+            popup.setAttribute('data-step', '1');
+            clearText();
+        }
     });
 }
 
@@ -466,6 +474,26 @@ function closeAllPopups(popups) {
         popup.classList.remove('active')
         popup.setAttribute('data-step', '1')
     });
+}
+
+/**
+ * Якщо в URL є ?modal=login|register|forgot — відкрити модалку входу/реєстрації/відновлення пароля.
+ */
+function openAuthModalFromUrl() {
+    const params = new URLSearchParams(window.location.search)
+    const modal = params.get('modal')
+    const steps = { login: '1', register: '5', forgot: '3' }
+    if (!modal || !steps[modal]) return
+    const popups = document.querySelectorAll('.general-popup')
+    const loginPopup = document.getElementById('login-popup')
+    if (!loginPopup) return
+    closeAllPopups(popups)
+    loginPopup.classList.add('active')
+    loginPopup.setAttribute('data-step', steps[modal])
+    params.delete('modal')
+    const newSearch = params.toString()
+    const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash
+    window.history.replaceState({}, '', newUrl)
 }
 
 function debounce(fn, delay) {

@@ -26,7 +26,7 @@
                 <td class="image"><a
                             href="{{route('products.show', ['product' => $item['product']->slugEn])}}"><img
                                 loading="lazy"
-                                src="{{$item['product']->getMedia('images')[0]->getUrl('preview')}}"
+                                 src="{{ optional($item['product']->getMedia('images')->first())->getUrl('preview_webp') ?? asset('assets/img/no-image.png') }}"
                                 alt="{{$item['product']->getName()}}"
                                 title="{{$item['product']->getName()}}" class="img-thumbnail"></a></td>
                     <td class="name"><span class="cat">{{$item['product']->category->name}}</span><a
@@ -83,7 +83,7 @@
             <div class="cart-mini-button">
                 <a href="{{route('checkout')}}" title="{{__('popup.cart_popup.checkout')}}" class="checkout colord"><i
                         class="fas fa-chevron-right"></i>{{__('popup.cart_popup.checkout')}}</a>
-                <div class="continion close-cart-popup"><i class="fas fa-chevron-right"></i>{{__('popup.cart_popup.continue_shopping')}}</div>
+                <div class="continion popup-close"><i class="fas fa-chevron-right"></i>{{__('popup.cart_popup.continue_shopping')}}</div>
             </div>
         </div>
     </li>

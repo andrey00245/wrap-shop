@@ -1,0 +1,40 @@
+@import "variables";
+
+$mod-main-color: $main-color-dark;
+$reviews-card-header-bg: rgba(255, 206, 28, 0.14);
+
+@import "style-reviews-general";
+
+.reviews-card__name {
+  color: #ffffff;
+}
+
+.reviews-card__product {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.reviews-card__product-link {
+  color: rgba(255, 206, 28, 0.95);
+
+  &:hover {
+    color: #ffdf4d;
+  }
+}
+
+/* Скролбар блоку тексту — жовтуватий під колір темної теми */
+.reviews-card__text {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 206, 28, 0.6);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 206, 28, 0.85);
+  }
+}

@@ -12,11 +12,11 @@
                             <td class="image"><a
                                     href="{{route('products.show', ['product' => $product->slugEn])}}"><img
                                         loading="lazy"
-                                        src="{{$product->getMedia('images')[0]->getUrl('preview')}}"
-                                        alt="{{$product->name}}"
-                                        title="{{$product->name}}" class="img-thumbnail"></a></td>
+                                        src="{{ optional($product->getMedia('images')->first())->getUrl('preview_webp') ?? asset('assets/img/no-image.png') }}"
+                                        alt="{{$product->getName()}}"
+                                        title="{{$product->getName()}}" class="img-thumbnail"></a></td>
                             <td class="name"><span class="cat">{{$product->category->name}}</span><a
-                                    href="{{route('products.show', $product->slugEn)}}">{{$product->name}}</a>
+                                    href="{{route('products.show', $product->slugEn)}}">{{$product->getName()}}</a>
                             </td>
                             <td class="price price-default">
                                 {{$product->getPrice()}} ₴<span class="price-unit-xvr"></span>

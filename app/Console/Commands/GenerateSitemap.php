@@ -1,17 +1,20 @@
 <?php
+
 namespace App\Console\Commands;
 
+use App\Models\Category;
+use App\Models\News;
+use App\Models\Product;
+use App\Models\SeoFilterPage;
 use Illuminate\Console\Command;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\News;
-use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 class GenerateSitemap extends Command
 {
     protected $signature = 'generate:sitemap';
+
     protected $description = 'Генерация sitemap.xml со всеми доступными страницами';
 
     public function handle()
@@ -31,10 +34,15 @@ class GenerateSitemap extends Command
             $sitemap->add(Url::create(LaravelLocalization::localizeURL(route('privacy-policy'))));
             $sitemap->add(Url::create(LaravelLocalization::localizeURL(route('checkout'))));
 
-            // Категории
-            Category::all()->each(function ($category) use ($sitemap, $localeCode) {
-                $slug = $category->getTranslation('slug', $localeCode);
-                $url = LaravelLocalization::localizeURL("/{$slug}");
+            $categoriesById = Category::all()->keyBy('id');
+
+            // Категории (повний шлях від кореня)
+            $categoriesById->each(function ($category) use ($sitemap, $localeCode, $categoriesById) {
+                $path = $this->categoryPathForLocale($category, $localeCode, $categoriesById);
+                if ($path === '') {
+                    return;
+                }
+                $url = LaravelLocalization::localizeURL(route('products.category', ['path' => $path]));
 
                 $sitemap->add(
                     Url::create($url)
@@ -43,6 +51,30 @@ class GenerateSitemap extends Command
                         ->setPriority(1.0)
                 );
             });
+
+            // SEO-сторінки фільтрів
+            SeoFilterPage::where('is_active', 1)
+                ->with('category')
+                ->get()
+                ->each(function (SeoFilterPage $seoPage) use ($sitemap, $localeCode, $categoriesById) {
+                    $category = $seoPage->category;
+                    if (! $category) {
+                        return;
+                    }
+                    $basePath = $this->categoryPathForLocale($category, $localeCode, $categoriesById);
+                    if ($basePath === '') {
+                        return;
+                    }
+                    $path = $basePath.'/'.$seoPage->slug;
+                    $url = LaravelLocalization::localizeURL(route('products.category', ['path' => $path]));
+
+                    $sitemap->add(
+                        Url::create($url)
+                            ->setLastModificationDate($seoPage->updated_at ?? now())
+                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                            ->setPriority(0.9)
+                    );
+                });
 
             // Продукты
             Product::where('is_active', true)->get()->each(function ($product) use ($sitemap, $localeCode) {
@@ -72,5 +104,28 @@ class GenerateSitemap extends Command
         $sitemap->writeToFile(public_path('sitemap.xml'));
 
         $this->info('✅ sitemap.xml успешно сгенерирован.');
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, Category>  $categoriesById
+     */
+    private function categoryPathForLocale(Category $category, string $localeCode, $categoriesById): string
+    {
+        $chain = [];
+        $cursor = $category;
+        while ($cursor) {
+            $chain[] = $cursor;
+            $cursor = $cursor->parent_id ? $categoriesById->get($cursor->parent_id) : null;
+        }
+        $chain = array_reverse($chain);
+        $segments = [];
+        foreach ($chain as $c) {
+            $slug = $c->getTranslation('slug', $localeCode) ?: $c->getTranslation('slug', 'en');
+            if ($slug !== null && $slug !== '') {
+                $segments[] = $slug;
+            }
+        }
+
+        return implode('/', $segments);
     }
 }

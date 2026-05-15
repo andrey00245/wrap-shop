@@ -1309,6 +1309,207 @@ body.theme-dark .home-category__cell .home-category-item:hover {
         }
     }
 
+    &--kits {
+        .home-block__heading .colord,
+        .home-block-kits__title .colord {
+            color: $mod-main-color;
+        }
+
+        .home-products-top {
+            margin: 0 0 28px;
+        }
+
+        .home-block-kits__header {
+            margin: 0 0 28px;
+            max-width: 960px;
+        }
+
+        .home-block-kits__title {
+            margin: 0;
+            white-space: normal;
+        }
+
+        .home-block-kits__lead {
+            margin: 12px 0 0;
+            font-size: 16px;
+            line-height: 1.55;
+            color: #3d3d3d;
+        }
+
+        .home-block-kits__grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        .home-block-kits__card {
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 16px 12px 14px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .home-block-kits__card-head {
+            flex-shrink: 0;
+        }
+
+        .home-block-kits__eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #8a8a8a;
+            margin: 0 0 8px;
+        }
+
+        .home-block-kits__card-title {
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.3;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .home-block-kits__card-title-link {
+            color: inherit;
+            text-decoration: none;
+
+            &:hover .home-block-kits__card-title {
+                text-decoration: underline;
+            }
+        }
+
+        .home-block-kits__card-desc {
+            margin: 8px 0 0;
+            font-size: 13px;
+            line-height: 1.45;
+            color: #555;
+        }
+
+        .home-block-kits__scroll {
+            flex: 1;
+            min-height: 0;
+            max-height: 380px;
+            overflow-y: auto;
+            margin-top: 14px;
+            padding-right: 2px;
+            scrollbar-width: thin;
+        }
+
+        .home-block-kits__group {
+            display: flex;
+            flex-direction: row;
+            gap: 6px;
+            margin-top: 12px;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+
+        .home-block-kits__group-rail {
+            flex: 0 0 28px;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            padding: 4px 0;
+        }
+
+        .home-block-kits__group-label {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #6f6f6f;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .home-block-kits__list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .home-block-kits__row {
+            margin: 0;
+            padding: 0;
+        }
+
+        .home-block-kits__row-link {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            text-decoration: none;
+            color: #1a1a1a;
+            font-size: 13px;
+            line-height: 1.35;
+            border-bottom: 1px solid #f0f0f0;
+
+            &:hover {
+                color: $mod-main-color;
+            }
+        }
+
+        .home-block-kits__row-link--nohref {
+            cursor: default;
+
+            &:hover {
+                color: #1a1a1a;
+            }
+        }
+
+        .home-block-kits__row:last-child .home-block-kits__row-link {
+            border-bottom: 0;
+        }
+
+        .home-block-kits__thumb-wrap {
+            flex: 0 0 auto;
+        }
+
+        .home-block-kits__thumb {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            display: block;
+            border-radius: 6px;
+            background: #f5f5f5;
+        }
+
+        .home-block-kits__thumb--placeholder {
+            border: 1px dashed #ddd;
+        }
+
+        .home-block-kits__name {
+            flex: 1;
+            min-width: 0;
+        }
+
+        @media screen and (max-width: 1199px) {
+            .home-block-kits__grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media screen and (max-width: 575px) {
+            .home-block-kits__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .home-block-kits__scroll {
+                max-height: 320px;
+            }
+        }
+    }
+
     body.theme-dark &--categories {
         .home-block__heading {
             color: rgba(255, 255, 255, 0.96);
@@ -1316,6 +1517,51 @@ body.theme-dark .home-category__cell .home-category-item:hover {
 
         .home-block__heading-line {
             color: rgba(255, 255, 255, 0.82);
+        }
+    }
+
+    body.theme-dark &--kits {
+        .home-block__heading,
+        .home-block-kits__title {
+            color: rgba(255, 255, 255, 0.96);
+        }
+
+        .home-block-kits__lead {
+            color: rgba(255, 255, 255, 0.78);
+        }
+
+        .home-block-kits__card {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .home-block-kits__eyebrow {
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .home-block-kits__card-title {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .home-block-kits__card-desc {
+            color: rgba(255, 255, 255, 0.72);
+        }
+
+        .home-block-kits__group-label {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .home-block-kits__row-link {
+            color: rgba(255, 255, 255, 0.9);
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .home-block-kits__row-link--nohref:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .home-block-kits__thumb {
+            background: rgba(0, 0, 0, 0.25);
         }
     }
 

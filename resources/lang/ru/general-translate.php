@@ -11,6 +11,7 @@ return [
 
     'sales_hit' => 'Хит продаж',
     'home_block_categories_sr_only' => 'Категории товаров',
+    'home_block_kits_sr_only' => 'Готовые решения с плёнкой',
     'all' => 'Все',
     'view' => 'Смотреть',
 

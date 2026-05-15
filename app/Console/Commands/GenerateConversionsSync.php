@@ -3,14 +3,13 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use App\Models\Product;
-use Spatie\MediaLibrary\Conversions\ImageGenerators\Image;
 use Illuminate\Support\Facades\File;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class GenerateConversionsSync extends Command
 {
     protected $signature = 'media:generate-sync {--collection=images : Коллекция для обработки} {--force : Принудительно пересоздать конверсии} {--only-missing : Создавать только отсутствующие конверсии}';
+
     protected $description = 'Синхронная генерация конверсий (без очереди)';
 
     public function handle()
@@ -30,7 +29,7 @@ class GenerateConversionsSync extends Command
                 'image/jpeg',
                 'image/png',
                 'image/gif',
-                'image/bmp'
+                'image/bmp',
             ])
             ->get();
 
@@ -38,6 +37,7 @@ class GenerateConversionsSync extends Command
 
         if ($mediaFiles->isEmpty()) {
             $this->warn('Нет изображений для обработки');
+
             return 0;
         }
 
@@ -52,8 +52,9 @@ class GenerateConversionsSync extends Command
                 // Получаем модель
                 $model = $media->model;
 
-                if (!$model) {
+                if (! $model) {
                     $this->warn("\nМедиа {$media->file_name} не привязано к модели, пропускаем");
+
                     continue;
                 }
 
@@ -63,7 +64,7 @@ class GenerateConversionsSync extends Command
                 $processed++;
 
             } catch (\Exception $e) {
-                $this->error("\nОшибка обработки {$media->file_name}: " . $e->getMessage());
+                $this->error("\nОшибка обработки {$media->file_name}: ".$e->getMessage());
                 $errors++;
             }
 
@@ -86,29 +87,32 @@ class GenerateConversionsSync extends Command
     {
         // Используем конфигурацию из MediaConversions
         $conversions = \App\Models\MediaConversions::getConversionsConfig();
-        
+
         // Получаем модель для создания конверсий
         $model = $media->model;
-        if (!$model) {
-            throw new \Exception("Медиа не привязано к модели");
+        if (! $model) {
+            throw new \Exception('Медиа не привязано к модели');
         }
 
         foreach ($conversions as $conversionName => $config) {
             try {
                 // Проверяем, существует ли оригинальный файл
                 $originalPath = $media->getPath();
-                if (!file_exists($originalPath)) {
+                if (! file_exists($originalPath)) {
                     $this->warn("\n⚠️ Оригинальный файл не найден: {$originalPath}");
+
                     continue;
                 }
 
                 // Проверяем, существует ли конверсия
-                if (!$force && $media->hasGeneratedConversion($conversionName)) {
+                if (! $force && $media->hasGeneratedConversion($conversionName)) {
                     if ($onlyMissing) {
                         $this->line("\n⏭️ Конверсия {$conversionName} уже существует для {$media->file_name}");
+
                         continue;
                     } else {
                         $this->line("\n⏭️ Конверсия {$conversionName} уже существует для {$media->file_name}, пропускаем");
+
                         continue;
                     }
                 }
@@ -146,8 +150,8 @@ class GenerateConversionsSync extends Command
                 $conversion->nonQueued(); // Отключаем очередь!
 
                 // Создаем папку conversions, если она не существует
-                $conversionsPath = dirname($originalPath) . '/conversions';
-                if (!is_dir($conversionsPath)) {
+                $conversionsPath = dirname($originalPath).'/conversions';
+                if (! is_dir($conversionsPath)) {
                     mkdir($conversionsPath, 0755, true);
                     $this->line("\n📁 Создана папка conversions: {$conversionsPath}");
                 }
@@ -158,63 +162,36 @@ class GenerateConversionsSync extends Command
                 $this->line("\n✅ Создана конверсия {$conversionName} для {$media->file_name}");
 
             } catch (\Exception $e) {
-                $this->warn("\n❌ Не удалось создать конверсию {$conversionName} для {$media->file_name}: " . $e->getMessage());
+                $this->warn("\n❌ Не удалось создать конверсию {$conversionName} для {$media->file_name}: ".$e->getMessage());
             }
         }
     }
 
     private function showExampleUrls($media)
     {
-        if (!$media) return;
+        if (! $media) {
+            return;
+        }
 
         $this->info("\n📋 Примеры URL для {$media->file_name}:");
-        $this->line("Оригинал: " . $media->getUrl());
+        $this->line('Оригинал: '.$media->getUrl());
 
         // Показываем только существующие конверсии
         if ($media->hasGeneratedConversion('preview')) {
-            $this->line("Preview: " . $media->getUrl('preview'));
+            $this->line('Preview: '.$media->getUrl('preview'));
         }
         if ($media->hasGeneratedConversion('preview_webp')) {
-            $this->line("Preview WebP: " . $media->getUrl('preview_webp'));
+            $this->line('Preview WebP: '.$media->getUrl('preview_webp'));
         }
         if ($media->hasGeneratedConversion('gallery')) {
-            $this->line("Gallery: " . $media->getUrl('gallery'));
+            $this->line('Gallery: '.$media->getUrl('gallery'));
         }
     }
 
     private function fixStoragePermissions()
     {
-        $this->info("🔧 Исправление прав доступа к файловой системе...");
+        $this->info('🔧 Исправление прав доступа к файловой системе...');
 
-        $paths = [
-            storage_path(),
-            base_path('bootstrap/cache'),
-        ];
-
-        foreach ($paths as $path) {
-            if (File::exists($path)) {
-                File::chmod($path, 0775);
-                $this->recurseChmod($path);
-                $this->line("✅ Исправлены права для: {$path}");
-            }
-        }
-    }
-
-    private function recurseChmod($path)
-    {
-        foreach (File::allFiles($path) as $file) {
-            @chmod($file->getRealPath(), 0664);
-        }
-        foreach (File::directories($path) as $dir) {
-            @chmod($dir, 0775);
-            $this->recurseChmod($dir);
-        }
-    }
-
-    private function fixStoragePermissions()
-    {
-        $this->info("🔧 Исправление прав доступа к файловой системе...");
-        
         $paths = [
             storage_path(),
             base_path('bootstrap/cache'),

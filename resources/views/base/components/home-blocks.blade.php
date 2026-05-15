@@ -11,8 +11,10 @@
   @endif
   @switch($block->getTypeEnum())
     @case(\App\Enums\HomeBlockType::Categories)
-    @case(\App\Enums\HomeBlockType::Kits)
       @include('base.components.home-blocks.categories', ['block' => $block])
+      @break
+    @case(\App\Enums\HomeBlockType::Kits)
+      @include('base.components.home-blocks.kits', ['block' => $block])
       @break
     @case(\App\Enums\HomeBlockType::Products)
       @include('base.components.home-blocks.products', ['block' => $block])

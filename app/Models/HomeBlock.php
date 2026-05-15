@@ -13,11 +13,12 @@ class HomeBlock extends Model
 {
     use HasTranslations;
 
-    public array $translatable = ['title'];
+    public array $translatable = ['title', 'lead'];
 
     protected $fillable = [
         'type',
         'title',
+        'lead',
         'sort_order',
         'is_active',
     ];
@@ -25,6 +26,7 @@ class HomeBlock extends Model
     protected $casts = [
         'type' => HomeBlockType::class,
         'title' => 'array',
+        'lead' => 'array',
         'sort_order' => 'integer',
         'is_active' => 'boolean',
     ];

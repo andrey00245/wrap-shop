@@ -83,10 +83,19 @@ class IndexController extends Controller
                     'items' => fn ($q) => $q
                         ->orderBy('sort_order')
                         ->with([
-                            'category',
+                            'category' => fn ($cq) => $cq->with([
+                                'children' => fn ($chq) => $chq->orderBy('id')->with([
+                                    'products' => fn ($pq) => $pq->where('is_active', 1)->orderBy('id')->with('media'),
+                                ]),
+                                'products' => fn ($pq) => $pq->where('is_active', 1)->orderBy('id')->with('media'),
+                            ]),
                             'product.category',
                             'product.media',
                             'media',
+                            'kitGroups',
+                            'kitLines' => fn ($ql) => $ql
+                                ->orderBy('sort_order')
+                                ->with(['product.media', 'kitGroup']),
                             'quickLinks' => fn ($ql) => $ql
                                 ->whereHas('category')
                                 ->orderBy('sort_order')

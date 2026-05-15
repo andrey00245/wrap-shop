@@ -9,13 +9,14 @@ use App\Models\HomeBlockItem as HomeBlockItemModel;
 use App\Nova\Fields\Images;
 use App\Nova\Fields\NovaTabTranslatable;
 use Laravel\Nova\Fields\BelongsTo;
-use Laravel\Nova\Fields\FormData;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Panel;
 use Outl1ne\NovaSortable\Traits\HasSortableRows;
 
 class HomeBlockItem extends Resource
@@ -39,16 +40,33 @@ class HomeBlockItem extends Resource
 
     public static function singularLabel(): string
     {
-        return 'Товар';
+        return 'Елемент блоку';
     }
 
     public function fields(NovaRequest $request): array
     {
-        $resolvedType = $this->resolveHomeBlockType($request);
-        $isProductsType = $resolvedType === HomeBlockType::Products;
-        $isCategoriesType = in_array($resolvedType, [HomeBlockType::Categories, HomeBlockType::Kits], true);
+        $t = $this->resolveHomeBlockType($request);
+        $isCategories = $t === HomeBlockType::Categories;
+        $isKits = $t === HomeBlockType::Kits;
+        $isProducts = $t === HomeBlockType::Products;
+        $isBanner = $t === HomeBlockType::Banner;
 
-        return [
+        if ($t === null) {
+            return [
+                ID::make()->sortable(),
+                BelongsTo::make('Блок', 'homeBlock', HomeBlock::class)
+                    ->rules('required')
+                    ->searchable()
+                    ->help('Спочатку оберіть блок — тоді з’являться поля для відповідного типу.'),
+                Number::make('Порядок', 'sort_order')
+                    ->default(0)
+                    ->sortable()
+                    ->hideFromIndex()
+                    ->rules('nullable', 'integer', 'min:0'),
+            ];
+        }
+
+        $base = [
             ID::make()->sortable(),
 
             Text::make('Назва', function () {
@@ -64,14 +82,44 @@ class HomeBlockItem extends Resource
                 ->searchable()
                 ->readonly(),
 
+            Number::make('Порядок', 'sort_order')
+                ->default(0)
+                ->sortable()
+                ->hideFromIndex()
+                ->rules('nullable', 'integer', 'min:0'),
+        ];
+
+        if ($isCategories) {
+            return array_merge($base, $this->fieldsForCategoriesBlock());
+        }
+
+        if ($isKits) {
+            return array_merge($base, $this->fieldsForKitsBlock());
+        }
+
+        if ($isProducts) {
+            return array_merge($base, $this->fieldsForProductsBlock());
+        }
+
+        if ($isBanner) {
+            return array_merge($base, $this->fieldsForBannerBlock());
+        }
+
+        return array_merge($base, [
+            Text::make('Примітка', fn () => 'Для цього типу блоку поля елемента не налаштовані в Nova.')
+                ->onlyOnDetail(),
+        ]);
+    }
+
+    /**
+     * @return array<int, \Laravel\Nova\Fields\Field|\Laravel\Nova\Panel>
+     */
+    private function fieldsForCategoriesBlock(): array
+    {
+        return [
             BelongsTo::make('Категорія', 'category', Category::class)
                 ->nullable()
-                ->canSee(fn () => ! $isProductsType),
-
-            BelongsTo::make('Товар', 'product', Product::class)
-                ->searchable()
-                ->nullable()
-                ->canSee(fn () => ! $isCategoriesType),
+                ->help('Плитка на головній веде в каталог цієї категорії.'),
 
             Select::make('Розмір плитки', 'tile_size')
                 ->options([
@@ -81,50 +129,93 @@ class HomeBlockItem extends Resource
                 ->nullable()
                 ->displayUsingLabels()
                 ->hideFromIndex()
-                ->help('Показується лише для блоку типу «Категорії»: одна «Велика» — у широку колонку, решта — у сітку; якщо ніде не обрано «Велика», великою буде перший за порядком.')
-                ->dependsOn(
-                    ['home_block_id', 'resource:'.HomeBlock::uriKey()],
-                    function (Select $field, NovaRequest $request, FormData $formData) {
-                        $blockId = $formData->get('home_block_id');
-                        if (blank($blockId)) {
-                            $blockId = $formData->get('resource:'.HomeBlock::uriKey());
-                        }
-                        if (blank($blockId) && filled($request->resourceId)
-                            && $request->route('resource') === static::uriKey()) {
-                            $blockId = HomeBlockItemModel::query()->find($request->resourceId)?->home_block_id;
-                        }
-
-                        if (blank($blockId)) {
-                            $field->hide();
-
-                            return;
-                        }
-
-                        $block = HomeBlockModel::query()->find($blockId);
-                        if ($block === null || $block->getTypeEnum() !== HomeBlockType::Categories) {
-                            $field->hide();
-                        }
-                    }
-                ),
+                ->help('Одна «Велика» — у широку колонку, решта — у сітку; якщо ніде не обрано «Велика», великою буде перший за порядком.')
+                ->rules('nullable'),
 
             NovaTabTranslatable::make([
                 Text::make('Заголовок', 'custom_title')
-                    ->help('Якщо порожньо — береться назва товару (або категорії).'),
+                    ->help('Якщо порожньо — береться назва категорії.'),
+                Text::make('Підзаголовок', 'custom_tagline')
+                    ->help('Якщо порожньо — можна залишити порожнім.'),
+            ])->setTitle('Текст на плитці'),
+
+            Images::make('Зображення', 'custom_image')
+                ->singleMediaRules('image'),
+
+            HasMany::make('Підкатегорії на плитці', 'quickLinks', HomeBlockItemQuickLink::class),
+        ];
+    }
+
+    /**
+     * @return array<int, \Laravel\Nova\Fields\Field|\Laravel\Nova\Panel>
+     */
+    private function fieldsForKitsBlock(): array
+    {
+        return [
+            Panel::make('Набір на головній', [
+                NovaTabTranslatable::make([
+                    Text::make('Заголовок набору', 'custom_title')
+                        ->help('Назва на картці (наприклад «Інструменти для поклейки…»).'),
+                    Text::make('Лейбл (рядок над назвою)', 'custom_tagline')
+                        ->help('Наприклад STARTER KIT. Якщо порожньо — на сайті покажемо STARTER KIT.'),
+                    Textarea::make('Опис набору', 'kit_description')
+                        ->rows(4)
+                        ->nullable()
+                        ->help('Текст під заголовком на картці.'),
+                ])->setTitle('Заголовок і опис'),
+
+                HasMany::make('Підгрупи (назва + товари)', 'kitGroups', HomeBlockKitGroup::class),
+
+                HasMany::make('Товари набору', 'kitLines', HomeBlockKitLine::class),
+            ]),
+        ];
+    }
+
+    /**
+     * @return array<int, \Laravel\Nova\Fields\Field|\Laravel\Nova\Panel>
+     */
+    private function fieldsForProductsBlock(): array
+    {
+        return [
+            BelongsTo::make('Товар', 'product', Product::class)
+                ->searchable()
+                ->rules('required'),
+
+            NovaTabTranslatable::make([
+                Text::make('Заголовок', 'custom_title')
+                    ->help('Якщо порожньо — береться назва товару.'),
                 Text::make('Підзаголовок', 'custom_tagline')
                     ->help('Якщо порожньо — береться назва категорії товару.'),
             ])->setTitle('Перевизначення'),
 
             Images::make('Зображення', 'custom_image')
                 ->singleMediaRules('image'),
+        ];
+    }
 
-            HasMany::make('Підкатегорії на плитці', 'quickLinks', HomeBlockItemQuickLink::class)
-                ->canSee(fn () => ! $isProductsType),
+    /**
+     * @return array<int, \Laravel\Nova\Fields\Field|\Laravel\Nova\Panel>
+     */
+    private function fieldsForBannerBlock(): array
+    {
+        return [
+            BelongsTo::make('Товар (посилання)', 'product', Product::class)
+                ->searchable()
+                ->nullable()
+                ->help('Якщо обрано — клік веде на картку товару.'),
 
-            Number::make('Порядок', 'sort_order')
-                ->default(0)
-                ->sortable()
-                ->hideFromIndex()
-                ->rules('nullable', 'integer', 'min:0'),
+            BelongsTo::make('Категорія (посилання)', 'category', Category::class)
+                ->nullable()
+                ->help('Якщо товар не обрано — можна вести в каталог категорії.'),
+
+            NovaTabTranslatable::make([
+                Text::make('Заголовок на слайді', 'custom_title'),
+                Text::make('Текст кнопки', 'custom_tagline')
+                    ->help('Якщо порожньо — буде «Переглянути» (локалізація).'),
+            ])->setTitle('Текст'),
+
+            Images::make('Зображення', 'custom_image')
+                ->singleMediaRules('image'),
         ];
     }
 
@@ -164,11 +255,7 @@ class HomeBlockItem extends Resource
 
     private function resolveHomeBlockType(NovaRequest $request): ?HomeBlockType
     {
-        $blockId = null;
-
-        if ($request->viaResource === HomeBlock::uriKey() && filled($request->viaResourceId)) {
-            $blockId = (int) $request->viaResourceId;
-        }
+        $blockId = static::homeBlockIdFromViaResource($request);
 
         if (! $blockId && filled($request->resourceId) && $request->route('resource') === static::uriKey()) {
             $blockId = HomeBlockItemModel::query()->find($request->resourceId)?->home_block_id;
@@ -182,23 +269,92 @@ class HomeBlockItem extends Resource
             $blockId = (int) $request->input('home_block_id');
         }
 
-        if (! $blockId) {
+        if ($blockId) {
+            $type = HomeBlockModel::query()->find($blockId)?->getTypeEnum();
+            if ($type !== null) {
+                return $type;
+            }
+        }
+
+        // Update.vue: GET …/{viaResource}/field/{viaRelationship}?relatable=true без viaResourceId.
+        if ($request->boolean('relatable')) {
+            $fromField = static::homeBlockTypeFromRelatableFieldName((string) ($request->route('field') ?? ''));
+            if ($fromField !== null) {
+                return $fromField;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Коли Nova шукає RelatableField на батьківському ресурсі, контексту item/block може не бути в query.
+     */
+    private static function homeBlockTypeFromRelatableFieldName(string $fieldAttribute): ?HomeBlockType
+    {
+        return match ($fieldAttribute) {
+            'kitGroups', 'kitLines' => HomeBlockType::Kits,
+            'quickLinks' => HomeBlockType::Categories,
+            default => null,
+        };
+    }
+
+    /**
+     * Для HasMany (kitLines, kitGroups, …) viaResource = home-block-items, viaResourceId = id елемента.
+     * Для типізованих блоків viaResourceId = id home_blocks.
+     */
+    private static function homeBlockIdFromViaResource(NovaRequest $request): ?int
+    {
+        $via = (string) ($request->viaResource ?? '');
+        if ($via === '' || ! filled($request->viaResourceId)) {
             return null;
         }
 
-        return HomeBlockModel::query()->find($blockId)?->getTypeEnum();
+        if ($via === static::uriKey()) {
+            $itemId = (int) $request->viaResourceId;
+
+            return (int) (HomeBlockItemModel::query()->whereKey($itemId)->value('home_block_id') ?? 0) ?: null;
+        }
+
+        if (in_array($via, [
+            HomeBlock::uriKey(),
+            HomeBlockCategories::uriKey(),
+            HomeBlockKits::uriKey(),
+            HomeBlockSeasonalProducts::uriKey(),
+            HomeBlockBanners::uriKey(),
+        ], true)) {
+            return (int) $request->viaResourceId;
+        }
+
+        return null;
     }
 
     private static function redirectToHomeBlock(NovaRequest $request, ?int $blockId): string
     {
-        if (! $blockId && filled($request->viaResourceId) && $request->viaResource === HomeBlock::uriKey()) {
-            $blockId = (int) $request->viaResourceId;
+        if (! $blockId) {
+            $blockId = static::homeBlockIdFromViaResource($request);
         }
 
         if ($blockId) {
-            return '/resources/'.HomeBlock::uriKey().'/'.$blockId;
+            $block = HomeBlockModel::query()->find($blockId);
+            $uriKey = $block
+                ? static::novaUriKeyForHomeBlockType($block->getTypeEnum())
+                : HomeBlock::uriKey();
+
+            return '/resources/'.$uriKey.'/'.$blockId;
         }
 
-        return '/resources/'.HomeBlock::uriKey();
+        return '/resources/'.HomeBlockCategories::uriKey();
+    }
+
+    private static function novaUriKeyForHomeBlockType(HomeBlockType $type): string
+    {
+        return match ($type) {
+            HomeBlockType::Categories => HomeBlockCategories::uriKey(),
+            HomeBlockType::Kits => HomeBlockKits::uriKey(),
+            HomeBlockType::Products => HomeBlockSeasonalProducts::uriKey(),
+            HomeBlockType::Banner => HomeBlockBanners::uriKey(),
+            default => HomeBlock::uriKey(),
+        };
     }
 }

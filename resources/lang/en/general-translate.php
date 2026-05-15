@@ -11,6 +11,7 @@ return [
 
     'sales_hit' => 'The best seller',
     'home_block_categories_sr_only' => 'Product categories',
+    'home_block_kits_sr_only' => 'Ready film solutions',
     'all' => 'All',
     'view' => 'View',
 

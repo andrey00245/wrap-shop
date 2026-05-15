@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Attribute;
 use App\Services\Pluralize;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -76,7 +75,6 @@ class Product extends Model implements HasMedia
         'slug',
         'descriptions',
         'banner_title',
-        'banner_title',
         'meta_title',
         'meta_description',
         'stock',
@@ -91,13 +89,6 @@ class Product extends Model implements HasMedia
         'meta_description' => '{"en":"","ru":"","uk":""}',
     ];
 
-    protected $attributes = [
-        'stock' => 0,
-        'name' => '{"en":"","ru":"","uk":""}',
-        'descriptions' => '{"en":"","ru":"","uk":""}',
-        'banner_title' => '{"en":"","ru":"","uk":""}',
-    ];
-
     protected $casts = [
         'banner_title' => 'json',
         'slug' => 'json',
@@ -109,10 +100,7 @@ class Product extends Model implements HasMedia
     ];
 
     /**
-     * @param $query
-     * @param $column
-     * @param $value
-     * @return Builder
+     * @param  $column
      */
     public function scopeWhereLikeInsensitive($query, array $columns, string $value): Builder
     {
@@ -306,7 +294,6 @@ class Product extends Model implements HasMedia
     }
 
     /**
-     * @return bool
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
@@ -318,6 +305,7 @@ class Product extends Model implements HasMedia
         if (session()?->has('wishlist')) {
             return in_array($this->id, session()?->get('wishlist', []), true);
         }
+
         return false;
     }
 
@@ -481,29 +469,6 @@ class Product extends Model implements HasMedia
             }
         }
 
-        return $this->getFirstMediaUrl('images');
-    }
-
-    public function getPreviewImage(): string
-    {
-        $media = $this->getFirstMedia('images');
-        if ($media) {
-            // Сначала пробуем preview_webp
-            if ($media->hasGeneratedConversion('preview_webp')) {
-                return $media->getUrl('preview_webp');
-            }
-            
-            // Если preview_webp нет, пробуем gallery
-            if ($media->hasGeneratedConversion('gallery')) {
-                return $media->getUrl('gallery');
-            }
-            
-            // Если gallery нет, пробуем preview
-            if ($media->hasGeneratedConversion('preview')) {
-                return $media->getUrl('preview');
-            }
-        }
-        
         return $this->getFirstMediaUrl('images');
     }
 

@@ -5,26 +5,26 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
-use Spatie\EloquentSortable\Sortable;
-use Spatie\EloquentSortable\SortableTrait;
 
 class Implementation extends Model implements HasMedia, Sortable
 {
     use HasFactory,
+        HasTranslations,
         InteractsWithMedia,
-        SortableTrait,
-        HasTranslations;
+        SortableTrait;
 
     protected $translatable = ['descriptions'];
 
     protected $with = ['media'];
 
     public $sortable = [
-        'order_column_name'  => 'sort_order',
+        'order_column_name' => 'sort_order',
         'sort_when_creating' => true,
     ];
 
@@ -33,12 +33,12 @@ class Implementation extends Model implements HasMedia, Sortable
         'title',
         'descriptions',
         'data',
-        'sort_order'
+        'sort_order',
     ];
 
     protected $casts = [
         'descriptions' => 'json',
-        'data'         => 'date',
+        'data' => 'date',
     ];
 
     protected static function booted()
@@ -97,16 +97,6 @@ class Implementation extends Model implements HasMedia, Sortable
         }
 
         return '';
-    }
-
-    public function getPreviewImage(): string
-    {
-        $media = $this->getFirstMedia('images');
-        if ($media && $media->hasGeneratedConversion('preview_webp')) {
-            return $media->getUrl('preview_webp');
-        }
-        
-        return $this->getFirstMediaUrl('images');
     }
 
     public function getData(): string

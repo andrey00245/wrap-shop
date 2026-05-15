@@ -12,6 +12,7 @@ return [
 
     'sales_hit' => 'Хіт продажів',
     'home_block_categories_sr_only' => 'Категорії товарів',
+    'home_block_kits_sr_only' => 'Готові рішення з плівкою',
     'all' => 'Всі',
     'view' => 'Дивитися',
 

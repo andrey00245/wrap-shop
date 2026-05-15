@@ -7,14 +7,17 @@ use App\Nova\Fields\NovaTabTranslatable;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class HomeBlock extends Resource
 {
     public static $model = \App\Models\HomeBlock::class;
+
+    /** Службовий ресурс (BelongsTo, прямі посилання); у меню — типізовані ресурси під «Блоки головної». */
+    public static $displayInNavigation = false;
 
     public static $title = 'title_for_nova';
 
@@ -37,14 +40,24 @@ class HomeBlock extends Resource
         return [
             ID::make()->sortable(),
 
-            Text::make('Заголовок (UK)', function () {
-                return $this->resource->getTranslation('title', 'uk') ?: '—';
+            Text::make('Заголовок', function () {
+                $raw = $this->resource->getTranslation('title', 'uk')
+                    ?: $this->resource->getTranslation('title', app()->getLocale());
+                $plain = trim(strip_tags((string) $raw));
+
+                return $plain !== '' ? $plain : '—';
             })->onlyOnIndex(),
 
             NovaTabTranslatable::make([
                 Text::make('Заголовок секції', 'title')
                     ->help('Можна HTML для акценту, напр. &lt;span class="colord"&gt;Категорії&lt;/span&gt; товарів'),
-            ])->setTitle('Заголовок'),
+                Textarea::make('Підзаголовок / лід (набори)', 'lead')
+                    ->help('Короткий текст під заголовком; для типу «Набори (kits)» на головній.')
+                    ->nullable()
+                    ->rows(3),
+            ])
+                ->setTitle('Заголовок')
+                ->hideFromIndex(),
 
             Select::make('Тип', 'type')
                 ->options([
@@ -57,10 +70,6 @@ class HomeBlock extends Resource
                 ->displayUsingLabels(),
 
             Boolean::make('Активний', 'is_active'),
-
-            Number::make('Порядок', 'sort_order')
-                ->sortable()
-                ->rules('required', 'integer', 'min:0'),
 
             HasMany::make('Елементи', 'items', HomeBlockItem::class),
         ];

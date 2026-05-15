@@ -14,7 +14,10 @@ use App\Nova\Consultation;
 use App\Nova\CustomBlock;
 use App\Nova\DeliveryOption;
 use App\Nova\Faq;
-use App\Nova\HomeBlock;
+use App\Nova\HomeBlockBanners;
+use App\Nova\HomeBlockCategories;
+use App\Nova\HomeBlockKits;
+use App\Nova\HomeBlockSeasonalProducts;
 use App\Nova\HomeBrand;
 use App\Nova\Implementation;
 use App\Nova\News;
@@ -106,10 +109,19 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
                 ])->icon('user')->collapsable();
             }
 
+            // Блоки головної (як «Користувачі»: окрема згортаєма секція з ресурсами всередині)
+            if (in_array($role, ['admin', 'content_manager'], true)) {
+                $menu[] = MenuSection::make('Блоки головної', [
+                    MenuItem::resource(HomeBlockCategories::class),
+                    MenuItem::resource(HomeBlockKits::class),
+                    MenuItem::resource(HomeBlockSeasonalProducts::class),
+                    MenuItem::resource(HomeBlockBanners::class),
+                ])->icon('template')->collapsable();
+            }
+
             // Контент (виды, «звуки», новини, FAQ тощо)
             if (in_array($role, ['admin', 'content_manager'], true)) {
                 $menu[] = MenuSection::make('Контент', [
-                    MenuItem::resource(HomeBlock::class),
                     MenuItem::resource(Banner::class),
                     MenuItem::resource(ProductBanner::class),
                     MenuItem::resource(CustomBlock::class),

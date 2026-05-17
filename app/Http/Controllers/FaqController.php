@@ -13,6 +13,10 @@ class FaqController extends Controller
             ->ordered()
             ->get();
 
+        if ($faqs->isEmpty()) {
+            abort(404);
+        }
+
         return view('base.pages.faq', compact('faqs'));
     }
 }

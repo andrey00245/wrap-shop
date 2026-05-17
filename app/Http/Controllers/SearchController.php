@@ -246,7 +246,10 @@ class SearchController extends Controller
 
         foreach ($attributes as $attribute) {
             foreach ($attribute as $item) {
-                $attributesArray[$item->field_name][$item->pivot->value]['count'] = 0;
+                $facetKey = Product::normalizePivotValueForCatalogFacetKey($item->pivot->value);
+                if ($facetKey !== null) {
+                    $attributesArray[$item->field_name][$facetKey]['count'] = 0;
+                }
             }
         }
 

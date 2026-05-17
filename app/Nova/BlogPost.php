@@ -3,11 +3,11 @@
 namespace App\Nova;
 
 use App\Nova\Fields\NovaTabTranslatable;
+use App\Nova\Support\LocaleFaqNovaFields;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
-use Laravel\Nova\Fields\Code;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
@@ -83,11 +83,7 @@ class BlogPost extends Resource
             Boolean::make('Активна', 'is_active')->default(true),
             Boolean::make('На головній блогу (hero)', 'is_featured')->default(false),
             Boolean::make('Коментарі увімкнено', 'comments_enabled')->default(true),
-            Code::make('FAQ для schema.org (JSON)', 'faq_items')
-                ->json()
-                ->nullable()
-                ->hideFromIndex()
-                ->help('Приклад: [{"question":"Питання?","answer":"Відповідь HTML або текст"}]'),
+            ...LocaleFaqNovaFields::make(),
             HasMany::make('Коментарі', 'comments', BlogComment::class),
         ];
     }

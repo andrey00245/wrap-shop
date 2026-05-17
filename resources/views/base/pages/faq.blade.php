@@ -1,5 +1,16 @@
 @extends('base.layouts.app')
 
+@php
+    $faqTitle = __('faq.title') . ' | Wrap.Shop';
+    $faqDescription = __('faq.meta_description');
+@endphp
+
+@section('title', $faqTitle)
+@section('description', $faqDescription)
+@section('og_title', $faqTitle)
+@section('og_description', $faqDescription)
+@section('canonical', route('faq'))
+
 @section('content')
   @push('styles')
       @if($theme === 'dark')
@@ -23,8 +34,7 @@
   <section class="page-faq wrap">
     <h1 class="default-title">{{ __('faq.title') }}</h1>
 
-    @if($faqs->count() > 0)
-      <div class="faq-accordion">
+    <div class="faq-accordion">
         @foreach($faqs as $index => $faq)
           <div class="faq-item" data-faq-id="{{ $faq->id }}">
             <div class="faq-question" data-index="{{ $index }}">
@@ -42,12 +52,7 @@
             </div>
           </div>
         @endforeach
-      </div>
-    @else
-      <div class="no-faq">
-        <p>{{ __('faq.no_items') }}</p>
-      </div>
-    @endif
+    </div>
   </section>
 
   @push('scripts')

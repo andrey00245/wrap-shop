@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\BestSeller;
 use App\Models\Category;
+use App\Support\SiteFaq;
 use App\Models\Product;
 use App\Models\ProductBanner;
 use App\Models\Setting;
@@ -130,12 +131,10 @@ class AppServiceProvider extends ServiceProvider
         // Окремі запити: один builder з ->with() мутував би обидва варіанти
         $mainCategories = Category::query()
             ->whereNull('parent_id')
+            ->menuOrdered()
             ->get();
 
-        $productCategories = Category::query()
-            ->whereNull('parent_id')
-            ->with('children')
-            ->get();
+        $productCategories = Category::catalogMenuTree();
 
         $productBanners = ProductBanner::query()
             ->where('is_active', true)
@@ -149,6 +148,7 @@ class AppServiceProvider extends ServiceProvider
             'mainCategories' => $mainCategories,
             'productCategories' => $productCategories,
             'productBanners' => $productBanners,
+            'hasActiveFaqs' => SiteFaq::hasActiveItems(),
         ]);
     }
 }

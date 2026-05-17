@@ -2,20 +2,35 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 
-class Category extends Model implements HasMedia
+class Category extends Model implements HasMedia, Sortable
 {
     use HasFactory,
         HasTranslations,
-        InteractsWithMedia;
+        InteractsWithMedia,
+        SortableTrait {
+            scopeOrdered as scopeSortableOrder;
+        }
+
+    public array $sortable = [
+        'order_column_name' => 'sort_order',
+        'sort_when_creating' => true,
+        'sort_on_has_many' => true,
+        'nova_order_by' => 'ASC',
+    ];
 
     protected static function booted(): void
     {
@@ -52,6 +67,7 @@ class Category extends Model implements HasMedia
         'content',
         'seo_text',
         'faq_items',
+        'sort_order',
     ];
 
     protected $casts = [
@@ -64,28 +80,18 @@ class Category extends Model implements HasMedia
         'content' => 'json',
         'seo_text' => 'json',
         'faq_items' => 'array',
+        'sort_order' => 'integer',
     ];
 
-    public function faqForSchema(): array
+    /**
+     * @return list<array{question: string, answer: string}>
+     */
+    public function faqForSchema(?string $locale = null): array
     {
-        $items = $this->faq_items;
-        if (! is_array($items)) {
-            return [];
-        }
-
-        $out = [];
-        foreach ($items as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-            $q = trim((string) ($row['question'] ?? ''));
-            $a = trim((string) ($row['answer'] ?? ''));
-            if ($q !== '' && $a !== '') {
-                $out[] = ['question' => $q, 'answer' => $a];
-            }
-        }
-
-        return $out;
+        return \App\Support\LocaleFaqItems::forLocale(
+            is_array($this->faq_items) ? $this->faq_items : null,
+            $locale ?: app()->getLocale()
+        );
     }
 
     public function registerMediaConversions(?Media $media = null): void
@@ -152,7 +158,58 @@ class Category extends Model implements HasMedia
 
     public function children()
     {
-        return $this->hasMany(Category::class, 'parent_id');
+        $relation = $this->hasMany(Category::class, 'parent_id');
+
+        return static::applyMenuOrder($relation);
+    }
+
+    public function buildSortQuery(): Builder
+    {
+        $query = static::query();
+
+        if ($this->parent_id === null) {
+            return $query->whereNull('parent_id');
+        }
+
+        return $query->where('parent_id', $this->parent_id);
+    }
+
+    public function scopeMenuOrdered(Builder $query): Builder
+    {
+        return static::applyMenuOrder($query);
+    }
+
+    public static function applyMenuOrder(Builder|Relation $query): Builder|Relation
+    {
+        if (static::hasSortOrderColumn()) {
+            return $query->orderBy('sort_order')->orderBy('id');
+        }
+
+        return $query->orderBy('id');
+    }
+
+    public static function hasSortOrderColumn(): bool
+    {
+        static $hasColumn = null;
+
+        if ($hasColumn === null) {
+            $hasColumn = Schema::hasColumn((new static)->getTable(), 'sort_order');
+        }
+
+        return $hasColumn;
+    }
+
+    public static function catalogMenuTree(): \Illuminate\Database\Eloquent\Collection
+    {
+        return static::query()
+            ->whereNull('parent_id')
+            ->menuOrdered()
+            ->with([
+                'children' => fn ($q) => $q->menuOrdered()->with([
+                    'children' => fn ($q2) => $q2->menuOrdered(),
+                ]),
+            ])
+            ->get();
     }
 
     public function parent()

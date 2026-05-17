@@ -53,7 +53,7 @@ class ProductController extends Controller
             ->orderByDesc('id')
             ->paginate(6);
 
-        $mainCategories = Category::query()->whereNull('parent_id')->get();
+        $mainCategories = Category::query()->whereNull('parent_id')->menuOrdered()->get();
 
         $categories = $products->take(5)->map(function ($product) {
             return $product->category;
@@ -881,7 +881,10 @@ class ProductController extends Controller
 
         foreach ($attributes->flatten()->unique('field_name') as $attribure) {
             foreach ($attribure->getPivotValue() as $value) {
-                $attributesArray[$attribure->field_name][$value]['count'] = 0;
+                $facetKey = Product::normalizePivotValueForCatalogFacetKey($value);
+                if ($facetKey !== null) {
+                    $attributesArray[$attribure->field_name][$facetKey]['count'] = 0;
+                }
             }
         }
 

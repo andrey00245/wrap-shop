@@ -4,5 +4,7 @@
   <li class="{{url()->current() === route('about-us') ? 'active' : ''}}"><a href="{{route('about-us')}}" title="{{__('header_footer.about_us')}}">{{__('header_footer.about_us')}}</a></li>
   <li class="{{url()->current() === route('contacts') ? 'active' : ''}}"><a href="{{route('contacts')}}" title="{{__('header_footer.contact_us')}}">{{__('header_footer.contact_us')}}</a></li>
   <li class="{{url()->current() === route('privacy-policy') ? 'active' : ''}}"><a href="{{route('privacy-policy')}}" title="{{__('header_footer.offers')}}">{{__('header_footer.offers')}}</a></li>
-  <li class="{{url()->current() === route('faq') ? 'active' : ''}}"><a href="{{route('faq')}}" title="{{'faq'}}">{{'faq'}}</a></li>
+  @if($hasActiveFaqs ?? false)
+  <li class="{{url()->current() === route('faq') ? 'active' : ''}}"><a href="{{route('faq')}}" title="FAQ">FAQ</a></li>
+  @endif
 </ul>

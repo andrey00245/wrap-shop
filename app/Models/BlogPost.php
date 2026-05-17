@@ -273,25 +273,14 @@ class BlogPost extends Model implements HasMedia
         return $this->published_at ?? $this->created_at;
     }
 
-    public function faqForSchema(): array
+    /**
+     * @return list<array{question: string, answer: string}>
+     */
+    public function faqForSchema(?string $locale = null): array
     {
-        $items = $this->faq_items;
-        if (! is_array($items)) {
-            return [];
-        }
-
-        $out = [];
-        foreach ($items as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-            $q = trim((string) ($row['question'] ?? ''));
-            $a = trim((string) ($row['answer'] ?? ''));
-            if ($q !== '' && $a !== '') {
-                $out[] = ['question' => $q, 'answer' => $a];
-            }
-        }
-
-        return $out;
+        return \App\Support\LocaleFaqItems::forLocale(
+            is_array($this->faq_items) ? $this->faq_items : null,
+            $locale ?: app()->getLocale()
+        );
     }
 }

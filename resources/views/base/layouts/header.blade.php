@@ -39,7 +39,7 @@
             </div>
             <div class="head-phone flex-center">
                 <div class="title">{{__('header_footer.phone')}}</div>
-                <a href="tel:{{$settings->phone ?? '#'}}">{!! $settings->phone_view ?? '#' !!}</a>
+                <a href="{{ \App\Support\SitePhone::telHref($settings ?? null) }}">{{ \App\Support\SitePhone::display($settings ?? null) }}</a>
             </div>
             <div class="head-top-close button popup-close"><i class="fal fa-times"></i></div>
         </div>
@@ -80,11 +80,7 @@
             </div>
             <div class="head-phone-mobil">
                 <div class="title">{{__('header_footer.phone')}}</div>
-                @php
-                    $phoneRaw = $settings->phone ?? '';
-                    $phoneView = $settings->phone_view ?? $phoneRaw;
-                @endphp
-                <a href="{{ $phoneRaw ? ('tel:' . $phoneRaw) : '#' }}">{!! $phoneView ?: '#' !!}</a>
+                <a href="{{ \App\Support\SitePhone::telHref($settings ?? null) }}">{{ \App\Support\SitePhone::display($settings ?? null) }}</a>
             </div>
             <div class="head-buttons">
                 <div class="general-popup-btn button search far fa-search"

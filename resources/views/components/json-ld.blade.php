@@ -168,7 +168,7 @@
         "logo": "{{ url('assets/img/logo.png') }}",
         "contactPoint": {
             "@type": "ContactPoint",
-            "telephone": "{{ $settings?->phone_view ?: ($settings?->phone ?: '+38-066-000-32-02') }}",
+            "telephone": "{{ \App\Support\SitePhone::schemaNumber($settings ?? null) }}",
             "contactType": "customer service",
             "areaServed": "UA",
             "availableLanguage": ["Ukrainian", "Russian", "English"]
@@ -193,20 +193,12 @@
                 ->get();
 
             if ($homeFaqs->isNotEmpty()) {
-                $homeFaqJson = [
-                    '@context' => 'https://schema.org',
-                    '@type' => 'FAQPage',
-                    'mainEntity' => $homeFaqs->map(function (\App\Models\Faq $faq) use ($locale) {
-                        return [
-                            '@type' => 'Question',
-                            'name' => $faq->getTranslation('question', $locale),
-                            'acceptedAnswer' => [
-                                '@type' => 'Answer',
-                                'text' => strip_tags($faq->getTranslation('answer', $locale)),
-                            ],
-                        ];
-                    })->toArray(),
-                ];
+                $homeFaqItems = $homeFaqs
+                    ->map(fn (\App\Models\Faq $faq) => \App\Support\LocaleFaqItems::rowFromFaqModel($faq, $locale))
+                    ->filter()
+                    ->values()
+                    ->all();
+                $homeFaqJson = \App\Support\LocaleFaqItems::faqPageSchema($homeFaqItems);
             }
         }
     @endphp

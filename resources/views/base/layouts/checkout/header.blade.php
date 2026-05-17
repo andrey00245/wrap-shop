@@ -32,11 +32,7 @@
       </div>
       <div class="head-phone flex-center">
         <div class="title">{{__('header_footer.phone')}}</div>
-        @php
-          $phoneRaw = $settings->phone ?? '';
-          $phoneView = $settings->phone_view ?? $phoneRaw;
-        @endphp
-        <a href="{{ $phoneRaw ? ('tel:' . $phoneRaw) : '#' }}">{!! $phoneView ?: '#' !!}</a>
+        <a href="{{ \App\Support\SitePhone::telHref($settings ?? null) }}">{{ \App\Support\SitePhone::display($settings ?? null) }}</a>
       </div>
 
       <div class="head-buttons">

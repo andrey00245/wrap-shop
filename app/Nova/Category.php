@@ -3,21 +3,27 @@
 namespace App\Nova;
 
 use App\Nova\Fields\NovaTabTranslatable;
+use App\Nova\Support\LocaleFaqNovaFields;
 use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Kongulov\NovaTabTranslatable\TranslatableTabToRowTrait;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\HasMany;
-use Laravel\Nova\Fields\Code;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Mostafaznv\NovaCkEditor\CkEditor;
-use Illuminate\Validation\ValidationException;
+use Outl1ne\NovaSortable\Traits\HasSortableRows;
 
 class Category extends Resource
 {
+    use HasSortableRows;
     use TranslatableTabToRowTrait;
+
+    public static $defaultSort = [
+        'sort_order' => 'asc',
+    ];
 
     /**
      * The model the resource corresponds to.
@@ -60,6 +66,10 @@ class Category extends Resource
     public function fields(NovaRequest $request)
     {
         return [
+            Number::make('Порядок', 'sort_order')
+                ->default(0)
+                ->sortable(),
+
             NovaTabTranslatable::make([
                 Text::make('Назва', 'name'),
                 Text::make('Slug', 'slug'),
@@ -89,45 +99,7 @@ class Category extends Resource
                     ->hideFromIndex(),
             ])->setTitle('Контент'),
 
-            Code::make('FAQ для schema.org (JSON)', 'faq_items')
-                ->json()
-                ->nullable()
-                ->hideFromIndex()
-                ->resolveUsing(function ($value) {
-                    if ($value === null || $value === '') {
-                        return null;
-                    }
-                    if (is_string($value)) {
-                        return $value;
-                    }
-
-                    return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-                })
-                ->fillUsing(function ($request, $model, $attribute, $requestAttribute) {
-                    $raw = $request[$requestAttribute] ?? null;
-                    if ($raw === null) {
-                        $model->{$attribute} = null;
-
-                        return;
-                    }
-                    $raw = trim((string) $raw);
-                    if ($raw === '' || strtolower($raw) === 'null') {
-                        $model->{$attribute} = null;
-
-                        return;
-                    }
-
-                    $decoded = json_decode($raw, true);
-                    if (json_last_error() !== JSON_ERROR_NONE) {
-                        throw ValidationException::withMessages([
-                            $requestAttribute => 'Некоректний JSON (перевірте коми/лапки).',
-                        ]);
-                    }
-
-                    $model->{$attribute} = $decoded;
-                })
-                ->rules('nullable', 'json')
-                ->help('Приклад: [{"question":"Питання?","answer":"Відповідь HTML або текст"}]'),
+            ...LocaleFaqNovaFields::make(),
 
             BelongsTo::make('Основна Категорія', 'parent', self::class)
                 ->nullable()

@@ -54,8 +54,10 @@
           {{__('contacts.call')}}
         </div>
 
-        <a href="tel:{{$settings->phone ?? '#'}}" class="phone">{!! $settings->phone_view ?? '#' !!}</a>
-        <a href="tel:{{$settings->phone_aditional ?? '#'}}" class="phone">{!! $settings->phone_aditional_view ?? '#' !!}</a>
+        <a href="{{ \App\Support\SitePhone::telHref($settings ?? null) }}" class="phone">{{ \App\Support\SitePhone::display($settings ?? null) }}</a>
+        @if(\App\Support\SitePhone::displayAdditional($settings ?? null) !== '')
+        <a href="{{ \App\Support\SitePhone::telHrefAdditional($settings ?? null) }}" class="phone">{{ \App\Support\SitePhone::displayAdditional($settings ?? null) }}</a>
+        @endif
       </div>
       <div class="item">
         <div class="title flex-wrap">

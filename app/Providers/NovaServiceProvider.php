@@ -16,7 +16,7 @@ use App\Nova\DeliveryOption;
 use App\Nova\Faq;
 use App\Nova\HomeBlockBanners;
 use App\Nova\HomeBlockCategories;
-use App\Nova\HomeBlockKits;
+use App\Nova\Kit;
 use App\Nova\HomeBlockSeasonalProducts;
 use App\Nova\HomeBrand;
 use App\Nova\Implementation;
@@ -113,7 +113,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
             if (in_array($role, ['admin', 'content_manager'], true)) {
                 $menu[] = MenuSection::make('Блоки головної', [
                     MenuItem::resource(HomeBlockCategories::class),
-                    MenuItem::resource(HomeBlockKits::class),
+                    MenuItem::resource(Kit::class),
                     MenuItem::resource(HomeBlockSeasonalProducts::class),
                     MenuItem::resource(HomeBlockBanners::class),
                 ])->icon('template')->collapsable();

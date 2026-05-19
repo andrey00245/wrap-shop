@@ -16,7 +16,6 @@ use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Laravel\Nova\Panel;
 use Outl1ne\NovaSortable\Traits\HasSortableRows;
 
 class HomeBlockItem extends Resource
@@ -47,7 +46,6 @@ class HomeBlockItem extends Resource
     {
         $t = $this->resolveHomeBlockType($request);
         $isCategories = $t === HomeBlockType::Categories;
-        $isKits = $t === HomeBlockType::Kits;
         $isProducts = $t === HomeBlockType::Products;
         $isBanner = $t === HomeBlockType::Banner;
 
@@ -91,10 +89,6 @@ class HomeBlockItem extends Resource
 
         if ($isCategories) {
             return array_merge($base, $this->fieldsForCategoriesBlock());
-        }
-
-        if ($isKits) {
-            return array_merge($base, $this->fieldsForKitsBlock());
         }
 
         if ($isProducts) {
@@ -143,31 +137,6 @@ class HomeBlockItem extends Resource
                 ->singleMediaRules('image'),
 
             HasMany::make('Підкатегорії на плитці', 'quickLinks', HomeBlockItemQuickLink::class),
-        ];
-    }
-
-    /**
-     * @return array<int, \Laravel\Nova\Fields\Field|\Laravel\Nova\Panel>
-     */
-    private function fieldsForKitsBlock(): array
-    {
-        return [
-            Panel::make('Набір на головній', [
-                NovaTabTranslatable::make([
-                    Text::make('Заголовок набору', 'custom_title')
-                        ->help('Назва на картці (наприклад «Інструменти для поклейки…»).'),
-                    Text::make('Лейбл (рядок над назвою)', 'custom_tagline')
-                        ->help('Наприклад STARTER KIT. Якщо порожньо — на сайті покажемо STARTER KIT.'),
-                    Textarea::make('Опис набору', 'kit_description')
-                        ->rows(4)
-                        ->nullable()
-                        ->help('Текст під заголовком на картці.'),
-                ])->setTitle('Заголовок і опис'),
-
-                HasMany::make('Підгрупи (назва + товари)', 'kitGroups', HomeBlockKitGroup::class),
-
-                HasMany::make('Товари набору', 'kitLines', HomeBlockKitLine::class),
-            ]),
         ];
     }
 
@@ -293,7 +262,6 @@ class HomeBlockItem extends Resource
     private static function homeBlockTypeFromRelatableFieldName(string $fieldAttribute): ?HomeBlockType
     {
         return match ($fieldAttribute) {
-            'kitGroups', 'kitLines' => HomeBlockType::Kits,
             'quickLinks' => HomeBlockType::Categories,
             default => null,
         };
@@ -319,7 +287,7 @@ class HomeBlockItem extends Resource
         if (in_array($via, [
             HomeBlock::uriKey(),
             HomeBlockCategories::uriKey(),
-            HomeBlockKits::uriKey(),
+            Kit::uriKey(),
             HomeBlockSeasonalProducts::uriKey(),
             HomeBlockBanners::uriKey(),
         ], true)) {
@@ -351,7 +319,6 @@ class HomeBlockItem extends Resource
     {
         return match ($type) {
             HomeBlockType::Categories => HomeBlockCategories::uriKey(),
-            HomeBlockType::Kits => HomeBlockKits::uriKey(),
             HomeBlockType::Products => HomeBlockSeasonalProducts::uriKey(),
             HomeBlockType::Banner => HomeBlockBanners::uriKey(),
             default => HomeBlock::uriKey(),

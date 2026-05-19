@@ -33,7 +33,8 @@
 {{--    @include('base.components.3m-color-wrap')--}}
 {{--    @include('base.components.yellotools')--}}
     @include('base.components.custom-blocks')
-    @include('base.components.home-blocks', ['onlyTypes' => ['categories', 'kits']])
+    @include('base.components.home-blocks', ['onlyTypes' => ['categories']])
+    @include('base.components.kits-section', ['kitSection' => $kitSection ?? null, 'kits' => $kits ?? collect()])
     @include('base.components.latest')
     @include('base.components.home-color-films-static')
     @include('base.components.home-reviews')

@@ -1,50 +1,43 @@
 @php
-  /** @var \App\Models\HomeBlock $block */
+  /** @var \App\Models\KitSection|null $kitSection */
+  /** @var \Illuminate\Support\Collection<int, \App\Models\Kit> $kits */
   $locale = app()->getLocale();
-  $items = $block->items->filter(function (\App\Models\HomeBlockItem $item) use ($locale) {
-      return $item->kitsProductGroupsForDisplay($locale)->contains(fn ($row) => $row['products']->isNotEmpty());
+  $kits = ($kits ?? collect())->filter(function (\App\Models\Kit $kit) use ($locale) {
+      return $kit->productGroupsForDisplay($locale)->contains(fn ($row) => $row['products']->isNotEmpty());
   });
 @endphp
-@if($items->isNotEmpty())
+@if($kits->isNotEmpty())
   @php
-    $headingPlain = trim(strip_tags((string) $block->title));
-    $lead = trim((string) ($block->getTranslation('lead', $locale) ?: $block->getTranslation('lead', 'uk') ?: ''));
+    $headingPlain = $kitSection ? trim(strip_tags((string) $kitSection->title)) : '';
+    $lead = $kitSection
+        ? trim((string) ($kitSection->getTranslation('lead', $locale) ?: $kitSection->getTranslation('lead', 'uk') ?: ''))
+        : '';
   @endphp
-  <section class="home-block home-block--kits" aria-labelledby="home-block-kits-h-{{ $block->id }}">
+  <section class="home-block home-block--kits" aria-labelledby="home-kits-section-h">
     <div class="wrap">
       @if($headingPlain !== '')
         <div class="home-block-kits__header">
-          <h2 id="home-block-kits-h-{{ $block->id }}" class="home-title home-block__heading home-block-kits__title">{!! $block->title !!}</h2>
+          <h2 id="home-kits-section-h" class="home-title home-block__heading home-block-kits__title">{!! $kitSection->title !!}</h2>
           @if($lead !== '')
             <p class="home-block-kits__lead">{{ $lead }}</p>
           @endif
         </div>
       @else
-        <h2 id="home-block-kits-h-{{ $block->id }}" class="visually-hidden">{{ __('general-translate.home_block_kits_sr_only') }}</h2>
+        <h2 id="home-kits-section-h" class="visually-hidden">{{ __('general-translate.home_block_kits_sr_only') }}</h2>
       @endif
 
       <div class="home-block-kits__grid">
-        @foreach($items as $item)
+        @foreach($kits as $kit)
           @php
-            $catUrl = $item->catalogUrl();
-            $groups = $item->kitsProductGroupsForDisplay($locale);
-            $eyebrow = trim((string) ($item->getTranslation('custom_tagline', $locale) ?: $item->getTranslation('custom_tagline', 'uk') ?: ''));
-            if ($eyebrow === '') {
-                $eyebrow = 'STARTER KIT';
-            }
-            $cardTitle = $item->displayTitle($locale);
-            $cardDesc = trim((string) ($item->getTranslation('kit_description', $locale) ?: $item->getTranslation('kit_description', 'uk') ?: ''));
+            $groups = $kit->productGroupsForDisplay($locale);
+            $eyebrow = $kit->displayTagline($locale);
+            $cardTitle = $kit->displayTitle($locale);
+            $cardDesc = trim((string) ($kit->getTranslation('description', $locale) ?: $kit->getTranslation('description', 'uk') ?: ''));
           @endphp
           <article class="home-block-kits__card">
             <header class="home-block-kits__card-head">
               <p class="home-block-kits__eyebrow">{{ $eyebrow }}</p>
-              @if($catUrl)
-                <a href="{{ $catUrl }}" class="home-block-kits__card-title-link">
-                  <h3 class="home-block-kits__card-title">{{ $cardTitle }}</h3>
-                </a>
-              @else
-                <h3 class="home-block-kits__card-title">{{ $cardTitle }}</h3>
-              @endif
+              <h3 class="home-block-kits__card-title">{{ $cardTitle }}</h3>
               @if($cardDesc !== '')
                 <p class="home-block-kits__card-desc">{{ $cardDesc }}</p>
               @endif

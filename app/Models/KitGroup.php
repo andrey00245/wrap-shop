@@ -11,7 +11,7 @@ use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 use Spatie\Translatable\HasTranslations;
 
-class HomeBlockKitGroup extends Model implements Sortable
+class KitGroup extends Model implements Sortable
 {
     use HasTranslations;
     use SortableTrait;
@@ -25,7 +25,7 @@ class HomeBlockKitGroup extends Model implements Sortable
     public array $translatable = ['title'];
 
     protected $fillable = [
-        'home_block_item_id',
+        'kit_id',
         'title',
         'sort_order',
     ];
@@ -48,16 +48,23 @@ class HomeBlockKitGroup extends Model implements Sortable
 
     public function buildSortQuery(): Builder
     {
-        return static::query()->where('home_block_item_id', $this->home_block_item_id);
+        return static::query()->where('kit_id', $this->kit_id);
     }
 
-    public function homeBlockItem(): BelongsTo
+    public function kit(): BelongsTo
     {
-        return $this->belongsTo(HomeBlockItem::class);
+        return $this->belongsTo(Kit::class);
     }
 
     public function kitLines(): HasMany
     {
-        return $this->hasMany(HomeBlockKitLine::class)->orderBy('sort_order');
+        return $this->hasMany(KitLine::class)->orderBy('sort_order');
+    }
+
+    public function getTitleForNovaAttribute(): string
+    {
+        $title = $this->getTranslation('title', 'uk') ?: $this->getTranslation('title', app()->getLocale()) ?: '';
+
+        return trim((string) $title) !== '' ? $title : 'Група #'.$this->id;
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\CustomBlock;
 use App\Models\Faq;
 use App\Models\HomeBlock;
+use App\Models\KitSection;
 use App\Models\HomeBrand;
 use App\Models\Implementation;
 use App\Models\News;
@@ -92,10 +93,6 @@ class IndexController extends Controller
                             'product.category',
                             'product.media',
                             'media',
-                            'kitGroups',
-                            'kitLines' => fn ($ql) => $ql
-                                ->orderBy('sort_order')
-                                ->with(['product.media', 'kitGroup']),
                             'quickLinks' => fn ($ql) => $ql
                                 ->whereHas('category')
                                 ->orderBy('sort_order')
@@ -152,6 +149,21 @@ class IndexController extends Controller
                 ->orderBy('sort_order')
                 ->get();
 
+            $kitSection = KitSection::query()
+                ->where('is_active', true)
+                ->first();
+
+            $kits = \App\Models\Kit::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->with([
+                    'kitGroups',
+                    'kitLines' => fn ($ql) => $ql
+                        ->orderBy('sort_order')
+                        ->with(['product.media', 'kitGroup']),
+                ])
+                ->get();
+
             return compact(
                 'topSellerCategories',
                 'topSellersProducts',
@@ -165,7 +177,9 @@ class IndexController extends Controller
                 'homeNews',
                 'youtubeChannelCards',
                 'homeFaqs',
-                'homeBrands'
+                'homeBrands',
+                'kitSection',
+                'kits',
             );
         });
 

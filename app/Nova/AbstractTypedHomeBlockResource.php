@@ -49,13 +49,6 @@ abstract class AbstractTypedHomeBlockResource extends Resource
                 ->help('Можна HTML для акценту, напр. &lt;span class="colord"&gt;Категорії&lt;/span&gt; товарів'),
         ];
 
-        if (static::homeBlockType() === HomeBlockType::Kits) {
-            $tabFields[] = Textarea::make('Підзаголовок / лід (набори)', 'lead')
-                ->help('Короткий текст під заголовком секції наборів на головній.')
-                ->nullable()
-                ->rows(3);
-        }
-
         return [
             ID::make()->sortable(),
 

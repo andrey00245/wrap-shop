@@ -51,10 +51,6 @@ class HomeBlock extends Resource
             NovaTabTranslatable::make([
                 Text::make('Заголовок секції', 'title')
                     ->help('Можна HTML для акценту, напр. &lt;span class="colord"&gt;Категорії&lt;/span&gt; товарів'),
-                Textarea::make('Підзаголовок / лід (набори)', 'lead')
-                    ->help('Короткий текст під заголовком; для типу «Набори (kits)» на головній.')
-                    ->nullable()
-                    ->rows(3),
             ])
                 ->setTitle('Заголовок')
                 ->hideFromIndex(),
@@ -62,7 +58,6 @@ class HomeBlock extends Resource
             Select::make('Тип', 'type')
                 ->options([
                     HomeBlockType::Categories->value => 'Категорії',
-                    HomeBlockType::Kits->value => 'Набори (kits)',
                     HomeBlockType::Products->value => 'Сезонні товари',
                     HomeBlockType::Banner->value => 'Банер',
                 ])

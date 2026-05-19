@@ -63,7 +63,6 @@ class HomeBlock extends Model
     public function categoriesTemplateLayout(): HomeBlockLayout
     {
         return match ($this->getTypeEnum()) {
-            HomeBlockType::Kits => HomeBlockLayout::Grid,
             HomeBlockType::Categories => HomeBlockLayout::LeftBig,
             default => HomeBlockLayout::LeftBig,
         };

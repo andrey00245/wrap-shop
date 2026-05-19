@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Enums\HomeBlockItemTileSize;
-use App\Enums\HomeBlockType;
-use App\Enums\KitsCatalogMode;
 use App\Support\HomeIndexCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -29,7 +27,7 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
         'sort_on_has_many' => true,
     ];
 
-    public array $translatable = ['custom_title', 'custom_tagline', 'kit_description'];
+    public array $translatable = ['custom_title', 'custom_tagline'];
 
     protected $fillable = [
         'home_block_id',
@@ -38,8 +36,6 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
         'tile_size',
         'custom_title',
         'custom_tagline',
-        'kit_description',
-        'kits_catalog_mode',
         'sort_order',
     ];
 
@@ -47,8 +43,6 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
         'tile_size' => HomeBlockItemTileSize::class,
         'custom_title' => 'array',
         'custom_tagline' => 'array',
-        'kit_description' => 'array',
-        'kits_catalog_mode' => KitsCatalogMode::class,
         'sort_order' => 'integer',
     ];
 
@@ -67,34 +61,9 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
             if ($item->sort_order === null) {
                 $item->sort_order = 0;
             }
-
-            $block = HomeBlock::query()->find($item->home_block_id);
-            if ($block?->getTypeEnum() !== HomeBlockType::Kits) {
-                $item->kits_catalog_mode = null;
-                $item->kit_description = null;
-
-                return;
-            }
-
-            if ($item->kits_catalog_mode === null) {
-                $item->kits_catalog_mode = KitsCatalogMode::Flat;
-            }
         });
 
-        static::saved(static function (HomeBlockItem $item) {
-            $block = HomeBlock::query()->find($item->home_block_id);
-
-            if ($block?->getTypeEnum() !== HomeBlockType::Kits) {
-                if ($item->kitLines()->exists() || $item->kitGroups()->exists()) {
-                    $item->kitLines()->delete();
-                    $item->kitGroups()->delete();
-                }
-            } elseif ($item->kits_catalog_mode === KitsCatalogMode::Flat) {
-                if ($item->kitGroups()->exists()) {
-                    $item->kitGroups()->delete();
-                }
-            }
-
+        static::saved(static function () {
             HomeIndexCache::flush();
         });
 
@@ -126,137 +95,6 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
     public function quickLinks(): HasMany
     {
         return $this->hasMany(HomeBlockItemQuickLink::class)->orderBy('sort_order');
-    }
-
-    public function kitGroups(): HasMany
-    {
-        return $this->hasMany(HomeBlockKitGroup::class)->orderBy('sort_order');
-    }
-
-    public function kitLines(): HasMany
-    {
-        return $this->hasMany(HomeBlockKitLine::class)->orderBy('sort_order');
-    }
-
-    public function getResolvedKitsCatalogMode(): KitsCatalogMode
-    {
-        if ($this->kits_catalog_mode instanceof KitsCatalogMode) {
-            return $this->kits_catalog_mode;
-        }
-
-        $try = KitsCatalogMode::tryFrom((string) $this->kits_catalog_mode);
-        if ($try !== null) {
-            return $try;
-        }
-
-        if ($this->relationLoaded('kitGroups')) {
-            return $this->kitGroups->isNotEmpty() ? KitsCatalogMode::Grouped : KitsCatalogMode::Flat;
-        }
-
-        return $this->kitGroups()->exists() ? KitsCatalogMode::Grouped : KitsCatalogMode::Flat;
-    }
-
-    /**
-     * @return \Illuminate\Support\Collection<int, array{label: ?string, products: \Illuminate\Support\Collection<int, \App\Models\Product>}>
-     */
-    public function kitsProductGroupsForDisplay(?string $locale = null): \Illuminate\Support\Collection
-    {
-        $locale = $locale ?: app()->getLocale();
-
-        if ($this->kitsHasManualProductLines()) {
-            return $this->kitsBuildManualProductGroups($locale);
-        }
-
-        return $this->kitsBuildCategoryFallbackGroups($locale);
-    }
-
-    private function kitsHasManualProductLines(): bool
-    {
-        if (! $this->relationLoaded('kitLines')) {
-            return false;
-        }
-
-        return $this->kitLines->whereNotNull('product_id')->isNotEmpty();
-    }
-
-    /**
-     * @return \Illuminate\Support\Collection<int, array{label: ?string, products: \Illuminate\Support\Collection<int, \App\Models\Product>}>
-     */
-    private function kitsBuildManualProductGroups(string $locale): \Illuminate\Support\Collection
-    {
-        $lines = $this->kitLines
-            ->sortBy('sort_order')
-            ->filter(fn (HomeBlockKitLine $l) => $l->product)
-            ->values();
-
-        if ($this->getResolvedKitsCatalogMode() === KitsCatalogMode::Flat) {
-            $flat = $lines->map->product->filter()->values();
-
-            return collect([['label' => null, 'products' => $flat]]);
-        }
-
-        $groupsDef = $this->relationLoaded('kitGroups')
-            ? $this->kitGroups->sortBy('sort_order')->values()
-            : collect();
-
-        $out = collect();
-
-        $ungrouped = $lines->whereNull('home_block_kit_group_id')->map->product->filter()->values();
-        if ($ungrouped->isNotEmpty()) {
-            $out->push(['label' => null, 'products' => $ungrouped]);
-        }
-
-        foreach ($groupsDef as $g) {
-            $prods = $lines->where('home_block_kit_group_id', $g->id)->map->product->filter()->values();
-            if ($prods->isEmpty()) {
-                continue;
-            }
-            $lbl = $g->getTranslation('title', $locale) ?: $g->getTranslation('title', 'uk') ?: '';
-
-            $out->push(['label' => $lbl !== '' ? $lbl : null, 'products' => $prods]);
-        }
-
-        return $out;
-    }
-
-    /**
-     * @return \Illuminate\Support\Collection<int, array{label: ?string, products: \Illuminate\Support\Collection<int, \App\Models\Product>}>
-     */
-    private function kitsBuildCategoryFallbackGroups(string $locale): \Illuminate\Support\Collection
-    {
-        $cat = $this->category;
-        if ($cat === null) {
-            return collect();
-        }
-
-        $children = $cat->relationLoaded('children') ? $cat->children : collect();
-
-        if ($children->isNotEmpty()) {
-            $groups = $children->map(function (Category $child) use ($locale) {
-                $products = $child->relationLoaded('products')
-                    ? $child->products->filter(fn (Product $p) => (bool) $p->is_active)->sortBy('id')->values()
-                    : collect();
-
-                if ($products->isEmpty()) {
-                    return null;
-                }
-
-                return [
-                    'label' => $child->getTranslation('name', $locale) ?: $child->getTranslation('name', 'uk') ?: '',
-                    'products' => $products,
-                ];
-            })->filter()->values();
-
-            if ($groups->isNotEmpty()) {
-                return $groups;
-            }
-        }
-
-        $flat = $cat->relationLoaded('products')
-            ? $cat->products->filter(fn (Product $p) => (bool) $p->is_active)->sortBy('id')->take(80)->values()
-            : collect();
-
-        return collect([['label' => null, 'products' => $flat]]);
     }
 
     public function buildSortQuery(): Builder

@@ -31,7 +31,7 @@ return [
     'in_wishlist' => 'В закладки',
     'lin_m_and_more' => ':count м.п. и больше',
     'show_next' => 'Показать следующие',
-    'in_stock' => 'In stock only',
+    'in_stock' => 'Только в наличии',
     'catalog_breadcrumb' => 'Каталог',
     'catalog_h1' => 'Каталог',
     'catalog_meta_title' => 'Каталог товаров | Wrap.Shop',

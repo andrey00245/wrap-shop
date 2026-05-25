@@ -649,9 +649,12 @@ class Product extends Model implements HasMedia
     public static function getCountProducts($categories, $request, $selectedFilterValues, $arrAttr = null, ?Collection $restrictSearchProductIds = null)
     {
         if ($request->get('filters')) {
-            $responseArray['attributes_count'] = $request->get('filters');
+            $responseArray['attributes_count'] = self::mergeClientFiltersIntoAttributesCount(
+                $request->get('filters'),
+                is_array($arrAttr) ? $arrAttr : []
+            );
         } else {
-            $responseArray['attributes_count'] = $arrAttr;
+            $responseArray['attributes_count'] = $arrAttr ?? [];
         }
 
         $withPrice = function ($query) {
@@ -790,10 +793,12 @@ class Product extends Model implements HasMedia
 
         foreach ($selectedProducts as $product) {
             foreach ($product->products_attributes as $products_attribute) {
-                if (array_key_exists($products_attribute->field_name, $responseArray['attributes_count'])) {
-                    if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'])) {
-                        $responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count']++;
-                    }
+                if (! array_key_exists($products_attribute->field_name, $responseArray['attributes_count'])) {
+                    continue;
+                }
+                $facetKey = self::normalizePivotValueForCatalogFacetKey($products_attribute->value);
+                if ($facetKey !== null && isset($responseArray['attributes_count'][$products_attribute->field_name][$facetKey]['count'])) {
+                    $responseArray['attributes_count'][$products_attribute->field_name][$facetKey]['count']++;
                 }
             }
         }
@@ -826,10 +831,12 @@ class Product extends Model implements HasMedia
 
             if ($tempAddCount === count($testArr) - 1) {
                 foreach ($product->products_attributes as $products_attribute) {
-                    if ($products_attribute->field_name === $tempField) {
-                        if (isset($responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count'])) {
-                            $responseArray['attributes_count'][$products_attribute->field_name][$products_attribute->value]['count']++;
-                        }
+                    if ($products_attribute->field_name !== $tempField) {
+                        continue;
+                    }
+                    $facetKey = self::normalizePivotValueForCatalogFacetKey($products_attribute->value);
+                    if ($facetKey !== null && isset($responseArray['attributes_count'][$products_attribute->field_name][$facetKey]['count'])) {
+                        $responseArray['attributes_count'][$products_attribute->field_name][$facetKey]['count']++;
                     }
                 }
             }
@@ -840,8 +847,11 @@ class Product extends Model implements HasMedia
         $search = [];
         $prices = [];
         $newUrl = '';
+        $listingPath = $request->get('_listing_path');
 
-        if ($referer) {
+        if ($listingPath) {
+            $newUrl = route('products.category', ['path' => $listingPath]);
+        } elseif ($referer) {
             $parsedUrl = parse_url($referer);
             $newUrl = ($parsedUrl['scheme'] ?? '').'://'.($parsedUrl['host'] ?? '').($parsedUrl['path'] ?? '');
 
@@ -891,6 +901,49 @@ class Product extends Model implements HasMedia
 
         return $responseArray;
 
+    }
+
+    /**
+     * Клієнтський filters (ключі як у data-filter, напр. «3M») + серверний каркас лічильників (ключі facet, напр. «3m»).
+     *
+     * @param  array<string, array<string, array{active?: bool|string}>>  $clientFilters
+     * @param  array<string, array<string, array{count?: int}>>  $arrAttr
+     * @return array<string, array<string, array{count: int, active: bool}>>
+     */
+    public static function mergeClientFiltersIntoAttributesCount(array $clientFilters, array $arrAttr): array
+    {
+        $out = [];
+
+        foreach ($arrAttr as $field => $items) {
+            if (! is_array($items)) {
+                continue;
+            }
+            foreach ($items as $facetKey => $data) {
+                $out[$field][$facetKey] = [
+                    'count' => (int) ($data['count'] ?? 0),
+                    'active' => false,
+                ];
+            }
+        }
+
+        foreach ($clientFilters as $field => $values) {
+            if (! is_array($values)) {
+                continue;
+            }
+            foreach ($values as $displayValue => $state) {
+                $facetKey = self::normalizePivotValueForCatalogFacetKey($displayValue);
+                if ($facetKey === null) {
+                    continue;
+                }
+                if (! isset($out[$field][$facetKey])) {
+                    $out[$field][$facetKey] = ['count' => 0, 'active' => false];
+                }
+                $active = is_array($state) ? ($state['active'] ?? false) : false;
+                $out[$field][$facetKey]['active'] = filter_var($active, FILTER_VALIDATE_BOOLEAN);
+            }
+        }
+
+        return $out;
     }
 
     /**
@@ -969,23 +1022,25 @@ class Product extends Model implements HasMedia
     }
 
     /**
-     * Нормалізація значення з pivot products_attributes до ключа, як у Attribute::getPivotValue() (для лічильників OCF).
+     * Текст значення атрибута для відображення в фільтрі (локаль сайту або задана).
      */
-    public static function normalizePivotValueForCatalogFacetKey(mixed $rawValue): ?string
+    public static function extractPivotValueForDisplay(mixed $rawValue, ?string $locale = null): ?string
     {
         if ($rawValue === null) {
             return null;
         }
+
+        $locale = $locale ?? App::getLocale();
+
         if (is_array($rawValue)) {
-            $locale = App::getLocale();
             $v = $rawValue[$locale] ?? reset($rawValue);
 
             return $v !== null && $v !== '' ? trim((string) $v) : null;
         }
+
         if (is_string($rawValue)) {
             $decoded = json_decode($rawValue, true);
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                $locale = App::getLocale();
                 $v = $decoded[$locale] ?? reset($decoded);
 
                 return $v !== null && $v !== '' ? trim((string) $v) : null;
@@ -999,6 +1054,38 @@ class Product extends Model implements HasMedia
         $s = trim((string) $rawValue);
 
         return $s !== '' ? $s : null;
+    }
+
+    /**
+     * Ключ для групування лічильників OCF (регістр ігнорується).
+     */
+    public static function normalizePivotValueForCatalogFacetKey(mixed $rawValue, ?string $locale = null): ?string
+    {
+        $display = self::extractPivotValueForDisplay($rawValue, $locale);
+
+        return $display !== null && $display !== '' ? mb_strtolower($display) : null;
+    }
+
+    /**
+     * Один варіант написання для UI, якщо в БД є дублі лише за регістром.
+     *
+     * @param  \Illuminate\Support\Collection<int, string>|array<int, string>  $variants
+     */
+    public static function pickCanonicalAttributeDisplayValue(Collection|array $variants): string
+    {
+        $variants = collect($variants)
+            ->map(fn ($v) => trim((string) $v))
+            ->filter(fn ($v) => $v !== '')
+            ->unique()
+            ->values();
+
+        if ($variants->isEmpty()) {
+            return '';
+        }
+
+        $capitalized = $variants->first(fn ($v) => preg_match('/^\p{Lu}/u', $v) === 1);
+
+        return $capitalized ?? $variants->sortByDesc(fn ($v) => mb_strlen($v))->first();
     }
 
     /**

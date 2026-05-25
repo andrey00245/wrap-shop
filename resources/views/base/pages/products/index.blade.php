@@ -41,7 +41,10 @@
         'sort', 'order', 'ocf',
     ]);
     $hasAttributeFilters = count(array_filter($queryExcept, fn ($v) => $v !== null && $v !== '')) > 0;
-    $noindex = $hasPage || $hasSortPriceFilters || $hasAttributeFilters;
+    // SEO-сторінка фільтра (/catalog/plivki/kybertane): фільтр у request для UI, але це не «фасетний» URL — індексуємо
+    $noindex = $isSeoFilterPage
+        ? ($hasPage || $hasSortPriceFilters)
+        : ($hasPage || $hasSortPriceFilters || $hasAttributeFilters);
 
     $robotsContent = $noindex ? 'noindex,follow' : 'index,follow';
     $canonicalUrl = $baseUrl;
@@ -116,12 +119,19 @@
                 <h1 class="title" id="categoryId">{{ __('product-index.catalog_h1') }}</h1>
             @elseif(isset($subsubcategory))
                 <h1 class="title" id="categoryId"
-                    data-category-id="{{$subsubcategory->id}}">{{$subsubcategory->h1 ?? $subsubcategory->name ?? ''}}</h1>
+                    data-category-id="{{$subsubcategory->id}}"
+                    data-category-base-url="{{ route('products.category', ['path' => $categoryPath]) }}"
+                    @if($isSeoFilterPage) data-seo-filter-page="1" @endif>{{$subsubcategory->h1 ?? $subsubcategory->name ?? ''}}</h1>
             @elseif(isset($subcategory))
                 <h1 class="title" id="categoryId"
-                    data-category-id="{{$subcategory->id}}">{{$subcategory->h1 ?? $subcategory->name ?? ''}}</h1>
+                    data-category-id="{{$subcategory->id}}"
+                    data-category-base-url="{{ route('products.category', ['path' => $categoryPath]) }}"
+                    @if($isSeoFilterPage) data-seo-filter-page="1" @endif>{{$subcategory->h1 ?? $subcategory->name ?? ''}}</h1>
             @else
-                <h1 class="title" id="categoryId" data-category-id="{{$category->id}}">{{$category->h1 ?? $category->name ?? ''}}</h1>
+                <h1 class="title" id="categoryId"
+                    data-category-id="{{$category->id}}"
+                    data-category-base-url="{{ route('products.category', ['path' => $categoryPath]) }}"
+                    @if($isSeoFilterPage) data-seo-filter-page="1" @endif>{{$category->h1 ?? $category->name ?? ''}}</h1>
             @endif
             @if($isCatalogRoot && $childrenCategories->isNotEmpty())
                 <nav class="category-child-nav">
@@ -357,6 +367,7 @@
                                                                     <button type="button"
                                                                             class="ocf-value ocf-checkbox filterProducts {{$selected}}"
                                                                             data-filter="{{$value}}"
+                                                                            data-facet-key="{{ $facetKey }}"
                                                                             data-filter-type="{{$attribute->field_name}}">
 
                                     <span class="ocf-value-color"
@@ -382,7 +393,7 @@
                                 @endforeach
                                 @foreach($attributes as $attribute)
                                     @if($attribute->field_name !== 'main_shade')
-                                        <div class="ocf-filter ocf-dropdown {{$attribute->field_name === 'brand' ? 'ocf-open' : ''}}" id="ocf-filter-86-2-1">
+                                        <div class="ocf-filter ocf-dropdown {{ in_array($attribute->field_name, ['brand', 'type'], true) ? 'ocf-open' : '' }}" id="ocf-filter-86-2-1">
                                             <div class="ocf-filter-body">
                                                 <div class="ocf-filter-header" data-ocf="expand">
                                                     <span class="ocf-active-label"></span>
@@ -394,7 +405,7 @@
                                   data-ocf-discard="86.2"></span>
                             <span class="ocf-plus-minus"></span></span>
                                                 </div><!-- /.ocf-filter-header -->
-                                                <div class="ocf-filter-collapse ocf-collapse {{$attribute->field_name === 'brand' ? 'ocf-in' : ''}}">
+                                                <div class="ocf-filter-collapse ocf-collapse {{ in_array($attribute->field_name, ['brand', 'type'], true) ? 'ocf-in' : '' }}">
 
 
                                                     <div class="ocf-value-list">
@@ -419,6 +430,7 @@
                                                                 <button type="button"
                                                                         class="ocf-value ocf-checkbox filterProducts {{$selected}}"
                                                                         data-filter="{{$value}}"
+                                                                        data-facet-key="{{ $facetKey }}"
                                                                         data-filter-type="{{$attribute->field_name}}">
                                                                     <span
                                                                         class="ocf-value-input ocf-value-input-checkbox"></span>

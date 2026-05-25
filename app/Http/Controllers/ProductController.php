@@ -706,18 +706,9 @@ class ProductController extends Controller
 
         $currentCategory = $subsubcategory ?? $subcategory ?? $category;
 
-        if ($seoFilterPage === null && $this->hasOnlyOneAttributeFilter($selectedFilterValues)) {
-            $redirectSeo = $this->findSeoPageForSingleFilter($currentCategory->id, $selectedFilterValues);
-            if ($redirectSeo) {
-                $categoryPath = $this->categoryPathFromLeaf($currentCategory);
-                $url = route('products.category', ['path' => $categoryPath.'/'.$redirectSeo->slug]);
-                if (request()->query()) {
-                    $url = $url.'?'.http_build_query(request()->only(['page', 'sort_by', 'sort_direction', 'min_price', 'max_price', 'in_stock']));
-                }
+        // Не робимо 301 з ?brand[]=3M на /catalog/plivki/brand-3m: обидва URL лишаються робочими
+        // без додаткових редіректів (SEO-сторінки — лише за прямим посиланням / sitemap / редіректами з адмінки).
 
-                return redirect()->to($url, 301);
-            }
-        }
         $categoryBreadcrumbs = $this->buildCategoryBreadcrumbs($currentCategory);
 
         // Получаем вложенные ID
@@ -761,6 +752,8 @@ class ProductController extends Controller
         string $categoryPath,
         bool $isCatalogRoot
     ): View|array|SymfonyResponse {
+        request()->attributes->set('product_listing_category_ids', $categories);
+
         if ($isCatalogRoot && ! $this->catalogSelectionHasAttributeFilters($selectedFilterValues)) {
             return $this->renderCatalogRootProductListing(
                 $childrenCategories,
@@ -978,21 +971,51 @@ class ProductController extends Controller
 
         $category = Category::query()->where('id', $request->get('category_id'))->first();
         if ($category !== null) {
-            if ($category->hasChildren()) {
-                $categories = $category->children()->pluck('id');
-            } else {
-                $categories[] = $category->id;
-            }
+            $categories = $category->hasChildren()
+                ? $category->allDescendantIds()
+                : [$category->id];
+            $request->merge(['_listing_path' => $this->categoryPathFromLeaf($category)]);
         }
 
         if (empty($categories)) {
             $categories = Category::all()->pluck('id');
         }
 
-        foreach ($request->get('filters') as $key => $filterType) {
-            foreach ($filterType as $key_i => $filterValue) {
-                if (in_array('true', $filterValue, true)) {
-                    $selectedFilterValues[$key][] = $key_i;
+        request()->attributes->set('product_listing_category_ids', $categories);
+
+        $excludedFieldNames = [
+            'name', 'application', 'purpose', 'benefits', 'default_quantity',
+            'master_qualification', 'store_terms', 'warranty', 'quantity_step',
+            'min_order_quantity', 'first_stock', 'second_stock', 'third_stock', 'under_order',
+        ];
+
+        $attributesArray = [];
+        $catalogAttributes = Attribute::query()
+            ->where('is_visible', true)
+            ->whereNotIn('field_name', $excludedFieldNames)
+            ->orderBy('id')
+            ->get();
+
+        foreach ($catalogAttributes as $attribute) {
+            foreach ($attribute->getPivotValue() as $value) {
+                $facetKey = Product::normalizePivotValueForCatalogFacetKey($value);
+                if ($facetKey !== null) {
+                    $attributesArray[$attribute->field_name][$facetKey]['count'] = 0;
+                }
+            }
+        }
+
+        $clientFilters = $request->get('filters', []);
+        if (is_array($clientFilters)) {
+            foreach ($clientFilters as $key => $filterType) {
+                if (! is_array($filterType)) {
+                    continue;
+                }
+                foreach ($filterType as $key_i => $filterValue) {
+                    if (is_array($filterValue)
+                        && filter_var($filterValue['active'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
+                        $selectedFilterValues[$key][] = $key_i;
+                    }
                 }
             }
         }
@@ -1013,7 +1036,7 @@ class ProductController extends Controller
             $categories,
             $request,
             $selectedFilterValues,
-            null,
+            $attributesArray,
             $restrictSearchProductIds
         ));
     }

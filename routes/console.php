@@ -102,3 +102,20 @@ if ($fullSyncEnd > 0) {
             Log::info('Scheduler: команда products:update відпрацювала (джоби поставлені в чергу)');
         });
 }
+
+// Sitemap (категорії, товари, SEO-фільтри, новини) — те саме, що кнопка в Command Runner
+Schedule::command('generate:sitemap')
+    ->everyTwoHours()
+    ->name('generate_sitemap')
+    ->withoutOverlapping(30)
+    ->before(function () {
+        Log::info('Scheduler: старт generate:sitemap');
+    })
+    ->after(function () {
+        Log::info('Scheduler: generate:sitemap завершено', [
+            'artisan_output' => trim(Artisan::output()),
+        ]);
+    })
+    ->onFailure(function () {
+        Log::error('Scheduler: generate:sitemap упав');
+    });

@@ -57,9 +57,12 @@ class Attribute extends Model
 
     public function getPivotValue()
     {
-        $category = request()->route()->parameter('subsubcategory')
-            ?? request()->route()->parameter('subcategory')
-            ?? request()->route()->parameter('category');
+        $route = request()->route();
+        $category = $route
+            ? ($route->parameter('subsubcategory')
+                ?? $route->parameter('subcategory')
+                ?? $route->parameter('category'))
+            : null;
 
         $searchCategories = collect();
 
@@ -81,8 +84,8 @@ class Attribute extends Model
             }
         }
 
-        $currentCategoryIds = null;
-        if ($category !== null) {
+        $currentCategoryIds = request()->attributes->get('product_listing_category_ids');
+        if ($currentCategoryIds === null && $category !== null) {
             // Для категорії з підкатегоріями беремо всі нащадки, інакше — тільки поточну
             $currentCategoryIds = $category->hasChildren()
                 ? $category->allDescendantIds()
@@ -133,33 +136,24 @@ class Attribute extends Model
             )
 
             ->get()
-            ->map(function ($product) {
-                $rawValue = $product->pivot->value;
-
-                // Пытаемся прочитать как JSON {uk: "...", ru: "...", ...}
-                $decoded = json_decode($rawValue, true);
-
-                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                    $locale = App::getLocale();
-
-                    // Берём значение для поточного локалю, або перше доступне
-                    return $decoded[$locale] ?? reset($decoded) ?? null;
-                }
-
-                // Старий формат: у pivot->value збережений просто рядок типу "3M"
-                return $rawValue;
-            })
+            ->map(fn ($product) => Product::extractPivotValueForDisplay($product->pivot->value))
             ->filter()
-            ->unique();
+            ->groupBy(fn ($value) => Product::normalizePivotValueForCatalogFacetKey($value))
+            ->map(fn ($group) => Product::pickCanonicalAttributeDisplayValue($group))
+            ->filter(fn ($value) => $value !== '')
+            ->values();
 
         return $result;
     }
 
     public function getDefaultProductsCount($attributeId, $value)
     {
-        $category = request()->route()->parameter('subsubcategory')
-            ?? request()->route()->parameter('subcategory')
-            ?? request()->route()->parameter('category');
+        $route = request()->route();
+        $category = $route
+            ? ($route->parameter('subsubcategory')
+                ?? $route->parameter('subcategory')
+                ?? $route->parameter('category'))
+            : null;
 
         $productIds = ProductAttribute::query()
             ->where('attribute_id', $attributeId)

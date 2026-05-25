@@ -108,6 +108,32 @@ $(document).ready(function () {
     let filters = {};
     let minPrice = 0;
     let maxPrice = 0;
+
+    function facetKeyForFilterButton($el) {
+        const key = $el.attr('data-facet-key');
+        if (key !== undefined && key !== '') {
+            return String(key);
+        }
+
+        return String($el.attr('data-filter') ?? '').trim().toLowerCase();
+    }
+
+    function categoryBaseUrl() {
+        return $('#categoryId').attr('data-category-base-url') || '';
+    }
+
+    function isSeoFilterPage() {
+        return $('#categoryId').attr('data-seo-filter-page') === '1';
+    }
+
+    function attributeCountEntry(attributesCount, filterType, $el) {
+        if (!attributesCount || !attributesCount[filterType]) {
+            return null;
+        }
+
+        return attributesCount[filterType][facetKeyForFilterButton($el)] ?? null;
+    }
+
     const filterProducts = $('.filterProducts')
     const categoryId = $('#categoryId').data('category-id');
     let filterProductsPrice = $('.filterProductsPrice')
@@ -305,6 +331,14 @@ $(document).ready(function () {
 
     function unselectAllFilters() {
         $('#cancel').on('click', function (e) {
+            const resetLink = $(this).data('link') || categoryBaseUrl();
+
+            if (isSeoFilterPage() && resetLink) {
+                window.location.href = resetLink;
+
+                return;
+            }
+
             if ($('.ocf-selected-card .ocf-selected-filter .ocf-selected-discard').length === 0) {
                 filterProducts.each(function () {
                     let filterType = $(this).data('filter-type')
@@ -312,14 +346,13 @@ $(document).ready(function () {
                     filters[filterType][filterValue]['active'] = false;
                     $(this).removeClass('ocf-selected');
                 })
-                // filterProductsPrice.each(function () {
-                //     $(this).removeClass('ocf-selected');
-                //     minPrice = 0;
-                //     maxPrice = 0;
-                // })
-                getCountAjax()
-            } else {
-                window.location.href = $(this).data('link');
+                getCountAjax(null, function (response) {
+                    if (countSelected(filters) === 0 && resetLink) {
+                        window.location.href = resetLink;
+                    }
+                })
+            } else if (resetLink) {
+                window.location.href = resetLink;
             }
         })
     }
@@ -539,13 +572,14 @@ $(document).ready(function () {
         }
     }
 
-    function getCountAjax(button = null) {
+    function getCountAjax(button = null, onDone = null) {
         let url = '/get-count'
 
         if (language !== 'uk') {
             url = '/' + language + url;
         }
         const inStockCheckbox = document.getElementById('in-stock-switch');
+        const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
         const getParametesUrl = new URL(window.location.href);
         const params = new URLSearchParams(getParametesUrl.search);
@@ -578,39 +612,57 @@ $(document).ready(function () {
             type: 'POST',
             dataType: 'json',
             data: data,
+            headers: csrfToken ? {'X-CSRF-TOKEN': csrfToken} : {},
             success: function (response) {
                 let filterTypeActive = [];
 
                 filterProducts.each(function () {
-                    if (response['attributes_count'][$(this).data('filter-type')][$(this).data('filter')]['active'] === "true") {
-                        filterTypeActive.push($(this).data('filter-type'));
+                    const $btn = $(this);
+                    const entry = attributeCountEntry(response['attributes_count'], $btn.data('filter-type'), $btn);
+                    if (entry && (entry.active === true || entry.active === 'true')) {
+                        filterTypeActive.push($btn.data('filter-type'));
                     }
                 })
 
                 filterProducts.each(function () {
-                    if (filterTypeActive.includes($(this).data('filter-type'))) {
-                        $(this).find('.ocf-value-count').text('+' + response['attributes_count'][$(this).data('filter-type')][$(this).data('filter')]['count'])
+                    const $btn = $(this);
+                    const filterType = $btn.data('filter-type');
+                    const entry = attributeCountEntry(response['attributes_count'], filterType, $btn);
+                    const count = entry && typeof entry.count === 'number' ? entry.count : 0;
+
+                    if (filterTypeActive.includes(filterType)) {
+                        $btn.find('.ocf-value-count').text('+' + count);
                     } else {
-                        $(this).find('.ocf-value-count').text(response['attributes_count'][$(this).data('filter-type')][$(this).data('filter')]['count'])
+                        $btn.find('.ocf-value-count').text(count);
                     }
-                    if (response['attributes_count'][$(this).data('filter-type')][$(this).data('filter')]['count'] === 0) {
-                        $(this).find('.ocf-value-count').text(response['attributes_count'][$(this).data('filter-type')][$(this).data('filter')]['count'])
-                        if ($(this).hasClass('ocf-selected')) {
-                            $(this).prop('disabled', false);
+                    if (count === 0) {
+                        $btn.find('.ocf-value-count').text(count);
+                        if ($btn.hasClass('ocf-selected')) {
+                            $btn.prop('disabled', false);
                         } else {
-                            $(this).addClass('ocf-disabled');
-                            $(this).prop('disabled', true);
+                            $btn.addClass('ocf-disabled');
+                            $btn.prop('disabled', true);
                         }
 
                     } else {
-                        $(this).removeClass('ocf-disabled');
-                        $(this).prop('disabled', false);
+                        $btn.removeClass('ocf-disabled');
+                        $btn.prop('disabled', false);
                     }
                 })
                 showTotalCountPopup(button, filters, response['total_count'], response['new_url'])
+
+                if (isSeoFilterPage() && countSelected(filters) === 0 && categoryBaseUrl()) {
+                    window.location.href = categoryBaseUrl();
+
+                    return;
+                }
+
+                if (typeof onDone === 'function') {
+                    onDone(response);
+                }
             },
             error: function (xhr, status, error) {
-                console.log('Error:', error);
+                console.error('get-count failed:', status, error, xhr.responseText);
             },
             complete: function (xhr, status) {
                 console.log('Request completed');

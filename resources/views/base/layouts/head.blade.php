@@ -101,7 +101,7 @@
 
     <style>
 
-      header {
+      header.header {
         min-height: 84px;
       }
 

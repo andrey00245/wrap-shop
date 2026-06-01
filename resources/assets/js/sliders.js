@@ -112,6 +112,31 @@ $(document).ready(function () {
         });
     }
 
+    document.querySelectorAll('.js-home-block-kits-splide').forEach((el) => {
+        if (el.querySelectorAll('.splide__slide').length < 2) {
+            return;
+        }
+
+        new Splide(el, {
+            pagination: false,
+            fixedWidth: '308.75px',
+            gap: '20px',
+            perMove: 1,
+            omitEnd: true,
+            type: 'slide',
+            rewind: false,
+            classes: {
+                arrows: 'splide__arrows home-products-slide-buttons',
+                prev: 'splide__arrow--prev',
+                next: 'splide__arrow--next',
+            },
+            breakpoints: {
+                1019: { fixedWidth: '280px', gap: '16px' },
+                767: { fixedWidth: '260px', gap: '12px' },
+            },
+        }).mount();
+    });
+
     document.querySelectorAll('.js-home-block-products-splide').forEach((el) => {
         if (el.querySelectorAll('.splide__slide').length < 2) {
             return;

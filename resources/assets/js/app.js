@@ -216,6 +216,7 @@ function telInputInitialization() {
 
 $(document).ready(function () {
     popupsOpenClose()
+    initHomeKitsAccordion()
     openAuthModalFromUrl()
     $('#popup-consultation').on('submit', function (e) {
         e.preventDefault()
@@ -551,6 +552,54 @@ function popupSearchHandler(dropdownMenu, event) {
     }
 }
 
+function initHomeKitsAccordion() {
+    document.querySelectorAll('.js-home-kits-accordion').forEach(function (accordion) {
+        if (accordion.dataset.kitsAccordionReady === '1') {
+            return;
+        }
+
+        accordion.dataset.kitsAccordionReady = '1';
+
+        accordion.querySelectorAll('.home-block-kits__accordion-item').forEach(function (item) {
+            item.addEventListener('toggle', function () {
+                if (!item.open) {
+                    return;
+                }
+
+                accordion.querySelectorAll('.home-block-kits__accordion-item').forEach(function (other) {
+                    if (other !== item) {
+                        other.open = false;
+                    }
+                });
+            });
+        });
+    });
+}
+
+let popupScrollLockY = 0;
+
+function lockBodyScroll() {
+    if (document.body.classList.contains('popup-scroll-lock')) {
+        return;
+    }
+
+    popupScrollLockY = window.scrollY || window.pageYOffset;
+    document.documentElement.classList.add('popup-scroll-lock');
+    document.body.classList.add('popup-scroll-lock');
+    document.body.style.top = `-${popupScrollLockY}px`;
+}
+
+function unlockBodyScroll() {
+    if (!document.body.classList.contains('popup-scroll-lock')) {
+        return;
+    }
+
+    document.documentElement.classList.remove('popup-scroll-lock');
+    document.body.classList.remove('popup-scroll-lock');
+    document.body.style.top = '';
+    window.scrollTo(0, popupScrollLockY);
+}
+
 function popupsOpenClose(){
     const popups = document.querySelectorAll('.general-popup');
     const body = document.querySelector('body');
@@ -560,7 +609,11 @@ function popupsOpenClose(){
         if (button) {
             closeAllPopups(popups)
             const target = button.getAttribute('data-popup')
-            document.getElementById(target).classList.add('active');
+            const popup = document.getElementById(target);
+            if (popup) {
+                popup.classList.add('active');
+                lockBodyScroll();
+            }
         }
     })
 
@@ -575,6 +628,7 @@ function popupsOpenClose(){
             popup.classList.remove('active');
             popup.setAttribute('data-step', '1');
             clearText();
+            unlockBodyScroll();
         }
     });
 }
@@ -591,6 +645,7 @@ function closeAllPopups(popups) {
         popup.classList.remove('active')
         popup.setAttribute('data-step', '1')
     });
+    unlockBodyScroll();
 }
 
 /**
@@ -607,6 +662,7 @@ function openAuthModalFromUrl() {
     closeAllPopups(popups)
     loginPopup.classList.add('active')
     loginPopup.setAttribute('data-step', steps[modal])
+    lockBodyScroll()
     params.delete('modal')
     const newSearch = params.toString()
     const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash

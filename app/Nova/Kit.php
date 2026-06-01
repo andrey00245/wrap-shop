@@ -9,7 +9,6 @@ use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Panel;
 use Outl1ne\NovaSortable\Traits\HasSortableRows;
@@ -58,10 +57,7 @@ class Kit extends Resource
                 Text::make('Заголовок', 'title')
                     ->help('Назва на картці набору.'),
                 Text::make('Лейбл (рядок над назвою)', 'tagline')
-                    ->help('Наприклад STARTER KIT.'),
-                Textarea::make('Опис', 'description')
-                    ->rows(4)
-                    ->nullable(),
+                    ->help('Наприклад STARTER KIT. Якщо порожньо — показується STARTER KIT.'),
             ])->setTitle('Картка набору'),
 
             Panel::make('Склад набору', [

@@ -579,6 +579,10 @@ function initHomeKitsAccordion() {
 let popupScrollLockY = 0;
 
 function lockBodyScroll() {
+    if (!window.matchMedia('(max-width: 767px)').matches) {
+        return;
+    }
+
     if (document.body.classList.contains('popup-scroll-lock')) {
         return;
     }
@@ -590,6 +594,10 @@ function lockBodyScroll() {
 }
 
 function unlockBodyScroll() {
+    if (!window.matchMedia('(max-width: 767px)').matches) {
+        return;
+    }
+
     if (!document.body.classList.contains('popup-scroll-lock')) {
         return;
     }

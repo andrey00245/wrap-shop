@@ -270,13 +270,30 @@ if (topBannersEl) {
         interval: 3000,
         type: 'loop',
         speed: 600,
-        pauseOnHover: false,
-        pauseOnFocus: false,
+        pauseOnHover: true,
+        pauseOnFocus: true,
         arrows: false,
         pagination: true,
     });
 
     topBannersSplide.mount();
+
+    // При любом взаимодействии пользователя — останавливаем автопрокрутку,
+    // чтобы можно было спокойно читать баннер.
+    const stopAutoplay = () => {
+        const autoplay = topBannersSplide?.Components?.Autoplay;
+        if (autoplay && typeof autoplay.stop === 'function') {
+            autoplay.stop();
+        }
+    };
+
+    // hover / touch / drag / scroll-wheel
+    topBannersEl.addEventListener('mouseenter', stopAutoplay, { passive: true });
+    topBannersEl.addEventListener('touchstart', stopAutoplay, { passive: true });
+    topBannersEl.addEventListener('pointerdown', stopAutoplay, { passive: true });
+    topBannersEl.addEventListener('wheel', stopAutoplay, { passive: true });
+    topBannersSplide.on('drag', stopAutoplay);
+    topBannersSplide.on('move', stopAutoplay);
 
     // Защита от дублирования точек пагинации (если слайдер по каким‑то причинам инициализируется дважды)
     (function fixTopBannersPagination() {

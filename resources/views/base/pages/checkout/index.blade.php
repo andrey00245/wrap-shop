@@ -45,7 +45,10 @@
             @endphp
             <div class="simple-content">
                 <div id="simplecheckout_form_0">
-                    <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm" data-has-long-film="{{ $checkoutHasLongFilmRolls ? '1' : '0' }}">
+                    <form action="{{ route('checkout.store') }}" method="POST" id="checkoutForm"
+                          data-has-long-film="{{ $checkoutHasLongFilmRolls ? '1' : '0' }}"
+                          data-np-branch-ref-error="{{ __('checkout.np_branch_select_from_list') }}"
+                          data-np-locker-ref-error="{{ __('checkout.np_locker_select_from_list') }}">
                         @csrf
                         <div class="simplecheckout">
                             <div class="simplecheckout-step" style="display: flex;">
@@ -262,6 +265,9 @@
 
                                                             <ul class="dropdown-suggestions" id="address-suggestions"
                                                                 style="display: none;"></ul>
+                                                            @error('novaposhta_warehouse_ref')
+                                                            <div class="error">{{ $message }}</div>
+                                                            @enderror
                                                             @error('shipping_address')
                                                             <div class="error">{{ $message }}</div>
                                                             @enderror
@@ -271,6 +277,11 @@
                                                                  data-rule="notEmpty"
                                                                  class="simplecheckout-error-text simplecheckout-rule"
                                                                  data-not-empty="1" data-required="true">{{__('checkout.this_field_required')}}
+                                                            </div>
+                                                            <div style="display:none;"
+                                                                 data-for="novaposhta_warehouse_ref"
+                                                                 class="simplecheckout-error-text simplecheckout-rule np-warehouse-ref-error">
+                                                                {{ __('checkout.np_branch_select_from_list') }}
                                                             </div>
                                                         </div>
 
@@ -283,6 +294,9 @@
                                                             <input type="hidden" name="locker_warehouse_ref" id="locker_warehouse_ref">
                                                             <ul class="dropdown-suggestions" id="locker-suggestions"
                                                                 style="display: none;"></ul>
+                                                            @error('locker_warehouse_ref')
+                                                            <div class="error">{{ $message }}</div>
+                                                            @enderror
                                                             @error('locker_address')
                                                             <div class="error">{{ $message }}</div>
                                                             @enderror
@@ -292,6 +306,11 @@
                                                                  data-rule="notEmpty"
                                                                  class="simplecheckout-error-text simplecheckout-rule"
                                                                  data-not-empty="1" data-required="true">{{__('checkout.this_field_required')}}
+                                                            </div>
+                                                            <div style="display:none;"
+                                                                 data-for="locker_warehouse_ref"
+                                                                 class="simplecheckout-error-text simplecheckout-rule np-warehouse-ref-error">
+                                                                {{ __('checkout.np_locker_select_from_list') }}
                                                             </div>
                                                         </div>
 

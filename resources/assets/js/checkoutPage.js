@@ -154,6 +154,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const novaPoshtaTypeInputs = document.querySelectorAll('input[name="nova_poshta_type"]');
     novaPoshtaTypeInputs.forEach(input => {
         input.addEventListener('change', function() {
+            $("#novaposhta_warehouse_ref").val('');
+            $("#locker_warehouse_ref").val('');
             updateNovaPoshtaFields();
         });
     });
@@ -409,6 +411,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
     restorePaymentMethod();
 
+    function validateNovaPoshtaWarehouseSelection() {
+        const shippingMethod = document.querySelector('input[name="shipping_method"]:checked');
+        if (!shippingMethod || shippingMethod.id !== 'novaposhta') {
+            return true;
+        }
+
+        const npType = document.querySelector('input[name="nova_poshta_type"]:checked');
+        if (!npType) {
+            return true;
+        }
+
+        const checkoutForm = document.getElementById('checkoutForm');
+        const branchRefError = document.querySelector('#branch-fields [data-for="novaposhta_warehouse_ref"]');
+        const lockerRefError = document.querySelector('#locker-fields [data-for="locker_warehouse_ref"]');
+
+        if (branchRefError) {
+            branchRefError.style.display = 'none';
+        }
+        if (lockerRefError) {
+            lockerRefError.style.display = 'none';
+        }
+
+        if (npType.value === 'branch') {
+            const ref = document.querySelector('#novaposhta_warehouse_ref')?.value?.trim();
+            if (!ref) {
+                if (branchRefError) {
+                    branchRefError.style.display = 'block';
+                    if (checkoutForm?.dataset?.npBranchRefError) {
+                        branchRefError.textContent = checkoutForm.dataset.npBranchRefError;
+                    }
+                }
+                document.querySelector('#shipping_address')?.focus();
+                return false;
+            }
+        }
+
+        if (npType.value === 'locker') {
+            const ref = document.querySelector('#locker_warehouse_ref')?.value?.trim();
+            if (!ref) {
+                if (lockerRefError) {
+                    lockerRefError.style.display = 'block';
+                    if (checkoutForm?.dataset?.npLockerRefError) {
+                        lockerRefError.textContent = checkoutForm.dataset.npLockerRefError;
+                    }
+                }
+                document.querySelector('#locker_address')?.focus();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     document.querySelector('#checkoutForm').addEventListener('submit', function (e) {
         const cityInput = document.querySelector('input[name="city"]');
         const citySelect = document.querySelector('select[name="city_select"]');
@@ -416,6 +471,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (citySelect && citySelect.style.display === 'block') {
             // Если выбран метод "Мої адреси" и отображается select, передаем значение select в input
             cityInput.value = citySelect.options[citySelect.selectedIndex].value; // Записываем в поле "city" значение выбранного города
+        }
+
+        if (!validateNovaPoshtaWarehouseSelection()) {
+            e.preventDefault();
         }
     });
 });
@@ -443,6 +502,8 @@ $(document).ready(function() {
     $("input[name='shipping_method']").on("change", function() {
         $("#city").val('');
         $("#shipping_address").val('');
+        $("#novaposhta_warehouse_ref").val('');
+        $("#locker_warehouse_ref").val('');
         // Проверяем, выбран ли метод "Нова Пошта"
         if ($("#novaposhta").is(":checked")) {
             // Включаем автозаполнение для поля города и адреса
@@ -541,13 +602,23 @@ $(document).ready(function() {
         $("#address-suggestions").empty();
         $("#shipping_address").val('');
         $("#locker_address").val('');
+        $("#novaposhta_warehouse_ref").val('');
+        $("#locker_warehouse_ref").val('');
         const branchErrOnCityPick = document.querySelector('#branch-fields [data-for="shipping_address"]');
         if (branchErrOnCityPick) {
             branchErrOnCityPick.style.display = 'none';
         }
+        const branchRefErrOnCityPick = document.querySelector('#branch-fields [data-for="novaposhta_warehouse_ref"]');
+        if (branchRefErrOnCityPick) {
+            branchRefErrOnCityPick.style.display = 'none';
+        }
         const lockerErrOnCityPick = document.querySelector('#locker-fields [data-for="locker_address"]');
         if (lockerErrOnCityPick) {
             lockerErrOnCityPick.style.display = 'none';
+        }
+        const lockerRefErrOnCityPick = document.querySelector('#locker-fields [data-for="locker_warehouse_ref"]');
+        if (lockerRefErrOnCityPick) {
+            lockerRefErrOnCityPick.style.display = 'none';
         }
         let selectedCity = $(this).data("value");
         let cityRef = $(this).data("id"); // Сохраняем идентификатор города
@@ -725,6 +796,11 @@ $(document).ready(function() {
         if (!$("#novaposhta").is(":checked")) {
             return;
         }
+        $("#novaposhta_warehouse_ref").val('');
+        const branchRefErr = document.querySelector('#branch-fields [data-for="novaposhta_warehouse_ref"]');
+        if (branchRefErr) {
+            branchRefErr.style.display = 'none';
+        }
         let query = $(this).val().trim();
         updateAddressSuggestions(query); // Обновляем предложения в зависимости от введенного текста
     });
@@ -733,6 +809,11 @@ $(document).ready(function() {
     $("#locker_address").on("input", function() {
         if (!$("#novaposhta_locker").is(":checked") || checkoutFormHasLongFilm()) {
             return;
+        }
+        $("#locker_warehouse_ref").val('');
+        const lockerRefErr = document.querySelector('#locker-fields [data-for="locker_warehouse_ref"]');
+        if (lockerRefErr) {
+            lockerRefErr.style.display = 'none';
         }
         let query = $(this).val().trim();
         updateLockerSuggestions(query); // Обновляем предложения в зависимости от введенного текста
@@ -760,6 +841,10 @@ $(document).ready(function() {
         if (branchErr) {
             branchErr.style.display = 'none';
         }
+        const branchRefErr = document.querySelector('#branch-fields [data-for="novaposhta_warehouse_ref"]');
+        if (branchRefErr) {
+            branchRefErr.style.display = 'none';
+        }
 
         // Прячем список предложений
         $("#address-suggestions").hide();
@@ -786,6 +871,10 @@ $(document).ready(function() {
         const lockerErr = document.querySelector('#locker-fields [data-for="locker_address"]');
         if (lockerErr) {
             lockerErr.style.display = 'none';
+        }
+        const lockerRefErr = document.querySelector('#locker-fields [data-for="locker_warehouse_ref"]');
+        if (lockerRefErr) {
+            lockerRefErr.style.display = 'none';
         }
 
         // Выбираем радио кнопку "locker"

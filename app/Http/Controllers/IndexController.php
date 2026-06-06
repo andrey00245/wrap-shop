@@ -16,6 +16,9 @@ class IndexController extends Controller
     /** TTL кешу головної (секунди): коротко, щоб контент не відставав надовго після змін у адмінці */
     private const HOME_CACHE_TTL = 120;
 
+    /** Блок «Плівки на автомобілі» (examples-of-work) на головній */
+    private const HOME_EXAMPLE_WORKS_LIMIT = 8;
+
     /**
      * Handle the incoming request.
      */
@@ -67,7 +70,7 @@ class IndexController extends Controller
 
             $exampleWorks = Implementation::query()
                 ->where('is_active', true)
-                ->take(12)
+                ->take(self::HOME_EXAMPLE_WORKS_LIMIT)
                 ->with(['product.media', 'product.category'])
                 ->get();
 

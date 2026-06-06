@@ -55,4 +55,6 @@ return [
     'house_apartment' => 'Будинок, квартира',
     'street' => "Вулиця",
     'input_delivery_address' => "Введіть адресу доставки",
+    'np_branch_select_from_list' => 'Оберіть відділення зі списку підказок Нової Пошти',
+    'np_locker_select_from_list' => 'Оберіть поштомат зі списку підказок Нової Пошти',
 ];

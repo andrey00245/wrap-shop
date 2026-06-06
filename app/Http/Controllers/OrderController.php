@@ -29,6 +29,7 @@ class OrderController extends Controller
             'comment' => 'nullable|string',
             'shipping_method' => 'string',
             'novaposhta_warehouse_ref' => 'nullable|string',
+            'locker_warehouse_ref' => 'nullable|string',
             'nova_poshta_type' => 'nullable|string|in:branch,locker,courier',
             'locker_address' => 'nullable|string',
             'courier_street' => 'nullable|string',
@@ -44,8 +45,10 @@ class OrderController extends Controller
                 $novaPoshtaType = $request->input('nova_poshta_type');
                 if ($novaPoshtaType === 'branch') {
                     $rules['shipping_address'] = 'required|string';
+                    $rules['novaposhta_warehouse_ref'] = 'required|string';
                 } elseif ($novaPoshtaType === 'locker') {
                     $rules['locker_address'] = 'required|string';
+                    $rules['locker_warehouse_ref'] = 'required|string';
                 } elseif ($novaPoshtaType === 'courier') {
                     $rules['courier_street'] = 'required|string';
                     $rules['courier_house'] = 'required|string';
@@ -62,7 +65,10 @@ class OrderController extends Controller
             $rules['my_address'] = 'required|string';
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, [
+            'novaposhta_warehouse_ref.required' => __('checkout.np_branch_select_from_list'),
+            'locker_warehouse_ref.required' => __('checkout.np_locker_select_from_list'),
+        ]);
 
 
         if (Auth::check()) {

@@ -59,4 +59,6 @@ return [
     'street' => 'Street',
     'input_branch' => 'Enter branch',
     'input_delivery_address' => 'Enter delivery address',
+    'np_branch_select_from_list' => 'Select a branch from Nova Poshta suggestions',
+    'np_locker_select_from_list' => 'Select a parcel locker from Nova Poshta suggestions',
 ];

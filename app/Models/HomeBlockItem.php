@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -125,6 +126,15 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
             ->height(400)
             ->format('webp')
             ->nonQueued();
+
+        /** Банер: рівно 1325×541 webp — заповнює блок без полос по боках */
+        $this
+            ->addMediaConversion('banner')
+            ->performOnCollections('custom_image', 'custom')
+            ->fit(Fit::Crop, 1325, 541)
+            ->format('webp')
+            ->quality(88)
+            ->nonQueued();
     }
 
     public function displayTitle(?string $locale = null): string
@@ -176,6 +186,50 @@ class HomeBlockItem extends Model implements HasMedia, Sortable
         }
 
         return filled($fromCategory) ? $fromCategory : self::tileFallbackImageUrl();
+    }
+
+    public function bannerButtonUrl(?string $locale = null): ?string
+    {
+        if ($this->product) {
+            $slug = $this->product->slugEn ?? $this->product->getTranslation('slug', 'en');
+            if (filled($slug)) {
+                return route('products.show', ['product' => $slug]);
+            }
+        }
+
+        return $this->catalogUrl($locale);
+    }
+
+    public function bannerImageUrl(): string
+    {
+        $media = $this->getFirstMedia('custom_image') ?? $this->getFirstMedia('custom');
+        if ($media !== null) {
+            $bannerUrl = $this->getExistingConversionUrl($media, 'banner');
+            if ($bannerUrl !== null) {
+                return $bannerUrl;
+            }
+        }
+
+        if (filled($this->product?->getPreviewImage())) {
+            return $this->product->getPreviewImage();
+        }
+
+        $fromCategory = $this->category?->getPreviewImage();
+
+        return filled($fromCategory) ? $fromCategory : self::tileFallbackImageUrl();
+    }
+
+    private function getExistingConversionUrl(Media $media, string $conversion): ?string
+    {
+        if (! $media->hasGeneratedConversion($conversion)) {
+            return null;
+        }
+
+        $path = $media->getPath($conversion);
+
+        return $path && is_file($path)
+            ? $media->getUrl($conversion)
+            : null;
     }
 
     public function catalogUrl(?string $locale = null): ?string

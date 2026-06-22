@@ -47,7 +47,7 @@ class Banner extends Model implements HasMedia
         /** Вебп для головного слайдера (~розмір у верстці) — менший за preview_webp, краще для LCP */
         $this
             ->addMediaConversion('hero')
-            ->fit(Fit::Crop, 1325, 450)
+            ->fit(Fit::Max, 1325, 450)
             ->format('webp')
             ->quality(82)
             ->nonQueued();

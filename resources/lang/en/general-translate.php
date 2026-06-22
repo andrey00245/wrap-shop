@@ -11,6 +11,7 @@ return [
 
     'sales_hit' => 'The best seller',
     'home_block_categories_sr_only' => 'Product categories',
+    'home_block_kits_title' => '<span class="colord">Ready</span> film solutions',
     'home_block_kits_sr_only' => 'Ready film solutions',
     'home_block_kits_lead' => 'Our ready-made film solutions for DIY wrapping make it easy and quick to refresh your car\'s appearance. Each kit includes high-quality film and detailed instructions to help you achieve a perfect result at home',
     'all' => 'All',

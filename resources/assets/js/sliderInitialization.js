@@ -1,3 +1,101 @@
+import { bindHomeProductsSplideProgress } from './homeMobileSplideProgress';
+
+function prepareCustomBlockSplideSlides(blockEl) {
+    const splideRoot = blockEl.querySelector('.home-products-list');
+
+    if (!splideRoot) {
+        return;
+    }
+
+    const desktopBanner = blockEl.querySelector('.customBlocks__hero-slide--desktop');
+
+    if (window.innerWidth <= 767) {
+        if (desktopBanner && !desktopBanner.dataset.customBlockDetached) {
+            desktopBanner.dataset.customBlockDetached = '1';
+            blockEl._customBlockDesktopBanner = desktopBanner;
+            desktopBanner.remove();
+        }
+
+        return;
+    }
+
+    if (blockEl._customBlockDesktopBanner && desktopBanner === null) {
+        const list = splideRoot.querySelector('.splide__list');
+
+        if (list) {
+            const banner = blockEl._customBlockDesktopBanner;
+            list.insertBefore(banner, list.firstChild);
+            delete banner.dataset.customBlockDetached;
+            delete blockEl._customBlockDesktopBanner;
+        }
+    }
+}
+
+function getCustomBlockProductItems($block) {
+    const $items = $block.find('.home-products-item');
+
+    if (window.innerWidth <= 767) {
+        return $items.not('.banner, .customBlocks__hero-slide--desktop');
+    }
+
+    return $items;
+}
+
+function attachHomeProductsProgress(splide) {
+    if (splide?.root) {
+        bindHomeProductsSplideProgress(splide.root, splide);
+    }
+
+    pauseHomeProductsAutoplayOnMobile(splide);
+}
+
+function resolveHomeProductsSliderType(itemCount, perPage) {
+    if (window.innerWidth <= 767) {
+        return 'slide';
+    }
+
+    return itemCount > (perPage * 2) ? 'loop' : 'slide';
+}
+
+function resolveHomeProductsAutoplay(itemCount, perPage) {
+    if (window.innerWidth <= 767) {
+        return false;
+    }
+
+    return itemCount > perPage;
+}
+
+function resolveHomeProductsRewind() {
+    return window.innerWidth > 767;
+}
+
+const HOME_PRODUCTS_MOBILE_BREAKPOINTS = {
+    767: {
+        perPage: 2,
+        padding: {right: 0},
+        gap: '8px',
+        type: 'slide',
+        autoplay: false,
+        rewind: false,
+    },
+    400: {
+        perPage: 2,
+        padding: {right: 0},
+        gap: '8px',
+        type: 'slide',
+        autoplay: false,
+        rewind: false,
+    },
+};
+
+function pauseHomeProductsAutoplayOnMobile(splide) {
+    if (window.innerWidth > 767 || !splide?.Components?.Autoplay) {
+        return;
+    }
+
+    splide.Components.Autoplay.pause();
+}
+
 export function productSliderInitialization(id) {
     const $block = $('#' + id);
     if (! $block.length || ! $block.find('.splide').length) {
@@ -9,7 +107,7 @@ export function productSliderInitialization(id) {
     // Определяем perPage в зависимости от ширины экрана
     let perPage = 4;
     if (window.innerWidth <= 400) {
-        perPage = 1;
+        perPage = 2;
     } else if (window.innerWidth <= 767) {
         perPage = 2;
     } else if (window.innerWidth <= 1019) {
@@ -18,8 +116,7 @@ export function productSliderInitialization(id) {
         perPage = 3;
     }
 
-    // Если товаров меньше или равно perPage * 2, используем 'slide' вместо 'loop' для предотвращения дублирования
-    const sliderType = totalItems > (perPage * 2) ? 'loop' : 'slide';
+    const sliderType = resolveHomeProductsSliderType(totalItems, perPage);
 
     let productsSlider = new Splide('#' + id + ' .splide', {
         pagination: false,
@@ -27,7 +124,8 @@ export function productSliderInitialization(id) {
         gap: '5px',
         padding: {right: '8%'},
         type: sliderType,
-        autoplay: totalItems > perPage, // Автопрокрутка только если товаров больше чем видно
+        rewind: resolveHomeProductsRewind(),
+        autoplay: resolveHomeProductsAutoplay(totalItems, perPage),
         interval: 4000,
         pauseOnHover: true,
         pauseOnFocus: true,
@@ -45,16 +143,10 @@ export function productSliderInitialization(id) {
                 perPage: 2,
                 padding: {right: '15%'},
             },
-            767: {
-                perPage: 2,
-                padding: {right: 0},
-            },
-            400: {
-                perPage: 1,
-                padding: {right: '25%'},
-            }
+            ...HOME_PRODUCTS_MOBILE_BREAKPOINTS,
         }
     }).mount();
+    attachHomeProductsProgress(productsSlider);
 
     // Сохраняем ссылку на слайдер для доступа при фильтрации
     $block[0]._splideInstance = productsSlider;
@@ -90,7 +182,7 @@ export function productSliderInitialization(id) {
             const visibleCount = $visibleSlides.length;
             let currentPerPage = perPage;
             if (window.innerWidth <= 400) {
-                currentPerPage = 1;
+                currentPerPage = 2;
             } else if (window.innerWidth <= 767) {
                 currentPerPage = 2;
             } else if (window.innerWidth <= 1019) {
@@ -101,8 +193,7 @@ export function productSliderInitialization(id) {
 
             // Если видимых товаров меньше или равно perPage, меняем тип на 'slide'
             // Используем 'slide' если товаров меньше чем perPage * 2, чтобы избежать дублирования
-            const needsSlideType = visibleCount <= (currentPerPage * 2);
-            const currentType = productsSlider.options.type;
+            const sliderType = resolveHomeProductsSliderType(visibleCount, currentPerPage);
 
             // Всегда пересоздаем слайдер при фильтрации для правильной работы
             productsSlider.destroy();
@@ -112,8 +203,8 @@ export function productSliderInitialization(id) {
                 perPage: currentPerPage,
                 gap: '5px',
                 padding: {right: '8%'},
-                type: needsSlideType ? 'slide' : 'loop',
-                rewind: false, // Отключаем перемотку для предотвращения дублирования
+                type: sliderType,
+                rewind: resolveHomeProductsRewind(),
                 autoplay: false, // Не включаем автопрокрутку после фильтрации
                 classes: {
                     arrows: 'splide__arrows home-products-slide-buttons',
@@ -123,10 +214,10 @@ export function productSliderInitialization(id) {
                 breakpoints: {
                     1331: { perPage: 3, padding: {right: '3%'} },
                     1019: { perPage: 2, padding: {right: '15%'} },
-                    767: { perPage: 2, padding: {right: 0} },
-                    400: { perPage: 1, padding: {right: '25%'} }
+                    ...HOME_PRODUCTS_MOBILE_BREAKPOINTS,
                 }
             }).mount();
+            attachHomeProductsProgress(productsSlider);
             $block[0]._splideInstance = productsSlider;
 
             // Если для категории есть товары — прокручиваем слайдер к первому видимому товару
@@ -214,7 +305,7 @@ export function productSliderInitialization(id) {
             const totalCount = $allSlides.length;
             let currentPerPage = perPage;
             if (window.innerWidth <= 400) {
-                currentPerPage = 1;
+                currentPerPage = 2;
             } else if (window.innerWidth <= 767) {
                 currentPerPage = 2;
             } else if (window.innerWidth <= 1019) {
@@ -222,7 +313,7 @@ export function productSliderInitialization(id) {
             } else if (window.innerWidth <= 1331) {
                 currentPerPage = 3;
             }
-            const needsSlideType = totalCount <= (currentPerPage * 2);
+            const sliderType = resolveHomeProductsSliderType(totalCount, currentPerPage);
 
             // Всегда пересоздаем слайдер при возврате к "Все"
             if (productsSlider) {
@@ -234,9 +325,9 @@ export function productSliderInitialization(id) {
                 perPage: currentPerPage,
                 gap: '5px',
                 padding: {right: '8%'},
-                type: needsSlideType ? 'slide' : 'loop',
-                rewind: false, // Отключаем перемотку для предотвращения дублирования
-                autoplay: !needsSlideType, // Включаем автопрокрутку только если товаров больше чем видно
+                type: sliderType,
+                rewind: resolveHomeProductsRewind(),
+                autoplay: resolveHomeProductsAutoplay(totalCount, currentPerPage),
                 interval: 4000,
                 pauseOnHover: true,
                 pauseOnFocus: true,
@@ -248,10 +339,10 @@ export function productSliderInitialization(id) {
                 breakpoints: {
                     1331: { perPage: 3, padding: {right: '3%'} },
                     1019: { perPage: 2, padding: {right: '15%'} },
-                    767: { perPage: 2, padding: {right: 0} },
-                    400: { perPage: 1, padding: {right: '25%'} }
+                    ...HOME_PRODUCTS_MOBILE_BREAKPOINTS,
                 }
             }).mount();
+            attachHomeProductsProgress(productsSlider);
             $block[0]._splideInstance = productsSlider;
 
             // Возвращаемся к первому слайду
@@ -269,13 +360,15 @@ export function productSliderInitializationClass(classEl) {
     for (var i = 0; i < elms.length; i++) {
         const blockId = elms[i].id;
         const $block = $(elms[i]);
-        const $allItems = $block.find('.home-products-item');
+        const $allItems = getCustomBlockProductItems($block);
         const totalItems = $allItems.length;
+
+        prepareCustomBlockSplideSlides(elms[i]);
 
         // Определяем perPage в зависимости от ширины экрана
         let perPage = 4;
         if (window.innerWidth <= 400) {
-            perPage = 1;
+            perPage = 2;
         } else if (window.innerWidth <= 767) {
             perPage = 2;
         } else if (window.innerWidth <= 1019) {
@@ -285,7 +378,7 @@ export function productSliderInitializationClass(classEl) {
         }
 
         // Если товаров меньше или равно perPage * 2, используем 'slide' вместо 'loop' для предотвращения дублирования
-        const sliderType = totalItems > (perPage * 2) ? 'loop' : 'slide';
+        const sliderType = resolveHomeProductsSliderType(totalItems, perPage);
 
         customBlockSplides[i] = new Splide(elms[i].querySelector('.home-products-list'), {
             pagination: false,
@@ -293,7 +386,7 @@ export function productSliderInitializationClass(classEl) {
             gap: '5px',
             padding: {right: '8%'},
             type: sliderType,
-            rewind: false, // Отключаем перемотку для предотвращения дублирования
+            rewind: resolveHomeProductsRewind(),
             autoplay: false,
             classes: {
                 arrows: 'splide__arrows home-products-slide-buttons',
@@ -309,16 +402,10 @@ export function productSliderInitializationClass(classEl) {
                     perPage: 2,
                     padding: {right: '15%'},
                 },
-                767: {
-                    perPage: 2,
-                    padding: {right: 0},
-                },
-                400: {
-                    perPage: 1,
-                    padding: {right: '25%'},
-                }
+                ...HOME_PRODUCTS_MOBILE_BREAKPOINTS,
             }
         }).mount();
+        attachHomeProductsProgress(customBlockSplides[i]);
 
         // Сохраняем ссылку на слайдер в элементе блока для доступа при фильтрации
         elms[i]._splideInstance = customBlockSplides[i];
@@ -330,7 +417,7 @@ export function productSliderInitializationClass(classEl) {
         const blockId = $block.attr('id');
         const activeItem = $(this).attr('data-cat');
         const productsSlider = $block[0]._splideInstance;
-        const $allSlides = $block.find('.home-products-item');
+        const $allSlides = getCustomBlockProductItems($block);
 
         if (activeItem !== 'all') {
             // Сбрасываем активные категории и скрываем все слайды в ЭТОМ блоке
@@ -352,7 +439,7 @@ export function productSliderInitializationClass(classEl) {
             const visibleCount = $visibleSlides.length;
             let currentPerPage = 4;
             if (window.innerWidth <= 400) {
-                currentPerPage = 1;
+                currentPerPage = 2;
             } else if (window.innerWidth <= 767) {
                 currentPerPage = 2;
             } else if (window.innerWidth <= 1019) {
@@ -362,20 +449,22 @@ export function productSliderInitializationClass(classEl) {
             }
 
             // Используем 'slide' если товаров меньше чем perPage * 2, чтобы избежать дублирования
-            const needsSlideType = visibleCount <= (currentPerPage * 2);
+            const sliderType = resolveHomeProductsSliderType(visibleCount, currentPerPage);
 
             // Всегда пересоздаем слайдер при фильтрации для правильной работы
             if (productsSlider) {
                 productsSlider.destroy();
             }
 
+            prepareCustomBlockSplideSlides($block[0]);
+
             productsSlider = new Splide($block.find('.home-products-list')[0], {
                 pagination: false,
                 perPage: currentPerPage,
                 gap: '5px',
                 padding: {right: '8%'},
-                type: needsSlideType ? 'slide' : 'loop',
-                rewind: false, // Отключаем перемотку для предотвращения дублирования
+                type: sliderType,
+                rewind: resolveHomeProductsRewind(),
                 autoplay: false, // Не включаем автопрокрутку после фильтрации
                 classes: {
                     arrows: 'splide__arrows home-products-slide-buttons',
@@ -385,10 +474,10 @@ export function productSliderInitializationClass(classEl) {
                 breakpoints: {
                     1331: { perPage: 3, padding: {right: '3%'} },
                     1019: { perPage: 2, padding: {right: '15%'} },
-                    767: { perPage: 2, padding: {right: 0} },
-                    400: { perPage: 1, padding: {right: '25%'} }
+                    ...HOME_PRODUCTS_MOBILE_BREAKPOINTS,
                 }
             }).mount();
+            attachHomeProductsProgress(productsSlider);
             $block[0]._splideInstance = productsSlider;
 
             // Прокручиваем слайдер к первому видимому товару
@@ -476,7 +565,7 @@ export function productSliderInitializationClass(classEl) {
             const totalCount = $allSlides.length;
             let currentPerPage = 4;
             if (window.innerWidth <= 400) {
-                currentPerPage = 1;
+                currentPerPage = 2;
             } else if (window.innerWidth <= 767) {
                 currentPerPage = 2;
             } else if (window.innerWidth <= 1019) {
@@ -484,20 +573,22 @@ export function productSliderInitializationClass(classEl) {
             } else if (window.innerWidth <= 1331) {
                 currentPerPage = 3;
             }
-            const needsSlideType = totalCount <= (currentPerPage * 2);
+            const sliderType = resolveHomeProductsSliderType(totalCount, currentPerPage);
 
             // Всегда пересоздаем слайдер при возврате к "Все"
             if (productsSlider) {
                 productsSlider.destroy();
             }
 
+            prepareCustomBlockSplideSlides($block[0]);
+
             productsSlider = new Splide($block.find('.home-products-list')[0], {
                 pagination: false,
                 perPage: currentPerPage,
                 gap: '5px',
                 padding: {right: '8%'},
-                type: needsSlideType ? 'slide' : 'loop',
-                rewind: false, // Отключаем перемотку для предотвращения дублирования
+                type: sliderType,
+                rewind: resolveHomeProductsRewind(),
                 autoplay: false,
                 classes: {
                     arrows: 'splide__arrows home-products-slide-buttons',
@@ -507,10 +598,10 @@ export function productSliderInitializationClass(classEl) {
                 breakpoints: {
                     1331: { perPage: 3, padding: {right: '3%'} },
                     1019: { perPage: 2, padding: {right: '15%'} },
-                    767: { perPage: 2, padding: {right: 0} },
-                    400: { perPage: 1, padding: {right: '25%'} }
+                    ...HOME_PRODUCTS_MOBILE_BREAKPOINTS,
                 }
             }).mount();
+            attachHomeProductsProgress(productsSlider);
             $block[0]._splideInstance = productsSlider;
 
             // Возвращаемся к первому слайду
@@ -523,13 +614,16 @@ export function productSliderInitializationClass(classEl) {
 
 export function customBlockSliderInitialization(id) {
     const $block = $('#' + id);
-    const $allItems = $block.find('.home-products-item');
+    const blockEl = $block[0];
+    const $allItems = getCustomBlockProductItems($block);
     const totalItems = $allItems.length;
+
+    prepareCustomBlockSplideSlides(blockEl);
 
     // Определяем perPage в зависимости от ширины экрана
     let perPage = 4;
     if (window.innerWidth <= 400) {
-        perPage = 1;
+        perPage = 2;
     } else if (window.innerWidth <= 767) {
         perPage = 2;
     } else if (window.innerWidth <= 1019) {
@@ -538,8 +632,7 @@ export function customBlockSliderInitialization(id) {
         perPage = 3;
     }
 
-    // Если товаров меньше или равно perPage * 2, используем 'slide' вместо 'loop' для предотвращения дублирования
-    const sliderType = totalItems > (perPage * 2) ? 'loop' : 'slide';
+    const sliderType = resolveHomeProductsSliderType(totalItems, perPage);
 
     let productsSlider = new Splide('#' + id + ' .splide', {
         pagination: false,
@@ -547,7 +640,7 @@ export function customBlockSliderInitialization(id) {
         gap: '5px',
         padding: {right: '8%'},
         type: sliderType,
-        rewind: false, // Отключаем перемотку для предотвращения дублирования
+        rewind: resolveHomeProductsRewind(),
         autoplay: false,
         classes: {
             arrows: 'splide__arrows home-products-slide-buttons',
@@ -563,20 +656,14 @@ export function customBlockSliderInitialization(id) {
                 perPage: 2,
                 padding: {right: '15%'},
             },
-            767: {
-                perPage: 2,
-                padding: {right: 0},
-            },
-            400: {
-                perPage: 1,
-                padding: {right: '25%'},
-            }
+            ...HOME_PRODUCTS_MOBILE_BREAKPOINTS,
         }
     }).mount();
+    attachHomeProductsProgress(productsSlider);
 
     $('#' + id + ' .home-products-nav .item').on('click', function () {
         const activeItem = $(this).attr('data-cat');
-        const $allSlides = $block.find('.home-products-item');
+        const $allSlides = getCustomBlockProductItems($block);
 
         // Останавливаем автопрокрутку при фильтрации
         if (productsSlider.Components.Autoplay) {
@@ -597,7 +684,7 @@ export function customBlockSliderInitialization(id) {
             const visibleCount = $visibleSlides.length;
             let currentPerPage = perPage;
             if (window.innerWidth <= 400) {
-                currentPerPage = 1;
+                currentPerPage = 2;
             } else if (window.innerWidth <= 767) {
                 currentPerPage = 2;
             } else if (window.innerWidth <= 1019) {
@@ -606,19 +693,22 @@ export function customBlockSliderInitialization(id) {
                 currentPerPage = 3;
             }
 
-            const needsSlideType = visibleCount <= currentPerPage;
+            const sliderType = resolveHomeProductsSliderType(visibleCount, currentPerPage);
 
             // Всегда пересоздаем слайдер при фильтрации для правильной работы
             if (productsSlider) {
                 productsSlider.destroy();
             }
 
+            prepareCustomBlockSplideSlides(blockEl);
+
             productsSlider = new Splide('#' + id + ' .splide', {
                 pagination: false,
                 perPage: currentPerPage,
                 gap: '5px',
                 padding: {right: '8%'},
-                type: needsSlideType ? 'slide' : 'loop',
+                type: sliderType,
+                rewind: resolveHomeProductsRewind(),
                 autoplay: false,
                 classes: {
                     arrows: 'splide__arrows home-products-slide-buttons',
@@ -628,10 +718,10 @@ export function customBlockSliderInitialization(id) {
                 breakpoints: {
                     1331: { perPage: 3, padding: {right: '3%'} },
                     1019: { perPage: 2, padding: {right: '15%'} },
-                    767: { perPage: 2, padding: {right: 0} },
-                    400: { perPage: 1, padding: {right: '25%'} }
+                    ...HOME_PRODUCTS_MOBILE_BREAKPOINTS,
                 }
             }).mount();
+            attachHomeProductsProgress(productsSlider);
 
             // Прокручиваем слайдер к первому видимому товару
             if ($visibleSlides.length) {
@@ -717,7 +807,7 @@ export function customBlockSliderInitialization(id) {
             const totalCount = $allSlides.length;
             let currentPerPage = perPage;
             if (window.innerWidth <= 400) {
-                currentPerPage = 1;
+                currentPerPage = 2;
             } else if (window.innerWidth <= 767) {
                 currentPerPage = 2;
             } else if (window.innerWidth <= 1019) {
@@ -725,20 +815,22 @@ export function customBlockSliderInitialization(id) {
             } else if (window.innerWidth <= 1331) {
                 currentPerPage = 3;
             }
-            const needsSlideType = totalCount <= (currentPerPage * 2);
+            const sliderType = resolveHomeProductsSliderType(totalCount, currentPerPage);
 
             // Всегда пересоздаем слайдер при возврате к "Все"
             if (productsSlider) {
                 productsSlider.destroy();
             }
 
+            prepareCustomBlockSplideSlides(blockEl);
+
             productsSlider = new Splide('#' + id + ' .splide', {
                 pagination: false,
                 perPage: currentPerPage,
                 gap: '5px',
                 padding: {right: '8%'},
-                type: needsSlideType ? 'slide' : 'loop',
-                rewind: false, // Отключаем перемотку для предотвращения дублирования
+                type: sliderType,
+                rewind: resolveHomeProductsRewind(),
                 autoplay: false,
                 classes: {
                     arrows: 'splide__arrows home-products-slide-buttons',
@@ -748,10 +840,10 @@ export function customBlockSliderInitialization(id) {
                 breakpoints: {
                     1331: { perPage: 3, padding: {right: '3%'} },
                     1019: { perPage: 2, padding: {right: '15%'} },
-                    767: { perPage: 2, padding: {right: 0} },
-                    400: { perPage: 1, padding: {right: '25%'} }
+                    ...HOME_PRODUCTS_MOBILE_BREAKPOINTS,
                 }
             }).mount();
+            attachHomeProductsProgress(productsSlider);
 
             // Возвращаемся к первому слайду
             setTimeout(() => {

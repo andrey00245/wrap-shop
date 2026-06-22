@@ -11,9 +11,8 @@
   </div>
 @else
   @php
-    $hero = $slideItems->first(fn ($i) => $i->getTileSizeEnum() === \App\Enums\HomeBlockItemTileSize::Large)
-        ?? $slideItems->first();
-    $rest = $slideItems->reject(fn ($i) => $hero && $i->is($hero))->values();
+    $hero = $slideItems->first();
+    $rest = $slideItems->slice(1)->values();
   @endphp
   <div class="home-block__layout home-block__layout--{{ $layoutClass }}">
     @if($hero)

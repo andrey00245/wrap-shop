@@ -2,7 +2,6 @@
 
 namespace App\Nova;
 
-use App\Enums\HomeBlockItemTileSize;
 use App\Enums\HomeBlockType;
 use App\Models\HomeBlock as HomeBlockModel;
 use App\Models\HomeBlockItem as HomeBlockItemModel;
@@ -12,7 +11,6 @@ use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
-use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -113,24 +111,11 @@ class HomeBlockItem extends Resource
         return [
             BelongsTo::make('Категорія', 'category', Category::class)
                 ->nullable()
-                ->help('Плитка на головній веде в каталог цієї категорії.'),
-
-            Select::make('Розмір плитки', 'tile_size')
-                ->options([
-                    HomeBlockItemTileSize::Large->value => 'Велика (колонка героя)',
-                    HomeBlockItemTileSize::Small->value => 'Мала (сітка поруч)',
-                ])
-                ->nullable()
-                ->displayUsingLabels()
-                ->hideFromIndex()
-                ->help('Одна «Велика» — у широку колонку, решта — у сітку; якщо ніде не обрано «Велика», великою буде перший за порядком.')
-                ->rules('nullable'),
+                ->help('Плитка на головній веде в каталог цієї категорії. Перша за порядком — велика, решта — малі.'),
 
             NovaTabTranslatable::make([
                 Text::make('Заголовок', 'custom_title')
                     ->help('Якщо порожньо — береться назва категорії.'),
-                Text::make('Підзаголовок', 'custom_tagline')
-                    ->help('Якщо порожньо — можна залишити порожнім.'),
             ])->setTitle('Текст на плитці'),
 
             Images::make('Зображення', 'custom_image')
@@ -184,7 +169,8 @@ class HomeBlockItem extends Resource
             ])->setTitle('Текст'),
 
             Images::make('Зображення', 'custom_image')
-                ->singleMediaRules('image'),
+                ->singleMediaRules('image')
+                ->help('Завантажуйте рівно 1325×541 px (пропорція 2.45:1). Тоді банер заповнить блок без полос і без обрізки. Інша пропорція — система обріже по центру.'),
         ];
     }
 

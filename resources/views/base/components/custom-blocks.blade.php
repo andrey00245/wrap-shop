@@ -15,6 +15,19 @@
             </div>
 
 
+            <div class="customBlocks__stage">
+                @if($customBlock->getImage())
+                    <div class="customBlocks__hero">
+                        <a href="{{$customBlock->url ?? '#'}}" class="customBlocks__hero-link" title="{{$customBlock->name}}">
+                            <img class="customBlocks__hero-image vertical"
+                                 src="{{$customBlock->getPreviewImage()}}"
+                                 alt="{{$customBlock->name}}"
+                                 title="{{$customBlock->name}}">
+                        </a>
+                    </div>
+                @endif
+
+                <div class="customBlocks__products">
             <div class="splide home-products-list">
                 <div class="splide__arrows home-products-slide-buttons">
                     <div class="line"></div>
@@ -22,7 +35,7 @@
                 <div class="splide__track">
                     <ul class="splide__list">
                         @if($customBlock->getImage())
-                            <li class="splide__slide home-products-item banner product-default"
+                            <li class="splide__slide home-products-item banner product-default customBlocks__hero-slide--desktop"
                                 role="group">
                                 <a href="{{$customBlock->url ?? '#'}}" title="{{$customBlock->name}}">
                                     <img class="vertical"
@@ -102,8 +115,8 @@
                                             <button
                                                 class="button colord general-popup-btn notify-available-btn"
                                                 data-popup="report-availability-popup"
-                                                data-product-id="{{$product->id}}"><i class="fas fa-bell"></i><span
-                                                    class="hidden-xs hidden-sm hidden-md">{{__('product-index.notify')}}</span></button>
+                                                data-product-id="{{$product->id}}"><i
+                                                    class="fas fa-bell"></i>{{__('product-index.notify')}}</button>
                                         @endif
                                     </div>
                                 </div>
@@ -131,6 +144,8 @@
                             </li>
                         @endforeach
                     </ul>
+                </div>
+            </div>
                 </div>
             </div>
         </div>

@@ -123,4 +123,16 @@ class News extends Model implements HasMedia
     {
         return $this->belongsTo(NewsCategory::class);
     }
+
+    public function plainDescription(int $limit = 0): string
+    {
+        $html = (string) $this->description;
+        $html = preg_replace('/<\/?(p|div|br|li|h[1-6]|blockquote|table|tr|td|th)[^>]*>/i', ' ', $html) ?? $html;
+        $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = str_replace("\xc2\xa0", ' ', $text);
+        $text = preg_replace('/\s+/u', ' ', $text) ?? $text;
+        $text = trim($text);
+
+        return $limit > 0 ? Str::limit($text, $limit) : $text;
+    }
 }

@@ -31,8 +31,8 @@
                                             <mask id="yt-mask-{{ $card->id }}">
                                                 <rect width="636" height="279" fill="white"/>
                                                 <g transform="rotate(40.85, 115.4, 54.05)">
-                                                    <rect x="-157" y="-23" width="544.8" height="154.1" rx="77" ry="77" fill="black"/>
-                                                    <rect x="101" y="-67" width="240" height="30.7" rx="15.4" ry="15.4" fill="black"/>
+                                                    <rect x="-180" y="-23" width="544.8" height="154.1" rx="77" ry="77" fill="black"/>
+                                                    <rect x="101" y="-67" width="215" height="30.7" rx="15.4" ry="15.4" fill="black"/>
                                                     <rect x="141" y="-108" width="120" height="30.7" rx="15.4" ry="15.4" fill="black"/>
                                                 </g>
                                             </mask>
@@ -96,8 +96,8 @@
                                 <mask id="yt-mask-{{ $card->id }}">
                                     <rect width="636" height="279" fill="white"/>
                                     <g transform="rotate(40.85, 115.4, 54.05)">
-                                        <rect x="-157" y="-23" width="544.8" height="154.1" rx="77" ry="77" fill="black"/>
-                                        <rect x="101" y="-67" width="240" height="30.7" rx="15.4" ry="15.4" fill="black"/>
+                                        <rect x="-180" y="-23" width="544.8" height="154.1" rx="77" ry="77" fill="black"/>
+                                        <rect x="101" y="-67" width="215" height="30.7" rx="15.4" ry="15.4" fill="black"/>
                                         <rect x="141" y="-108" width="120" height="30.7" rx="15.4" ry="15.4" fill="black"/>
                                     </g>
                                 </mask>

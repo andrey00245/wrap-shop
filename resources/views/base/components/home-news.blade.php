@@ -28,7 +28,7 @@
                   $newsUrl = route('news.show', ['news_category' => $news->category->slugEn, 'news' => $news->slugEn]);
                   $newsDate = \Carbon\Carbon::parse($news->created_at)->format('d.m.Y');
                   $newsTitle = trim((string) $news->title);
-                  $newsDescription = trim(strip_tags((string) $news->description));
+                  $newsDescription = $news->plainDescription(320);
                 @endphp
                 <li class="splide__slide home-news__slide">
                   <a href="{{ $newsUrl }}" class="home-news-card" title="{{ $newsTitle }}">
@@ -64,7 +64,7 @@
               $newsUrl = route('news.show', ['news_category' => $news->category->slugEn, 'news' => $news->slugEn]);
               $newsDate = \Carbon\Carbon::parse($news->created_at)->format('d.m.Y');
               $newsTitle = trim((string) $news->title);
-              $newsDescription = trim(strip_tags((string) $news->description));
+              $newsDescription = $news->plainDescription(320);
             @endphp
             <a href="{{ $newsUrl }}" class="home-news-card" title="{{ $newsTitle }}">
               <img src="{{ $newsImage }}" alt="{{ $newsTitle }}" class="home-news-card__image" loading="lazy">

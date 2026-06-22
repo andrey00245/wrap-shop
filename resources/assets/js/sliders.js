@@ -5,12 +5,13 @@ import {
     popupSliderInitialization,
     imageSliderInProduct
 } from "./sliderInitialization";
+import { initHomeProductsSliderProgress, bindHomeProductsSplideProgress } from "./homeMobileSplideProgress";
 
 $(document).ready(function () {
     productSliderInitialization('homeBestseller');
     productSliderInitialization('homeLatest');
     productSliderInitializationClass('customBlocks');
-    
+
     // Инициализация каждого кастомного блока отдельно
     $('.customBlocks').each(function() {
         const blockId = $(this).attr('id');
@@ -18,6 +19,9 @@ $(document).ready(function () {
             customBlockSliderInitialization(blockId);
         }
     });
+
+    initHomeProductsSliderProgress();
+    window.addEventListener('resize', initHomeProductsSliderProgress);
 
     $('.js-home-block-categories-splide').each(function () {
         const el = this;
@@ -52,11 +56,10 @@ $(document).ready(function () {
             breakpoints: {
                 1331: { perPage: 4, gap: '12px' },
                 1019: { perPage: 3, gap: '10px' },
-                767: { perPage: 2, gap: '10px' },
-                520: {
+                767: {
                     perPage: 1,
-                    gap: '12px',
-                    padding: { left: '10px', right: '10px' },
+                    gap: '0px',
+                    padding: { left: 0, right: 0 },
                 },
             }
         }).mount();
@@ -241,9 +244,9 @@ $(document).ready(function () {
             return;
         }
 
-        new Splide(el, {
+        const youtubeSplide = new Splide(el, {
             type: 'slide',
-            rewind: true,
+            rewind: false,
             perPage: 2,
             gap: '20px',
             speed: 500,
@@ -256,9 +259,17 @@ $(document).ready(function () {
             },
             breakpoints: {
                 1019: { perPage: 1, gap: '14px' },
-                520: { perPage: 1, gap: '12px' },
+                767: {
+                    perPage: 1,
+                    gap: '12px',
+                    padding: { left: 0, right: 0 },
+                    type: 'slide',
+                    rewind: false,
+                },
             },
         }).mount();
+
+        bindHomeProductsSplideProgress(el, youtubeSplide);
     });
 });
 

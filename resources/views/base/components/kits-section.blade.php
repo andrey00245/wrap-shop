@@ -1,5 +1,4 @@
 @php
-  /** @var \App\Models\KitSection|null $kitSection */
   /** @var \Illuminate\Support\Collection<int, \App\Models\Kit> $kits */
   $locale = app()->getLocale();
   $kits = ($kits ?? collect())->filter(function (\App\Models\Kit $kit) use ($locale) {
@@ -8,29 +7,18 @@
 @endphp
 @if($kits->isNotEmpty())
   @php
-    $headingPlain = $kitSection ? trim(strip_tags((string) $kitSection->title)) : '';
-    $lead = $kitSection
-        ? trim((string) ($kitSection->getTranslation('lead', $locale) ?: $kitSection->getTranslation('lead', 'uk') ?: ''))
-        : '';
-    if ($lead === '') {
-        $lead = __('general-translate.home_block_kits_lead');
-    }
+    $headingHtml = __('general-translate.home_block_kits_title');
+    $lead = __('general-translate.home_block_kits_lead');
     $useSlider = $kits->count() > 4;
     $gridCount = min($kits->count(), 4);
     $splideId = 'homeKitsSplide';
   @endphp
   <section class="home-block home-block--kits" aria-labelledby="home-kits-section-h">
     <div class="wrap">
-      @if($headingPlain !== '')
-        <div class="home-products-top flex-justify home-block-kits__top">
-          <h2 id="home-kits-section-h" class="home-title home-block-kits__title">{!! $kitSection->title !!}</h2>
-        </div>
-        @if($lead !== '')
-          <p class="home-block-kits__lead">{{ $lead }}</p>
-        @endif
-      @else
-        <h2 id="home-kits-section-h" class="visually-hidden">{{ __('general-translate.home_block_kits_sr_only') }}</h2>
-      @endif
+      <div class="home-products-top flex-justify home-block-kits__top">
+        <h2 id="home-kits-section-h" class="home-title home-block-kits__title">{!! $headingHtml !!}</h2>
+      </div>
+      <p class="home-block-kits__lead">{{ $lead }}</p>
 
       <div class="home-block-kits__desktop">
         @if($useSlider)

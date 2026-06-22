@@ -51,4 +51,11 @@ class KitSection extends Model
     {
         return $this->hasMany(Kit::class)->orderBy('sort_order');
     }
+
+    public function getTitleForNovaAttribute(): string
+    {
+        $plain = trim(strip_tags((string) ($this->getTranslation('title', 'uk') ?: $this->getTranslation('title', app()->getLocale()) ?: '')));
+
+        return $plain !== '' ? $plain : 'Секція наборів #'.$this->id;
+    }
 }

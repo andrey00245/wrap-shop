@@ -26,7 +26,7 @@
     <div class="ellipse orange"></div>
     @include('base.components.big-banners')
     <div class="mobil-catalog wrap">
-      <div class="mobil-catalog-open button"><i class="far fa-th-large"></i>{{__('header_footer.catalog_products')}}</div>
+      <div class="mobil-catalog-open button">@include('base.components.partials.mobil-catalog-icon'){{__('header_footer.catalog_products')}}</div>
     </div>
     @include('base.components.categories-slider')
     @include('base.components.bestseller')

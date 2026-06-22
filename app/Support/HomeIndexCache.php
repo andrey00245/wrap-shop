@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Cache;
 
 final class HomeIndexCache
 {
-    public const VERSION = 'v8';
+    public const VERSION = 'v16';
 
     public const TAG = 'home';
 

@@ -84,19 +84,15 @@ class IndexController extends Controller
                     'items' => fn ($q) => $q
                         ->orderBy('sort_order')
                         ->with([
-                            'category' => fn ($cq) => $cq->with([
-                                'children' => fn ($chq) => $chq->orderBy('id')->with([
-                                    'products' => fn ($pq) => $pq->where('is_active', 1)->orderBy('id')->with('media'),
-                                ]),
-                                'products' => fn ($pq) => $pq->where('is_active', 1)->orderBy('id')->with('media'),
-                            ]),
+                            'category.media',
+                            'category.parent',
                             'product.category',
                             'product.media',
                             'media',
                             'quickLinks' => fn ($ql) => $ql
                                 ->whereHas('category')
                                 ->orderBy('sort_order')
-                                ->with('category'),
+                                ->with(['category.media', 'category.parent']),
                         ]),
                 ])
                 ->get();
@@ -151,7 +147,8 @@ class IndexController extends Controller
 
             $kitSection = KitSection::query()
                 ->where('is_active', true)
-                ->first();
+                ->first()
+                ?? KitSection::query()->find(KitSection::defaultId());
 
             $kits = \App\Models\Kit::query()
                 ->where('is_active', true)

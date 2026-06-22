@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('button_text');
             $table->string('button_url');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->boolean('is_active')->default(true);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();

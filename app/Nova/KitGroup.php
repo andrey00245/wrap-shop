@@ -53,6 +53,9 @@ class KitGroup extends Resource
                 ->readonly(fn (NovaRequest $request) => static::viaKitGroups($request))
                 ->rules(fn (NovaRequest $request) => static::viaKitGroups($request) ? [] : ['required']),
 
+            Text::make('Назва', 'title_for_nova')
+                ->onlyOnIndex(),
+
             Text::make('Назва групи', 'nova_title_label')
                 ->rules('required', 'max:500')
                 ->hideFromIndex()
@@ -76,7 +79,6 @@ class KitGroup extends Resource
             Number::make('Порядок', 'sort_order')
                 ->default(0)
                 ->sortable()
-                ->hideFromIndex()
                 ->rules('nullable', 'integer', 'min:0'),
 
             Panel::make('Товари підгрупи', [

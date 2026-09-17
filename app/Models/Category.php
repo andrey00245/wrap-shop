@@ -100,14 +100,31 @@ class Category extends Model implements HasMedia, Sortable
             ->addMediaConversion('preview')
             ->width(310)
             ->height(310)
-            ->nonQueued();
+            ->nonQueued()
+            ->performOnCollections('main');
 
         $this
             ->addMediaConversion('preview_webp')
             ->width(310)
             ->height(310)
             ->format('webp')
-            ->nonQueued();
+            ->nonQueued()
+            ->performOnCollections('main');
+
+        $this
+            ->addMediaConversion('menu_thumb')
+            ->width(96)
+            ->height(96)
+            ->nonQueued()
+            ->performOnCollections('menu_icon');
+
+        $this
+            ->addMediaConversion('menu_thumb_webp')
+            ->width(96)
+            ->height(96)
+            ->format('webp')
+            ->nonQueued()
+            ->performOnCollections('menu_icon');
     }
 
     public function getAllChildren()
@@ -136,6 +153,9 @@ class Category extends Model implements HasMedia, Sortable
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('main')->singleFile();
+        $this->addMediaCollection('menu_icon')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
     }
 
     public function getSlugEnAttribute()
@@ -201,7 +221,7 @@ class Category extends Model implements HasMedia, Sortable
 
     public static function catalogMenuTree(): \Illuminate\Database\Eloquent\Collection
     {
-        return static::query()
+        $categories = static::query()
             ->whereNull('parent_id')
             ->menuOrdered()
             ->with([
@@ -210,6 +230,206 @@ class Category extends Model implements HasMedia, Sortable
                 ]),
             ])
             ->get();
+
+        static::attachMenuSpotlightProducts($categories);
+
+        return $categories;
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, Category>  $rootCategories
+     */
+    public static function attachMenuSpotlightProducts($rootCategories, int $limit = 5): void
+    {
+        if ($rootCategories->isEmpty()) {
+            return;
+        }
+
+        $categoryIdMap = [];
+        foreach ($rootCategories as $root) {
+            $ids = [$root->id];
+            foreach ($root->children ?? [] as $child) {
+                $ids[] = $child->id;
+                foreach ($child->children ?? [] as $grandChild) {
+                    $ids[] = $grandChild->id;
+                }
+            }
+            $categoryIdMap[$root->id] = array_values(array_unique($ids));
+        }
+
+        $allCategoryIds = collect($categoryIdMap)->flatten()->unique()->values()->all();
+        if ($allCategoryIds === []) {
+            return;
+        }
+
+        $bestSellerIds = BestSeller::query()
+            ->pluck('product_id')
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->all();
+
+        $products = Product::query()
+            ->where('is_active', 1)
+            ->where('stock', '>', 0)
+            ->whereIn('category_id', $allCategoryIds)
+            ->withSum('orderLines as sold_qty', 'quantity')
+            ->withCount([
+                'reviews as approved_reviews_count' => function ($query) {
+                    $query->where('is_active', true)
+                        ->where('moderation_status', 'approved');
+                },
+            ])
+            ->get([
+                'id',
+                'category_id',
+                'name',
+                'slug',
+                'is_active',
+                'stock',
+                'is_best_seller',
+            ]);
+
+        $pickedIdsByRoot = [];
+
+        foreach ($rootCategories as $root) {
+            $scopeIds = $categoryIdMap[$root->id] ?? [];
+            $scoped = $products
+                ->filter(fn (Product $product) => in_array((int) $product->category_id, $scopeIds, true))
+                ->values();
+
+            $picked = collect();
+
+            $bySales = $scoped
+                ->filter(function (Product $product) use ($bestSellerIds) {
+                    $sold = (float) ($product->sold_qty ?? 0);
+
+                    return $sold > 0
+                        || (bool) $product->is_best_seller
+                        || in_array((int) $product->id, $bestSellerIds, true);
+                })
+                ->sortByDesc(function (Product $product) use ($bestSellerIds) {
+                    $sold = (float) ($product->sold_qty ?? 0);
+                    $flag = ((bool) $product->is_best_seller || in_array((int) $product->id, $bestSellerIds, true)) ? 1000000 : 0;
+
+                    return $sold + $flag;
+                })
+                ->values();
+
+            foreach ($bySales as $product) {
+                if ($picked->count() >= $limit) {
+                    break;
+                }
+                $picked->push($product);
+            }
+
+            if ($picked->count() < $limit) {
+                $pickedIds = $picked->pluck('id')->all();
+                $byReviews = $scoped
+                    ->filter(function (Product $product) use ($pickedIds) {
+                        return ! in_array($product->id, $pickedIds, true)
+                            && (int) ($product->approved_reviews_count ?? 0) > 0;
+                    })
+                    ->sortByDesc(fn (Product $product) => (int) ($product->approved_reviews_count ?? 0))
+                    ->values();
+
+                foreach ($byReviews as $product) {
+                    if ($picked->count() >= $limit) {
+                        break;
+                    }
+                    $picked->push($product);
+                }
+            }
+
+            if ($picked->count() < $limit) {
+                $pickedIds = $picked->pluck('id')->all();
+                $fallback = $scoped
+                    ->reject(fn (Product $product) => in_array($product->id, $pickedIds, true))
+                    ->sortBy('id')
+                    ->values();
+
+                foreach ($fallback as $product) {
+                    if ($picked->count() >= $limit) {
+                        break;
+                    }
+                    $picked->push($product);
+                }
+            }
+
+            $pickedIdsByRoot[$root->id] = $picked->take($limit)->pluck('id')->all();
+        }
+
+        $allPickedIds = collect($pickedIdsByRoot)->flatten()->unique()->filter()->values()->all();
+        $hydrated = $allPickedIds === []
+            ? collect()
+            : Product::query()
+                ->whereIn('id', $allPickedIds)
+                ->with([
+                    'media',
+                    'prices.type',
+                    'attributes',
+                ])
+                ->get()
+                ->keyBy('id');
+
+        foreach ($rootCategories as $root) {
+            $items = collect($pickedIdsByRoot[$root->id] ?? [])
+                ->map(fn ($id) => $hydrated->get($id))
+                ->filter()
+                ->values();
+
+            $root->setRelation('menuSpotlightProducts', $items);
+        }
+    }
+
+    /**
+     * @return list<array{name: string, image: string, price: string, url: string}>
+     */
+    public function menuSpotlightCards(): array
+    {
+        $products = $this->relationLoaded('menuSpotlightProducts')
+            ? $this->menuSpotlightProducts
+            : collect();
+
+        $cards = [];
+
+        foreach ($products->take(5) as $product) {
+            if (! $product instanceof Product) {
+                continue;
+            }
+
+            $name = trim((string) $product->getName());
+            if ($name === '') {
+                continue;
+            }
+
+            $priceValue = $product->getPrice();
+            $price = is_numeric($priceValue) && (float) $priceValue > 0
+                ? number_format((float) $priceValue, 0, '.', ' ').' ₴'
+                : '';
+
+            $image = $product->getPreviewImage();
+            if (! filled($image)) {
+                $image = $product->getImage();
+            }
+            if (! filled($image)) {
+                $image = asset('assets/img/logo.svg');
+            }
+
+            $slug = $product->slugEn ?: $product->getTranslation('slug', app()->getLocale());
+            if (! filled($slug)) {
+                continue;
+            }
+
+            $cards[] = [
+                'name' => $name,
+                'image' => $image,
+                'price' => $price,
+                'url' => route('products.show', ['product' => $slug]),
+            ];
+        }
+
+        return $cards;
     }
 
     public function parent()
@@ -259,6 +479,47 @@ class Category extends Model implements HasMedia, Sortable
         }
 
         return $this->getFirstMediaUrl('main');
+    }
+
+    public function getMenuIcon(): string
+    {
+        $media = $this->getFirstMedia('menu_icon');
+        if (! $media) {
+            return '';
+        }
+
+        if ($media->hasGeneratedConversion('menu_thumb_webp')) {
+            return $media->getUrl('menu_thumb_webp');
+        }
+
+        if ($media->hasGeneratedConversion('menu_thumb')) {
+            return $media->getUrl('menu_thumb');
+        }
+
+        return $media->getUrl();
+    }
+
+    /**
+     * Menu icon → category preview/photo → empty (blade falls back to logo).
+     */
+    public function resolveMenuIconUrl(): string
+    {
+        $menuIcon = $this->getMenuIcon();
+        if (filled($menuIcon)) {
+            return $menuIcon;
+        }
+
+        $preview = $this->getPreviewImage();
+        if (filled($preview)) {
+            return $preview;
+        }
+
+        $image = $this->getImage();
+        if (filled($image)) {
+            return $image;
+        }
+
+        return '';
     }
 
     public function isParent(): bool

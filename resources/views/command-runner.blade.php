@@ -167,6 +167,72 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        .form-group select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 0.375rem;
+            background: #fff;
+        }
+
+        .progress-wrap {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .progress-wrap.show {
+            display: block;
+        }
+
+        .progress-label {
+            font-size: 0.875rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #4299e1, #48bb78);
+            transition: width 0.3s ease;
+        }
+
+        .translate-log {
+            margin-top: 0.75rem;
+            max-height: 160px;
+            overflow: auto;
+            font-size: 0.75rem;
+            color: #4a5568;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            display: none;
+        }
+
+        .translate-log.show {
+            display: block;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-row .btn {
+            width: auto;
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -302,6 +368,51 @@
 
                 <div class="alert alert-success" id="storage-link-success"></div>
                 <div class="alert alert-error" id="storage-link-error"></div>
+            </div>
+
+            <!-- Bulk GPT переклад -->
+            <div class="command-card" style="border: 2px solid #ed8936; grid-column: 1 / -1;">
+                <h3>🌐 Bulk-переклад (GPT)</h3>
+                <p>Поступовий переклад лише <strong>неперекладених</strong> записів через OpenAI. Батчами, з progress bar. Для «Усе» — порядок: товари → атрибути → категорії.</p>
+
+                <div class="form-group">
+                    <label for="translate-type">Тип:</label>
+                    <select id="translate-type">
+                        <option value="products">Товари</option>
+                        <option value="attributes">Атрибути</option>
+                        <option value="categories">Категорії</option>
+                        <option value="all">Усе (products → attributes → categories)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="translate-batch-size">Розмір батчу (1–20):</label>
+                    <input type="number" id="translate-batch-size" value="5" min="1" max="20" step="1">
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="translate-start-btn" onclick="startBulkTranslate(this)">
+                        Почати переклад
+                    </button>
+                    <button class="btn btn-danger" id="translate-stop-btn" onclick="stopBulkTranslate(this)" disabled>
+                        Зупинити
+                    </button>
+                    <button class="btn btn-danger" id="translate-clear-btn" onclick="clearBulkTranslateLog()" style="background:#718096;">
+                        Очистити лог
+                    </button>
+                </div>
+
+                <div class="progress-wrap" id="translate-progress-wrap">
+                    <div class="progress-label" id="translate-progress-label">Очікування...</div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" id="translate-progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="translate-log" id="translate-log"></div>
+
+                <div class="alert alert-success" id="translate-success"></div>
+                <div class="alert alert-error" id="translate-error"></div>
             </div>
 
             <!-- Custom Artisan Command -->
@@ -702,6 +813,224 @@
             } finally {
                 setLoading(btn, false);
             }
+        }
+
+        const translateState = {
+            running: false,
+            stopRequested: false,
+            stats: { products: 0, attributes: 0, categories: 0 },
+            doneByType: { products: 0, attributes: 0, categories: 0 },
+            cursors: { products: 0, attributes: 0, categories: 0 },
+            stageIndex: 0,
+            stages: [],
+        };
+
+        const translateTypeLabels = {
+            products: 'товари',
+            attributes: 'атрибути',
+            categories: 'категорії',
+        };
+
+        function getCsrfToken() {
+            return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        }
+
+        function appendTranslateLog(message) {
+            const log = document.getElementById('translate-log');
+            log.classList.add('show');
+            const line = document.createElement('div');
+            line.textContent = message;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateTranslateProgress() {
+            const total = translateState.stages.reduce((sum, type) => sum + (translateState.stats[type] || 0), 0);
+            const done = translateState.stages.reduce((sum, type) => sum + (translateState.doneByType[type] || 0), 0);
+            const percent = total > 0 ? Math.min(100, Math.round((done / total) * 100)) : 0;
+            const currentStage = translateState.stages[translateState.stageIndex] || translateState.stages[translateState.stages.length - 1];
+            const stageLabel = translateTypeLabels[currentStage] || '';
+            const stageDone = translateState.doneByType[currentStage] || 0;
+            const stageTotal = translateState.stats[currentStage] || 0;
+
+            document.getElementById('translate-progress-wrap').classList.add('show');
+            document.getElementById('translate-progress-fill').style.width = percent + '%';
+            document.getElementById('translate-progress-label').textContent =
+                `Етап: ${stageLabel} — ${stageDone}/${stageTotal} · Загалом: ${done}/${total} (${percent}%)`;
+        }
+
+        async function fetchTranslateStats() {
+            const response = await fetch('/nova-vendor/command-runner/translate/stats', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message || 'Не вдалося отримати статистику');
+            }
+
+            return data.stats;
+        }
+
+        async function runTranslateBatch(type, batchSize, afterId) {
+            const response = await fetch('/nova-vendor/command-runner/translate/batch', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    type,
+                    batch_size: batchSize,
+                    after_id: afterId,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message || 'Помилка батчу');
+            }
+
+            return data;
+        }
+
+        async function startBulkTranslate(btn) {
+            const selectedType = document.getElementById('translate-type').value;
+            const batchSize = Math.min(20, Math.max(1, parseInt(document.getElementById('translate-batch-size').value, 10) || 5));
+
+            if (!confirm('Запустити bulk-переклад через GPT? Це може зайняти багато часу та використати OpenAI API.')) {
+                return;
+            }
+
+            translateState.running = true;
+            translateState.stopRequested = false;
+            translateState.stageIndex = 0;
+            translateState.doneByType = { products: 0, attributes: 0, categories: 0 };
+            translateState.cursors = { products: 0, attributes: 0, categories: 0 };
+            translateState.stages = selectedType === 'all'
+                ? ['products', 'attributes', 'categories']
+                : [selectedType];
+
+            document.getElementById('translate-log').innerHTML = '';
+            document.getElementById('translate-log').classList.add('show');
+            document.getElementById('translate-start-btn').disabled = true;
+            document.getElementById('translate-stop-btn').disabled = false;
+            setLoading(btn, true);
+
+            try {
+                showAlert('translate', '', true);
+                document.getElementById('translate-success').classList.remove('show');
+                document.getElementById('translate-error').classList.remove('show');
+
+                appendTranslateLog('Завантаження статистики...');
+                translateState.stats = await fetchTranslateStats();
+
+                const totalPlanned = translateState.stages.reduce((sum, type) => sum + (translateState.stats[type] || 0), 0);
+                appendTranslateLog(`Знайдено неперекладених: товари ${translateState.stats.products}, атрибути ${translateState.stats.attributes}, категорії ${translateState.stats.categories}`);
+
+                if (totalPlanned === 0) {
+                    showAlert('translate', 'Немає неперекладених записів для обраного типу.', true);
+                    return;
+                }
+
+                updateTranslateProgress();
+
+                while (translateState.stageIndex < translateState.stages.length) {
+                    if (translateState.stopRequested) {
+                        appendTranslateLog('Зупинено користувачем.');
+                        showAlert('translate', 'Переклад зупинено.', true);
+                        break;
+                    }
+
+                    const type = translateState.stages[translateState.stageIndex];
+
+                    if ((translateState.stats[type] || 0) === 0) {
+                        translateState.stageIndex++;
+                        continue;
+                    }
+
+                    let afterId = translateState.cursors[type] || 0;
+                    let stageDone = false;
+
+                    while (!stageDone) {
+                        if (translateState.stopRequested) {
+                            appendTranslateLog('Зупинено користувачем.');
+                            showAlert('translate', 'Переклад зупинено.', true);
+                            return;
+                        }
+
+                        appendTranslateLog(`Батч ${translateTypeLabels[type]} (after_id=${afterId})...`);
+                        const result = await runTranslateBatch(type, batchSize, afterId);
+
+                        afterId = result.next_after_id;
+                        translateState.cursors[type] = afterId;
+
+                        (result.items || []).forEach((item) => {
+                            const status = item.status === 'translated' ? '✓' : (item.status === 'error' ? '✗' : '·');
+                            appendTranslateLog(`${status} #${item.id}: ${item.label}`);
+                        });
+
+                        (result.errors || []).forEach((err) => {
+                            appendTranslateLog(`✗ Помилка #${err.id}: ${err.message}`);
+                        });
+
+                        translateState.doneByType[type] += result.translated || 0;
+                        updateTranslateProgress();
+
+                        if (result.done) {
+                            stageDone = true;
+                        }
+                    }
+
+                    translateState.stageIndex++;
+                }
+
+                if (!translateState.stopRequested) {
+                    showAlert('translate', 'Bulk-переклад завершено.', true);
+                    appendTranslateLog('Готово.');
+                }
+            } catch (error) {
+                showAlert('translate', 'Помилка: ' + error.message, false);
+                appendTranslateLog('Помилка: ' + error.message);
+            } finally {
+                translateState.running = false;
+                document.getElementById('translate-start-btn').disabled = false;
+                document.getElementById('translate-stop-btn').disabled = true;
+                setLoading(btn, false);
+            }
+        }
+
+        function stopBulkTranslate(btn) {
+            if (!translateState.running) {
+                return;
+            }
+
+            translateState.stopRequested = true;
+            btn.disabled = true;
+            appendTranslateLog('Запит на зупинку...');
+        }
+
+        function clearBulkTranslateLog() {
+            const log = document.getElementById('translate-log');
+            log.innerHTML = '';
+            log.classList.remove('show');
+
+            document.getElementById('translate-progress-wrap').classList.remove('show');
+            document.getElementById('translate-progress-fill').style.width = '0%';
+            document.getElementById('translate-progress-label').textContent = 'Очікування...';
+
+            document.getElementById('translate-success').classList.remove('show');
+            document.getElementById('translate-error').classList.remove('show');
+            document.getElementById('translate-success').textContent = '';
+            document.getElementById('translate-error').textContent = '';
         }
 
         async function runCleanupOldConversions(btn, dryRun = true) {

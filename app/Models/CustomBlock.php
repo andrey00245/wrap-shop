@@ -53,6 +53,20 @@ class CustomBlock extends Model implements HasMedia, Sortable
         return '';
     }
 
+    public function getMobileImageUrl(): ?string
+    {
+        $media = $this->getFirstMedia('main_mobile');
+        if ($media === null) {
+            return null;
+        }
+
+        if ($media->hasGeneratedConversion('mobile_webp')) {
+            return $media->getUrl('mobile_webp');
+        }
+
+        return $media->getUrl() ?: null;
+    }
+
     public function products()
     {
         return $this->belongsToMany(Product::class)
@@ -66,21 +80,32 @@ class CustomBlock extends Model implements HasMedia, Sortable
     {
         $this
             ->addMediaConversion('preview')
-            ->width(683)
-            ->height(201)
+            ->performOnCollections('main')
+            ->fit(\Spatie\Image\Enums\Fit::Crop, 683, 201)
             ->nonQueued();
 
+        /** Десктопний слайд у кастомному блоці — вертикальна картка як у товарів */
         $this
             ->addMediaConversion('preview_webp')
-            ->width(624)       // 312 * 2
-            ->height(1068)     // 534 * 2
+            ->performOnCollections('main')
+            ->fit(\Spatie\Image\Enums\Fit::Crop, 624, 1068)
             ->format('webp')
-            ->quality(85)     
+            ->quality(85)
+            ->nonQueued();
+
+        /** Мобільний full-width hero */
+        $this
+            ->addMediaConversion('mobile_webp')
+            ->performOnCollections('main_mobile')
+            ->fit(\Spatie\Image\Enums\Fit::Crop, 1080, 1350)
+            ->format('webp')
+            ->quality(88)
             ->nonQueued();
     }
 
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('main')->singleFile();
+        $this->addMediaCollection('main_mobile')->singleFile();
     }
 }

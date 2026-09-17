@@ -31,7 +31,7 @@ return [
     'requirements_desc' => 'Какие минимальные требования необходимы для эффективной работы с товаром',
     'masters-qualification' => 'Квалификация мастера',
     'room-temperature' => 'Температура помещения',
-    'room-temperature-val' => 'от :temperature °C',
+    'room-temperature-val' => ':temperature °C',
     'expiration-date' => 'Срок хранения',
     'expiration-date-val' => ':month месяца',
     'quantity-in-stock' => 'Извините, количество в наличии :max',

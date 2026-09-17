@@ -398,6 +398,8 @@ Route::middleware(['nova'])->prefix('nova-vendor/command-runner')->group(functio
     Route::post('/custom-command', [CommandRunnerController::class, 'runCustomCommand']);
     Route::post('/sync-prices-stock', [CommandRunnerController::class, 'syncPricesAndStock']);
     Route::post('/sync-product-categories', [CommandRunnerController::class, 'syncProductCategories']);
+    Route::post('/translate/stats', [CommandRunnerController::class, 'translateStats']);
+    Route::post('/translate/batch', [CommandRunnerController::class, 'translateBatch']);
 });
 Route::get('/slug-generate', function () {
     $products = Product::all();

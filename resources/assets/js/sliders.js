@@ -186,6 +186,7 @@ $(document).ready(function () {
             breakpoints: {
                 1331: { perPage: 3, gap: '14px' },
                 1019: { perPage: 2, gap: '12px' },
+                767: { perPage: 1, gap: '10px', padding: { left: 0, right: 0 } },
                 520: { perPage: 1, gap: '10px' },
             }
         }).mount();

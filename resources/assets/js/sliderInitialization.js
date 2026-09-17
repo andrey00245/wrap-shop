@@ -904,20 +904,52 @@ export function imageSliderInProduct(item_class) {
     let hoverItems = document.querySelectorAll('.' + item_class + ':not(.banner)');
     let image_splides = []
 
+    // На тачі drag у вкладеному Splide ловить скрол і міняє фото — тільки hover на десктопі
+    const canHoverSwap = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
     for (var i = 0; i < elms.length; i++) {
         image_splides[i] = new Splide(elms[i], {
             pagination: false,
             perPage: 1,
-            arrows:false
+            arrows: false,
+            drag: false,
+            keyboard: false,
         }).mount();
     }
 
+    if (!canHoverSwap) {
+        return;
+    }
+
+    const preloadCardImages = function (card) {
+        card.querySelectorAll('.products-images img').forEach(function (img) {
+            // Off-screen slider slides often stay unloaded with loading="lazy"
+            if (img.getAttribute('loading') === 'lazy') {
+                img.setAttribute('loading', 'eager');
+            }
+            if (!img.complete && img.getAttribute('src')) {
+                const src = img.getAttribute('src');
+                img.setAttribute('src', src);
+            }
+        });
+    };
+
     hoverItems.forEach(function (el, i) {
+        const splide = image_splides[i];
+        if (!splide) {
+            return;
+        }
+
         el.addEventListener('mouseenter', function () {
-            image_splides[i].go(1);
+            preloadCardImages(el);
+            if (splide.length > 1) {
+                splide.go(1);
+            }
         })
         el.addEventListener('mouseleave', function () {
-            image_splides[i].go(0);
+            if (splide.length > 1) {
+                splide.go(0);
+            }
         })
     })
 }

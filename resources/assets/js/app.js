@@ -6,7 +6,6 @@ import {language} from './variables'
 
 
 $(document).ready(function () {
-    showHideSubCategories();
     popupSliderInitialization('cartProductSlider')
     imageSliderInProduct('home-products-item');
     imageSliderInProduct('account-products-list .product-default');
@@ -33,19 +32,314 @@ $(document).ready(function () {
         }
     }
 
+    function isDesktopCatalogMega() {
+        return window.matchMedia("(min-width: 992px)").matches;
+    }
+
+    let catalogMegaHoverTimer = null;
+    let catalogMegaPromoLocked = false;
+    const CATALOG_MEGA_HOVER_DELAY_MS = 500;
+
+    function clearCatalogMegaHoverTimer() {
+        if (catalogMegaHoverTimer) {
+            window.clearTimeout(catalogMegaHoverTimer);
+            catalogMegaHoverTimer = null;
+        }
+    }
+
+    function setActiveCatalogMegaGroup($group, options = {}) {
+        const immediate = options.immediate === true;
+        const $mega = $("#headCatalogMega");
+        const $groups = $mega.find(".head-catalog-mega__group");
+        if (!$groups.length) {
+            return;
+        }
+
+        const $target = $group && $group.length ? $group : $groups.first();
+        if ($target.hasClass("is-active") && !immediate) {
+            return;
+        }
+
+        $groups.removeClass("is-active");
+        $target.addClass("is-active");
+        updateCatalogMegaPromo($target);
+    }
+
+    function scheduleCatalogMegaGroup($group) {
+        if (catalogMegaPromoLocked) {
+            return;
+        }
+
+        clearCatalogMegaHoverTimer();
+
+        if ($group && $group.hasClass("is-active")) {
+            return;
+        }
+
+        catalogMegaHoverTimer = window.setTimeout(function () {
+            catalogMegaHoverTimer = null;
+            if (catalogMegaPromoLocked) {
+                return;
+            }
+            setActiveCatalogMegaGroup($group);
+        }, CATALOG_MEGA_HOVER_DELAY_MS);
+    }
+
+    function setCatalogMegaOpen(open) {
+        const $mega = $("#headCatalogMega");
+        const $trigger = $(".head-catalog-open");
+        const $bg = $(".head-catalog-bg");
+        const header = document.querySelector(".fixed-header");
+
+        clearCatalogMegaHoverTimer();
+        catalogMegaPromoLocked = false;
+
+        if (open && header) {
+            const top = Math.ceil(header.getBoundingClientRect().bottom);
+            document.documentElement.style.setProperty("--catalog-mega-top", top + "px");
+        }
+
+        $mega.toggleClass("is-open", open);
+        if (open) {
+            $mega.removeAttr("hidden");
+            setActiveCatalogMegaGroup($mega.find(".head-catalog-mega__group").first(), { immediate: true });
+        } else {
+            $mega.attr("hidden", "hidden");
+            $mega.find(".head-catalog-mega__group.is-active").removeClass("is-active");
+            $mega.find(".head-catalog-mega__item.has-children.is-open")
+                .removeClass("is-open")
+                .children(".head-catalog-mega__toggle")
+                .attr("aria-expanded", "false");
+            $mega.find(".head-catalog-mega__list.is-expanded").each(function () {
+                const $list = $(this);
+                const $btn = $list.find(".head-catalog-mega__more");
+                $list.removeClass("is-expanded");
+                $btn.attr("aria-expanded", "false");
+                $btn.find(".head-catalog-mega__more-text").text($btn.attr("data-label-more") || "");
+            });
+        }
+
+        $trigger.toggleClass("active", open);
+        $bg.toggleClass("active", open);
+        $trigger.attr("aria-expanded", open ? "true" : "false");
+        $("body").toggleClass("catalog-mega-open", open);
+    }
+
     $(".head-catalog-open, .head-catalog-bg").on("click", function () {
-        $('.head-catalog').slideToggle();
+        if (isDesktopCatalogMega()) {
+            const willOpen = !$("#headCatalogMega").hasClass("is-open");
+            setCatalogMegaOpen(willOpen);
+            return;
+        }
+
+        $(".head-catalog").slideToggle();
         $(".head-catalog-open, .head-catalog-bg").toggleClass("active");
     });
-    $(".mobil-catalog-open, .head-catalog-close").on("click", function () {
-        $('.head-catalog').toggleClass("active");
+
+    function resetMobileCatalogAccordion($root) {
+        const $scope = $root && $root.length ? $root : $(document);
+        $scope.find(".head-catalog-mob__item.has-children.is-open")
+            .removeClass("is-open")
+            .find(".head-catalog-mob__toggle, .head-catalog-mob__subtoggle")
+            .attr("aria-expanded", "false");
+        $scope.find(".head-catalog-mob__subitem.is-open").removeClass("is-open");
+    }
+
+    function setMenuCatalogOpen(open) {
+        const $menu = $("#menu-popup");
+        const $btn = $menu.find(".mob-menu-catalog");
+        const $panel = $menu.find(".mob-menu-catalog-panel");
+
+        $menu.toggleClass("is-catalog-open", open);
+        $btn.toggleClass("is-back", open).attr("aria-expanded", open ? "true" : "false");
+        $panel.prop("hidden", !open);
+
+        if (!open) {
+            resetMobileCatalogAccordion($panel);
+        }
+    }
+
+    $(".mob-menu-catalog").on("click", function () {
+        setMenuCatalogOpen(!$("#menu-popup").hasClass("is-catalog-open"));
     });
 
-    $("#enter_with_phone").on("click", function (){
-        $(".enter-with-phone").show()
-        $(".enter-with-email").hide()
-        $("#column-login").attr('data-type-login', 'phone')
-    })
+    $(".mobil-catalog-open").on("click", function () {
+        setCatalogMegaOpen(false);
+        $("body").removeClass("catalog-mega-open");
+        $("#menu-popup").removeClass("active");
+        setMenuCatalogOpen(false);
+
+        const $catalog = $(".head-catalog");
+        $catalog.toggleClass("active");
+        if (!$catalog.hasClass("active")) {
+            resetMobileCatalogAccordion($catalog);
+            unlockBodyScroll();
+        }
+    });
+
+    $(".head-catalog-close").on("click", function () {
+        setCatalogMegaOpen(false);
+        $("body").removeClass("catalog-mega-open");
+        $(".head-catalog").removeClass("active");
+        resetMobileCatalogAccordion($(".head-catalog"));
+        $("#menu-popup").removeClass("active");
+        setMenuCatalogOpen(false);
+        unlockBodyScroll();
+    });
+
+    $(document).on("keydown", function (event) {
+        if (event.key === "Escape") {
+            setCatalogMegaOpen(false);
+        }
+    });
+
+    $(window).on("resize", function () {
+        if (!isDesktopCatalogMega()) {
+            setCatalogMegaOpen(false);
+        }
+    });
+
+    $(document).on("click", ".head-catalog-mega__toggle", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const $item = $(this).closest(".head-catalog-mega__item.has-children");
+        const willOpen = !$item.hasClass("is-open");
+
+        $item
+            .siblings(".head-catalog-mega__item.has-children.is-open")
+            .removeClass("is-open")
+            .children(".head-catalog-mega__toggle")
+            .attr("aria-expanded", "false");
+
+        $item.toggleClass("is-open", willOpen);
+        $(this).attr("aria-expanded", willOpen ? "true" : "false");
+    });
+
+    $(document).on("click", ".head-catalog-mega__more", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const $btn = $(this);
+        const $list = $btn.closest(".head-catalog-mega__list");
+        const willExpand = !$list.hasClass("is-expanded");
+        const label = willExpand
+            ? ($btn.attr("data-label-less") || "")
+            : ($btn.attr("data-label-more") || "");
+
+        $list.toggleClass("is-expanded", willExpand);
+        $btn.attr("aria-expanded", willExpand ? "true" : "false");
+        $btn.find(".head-catalog-mega__more-text").text(label);
+
+        if (!willExpand) {
+            $list.find(".head-catalog-mega__item.has-children.is-open")
+                .removeClass("is-open")
+                .children(".head-catalog-mega__toggle")
+                .attr("aria-expanded", "false");
+        }
+    });
+
+    function updateCatalogMegaPromo($group) {
+        const $promo = $("#headCatalogMega .head-catalog-mega__promo");
+        if (!$promo.length) {
+            return;
+        }
+
+        const useDefaults = !$group || !$group.length;
+        const title = useDefaults ? $promo.attr("data-default-title") : $group.attr("data-promo-title");
+        const url = useDefaults ? $promo.attr("data-default-url") : $group.attr("data-promo-url");
+        let products = [];
+
+        try {
+            products = JSON.parse(
+                useDefaults ? ($promo.attr("data-default-products") || "[]") : ($group.attr("data-promo-products") || "[]")
+            );
+            if (!Array.isArray(products)) {
+                products = [];
+            }
+        } catch (e) {
+            products = [];
+        }
+
+        $promo.addClass("is-updating");
+        window.setTimeout(function () {
+            $promo.find(".head-catalog-mega__promo-title").text(title || "");
+            $promo.find(".head-catalog-mega__promo-cta").attr("href", url || "#");
+
+            const $list = $promo.find(".head-catalog-mega__promo-products");
+            $list.toggleClass("is-empty", products.length === 0);
+
+            $list.find(".head-catalog-mega__promo-product").each(function (index) {
+                const $product = $(this);
+                const card = products[index] || null;
+                const hasProduct = !!(card && card.name && card.url);
+
+                $product.toggleClass("is-empty", !hasProduct);
+                if (!hasProduct) {
+                    return;
+                }
+
+                $product.attr("href", card.url).attr("title", card.name);
+                $product.find(".head-catalog-mega__promo-product-image").attr("src", card.image || "");
+                $product.find(".head-catalog-mega__promo-product-name").text(card.name || "");
+                $product.find(".head-catalog-mega__promo-product-price")
+                    .text(card.price || "")
+                    .toggleClass("is-empty", !card.price);
+            });
+
+            $promo.removeClass("is-updating");
+        }, 120);
+    }
+
+    $(document).on("mouseenter", ".head-catalog-mega__group", function () {
+        scheduleCatalogMegaGroup($(this));
+    });
+
+    $(document).on("mouseleave", ".head-catalog-mega__group", function () {
+        clearCatalogMegaHoverTimer();
+    });
+
+    $(document).on("mouseenter", ".head-catalog-mega__promo", function () {
+        catalogMegaPromoLocked = true;
+        clearCatalogMegaHoverTimer();
+    });
+
+    $(document).on("mouseleave", ".head-catalog-mega__promo", function () {
+        catalogMegaPromoLocked = false;
+    });
+
+    $(document).on("click", ".mob-menu-lang__current", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const $wrap = $(this).closest(".mob-menu-lang");
+        const willOpen = !$wrap.hasClass("is-open");
+        $(".mob-menu-lang").removeClass("is-open");
+        $(".head-lang-dropdown").removeClass("is-open");
+        $wrap.toggleClass("is-open", willOpen);
+        $(this).attr("aria-expanded", willOpen ? "true" : "false");
+    });
+
+    $(document).on("click", ".head-lang-dropdown__current", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const $wrap = $(this).closest(".head-lang-dropdown");
+        const willOpen = !$wrap.hasClass("is-open");
+        $(".head-lang-dropdown").removeClass("is-open");
+        $(".mob-menu-lang").removeClass("is-open");
+        $wrap.toggleClass("is-open", willOpen);
+        $(this).attr("aria-expanded", willOpen ? "true" : "false");
+    });
+
+    $(document).on("click", function (event) {
+        if (!event.target.closest(".mob-menu-lang")) {
+            $(".mob-menu-lang").removeClass("is-open");
+            $(".mob-menu-lang__current").attr("aria-expanded", "false");
+        }
+        if (!event.target.closest(".head-lang-dropdown")) {
+            $(".head-lang-dropdown").removeClass("is-open");
+            $(".head-lang-dropdown__current").attr("aria-expanded", "false");
+        }
+    });
 
     $("#enter_with_email").on("click", function (){
         $(".enter-with-phone").hide()
@@ -457,97 +751,177 @@ $(document).ready(function () {
 });
 
 
-function showHideSubCategories() {
-    let openSubMenu = $('.openSubMenu')
-    let mainMenu = $('.head-catalog-container.mainMenu')
-    let subMenu = $('.head-catalog-container.subMenu')
-    let backToMainCategory = $('.head-catalog-container .back_to_main_category')
+$(document).on("click", ".head-catalog-mob__toggle", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleMobileCatalogItem($(this).closest(".head-catalog-mob__item.has-children"), $(this));
+});
 
-    backToMainCategory.on('click', function () {
-        let currentCutegoryId = $(this).data('category-id')
-        subMenu.each(function () {
-            if ($(this).data('modal-category') === currentCutegoryId) {
-                $(this).removeClass('show')
-            }
-        })
-        mainMenu.addClass('show')
-    })
+$(document).on("click", ".head-catalog-mob__link", function (event) {
+    const $item = $(this).closest(".head-catalog-mob__item");
+    if (!$item.hasClass("has-children")) {
+        return;
+    }
 
-    openSubMenu.on('click', function () {
-        let currentCutegoryId = $(this).data('category-id')
-        mainMenu.removeClass('show')
-        subMenu.each(function () {
-            if ($(this).data('modal-category') === currentCutegoryId) {
-                $(this).addClass('show')
-            }
-        })
-    })
+    event.preventDefault();
+    event.stopPropagation();
+    toggleMobileCatalogItem($item, $item.find("> .head-catalog-mob__row .head-catalog-mob__toggle"));
+});
+
+function toggleMobileCatalogItem($item, $toggle) {
+    if (!$item.length) {
+        return;
+    }
+
+    const willOpen = !$item.hasClass("is-open");
+    const $menu = $item.closest(".head-catalog-mob");
+
+    $menu.find(".head-catalog-mob__item.has-children.is-open")
+        .not($item)
+        .removeClass("is-open")
+        .find(".head-catalog-mob__subitem.is-open")
+        .removeClass("is-open");
+    $menu.find(".head-catalog-mob__item.has-children")
+        .not($item)
+        .find(".head-catalog-mob__toggle, .head-catalog-mob__subtoggle")
+        .attr("aria-expanded", "false");
+
+    $item.toggleClass("is-open", willOpen);
+    $toggle.attr("aria-expanded", willOpen ? "true" : "false");
+
+    if (!willOpen) {
+        $item.find(".head-catalog-mob__subitem.is-open")
+            .removeClass("is-open")
+            .children(".head-catalog-mob__subtoggle")
+            .attr("aria-expanded", "false");
+    }
 }
+
+$(document).on("click", ".head-catalog-mob__subtoggle", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const $item = $(this).closest(".head-catalog-mob__subitem.has-children");
+    const willOpen = !$item.hasClass("is-open");
+
+    $item
+        .siblings(".head-catalog-mob__subitem.has-children.is-open")
+        .removeClass("is-open")
+        .children(".head-catalog-mob__subtoggle")
+        .attr("aria-expanded", "false");
+
+    $item.toggleClass("is-open", willOpen);
+    $(this).attr("aria-expanded", willOpen ? "true" : "false");
+});
 
 
 function popupSearchAction(){
-    const searchField = document.querySelector('#search-popup #search input[name="search-popup"]');
-    const searchButton = document.querySelector('#search-popup #search button');
-    const dropdownMenu = document.querySelector('#search-popup #search .dropdown-menu');
-    let searchLink = '/search';
-    if(language !== 'uk'){
-        searchLink = `/${language}/search`;
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    const popupRoot = document.querySelector('#search-popup #search');
+    if (popupRoot) {
+        initSearchWidget({
+            input: popupRoot.querySelector('input[name="search-popup"]'),
+            button: popupRoot.querySelector('button'),
+            dropdown: popupRoot.querySelector('.dropdown-menu'),
+        });
     }
 
-    document.addEventListener('click', function (e){
-        if(!e.target.closest('.dropdown-menu') && !e.target.closest('input[name="search-popup"]')){
-            dropdownMenu.style.display = 'none';
-        }
-    })
+    const headRoot = document.querySelector('#head-search');
+    if (headRoot) {
+        initSearchWidget({
+            input: headRoot.querySelector('input[name="head-search"]'),
+            button: headRoot.querySelector('.head-search__submit'),
+            dropdown: headRoot.querySelector('.head-search__dropdown'),
+        });
+    }
+}
 
-    searchField.addEventListener('click', function (){
-        if(searchField.value.length>=3){
-            dropdownMenu.style.display = 'block';
-        }
-    })
+function initSearchWidget({ input, button, dropdown }) {
+    if (!input || !button || !dropdown) {
+        return;
+    }
 
-    searchButton.addEventListener('click', function (){
-        if(searchField.value.trim().length !== 0){
-            searchLink = '/search?search='+searchField.value.trim();
-            if(language !== 'uk'){
-                searchLink = `/${language}/search?search=${searchField.value.trim()}`;
-            }
-        }
-        window.location.href = searchLink;
-    })
+    const searchRoot = input.closest('#head-search')
+        || input.closest('#search-popup')
+        || input.closest('#search')
+        || input.parentElement;
 
-    const debouncedSearch = debounce(popupSearchHandler.bind(null, dropdownMenu), 500);
-    searchField.addEventListener('input', debouncedSearch)
+    document.addEventListener('click', function (e) {
+        if (searchRoot && !searchRoot.contains(e.target)) {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    input.addEventListener('click', function () {
+        if (input.value.trim().length >= 3) {
+            dropdown.style.display = 'block';
+        }
+    });
+
+    const goToSearch = function () {
+        const value = input.value.trim();
+        let nextLink = (language && language !== 'uk') ? `/${language}/search` : '/search';
+        if (value.length !== 0) {
+            const q = encodeURIComponent(value);
+            nextLink = (language && language !== 'uk')
+                ? `/${language}/search?search=${q}`
+                : `/search?search=${q}`;
+        }
+        window.location.href = nextLink;
+    };
+
+    button.addEventListener('click', function (event) {
+        event.preventDefault();
+        goToSearch();
+    });
+
+    input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            goToSearch();
+        }
+    });
+
+    const debouncedSearch = debounce(function (event) {
+        popupSearchHandler(dropdown, event);
+    }, 500);
+    input.addEventListener('input', debouncedSearch);
 }
 
 function popupSearchHandler(dropdownMenu, event) {
     const query = event.target.value.trim();
     let url = '/get-search-items';
-    if(language !== 'uk'){
-        let url = `/${language}/get-search-items`;
+    if (language && language !== 'uk') {
+        url = `/${language}/get-search-items`;
     }
 
-    if(query.length >= 3){
+    if (query.length >= 3) {
         $.ajax({
             url: url,
             type: 'POST',
-            data: {search: query},
+            data: {
+                search: query,
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            },
             dataType: 'json',
             success: function (response) {
-                dropdownMenu.innerHTML = response.data.view;
-                if(response.data.total_count === 0){
+                if (!response || !response.data) {
                     dropdownMenu.style.display = 'none';
+                    return;
                 }
-                else{
-                    dropdownMenu.style.display = 'block';
-                }
+                dropdownMenu.innerHTML = response.data.view;
+                dropdownMenu.style.display = response.data.total_count === 0 ? 'none' : 'block';
             },
-            error: function (xhr, status, error) {
-
+            error: function () {
+                dropdownMenu.style.display = 'none';
             }
         });
-    }
-    else {
+    } else {
         dropdownMenu.style.display = 'none';
     }
 }
@@ -634,9 +1008,29 @@ function popupsOpenClose(){
         const popup = closeBtn.closest('.general-popup');
         if (popup) {
             popup.classList.remove('active');
+            popup.classList.remove('is-catalog-open');
             popup.setAttribute('data-step', '1');
             clearText();
             unlockBodyScroll();
+
+            const catalogBtn = popup.querySelector('.mob-menu-catalog');
+            const catalogPanel = popup.querySelector('.mob-menu-catalog-panel');
+            if (catalogBtn) {
+                catalogBtn.classList.remove('is-back');
+                catalogBtn.setAttribute('aria-expanded', 'false');
+            }
+            if (catalogPanel) {
+                catalogPanel.hidden = true;
+                catalogPanel.querySelectorAll('.head-catalog-mob__item.has-children.is-open').forEach((item) => {
+                    item.classList.remove('is-open');
+                });
+                catalogPanel.querySelectorAll('.head-catalog-mob__subitem.is-open').forEach((item) => {
+                    item.classList.remove('is-open');
+                });
+                catalogPanel.querySelectorAll('.head-catalog-mob__toggle, .head-catalog-mob__subtoggle').forEach((btn) => {
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+            }
         }
     });
 }
@@ -651,7 +1045,18 @@ function closeAllPopups(popups) {
     clearText()
     popups.forEach(popup  =>  {
         popup.classList.remove('active')
+        popup.classList.remove('is-catalog-open')
         popup.setAttribute('data-step', '1')
+
+        const catalogBtn = popup.querySelector('.mob-menu-catalog');
+        const catalogPanel = popup.querySelector('.mob-menu-catalog-panel');
+        if (catalogBtn) {
+            catalogBtn.classList.remove('is-back');
+            catalogBtn.setAttribute('aria-expanded', 'false');
+        }
+        if (catalogPanel) {
+            catalogPanel.hidden = true;
+        }
     });
     unlockBodyScroll();
 }

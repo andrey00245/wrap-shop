@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Spatie\Translatable\HasTranslations;
+use App\Support\TranslationCompleteness;
 
 class Attribute extends Model
 {
@@ -189,19 +190,10 @@ class Attribute extends Model
      */
     public function getIsTranslatedAttribute(): bool
     {
-        $nameRu = $this->getTranslation('name', 'ru');
-        $nameEn = $this->getTranslation('name', 'en');
-
-        // Проверяем, что переводы существуют
-        if (empty($nameRu) || empty($nameEn)) {
-            return false;
-        }
-
-        // Проверяем, что переводы не одинаковые
-        if (trim($nameRu) === trim($nameEn)) {
-            return false;
-        }
-
-        return true;
+        return TranslationCompleteness::isComplete(
+            (string) $this->getTranslation('name', 'uk', false),
+            (string) $this->getTranslation('name', 'ru', false),
+            (string) $this->getTranslation('name', 'en', false),
+        );
     }
 }

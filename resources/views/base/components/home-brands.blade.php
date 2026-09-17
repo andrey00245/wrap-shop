@@ -9,7 +9,7 @@
                 <div class="home-brands__item" title="{{ $brand->name ?? '' }}">
                     <img
                         src="{{ $brand->getLogoUrl() }}"
-                        alt="{{ $brand->name ?? 'Brand logo' }}"
+                        alt="{{ $brand->name ?? ($brand->brand_key ?? 'Brand logo') }}"
                         class="home-brands__image"
                         loading="lazy"
                     >

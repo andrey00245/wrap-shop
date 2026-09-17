@@ -1,7 +1,7 @@
 @php
   $homeNewsItems = collect($homeNews ?? [])->filter(fn ($news) => $news->category && filled($news->slugEn) && $news->getMedia('main')->isNotEmpty());
   $homeNewsItems = $homeNewsItems->take(10)->values();
-  $useSlider = $homeNewsItems->count() > 4;
+  $useSlider = $homeNewsItems->count() > 1;
 @endphp
 
 @if($homeNewsItems->isNotEmpty())

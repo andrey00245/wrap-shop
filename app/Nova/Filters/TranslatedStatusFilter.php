@@ -11,13 +11,15 @@ class TranslatedStatusFilter extends Filter
 
     public function apply(Request $request, $query, $value)
     {
+        // Приблизний SQL: порожні локалі або en = uk (копіпаст кирилиці в en).
+        // Точна перевірка — в Product::is_translated (колонка в індексі).
         if ($value === 'translated') {
             return $query->whereJsonLength('name->ru', '>', 0)
                 ->whereJsonLength('name->en', '>', 0)
                 ->whereJsonLength('descriptions->ru', '>', 0)
                 ->whereJsonLength('descriptions->en', '>', 0)
-                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(name, '$.ru')) != JSON_UNQUOTE(JSON_EXTRACT(name, '$.en'))")
-                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(descriptions, '$.ru')) != JSON_UNQUOTE(JSON_EXTRACT(descriptions, '$.en'))");
+                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(name, '$.en')) != JSON_UNQUOTE(JSON_EXTRACT(name, '$.uk'))")
+                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(descriptions, '$.en')) != JSON_UNQUOTE(JSON_EXTRACT(descriptions, '$.uk'))");
         }
 
         if ($value === 'not_translated') {
@@ -26,8 +28,12 @@ class TranslatedStatusFilter extends Filter
                     ->orWhereNull('name->en')
                     ->orWhereNull('descriptions->ru')
                     ->orWhereNull('descriptions->en')
-                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(name, '$.ru')) = JSON_UNQUOTE(JSON_EXTRACT(name, '$.en'))")
-                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(descriptions, '$.ru')) = JSON_UNQUOTE(JSON_EXTRACT(descriptions, '$.en'))");
+                    ->orWhereRaw("TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT(name, '$.ru')), '')) = ''")
+                    ->orWhereRaw("TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT(name, '$.en')), '')) = ''")
+                    ->orWhereRaw("TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT(descriptions, '$.ru')), '')) = ''")
+                    ->orWhereRaw("TRIM(COALESCE(JSON_UNQUOTE(JSON_EXTRACT(descriptions, '$.en')), '')) = ''")
+                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(name, '$.en')) = JSON_UNQUOTE(JSON_EXTRACT(name, '$.uk'))")
+                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(descriptions, '$.en')) = JSON_UNQUOTE(JSON_EXTRACT(descriptions, '$.uk'))");
             });
         }
 

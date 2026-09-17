@@ -1,4 +1,4 @@
-<nav class="home-category wrap" aria-label="{{ __('header_footer.catalog_products') }}">
+<nav class="home-category wrap{{ !empty($footer) ? ' home-category--footer' : '' }}" aria-label="{{ __('header_footer.catalog_products') }}">
     <ul class="home-category__list">
         @foreach($mainCategories as $mainCategory)
             @php

@@ -45,7 +45,7 @@
     @include('base.components.home-youtube-cards')
     @include('base.components.home-faq')
     @include('base.components.home-brands')
-    @include('base.components.categories-slider')
+    @include('base.components.categories-slider', ['footer' => true])
 
     @push('scripts')
       <script src="{{ mix('build/js/sliders.js') }}" defer></script>

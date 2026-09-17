@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\UpdateProductJob;
+use App\Services\ContentTranslationService;
 use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -665,6 +666,80 @@ class CommandRunnerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Статистика неперекладених товарів / атрибутів / категорій.
+     */
+    public function translateStats(ContentTranslationService $translationService): JsonResponse
+    {
+        try {
+            set_time_limit(300);
+
+            return response()->json([
+                'success' => true,
+                'stats' => $translationService->stats(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('CommandRunner: помилка translateStats', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Помилка: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Батчовий переклад GPT (products / attributes / categories).
+     */
+    public function translateBatch(Request $request, ContentTranslationService $translationService): JsonResponse
+    {
+        $type = (string) $request->input('type', 'products');
+        $allowedTypes = ['products', 'attributes', 'categories'];
+
+        if (! in_array($type, $allowedTypes, true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Невідомий тип: '.$type,
+            ], 422);
+        }
+
+        $batchSize = max(1, min(20, (int) $request->input('batch_size', 5)));
+        $afterId = max(0, (int) $request->input('after_id', 0));
+
+        try {
+            set_time_limit(180);
+
+            $result = $translationService->processBatch($type, $afterId, $batchSize);
+
+            return response()->json([
+                'success' => true,
+                'type' => $type,
+                'translated' => $result['translated'],
+                'skipped' => $result['skipped'],
+                'errors' => $result['errors'],
+                'next_after_id' => $result['next_after_id'],
+                'done' => $result['done'],
+                'items' => $result['items'],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('CommandRunner: помилка translateBatch', [
+                'type' => $type,
+                'after_id' => $afterId,
+                'batch_size' => $batchSize,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Помилка: '.$e->getMessage(),
             ], 500);
         }
     }

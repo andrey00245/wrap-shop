@@ -21,6 +21,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
+use App\Support\TranslationCompleteness;
 
 /**
  * @method static Builder whereLikeInsensitive(string $column, string $value)
@@ -1289,6 +1290,21 @@ class Product extends Model implements HasMedia
         return $this->attributes()->where('field_name', 'brand')->first()?->pivot?->value;
     }
 
+    public function getBrandDisplayName(): ?string
+    {
+        return self::extractPivotValueForDisplay($this->getBrand());
+    }
+
+    public function getBrandLogoUrl(): string
+    {
+        return HomeBrand::resolveLogoUrlForAttributeValue($this->getBrand());
+    }
+
+    public function getBrandLogoModel(): ?HomeBrand
+    {
+        return HomeBrand::resolveForAttributeValue($this->getBrand());
+    }
+
     public function getRoomTemperature()
     {
         return $this->attributes()->where('field_name', 'room_temperature')->first()?->pivot?->value;
@@ -1430,50 +1446,49 @@ class Product extends Model implements HasMedia
         return $this->hasMany(Review::class);
     }
 
+    public function orderLines()
+    {
+        return $this->hasMany(OrderProduct::class);
+    }
+
     public function getIsTranslatedAttribute(): bool
     {
-        $nameRu = $this->getTranslation('name', 'ru');
-        $nameEn = $this->getTranslation('name', 'en');
-        $descRu = $this->getTranslation('descriptions', 'ru');
-        $descEn = $this->getTranslation('descriptions', 'en');
+        $nameUk = (string) $this->getTranslation('name', 'uk', false);
+        $nameRu = (string) $this->getTranslation('name', 'ru', false);
+        $nameEn = (string) $this->getTranslation('name', 'en', false);
+        $descUk = (string) $this->getTranslation('descriptions', 'uk', false);
+        $descRu = (string) $this->getTranslation('descriptions', 'ru', false);
+        $descEn = (string) $this->getTranslation('descriptions', 'en', false);
 
-        // Проверяем основные поля продукта
-        if (
-            empty(strip_tags($nameRu)) ||
-            empty(strip_tags($nameEn)) ||
-            empty(strip_tags($descRu)) ||
-            empty(strip_tags($descEn))
-        ) {
+        if (! TranslationCompleteness::isComplete($nameUk, $nameRu, $nameEn)) {
             return false;
         }
 
-        if (
-            trim(strip_tags($nameRu)) === trim(strip_tags($nameEn)) ||
-            trim(strip_tags($descRu)) === trim(strip_tags($descEn))
-        ) {
+        if (! TranslationCompleteness::isComplete($descUk, $descRu, $descEn)) {
             return false;
         }
 
-        // Проверяем переводы атрибутов
         $productAttributes = $this->products_attributes()->get();
         foreach ($productAttributes as $attribute) {
             $value = $attribute->value;
 
-            // Если значение не является массивом (не переведено), пропускаем
             if (! is_array($value)) {
+                if (is_string($value) && trim($value) !== '') {
+                    return false;
+                }
+
                 continue;
             }
 
-            $valueRu = $value['ru'] ?? '';
-            $valueEn = $value['en'] ?? '';
+            $valueUk = (string) ($value['uk'] ?? '');
+            $valueRu = (string) ($value['ru'] ?? '');
+            $valueEn = (string) ($value['en'] ?? '');
 
-            // Если хотя бы один атрибут не переведен, продукт считается не переведенным
-            if (empty($valueRu) || empty($valueEn)) {
-                return false;
+            if ($valueUk === '' && $valueRu === '' && $valueEn === '') {
+                continue;
             }
 
-            // Если переводы одинаковые, продукт считается не переведенным
-            if (trim($valueRu) === trim($valueEn)) {
+            if (! TranslationCompleteness::isComplete($valueUk, $valueRu, $valueEn)) {
                 return false;
             }
         }

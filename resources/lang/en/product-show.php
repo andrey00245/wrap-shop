@@ -31,7 +31,7 @@ return [
     'requirements_desc' => 'What minimum requirements are necessary for effective work with the product',
     'masters-qualification' => 'Master\'s qualification',
     'room-temperature' => 'Room temperature',
-    'room-temperature-val' => 'from :temperature °C',
+    'room-temperature-val' => ':temperature °C',
     'expiration-date' => 'Expiration date',
     'expiration-date-val' => ':month month',
     'quantity-in-stock' => 'Sorry, quantity in stock :max',

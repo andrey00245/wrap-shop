@@ -85,8 +85,13 @@ class CustomBlock extends Resource
             Text::make('Url')->hideFromIndex(),
             Boolean::make('Active', 'is_active'),
 
-            Images::make('Баннер','main')
-                ->conversionOnIndexView('preview'),
+            Images::make('Баннер (десктоп)', 'main')
+                ->conversionOnIndexView('preview_webp')
+                ->help('Вертикальний кадр під слайдер товарів, бажано 624×1068 px (пропорція ≈ 1:1.7). Не горизонтальний банер — інакше залишаться порожні поля внизу картки.'),
+
+            Images::make('Баннер (мобільний)', 'main_mobile')
+                ->singleMediaRules('image')
+                ->help('Окремий кадр на всю ширину телефону, бажано 1080×1350 px (4:5). Якщо порожньо — на мобілці покажеться десктопне фото.'),
 
             Text::make('Кількість товарів', function () {
                 return $this->products()->count();

@@ -25,14 +25,17 @@
 
 <footer class="footer">
   <div class="ellipse orange"></div>
-  <div class="wrap flex-justify">
-    <div class="foot-info">
+  <div class="wrap footer__main flex-justify">
+    <div class="foot-brand">
       <div class="foot-logo">
         <a href="{{route('index')}}" title="Wrap-Shop"><img loading="lazy" src="{{asset('assets/img/logo.png')}}"
                                                             alt="Wrap-Shop" title="Wrap-Shop" width="118" height="124"></a>
       </div>
+      <div class="foot-copir">{{__('header_footer.all_rights_reserved', ['year'=> date('Y')])}}</div>
     </div>
+
     <nav class="foot-catalog foot-item">
+      <div class="title foot-catalog__title">{{ __('header_footer.catalog') }}</div>
       <ul class="footer-cat">
         @foreach($mainCategories as $category)
           <li>
@@ -47,27 +50,49 @@
         @endforeach
       </ul>
     </nav>
+
     <nav class="foot-menu foot-item">
       <div class="title">{{__('header_footer.information')}}</div>
-      @include('base.layouts.menu')
+      @include('base.layouts.footer-menu')
     </nav>
-    <div class="foot-add foot-item">
-      <div class="title">{{__('header_footer.our_office')}}</div>
-      <a href="{{$settings->google_map_link ?? '#'}}" target="_blank"
-         title="{{$settings->address ?? '#'}}">{{$settings->address ?? '#'}}</a>
 
-    </div>
+    <div class="foot-meta foot-item">
+      <div class="foot-add">
+        <div class="title">{{__('header_footer.our_office')}}</div>
+        <a href="{{$settings->google_map_link ?? '#'}}" target="_blank"
+           title="{{$settings->address ?? '#'}}">{{$settings->address ?? '#'}}</a>
+      </div>
 
-    <div class="foot-contact foot-item">
-      <div class="title">{{__('header_footer.contact_us')}}</div>
-      <a href="tel:{{$settings->phone ?? '#'}}" class="phone"> {!! $settings->phone_view ?? '#' !!}</a>
-      <a href="mailto:{{$settings->email ?? '#'}}" class="email" title="Email">{{$settings->email ?? '#'}}</a>
-      <div class="social">
-        <a href="{{$settings->telegram ?? '#'}}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
-        <a href="{{$settings->instagram ?? '#'}}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
+      <div class="foot-contact">
+        <div class="title">{{__('header_footer.contact_us')}}</div>
+        <a href="{{ \App\Support\SitePhone::telHref($settings ?? null) }}" class="phone">{{ \App\Support\SitePhone::display($settings ?? null) }}</a>
+        <a href="mailto:{{$settings->email ?? '#'}}" class="email" title="Email">{{$settings->email ?? '#'}}</a>
+        <div class="social">
+          <a href="{{$settings->telegram ?? '#'}}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
+          <a href="{{$settings->instagram ?? '#'}}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
+        </div>
       </div>
     </div>
-    <div class="foot-copir">{{__('header_footer.all_rights_reserved', ['year'=> date('Y')])}}</div>
+
+    <div class="foot-cities foot-item">
+      <div class="title">{{ __('header_footer.films_in_other_cities') }}</div>
+      <ul class="foot-cities__list">
+        @foreach([
+          'lviv' => __('header_footer.cities.lviv'),
+          'odesa' => __('header_footer.cities.odesa'),
+          'mykolaiv' => __('header_footer.cities.mykolaiv'),
+          'dnipro' => __('header_footer.cities.dnipro'),
+          'kharkiv' => __('header_footer.cities.kharkiv'),
+        ] as $cityKey => $cityName)
+          <li>
+            <a href="{{ route('contacts') }}#{{ $cityKey }}" class="foot-cities__link" title="{{ $cityName }}">
+              <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+              <span>{{ $cityName }}</span>
+            </a>
+          </li>
+        @endforeach
+      </ul>
+    </div>
   </div>
 
   <div class="foot-form foot-item">

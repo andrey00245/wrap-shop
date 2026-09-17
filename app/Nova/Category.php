@@ -2,9 +2,9 @@
 
 namespace App\Nova;
 
+use App\Nova\Fields\Images;
 use App\Nova\Fields\NovaTabTranslatable;
 use App\Nova\Support\LocaleFaqNovaFields;
-use Ebess\AdvancedNovaMediaLibrary\Fields\Images;
 use Kongulov\NovaTabTranslatable\TranslatableTabToRowTrait;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
@@ -120,6 +120,11 @@ class Category extends Resource
                 }),
 
             Images::make('Фото', 'main')
+                ->withMeta(['style' => 'border: 1px solid #ddd; background: #f5f5f5; padding: 5px;']),
+
+            Images::make('Іконка меню', 'menu_icon')
+                ->croppable(false)
+                ->help('Окрема іконка для мобільного/мега-меню (краще до 200–300 КБ). Якщо порожньо — береться фото категорії, інакше логотип.')
                 ->withMeta(['style' => 'border: 1px solid #ddd; background: #f5f5f5; padding: 5px;']),
         ];
     }

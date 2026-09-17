@@ -17,12 +17,22 @@
 
             <div class="customBlocks__stage">
                 @if($customBlock->getImage())
-                    <div class="customBlocks__hero">
+                    @php
+                        $desktopBanner = $customBlock->getPreviewImage();
+                        $mobileBanner = $customBlock->getMobileImageUrl();
+                        $hasMobileBanner = filled($mobileBanner);
+                    @endphp
+                    <div class="customBlocks__hero{{ $hasMobileBanner ? ' has-mobile-image' : '' }}">
                         <a href="{{$customBlock->url ?? '#'}}" class="customBlocks__hero-link" title="{{$customBlock->name}}">
-                            <img class="customBlocks__hero-image vertical"
-                                 src="{{$customBlock->getPreviewImage()}}"
-                                 alt="{{$customBlock->name}}"
-                                 title="{{$customBlock->name}}">
+                            <picture>
+                                @if($hasMobileBanner)
+                                    <source media="(max-width: 767px)" srcset="{{ $mobileBanner }}">
+                                @endif
+                                <img class="customBlocks__hero-image vertical"
+                                     src="{{ $desktopBanner }}"
+                                     alt="{{$customBlock->name}}"
+                                     title="{{$customBlock->name}}">
+                            </picture>
                         </a>
                     </div>
                 @endif

@@ -1,12 +1,24 @@
 <?php
 
 return [
+    'catalog' => 'Каталог',
     'catalog_products' => 'Каталог товарів',
+    'catalog_show_more' => 'Показати ще',
+    'catalog_show_less' => 'Згорнути',
+    'catalog_promo_cta' => 'Перейти в категорію',
+    'catalog_featured_products' => 'Популярні товари',
     'video_reviews' => 'Відеоогляди',
     'delivery' => 'Доставка',
     'news' => 'Новини',
+    'news_and_promos' => 'Новини та акції',
     'about_us' => 'Про нас',
     'contact_us' => 'Контакти',
+    'blog' => 'Блог',
+    'popular_categories' => 'Популярні категорії',
+    'menu_search_placeholder' => 'Пошук',
+    'login_cabinet' => 'Увійти в кабінет',
+    'cart' => 'Кошик',
+    'favorites' => 'Обране',
     'offers' => 'Оферта',
     'store_reviews' => 'Відгуки клієнтів',
     'phone' => 'Телефон',
@@ -20,7 +32,13 @@ return [
     'subscribe_btn' => 'Відправити',
     'all_rights_reserved' => 'Всі права захищені. © :year',
     'films_in_other_cities' => 'Плівки в інших містах',
-
+    'cities' => [
+        'lviv' => 'Львів',
+        'odesa' => 'Одеса',
+        'mykolaiv' => 'Миколаїв',
+        'dnipro' => 'Дніпро',
+        'kharkiv' => 'Харків',
+    ],
     'home' => 'Головна',
 
 ];

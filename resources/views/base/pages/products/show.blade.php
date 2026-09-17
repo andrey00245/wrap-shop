@@ -693,6 +693,8 @@
         @endif
     </section>
 
+    {{-- Temporarily hidden: product-range (film opacity slider) — redesign pending --}}
+    @if(false)
     <section class="product-range wrap" data-tonirovka-range>
         <div class="product-range__inner box-left-image-right-text">
             <div class="box-left-image-right-text__img tonirovka-fon">
@@ -749,6 +751,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     @include('base.components.recommendations')
     {{-- @include('base.components.examples-of-work') --}}

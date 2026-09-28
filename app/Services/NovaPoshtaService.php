@@ -56,13 +56,25 @@ class NovaPoshtaService
      *
      * @param  bool  $cargoOnly  Плівка від 1 м.п. — лише вантажні відділення НП (ліміт у довіднику 200/1100 кг тощо).
      */
-    public function getWarehouses(?string $cityRef, bool $cargoOnly = false): array
+    public function getWarehouses(?string $cityRef, bool $cargoOnly = false, int $retryCount = 0): array
     {
         if ($cityRef === null || $cityRef === '') {
+            \Log::warning('NovaPoshta getWarehouses: порожній cityRef');
+
+            return [];
+        }
+
+        if ($this->apiKey === null || $this->apiKey === '') {
+            \Log::error('NovaPoshta getWarehouses: NOVA_POSHTA_API_KEY не задано', [
+                'cityRef' => $cityRef,
+            ]);
+
             return [];
         }
 
         try {
+            $this->throttleNovaPoshtaRequest();
+
             $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
                 'apiKey'           => $this->apiKey,
                 'modelName'        => 'Address',
@@ -72,53 +84,128 @@ class NovaPoshtaService
                 ]
             ]);
 
-            // Проверяем успешность запроса
-            if ($response->successful()) {
-                $data = $response->json();
+            if (! $response->successful()) {
+                \Log::error('NovaPoshta getWarehouses: HTTP помилка', [
+                    'cityRef' => $cityRef,
+                    'cargo_only' => $cargoOnly,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
 
-                $locale = app()->getLocale();
-                // Если данные есть, продолжаем маппинг
-                if (!empty($data['data'])) {
-                    $rows = collect($data['data'])->filter(function ($warehouse) {
-                        return ($warehouse['CategoryOfWarehouse'] ?? '') === 'Branch'
-                            || ($warehouse['CategoryOfWarehouse'] ?? '') === 'Store';
-                    });
-
-                    if ($cargoOnly) {
-                        $filtered = $rows->filter(fn (array $w) => $this->isCargoWarehouse($w));
-                        if ($filtered->isEmpty() && $rows->isNotEmpty()) {
-                            \Log::warning('Nova Poshta: cargo_only відфільтрував усі відділення, повертаємо повний список Branch/Store', [
-                                'cityRef' => $cityRef,
-                                'before' => $rows->count(),
-                            ]);
-                            $filtered = $rows;
-                        }
-                        $rows = $filtered;
-                    }
-
-                    return $rows->map(function ($warehouse) use ($locale) {
-                        $baseName = $locale === 'ru'
-                            ? (string) ($warehouse['DescriptionRu'] ?? '')
-                            : (string) ($warehouse['Description'] ?? '');
-
-                        return [
-                            'id' => $warehouse['Ref'], // уникальный идентификатор склада
-                            'name' => $this->warehouseDisplayName($warehouse, $baseName, $locale),
-                            'address' => $warehouse['ShortAddress'], // короткий адрес
-                            'city' => $warehouse['CityDescription'], // город
-                            'region' =>  $locale === 'ru' ?  $warehouse['SettlementAreaDescriptionRu']: $warehouse['SettlementAreaDescription'], // область
-                        ];
-                    })->values()->all();
-                } else {
-                    return [];
-                }
-            } else {
-                // Логирование ошибки
                 return [];
             }
-        } catch (\Exception $e) {
+
+            $data = $response->json();
+
+            if (isset($data['success']) && $data['success'] === false) {
+                $errors = $data['errors'] ?? [];
+
+                if (in_array('To many requests', $errors, true) && $retryCount < 3) {
+                    \Log::warning('NovaPoshta getWarehouses: ліміт запитів, повтор', [
+                        'cityRef' => $cityRef,
+                        'cargo_only' => $cargoOnly,
+                        'retry_count' => $retryCount + 1,
+                        'errors' => $errors,
+                        'info' => $data['info'] ?? [],
+                    ]);
+                    sleep(1);
+
+                    return $this->getWarehouses($cityRef, $cargoOnly, $retryCount + 1);
+                }
+
+                \Log::error('NovaPoshta getWarehouses: API повернув помилку', [
+                    'cityRef' => $cityRef,
+                    'cargo_only' => $cargoOnly,
+                    'retry_count' => $retryCount,
+                    'errors' => $errors,
+                    'warnings' => $data['warnings'] ?? [],
+                    'info' => $data['info'] ?? [],
+                ]);
+
+                return [];
+            }
+
+            if (empty($data['data'])) {
+                \Log::warning('NovaPoshta getWarehouses: порожня відповідь data', [
+                    'cityRef' => $cityRef,
+                    'cargo_only' => $cargoOnly,
+                    'success' => $data['success'] ?? null,
+                    'errors' => $data['errors'] ?? [],
+                    'info' => $data['info'] ?? [],
+                ]);
+
+                return [];
+            }
+
+            $locale = app()->getLocale();
+            $allCount = count($data['data']);
+            $rows = collect($data['data'])->filter(function ($warehouse) {
+                return ($warehouse['CategoryOfWarehouse'] ?? '') === 'Branch'
+                    || ($warehouse['CategoryOfWarehouse'] ?? '') === 'Store';
+            });
+
+            if ($rows->isEmpty()) {
+                \Log::warning('NovaPoshta getWarehouses: після фільтра Branch/Store список порожній', [
+                    'cityRef' => $cityRef,
+                    'cargo_only' => $cargoOnly,
+                    'api_rows' => $allCount,
+                ]);
+
+                return [];
+            }
+
+            if ($cargoOnly) {
+                $filtered = $rows->filter(fn (array $w) => $this->isCargoWarehouse($w));
+                if ($filtered->isEmpty() && $rows->isNotEmpty()) {
+                    \Log::warning('Nova Poshta: cargo_only відфільтрував усі відділення, повертаємо повний список Branch/Store', [
+                        'cityRef' => $cityRef,
+                        'before' => $rows->count(),
+                    ]);
+                    $filtered = $rows;
+                }
+                $rows = $filtered;
+            }
+
+            return $rows->map(function ($warehouse) use ($locale) {
+                $baseName = $locale === 'ru'
+                    ? (string) ($warehouse['DescriptionRu'] ?? '')
+                    : (string) ($warehouse['Description'] ?? '');
+
+                return [
+                    'id' => $warehouse['Ref'],
+                    'name' => $this->warehouseDisplayName($warehouse, $baseName, $locale),
+                    'address' => $warehouse['ShortAddress'],
+                    'city' => $warehouse['CityDescription'],
+                    'region' => $locale === 'ru'
+                        ? $warehouse['SettlementAreaDescriptionRu']
+                        : $warehouse['SettlementAreaDescription'],
+                ];
+            })->values()->all();
+        } catch (\Throwable $e) {
+            \Log::error('NovaPoshta getWarehouses: виняток', [
+                'cityRef' => $cityRef,
+                'cargo_only' => $cargoOnly,
+                'message' => $e->getMessage(),
+            ]);
+
             return [];
         }
+    }
+
+    /**
+     * Пауза між запитами до Nova Poshta, щоб рідше ловити "To many requests".
+     */
+    private function throttleNovaPoshtaRequest(): void
+    {
+        static $lastRequestTime = 0.0;
+        $currentTime = microtime(true);
+        $timeSinceLastRequest = $currentTime - $lastRequestTime;
+
+        if ($timeSinceLastRequest < 0.5) {
+            usleep((int) ((0.5 - $timeSinceLastRequest) * 1_000_000));
+        }
+
+        $lastRequestTime = microtime(true);
     }
 
     /**
@@ -210,18 +297,8 @@ class NovaPoshtaService
     public function getPostMachines(string $cityRef, int $retryCount = 0)
     {
         try {
-            // Добавляем задержку между запросами к API Nova Poshta
-            static $lastRequestTime = 0;
-            $currentTime = microtime(true);
-            $timeSinceLastRequest = $currentTime - $lastRequestTime;
-            
-            if ($timeSinceLastRequest < 0.5) {
-                $sleepTime = 0.5 - $timeSinceLastRequest;
-                usleep($sleepTime * 1000000); // Конвертируем в микросекунды
-            }
-            
-            $lastRequestTime = microtime(true);
-            
+            $this->throttleNovaPoshtaRequest();
+
             $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
                 'apiKey'           => $this->apiKey,
                 'modelName'        => 'Address',

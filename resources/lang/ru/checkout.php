@@ -61,4 +61,6 @@ return [
     'input_delivery_address' => 'Введите адрес доставки',
     'np_branch_select_from_list' => 'Выберите отделение из подсказок Новой Почты',
     'np_locker_select_from_list' => 'Выберите почтомат из подсказок Новой Почты',
+    'kyiv_select_settlement' => 'Выберите населённый пункт из подсказок',
+    'kyiv_select_street' => 'Выберите улицу из подсказок',
 ];

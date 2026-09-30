@@ -35,6 +35,10 @@ class OrderController extends Controller
             'courier_street' => 'nullable|string',
             'courier_house' => 'nullable|string',
             'kyiv_address' => 'nullable|string',
+            'kyiv_street' => 'nullable|string',
+            'kyiv_house' => 'nullable|string',
+            'kyiv_city_ref' => 'nullable|string',
+            'kyiv_street_ref' => 'nullable|string',
         ];
 
         if (in_array($request->input('shipping_method'), ['flat', 'novaposhta', 'novaposhta_doors','my_addresses'])) {
@@ -54,7 +58,10 @@ class OrderController extends Controller
                     $rules['courier_house'] = 'required|string';
                 }
             } elseif ($request->input('shipping_method') === 'flat') {
-                $rules['kyiv_address'] = 'required|string';
+                $rules['kyiv_city_ref'] = 'required|string';
+                $rules['kyiv_street'] = 'required|string';
+                $rules['kyiv_street_ref'] = 'required|string';
+                $rules['kyiv_house'] = 'required|string';
             } else {
                 $rules['shipping_address'] = 'required|string';
             }
@@ -68,6 +75,8 @@ class OrderController extends Controller
         $validated = $request->validate($rules, [
             'novaposhta_warehouse_ref.required' => __('checkout.np_branch_select_from_list'),
             'locker_warehouse_ref.required' => __('checkout.np_locker_select_from_list'),
+            'kyiv_city_ref.required' => __('checkout.kyiv_select_settlement'),
+            'kyiv_street_ref.required' => __('checkout.kyiv_select_street'),
         ]);
 
 
@@ -140,7 +149,9 @@ class OrderController extends Controller
                 $order->novaposhta_warehouse_ref = null; // Для курьера нет warehouse_ref
             }
         } elseif ($request->input('shipping_method') === 'flat') {
-            $order->shipping_address = Arr::get($validated,'kyiv_address');
+            $kyivStreet = trim((string) Arr::get($validated, 'kyiv_street', ''));
+            $kyivHouse = trim((string) Arr::get($validated, 'kyiv_house', ''));
+            $order->shipping_address = trim($kyivStreet.', '.$kyivHouse);
         } elseif ($request->input('shipping_method') === 'my_addresses') {
             $order->shipping_address = Arr::get($validated,'my_address');
         } else {

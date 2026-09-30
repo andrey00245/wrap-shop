@@ -424,6 +424,7 @@ Route::group([
 ], function () {
 
     Route::get('/api/get-cities', [NovaPoshtaController::class, 'getCities']);
+    Route::get('/api/get-streets', [NovaPoshtaController::class, 'getStreets']);
     Route::get('/api/get-branches', [NovaPoshtaController::class, 'getBranches']);
     Route::get('/api/get-postmachines', [NovaPoshtaController::class, 'getPostMachines']);
     Route::get('/api/get-checkout-cart', [CartController::class, 'getCheckoutCart']);

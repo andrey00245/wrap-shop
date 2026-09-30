@@ -6,6 +6,7 @@ use App\Models\Banner;
 use App\Models\BestSeller;
 use App\Models\Category;
 use App\Models\CustomBlock;
+use App\Models\HomePage;
 use App\Models\Implementation;
 use App\Models\Product;
 use Illuminate\Support\Facades\Cache;
@@ -78,6 +79,8 @@ class IndexController extends Controller
                 return $bestSeller->product->category;
             })->filter()->unique('id')->values();
 
+            $homePage = HomePage::query()->first();
+
             return compact(
                 'topSellerCategories',
                 'topSellersProducts',
@@ -85,7 +88,8 @@ class IndexController extends Controller
                 'products',
                 'banners',
                 'exampleWorks',
-                'customBlocks'
+                'customBlocks',
+                'homePage'
             );
         });
 

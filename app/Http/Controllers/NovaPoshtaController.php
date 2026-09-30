@@ -17,10 +17,25 @@ class NovaPoshtaController extends Controller
     public function getCities(Request $request)
     {
         $cityName = $request->input('cityName');
+        $kyivAreaOnly = $request->boolean('kyiv_only');
 
-        $cities = $this->novaPoshtaService->getCities($cityName);
+        $cities = $this->novaPoshtaService->getCities($cityName, $kyivAreaOnly);
 
         return response()->json(['data' => $cities]);
+    }
+
+    public function getStreets(Request $request)
+    {
+        $request->validate([
+            'cityRef' => 'required|string',
+        ]);
+
+        $streets = $this->novaPoshtaService->getStreets(
+            $request->input('cityRef'),
+            $request->input('streetName')
+        );
+
+        return response()->json(['data' => $streets]);
     }
 
     public function getBranches(Request $request)

@@ -16,7 +16,7 @@ class NovaPoshtaService
     /**
      * Получить список городов по названию
      */
-    public function getCities(string $cityName = null)
+    public function getCities(?string $cityName = null, bool $kyivAreaOnly = false)
     {
         $methodProperties = [];
         if ($cityName) {
@@ -29,26 +29,104 @@ class NovaPoshtaService
             'apiKey' => $this->apiKey,
             'modelName' => 'Address',
             'calledMethod' => 'getCities',
-            'methodProperties' => $methodProperties  // Передаем метод с фильтром
+            'methodProperties' => $methodProperties
         ]);
 
         $data = $response->json();
         $locale = app()->getLocale();
 
-        if ($data['success']) {
-            $cities = collect($data['data'])->map(function ($city) use($locale) {
-                return [
-                    'name' => $locale === 'ru' ? $city['DescriptionRu'] : $city['Description'],
-                    'region' => $locale === 'ru' ? $city['AreaDescriptionRu'] : $city['AreaDescription'],
-                    'ref' => $city['Ref'],
-                ];
-            });
+        if (!($data['success'] ?? false)) {
+            \Log::error('NovaPoshta getCities error', [
+                'errors' => $data['errors'] ?? [],
+                'cityName' => $cityName,
+            ]);
 
-        } else {
-            dd('Ошибка: ', $data['errors']);
+            return collect();
         }
 
-        return $cities ?? [];
+        $cities = collect($data['data'] ?? [])->map(function ($city) use ($locale) {
+            return [
+                'name' => $locale === 'ru' ? ($city['DescriptionRu'] ?? $city['Description']) : $city['Description'],
+                'region' => $locale === 'ru' ? ($city['AreaDescriptionRu'] ?? $city['AreaDescription'] ?? '') : ($city['AreaDescription'] ?? ''),
+                'ref' => $city['Ref'],
+                'area' => $city['AreaDescription'] ?? '',
+                'area_ru' => $city['AreaDescriptionRu'] ?? '',
+            ];
+        });
+
+        if ($kyivAreaOnly) {
+            $cities = $cities->filter(function (array $city) {
+                $region = mb_strtolower(trim(
+                    ($city['region'] ?? '').' '.($city['area'] ?? '').' '.($city['area_ru'] ?? '')
+                ));
+                $name = mb_strtolower(trim($city['name'] ?? ''));
+
+                // Київ (місто) або населені пункти Київської області — не «Київець» тощо з інших областей
+                if ($name === 'київ' || $name === 'киев' || $name === 'kyiv' || $name === 'kiev') {
+                    return true;
+                }
+
+                return str_contains($region, 'київськ')
+                    || str_contains($region, 'киевск')
+                    || str_contains($region, 'kyiv');
+            })->values();
+        }
+
+        return $cities;
+    }
+
+    /**
+     * Вулиці міста (Address.getStreet).
+     */
+    public function getStreets(string $cityRef, ?string $streetName = null)
+    {
+        if ($cityRef === '') {
+            return collect();
+        }
+
+        $methodProperties = [
+            'CityRef' => $cityRef,
+            'Limit' => '50',
+        ];
+        if ($streetName) {
+            $methodProperties['FindByString'] = $streetName;
+        }
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post('https://api.novaposhta.ua/v2.0/json/', [
+            'apiKey' => $this->apiKey,
+            'modelName' => 'Address',
+            'calledMethod' => 'getStreet',
+            'methodProperties' => $methodProperties,
+        ]);
+
+        $data = $response->json();
+        $locale = app()->getLocale();
+
+        if (!($data['success'] ?? false)) {
+            \Log::error('NovaPoshta getStreet error', [
+                'errors' => $data['errors'] ?? [],
+                'cityRef' => $cityRef,
+                'streetName' => $streetName,
+            ]);
+
+            return collect();
+        }
+
+        return collect($data['data'] ?? [])->map(function ($street) use ($locale) {
+            $name = $locale === 'ru'
+                ? ($street['DescriptionRu'] ?? $street['Description'] ?? '')
+                : ($street['Description'] ?? '');
+
+            return [
+                'name' => $name,
+                'ref' => $street['Ref'] ?? '',
+                'streets_type' => $locale === 'ru'
+                    ? ($street['StreetsTypeRu'] ?? $street['StreetsType'] ?? '')
+                    : ($street['StreetsType'] ?? ''),
+            ];
+        })->filter(fn (array $street) => $street['name'] !== '')->values();
     }
 
     /**

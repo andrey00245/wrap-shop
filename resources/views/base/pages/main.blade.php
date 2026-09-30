@@ -47,6 +47,23 @@
     @include('base.components.home-brands')
     @include('base.components.categories-slider', ['footer' => true])
 
+    @if(!empty($homePage) && ($homePage->content || $homePage->seo_text))
+      <section class="category-seo-content home-seo-content wrap row">
+        <div class="category-content">
+          @if($homePage->content)
+            <div class="category-main-content">
+              {!! $homePage->content !!}
+            </div>
+          @endif
+          @if($homePage->seo_text)
+            <div class="category-seo-text">
+              {!! $homePage->seo_text !!}
+            </div>
+          @endif
+        </div>
+      </section>
+    @endif
+
     @push('scripts')
       <script src="{{ mix('build/js/sliders.js') }}" defer></script>
     @endpush

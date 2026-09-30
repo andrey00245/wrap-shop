@@ -16,9 +16,10 @@ use App\Nova\DeliveryOption;
 use App\Nova\Faq;
 use App\Nova\HomeBlockBanners;
 use App\Nova\HomeBlockCategories;
-use App\Nova\Kit;
 use App\Nova\HomeBlockSeasonalProducts;
 use App\Nova\HomeBrand;
+use App\Nova\HomePage;
+use App\Nova\Kit;
 use App\Nova\Implementation;
 use App\Nova\News;
 use App\Nova\NewsCategory;
@@ -150,6 +151,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
             // SEO – редиректи та SEO-сторінки фільтрів для адміна та контент-менеджера
             if (in_array($role, ['admin', 'content_manager'], true)) {
                 $menu[] = MenuSection::make('SEO', [
+                    MenuItem::resource(HomePage::class),
                     MenuItem::resource(RedirectResource::class),
                     MenuItem::resource(SeoFilterPage::class),
                 ])->icon('link')->collapsable();

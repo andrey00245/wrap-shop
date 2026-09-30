@@ -8,8 +8,9 @@ use App\Models\Category;
 use App\Models\CustomBlock;
 use App\Models\Faq;
 use App\Models\HomeBlock;
-use App\Models\KitSection;
 use App\Models\HomeBrand;
+use App\Models\HomePage;
+use App\Models\KitSection;
 use App\Models\Implementation;
 use App\Models\News;
 use App\Models\Product;
@@ -161,6 +162,8 @@ class IndexController extends Controller
                 ])
                 ->get();
 
+            $homePage = HomePage::query()->first();
+
             return compact(
                 'topSellerCategories',
                 'topSellersProducts',
@@ -177,6 +180,7 @@ class IndexController extends Controller
                 'homeBrands',
                 'kitSection',
                 'kits',
+                'homePage'
             );
         });
 

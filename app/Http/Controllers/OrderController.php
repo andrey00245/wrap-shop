@@ -35,7 +35,6 @@ class OrderController extends Controller
             'courier_house' => 'nullable|string',
             'kyiv_address' => 'nullable|string',
             'kyiv_street' => 'nullable|string',
-            'kyiv_house' => 'nullable|string',
             'kyiv_city_ref' => 'nullable|string',
             'kyiv_street_ref' => 'nullable|string',
         ];
@@ -58,7 +57,6 @@ class OrderController extends Controller
                 $rules['kyiv_city_ref'] = 'required|string';
                 $rules['kyiv_street'] = 'required|string';
                 $rules['kyiv_street_ref'] = 'required|string';
-                $rules['kyiv_house'] = 'required|string';
             } else {
                 $rules['shipping_address'] = 'required|string';
             }
@@ -146,9 +144,8 @@ class OrderController extends Controller
                 $order->novaposhta_warehouse_ref = null; // Для курьера нет warehouse_ref
             }
         } elseif ($request->input('shipping_method') === 'flat') {
-            $kyivStreet = trim((string) Arr::get($validated, 'kyiv_street', ''));
-            $kyivHouse = trim((string) Arr::get($validated, 'kyiv_house', ''));
-            $order->shipping_address = trim($kyivStreet.', '.$kyivHouse);
+            // Тип уже в значенні з підказки НП: «вул. …», «площа …» тощо
+            $order->shipping_address = trim((string) Arr::get($validated, 'kyiv_street', ''));
         } elseif ($request->input('shipping_method') === 'my_addresses') {
             $order->shipping_address = Arr::get($validated,'my_address');
         } else {

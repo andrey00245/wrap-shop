@@ -3,7 +3,7 @@
 
 @include('base.layouts.head')
 
-<body class="theme-{{$theme ?? 'light'}}">
+<body class="theme-{{ $theme ?? 'light' }} @yield('body_class')">
 
 <div class="ellipse-body">
   <div class="ellipse red"></div>

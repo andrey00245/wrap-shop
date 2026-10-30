@@ -94,6 +94,43 @@ class Category extends Model implements HasMedia, Sortable
         );
     }
 
+    /**
+     * FAQ для UI: faq_items + прив'язані Faq-моделі, без дублів питань.
+     *
+     * @return list<array{question: string, answer: string}>
+     */
+    public function faqForDisplay(?string $locale = null): array
+    {
+        $locale = $locale ?: app()->getLocale();
+        $items = $this->faqForSchema($locale);
+        $seen = [];
+
+        foreach ($items as $row) {
+            $seen[mb_strtolower(trim($row['question']))] = true;
+        }
+
+        $relatedFaqs = $this->relationLoaded('faqs')
+            ? $this->faqs
+            : $this->faqs()->get();
+
+        foreach ($relatedFaqs as $faq) {
+            $row = \App\Support\LocaleFaqItems::rowFromFaqModel($faq, $locale);
+            if ($row === null) {
+                continue;
+            }
+
+            $key = mb_strtolower(trim($row['question']));
+            if (isset($seen[$key])) {
+                continue;
+            }
+
+            $seen[$key] = true;
+            $items[] = $row;
+        }
+
+        return $items;
+    }
+
     public function registerMediaConversions(?Media $media = null): void
     {
         $this
@@ -398,7 +435,13 @@ class Category extends Model implements HasMedia, Sortable
                 continue;
             }
 
-            $name = trim((string) $product->getName());
+            $name = trim((string) $product->getTranslation('name', app()->getLocale(), false));
+            if ($name === '') {
+                $name = trim((string) $product->getTranslation('name', 'uk', false));
+            }
+            if ($name === '') {
+                $name = trim((string) $product->getName());
+            }
             if ($name === '') {
                 continue;
             }
@@ -464,6 +507,28 @@ class Category extends Model implements HasMedia, Sortable
     public function getNameUkAttribute()
     {
         return $this->getTranslation('name', 'uk');
+    }
+
+    /**
+     * Короткий підпис у меню/промо з урахуванням локалі.
+     * Якщо name ще скопійований з uk, беремо локалізований H1 (коли є).
+     */
+    public function menuLabel(?string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+        $name = trim((string) $this->getTranslation('name', $locale, false));
+        $nameUk = trim((string) $this->getTranslation('name', 'uk', false));
+        $h1 = trim((string) $this->getTranslation('h1', $locale, false));
+
+        if ($name !== '' && ($locale === 'uk' || $name !== $nameUk)) {
+            return $name;
+        }
+
+        if ($h1 !== '') {
+            return $h1;
+        }
+
+        return $name !== '' ? $name : $nameUk;
     }
 
     public function getImage(): string

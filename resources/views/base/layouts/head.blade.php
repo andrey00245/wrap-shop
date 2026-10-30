@@ -94,10 +94,10 @@
     @endif
     @stack('styles')
 
-    <link rel="alternate" hreflang="uk-ua" href="{{LaravelLocalization::getLocalizedURL('uk')}}">
-    <link rel="alternate" hreflang="x-default" href="{{LaravelLocalization::getLocalizedURL('uk')}}">
-    <link rel="alternate" hreflang="ru-ua" href="{{LaravelLocalization::getLocalizedURL('ru')}}">
-    <link rel="alternate" hreflang="en-gb" href="{{LaravelLocalization::getLocalizedURL('en')}}">
+    <link rel="alternate" hreflang="uk-ua" href="{{ ($localizedCategoryUrls['uk'] ?? null) ?: LaravelLocalization::getLocalizedURL('uk') }}">
+    <link rel="alternate" hreflang="x-default" href="{{ ($localizedCategoryUrls['uk'] ?? null) ?: LaravelLocalization::getLocalizedURL('uk') }}">
+    <link rel="alternate" hreflang="ru-ua" href="{{ ($localizedCategoryUrls['ru'] ?? null) ?: LaravelLocalization::getLocalizedURL('ru') }}">
+    <link rel="alternate" hreflang="en-gb" href="{{ ($localizedCategoryUrls['en'] ?? null) ?: LaravelLocalization::getLocalizedURL('en') }}">
 
     <style>
 

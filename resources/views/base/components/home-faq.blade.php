@@ -10,7 +10,7 @@
             @foreach($homeFaqItems as $index => $faq)
                 <div class="faq-item" data-faq-id="{{ $faq->id }}">
                     <div class="faq-question" data-index="{{ $index }}">
-                        <h3 class="faq-question-text">{{ $faq->question }}</h3>
+                        <h4 class="faq-question-text">{{ $faq->question }}</h4>
                         <span class="faq-toggle">
                             <span class="faq-toggle-symbol" aria-hidden="true"></span>
                         </span>

@@ -458,7 +458,7 @@ class ProductController extends Controller
             abort(404);
         }
 
-        $segments = array_filter(explode('/', $path));
+        $segments = array_values(array_filter(explode('/', $path)));
         $segmentCount = count($segments);
 
         if ($segmentCount === 1) {
@@ -468,6 +468,10 @@ class ProductController extends Controller
                 abort(404);
             }
             [$category, $subcategory, $subsubcategory] = $resolved;
+            $leaf = $subsubcategory ?? $subcategory ?? $category;
+            if ($redirect = $this->redirectToCanonicalCategoryPathIfNeeded($path, $leaf)) {
+                return $redirect;
+            }
 
             return $this->renderCategoryListing($category, $subcategory, $subsubcategory, null);
         }
@@ -494,6 +498,10 @@ class ProductController extends Controller
                     request()->query->add([$key => $values]);
                 }
 
+                if ($redirect = $this->redirectToCanonicalCategoryPathIfNeeded($path, $category, $seoPage)) {
+                    return $redirect;
+                }
+
                 return $this->renderCategoryListing($category, null, null, $seoPage);
             }
 
@@ -502,6 +510,10 @@ class ProductController extends Controller
                 abort(404);
             }
             [$category, $subcategory, $subsubcategory] = $resolved;
+            $leaf = $subsubcategory ?? $subcategory ?? $category;
+            if ($redirect = $this->redirectToCanonicalCategoryPathIfNeeded($path, $leaf)) {
+                return $redirect;
+            }
 
             return $this->renderCategoryListing($category, $subcategory, $subsubcategory, null);
         }
@@ -531,6 +543,10 @@ class ProductController extends Controller
                     request()->query->add([$key => $values]);
                 }
 
+                if ($redirect = $this->redirectToCanonicalCategoryPathIfNeeded($path, $subcategory, $seoPage)) {
+                    return $redirect;
+                }
+
                 return $this->renderCategoryListing($category, $subcategory, null, $seoPage);
             }
 
@@ -539,6 +555,10 @@ class ProductController extends Controller
                 abort(404);
             }
             [$category, $subcategory, $subsubcategory] = $resolved;
+            $leaf = $subsubcategory ?? $subcategory ?? $category;
+            if ($redirect = $this->redirectToCanonicalCategoryPathIfNeeded($path, $leaf)) {
+                return $redirect;
+            }
 
             return $this->renderCategoryListing($category, $subcategory, $subsubcategory, null);
         }
@@ -548,28 +568,20 @@ class ProductController extends Controller
 
     protected function resolveRootCategoryBySlug(string $slug): ?Category
     {
-        $locale = App::getLocale();
-        $slugPath = '$.'.preg_replace('/[^a-z_]/', '', $locale);
-
         return Category::query()
             ->whereNull('parent_id')
-            ->where(function ($q) use ($slug, $slugPath) {
-                $q->whereRaw('JSON_UNQUOTE(JSON_EXTRACT(slug, ?)) = ?', [$slugPath, $slug])
-                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(slug, '$.en')) = ?", [$slug]);
+            ->where(function ($q) use ($slug) {
+                $this->constrainCategorySlug($q, $slug);
             })
             ->first();
     }
 
     protected function resolveChildCategoryBySlug(int $parentId, string $slug): ?Category
     {
-        $locale = App::getLocale();
-        $slugPath = '$.'.preg_replace('/[^a-z_]/', '', $locale);
-
         return Category::query()
             ->where('parent_id', $parentId)
-            ->where(function ($q) use ($slug, $slugPath) {
-                $q->whereRaw('JSON_UNQUOTE(JSON_EXTRACT(slug, ?)) = ?', [$slugPath, $slug])
-                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(slug, '$.en')) = ?", [$slug]);
+            ->where(function ($q) use ($slug) {
+                $this->constrainCategorySlug($q, $slug);
             })
             ->first();
     }
@@ -613,23 +625,20 @@ class ProductController extends Controller
     /**
      * Розбиває path на сегменти і знаходить категорії по slug (перший — коренева, далі — діти).
      * Підтримує довільну глибину: корінь + ланцюг slug-ів; повертає [root, рівень2 або null, лист якщо глибина ≥3].
+     * Slug шукається в усіх локалях (uk/ru/en), щоб перемикач мови не давав 404.
      */
     protected function resolvePathToCategories(string $path): ?array
     {
-        $segments = array_filter(explode('/', $path));
+        $segments = array_values(array_filter(explode('/', $path)));
         if (empty($segments)) {
             return null;
         }
 
-        $locale = App::getLocale();
-        $slugPath = '$.'.preg_replace('/[^a-z_]/', '', $locale);
-
         $seg0 = $segments[0];
         $category = Category::query()
             ->whereNull('parent_id')
-            ->where(function ($q) use ($seg0, $slugPath) {
-                $q->whereRaw('JSON_UNQUOTE(JSON_EXTRACT(slug, ?)) = ?', [$slugPath, $seg0])
-                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(slug, '$.en')) = ?", [$seg0]);
+            ->where(function ($q) use ($seg0) {
+                $this->constrainCategorySlug($q, $seg0);
             })
             ->first();
         if (! $category) {
@@ -649,9 +658,8 @@ class ProductController extends Controller
             $seg = $segments[$i];
             $child = Category::query()
                 ->where('parent_id', $current->id)
-                ->where(function ($q) use ($seg, $slugPath) {
-                    $q->whereRaw('JSON_UNQUOTE(JSON_EXTRACT(slug, ?)) = ?', [$slugPath, $seg])
-                        ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(slug, '$.en')) = ?", [$seg]);
+                ->where(function ($q) use ($seg) {
+                    $this->constrainCategorySlug($q, $seg);
                 })
                 ->first();
             if (! $child) {
@@ -668,6 +676,71 @@ class ProductController extends Controller
         }
 
         return [$category, $subcategory, $subsubcategory];
+    }
+
+    /**
+     * Match category slug in any configured locale (not only current + en).
+     */
+    protected function constrainCategorySlug($query, string $slug): void
+    {
+        $locales = array_values(array_unique(array_filter([
+            App::getLocale(),
+            ...(array) config('tab-translatable.locales', ['uk', 'ru', 'en']),
+        ])));
+
+        foreach ($locales as $index => $locale) {
+            $locale = preg_replace('/[^a-z_]/', '', (string) $locale) ?: 'uk';
+            $slugPath = '$.'.$locale;
+            $method = $index === 0 ? 'whereRaw' : 'orWhereRaw';
+            $query->{$method}('JSON_UNQUOTE(JSON_EXTRACT(slug, ?)) = ?', [$slugPath, $slug]);
+        }
+    }
+
+    /**
+     * Якщо в URL slug іншої мови — 301 на канонічний path поточної локалі.
+     */
+    protected function redirectToCanonicalCategoryPathIfNeeded(
+        string $requestPath,
+        Category $leaf,
+        ?SeoFilterPage $seoFilterPage = null
+    ): ?SymfonyResponse {
+        $canonicalPath = $leaf->catalogPath(App::getLocale());
+        if ($seoFilterPage) {
+            $canonicalPath .= '/'.$seoFilterPage->slug;
+        }
+
+        $requestPath = trim($requestPath, '/');
+        if (mb_strtolower($canonicalPath) === mb_strtolower($requestPath)) {
+            return null;
+        }
+
+        $url = route('products.category', ['path' => $canonicalPath]);
+        $query = request()->getQueryString();
+
+        return redirect()->to($query ? $url.'?'.$query : $url, 301);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function buildLocalizedCategoryUrls(Category $leaf, ?SeoFilterPage $seoFilterPage = null): array
+    {
+        $urls = [];
+        $locales = (array) config('tab-translatable.locales', ['uk', 'ru', 'en']);
+
+        foreach ($locales as $locale) {
+            $path = $leaf->catalogPath($locale);
+            if ($seoFilterPage) {
+                $path .= '/'.$seoFilterPage->slug;
+            }
+
+            $urls[$locale] = \LaravelLocalization::getLocalizedURL(
+                $locale,
+                route('products.category', ['path' => $path])
+            );
+        }
+
+        return $urls;
     }
 
     /**
@@ -720,6 +793,7 @@ class ProductController extends Controller
         $childrenCategories = $currentCategory->children;
 
         $categoryPath = $this->categoryPathFromLeaf($currentCategory);
+        $localizedCategoryUrls = $this->buildLocalizedCategoryUrls($currentCategory, $seoFilterPage);
 
         return $this->renderCategoryProductListing(
             $categories,
@@ -731,7 +805,8 @@ class ProductController extends Controller
             $subsubcategory,
             $seoFilterPage,
             $categoryPath,
-            false
+            false,
+            $localizedCategoryUrls
         );
     }
 
@@ -739,6 +814,7 @@ class ProductController extends Controller
      * Спільний рендер сторінки списку товарів (категорія або весь каталог /catalog).
      *
      * @param  array<int, int>  $categories
+     * @param  array<string, string>  $localizedCategoryUrls
      */
     protected function renderCategoryProductListing(
         array $categories,
@@ -750,7 +826,8 @@ class ProductController extends Controller
         ?Category $subsubcategory,
         ?SeoFilterPage $seoFilterPage,
         string $categoryPath,
-        bool $isCatalogRoot
+        bool $isCatalogRoot,
+        array $localizedCategoryUrls = []
     ): View|array|SymfonyResponse {
         request()->attributes->set('product_listing_category_ids', $categories);
 
@@ -905,6 +982,7 @@ class ProductController extends Controller
             'seoFilterPage' => $seoFilterPage,
             'categoryPath' => $categoryPath,
             'isCatalogRoot' => $isCatalogRoot,
+            'localizedCategoryUrls' => $localizedCategoryUrls,
         ]);
     }
 

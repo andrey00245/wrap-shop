@@ -723,7 +723,11 @@
 
     @php
         $seoFilterPageText = isset($seoFilterPage) && $seoFilterPage ? $seoFilterPage->getTranslation('seo_text', app()->getLocale()) : null;
+        $categoryFaqItems = (!$isCatalogRoot && $currentCategory)
+            ? $currentCategory->faqForDisplay(app()->getLocale())
+            : [];
     @endphp
+
     @if($seoFilterPageText || ($currentCategory && ($currentCategory->content || $currentCategory->seo_text)))
         <section class="category-seo-content wrap row">
             <div class="category-content">
@@ -746,6 +750,8 @@
             </div>
         </section>
     @endif
+
+    @include('base.components.category-faq', ['faqItems' => $categoryFaqItems])
 
 @endsection
 

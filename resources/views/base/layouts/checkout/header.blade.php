@@ -1,55 +1,61 @@
 <header class="header checkout-header">
-
   <div class="fixed-header">
-    <div class="head-boot flex-justify wrap">
-      <div class="head-lang flex-center" id="form-language">
-        <a href="{{ LaravelLocalization::getLocalizedURL('uk') }}"
-           class="button language-select {{LaravelLocalization::getCurrentLocale() === 'uk' ? 'active' : ''}}">Ua</a>
-        <a href="{{ LaravelLocalization::getLocalizedURL('ru') }}"
-           class="button language-select {{LaravelLocalization::getCurrentLocale() === 'ru' ? 'active' : ''}}">Ru</a>
-        <a href="{{ LaravelLocalization::getLocalizedURL('en') }}"
-           class="button language-select {{LaravelLocalization::getCurrentLocale() === 'en' ? 'active' : ''}}">En</a>
-        <input type="hidden" name="code" value="">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-
-      </div>
+    <div class="head-boot wrap">
+      <div class="checkout-header__left">
+        <div class="head-lang flex-center" id="form-language">
+          <a href="{{ LaravelLocalization::getLocalizedURL('uk') }}"
+             class="button language-select {{ LaravelLocalization::getCurrentLocale() === 'uk' ? 'active' : '' }}">Ua</a>
+          <a href="{{ LaravelLocalization::getLocalizedURL('ru') }}"
+             class="button language-select {{ LaravelLocalization::getCurrentLocale() === 'ru' ? 'active' : '' }}">Ru</a>
+          <a href="{{ LaravelLocalization::getLocalizedURL('en') }}"
+             class="button language-select {{ LaravelLocalization::getCurrentLocale() === 'en' ? 'active' : '' }}">En</a>
+          <input type="hidden" name="code" value="">
+          <meta name="csrf-token" content="{{ csrf_token() }}">
+        </div>
         @if(Route::currentRouteName() !== 'checkout.success')
-            <div class="head-continue">
-                <a href="{{ route('index') }}" title="{{__('checkout.continue_shopping')}}" class="button">{{__('checkout.continue_shopping')}}</a>
-            </div>
+          <div class="head-continue">
+            <a href="{{ route('index') }}" title="{{ __('checkout.continue_shopping') }}" class="button">{{ __('checkout.continue_shopping') }}</a>
+          </div>
         @endif
-      <div class="head-catalog-bg"></div>
-      <div class="head-logo">
-        <a href="{{route('index')}}" title="Wrap.Shop">
-          <img loading="lazy" src="{{asset('assets/img/logo.png')}}"
-               title="Wrap.Shop" alt="Wrap.Shop" width="93"
-               height="98"></a>
       </div>
 
-      <div class="head-social flex-center">
-        <a href="{{ $settings->telegram ?? '#' }}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
-        <a href="{{ $settings->instagram ?? '#' }}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
-      </div>
-      <div class="head-phone flex-center">
-        <div class="title">{{__('header_footer.phone')}}</div>
-        <a href="{{ \App\Support\SitePhone::telHref($settings ?? null) }}">{{ \App\Support\SitePhone::display($settings ?? null) }}</a>
+      <div class="head-logo checkout-header__logo">
+        <a href="{{ route('index') }}" title="Wrap.Shop">
+          <img src="{{ asset('assets/img/logo.png') }}"
+               title="Wrap.Shop"
+               alt="Wrap.Shop"
+               width="118"
+               height="124"
+               decoding="async">
+        </a>
       </div>
 
-      <div class="head-buttons">
-        <div class="search-popup-open button search far fa-search general-popup-btn" data-popup="search-popup"></div>
-        <button class="button cart-open far fa-shopping-cart dropdown-toggle general-popup-btn" data-popup="cart-popup"><span
-            id="cart-total" class="cart-total flex-center">{{$cartItemsCount}}</span></button>
-        @guest
-          <div id="wishlist-total" class="button heart login-show far fa-heart login-popup-open general-popup-btn" data-popup="login-popup"><span
-              class="wishlist-total flex-center">{{count(session()->get('wishlist', []))}}</span></div>
-          <div class="button userform-open login-show far fa-user login-popup-open general-popup-btn" data-popup="login-popup"></div>
-        @endguest
-
-        @auth
-          <a href="{{route('wishlist')}}" id="wishlist-total" title="{{__('checkout.wishlist')}}"
-             class="button heart far fa-heart"><span class="wishlist-total flex-center">0</span></a>
-          <a href="{{route('account')}}" title="{{__('checkout.personal_account')}}" class="button user far fa-user-check"></a>
-        @endauth
+      <div class="checkout-header__right">
+        <div class="head-social flex-center">
+          <a href="{{ $settings->telegram ?? '#' }}" title="Telegram" target="_blank" class="fab fa-telegram-plane"></a>
+          <a href="{{ $settings->instagram ?? '#' }}" title="Instagram" target="_blank" class="fab fa-instagram"></a>
+        </div>
+        <div class="head-phone flex-center">
+          <div class="title">{{ __('header_footer.phone') }}</div>
+          <a href="{{ \App\Support\SitePhone::telHref($settings ?? null) }}">{{ \App\Support\SitePhone::display($settings ?? null) }}</a>
+        </div>
+        <div class="head-buttons">
+          <div class="search-popup-open button search far fa-search general-popup-btn" data-popup="search-popup"></div>
+          <button class="button cart-open far fa-shopping-cart dropdown-toggle general-popup-btn" data-popup="cart-popup">
+            <span id="cart-total" class="cart-total flex-center">{{ $cartItemsCount }}</span>
+          </button>
+          @guest
+            <div id="wishlist-total" class="button heart login-show far fa-heart login-popup-open general-popup-btn" data-popup="login-popup">
+              <span class="wishlist-total flex-center">{{ count(session()->get('wishlist', [])) }}</span>
+            </div>
+            <div class="button userform-open login-show far fa-user login-popup-open general-popup-btn" data-popup="login-popup"></div>
+          @endguest
+          @auth
+            <a href="{{ route('wishlist') }}" id="wishlist-total" title="{{ __('checkout.wishlist') }}"
+               class="button heart far fa-heart"><span class="wishlist-total flex-center">0</span></a>
+            <a href="{{ route('account') }}" title="{{ __('checkout.personal_account') }}" class="button user far fa-user-check"></a>
+          @endauth
+        </div>
       </div>
     </div>
   </div>

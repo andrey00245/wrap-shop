@@ -753,3 +753,9 @@
         transform: rotate(0);
     }
 }
+
+.category-faq.home-faq {
+    margin: 36px auto 8px;
+    width: min(920px, calc(100% - 48px));
+    box-sizing: border-box;
+}

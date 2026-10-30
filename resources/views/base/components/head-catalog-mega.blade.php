@@ -11,7 +11,7 @@
     $promoCards = [];
 
     if ($promoCategory) {
-        $promoTitle = $promoCategory->name;
+        $promoTitle = $promoCategory->menuLabel($locale);
         $promoUrl = route('products.category', ['path' => $promoCategory->catalogPath($locale)]);
         $promoCards = $promoCategory->menuSpotlightCards();
     }
@@ -25,6 +25,7 @@
                     @foreach($productCategories as $category)
                         @php
                             $categoryPath = $category->catalogPath($locale);
+                            $categoryLabel = $category->menuLabel($locale);
                             $resolvedMenuIcon = $category->resolveMenuIconUrl();
                             $categoryImage = filled($resolvedMenuIcon)
                                 ? $resolvedMenuIcon
@@ -36,13 +37,13 @@
 
                         <section
                             class="head-catalog-mega__group"
-                            data-promo-title="{{ $category->name }}"
+                            data-promo-title="{{ $categoryLabel }}"
                             data-promo-url="{{ route('products.category', ['path' => $categoryPath]) }}"
                             data-promo-products='@json($spotlightCards)'
                         >
                             <a href="{{ route('products.category', ['path' => $categoryPath]) }}"
                                class="head-catalog-mega__heading"
-                               title="{{ $category->name }}">
+                               title="{{ $categoryLabel }}">
                                 <span class="head-catalog-mega__icon flex-center">
                                     <img
                                         src="{{ $categoryImage }}"
@@ -52,7 +53,7 @@
                                         loading="lazy"
                                     >
                                 </span>
-                                <span class="head-catalog-mega__title">{{ $category->name }}</span>
+                                <span class="head-catalog-mega__title">{{ $categoryLabel }}</span>
                             </a>
 
                             @if($children->isNotEmpty())
@@ -61,6 +62,7 @@
                                         @php
                                             $child->setRelation('parent', $category);
                                             $childPath = $child->catalogPath($locale);
+                                            $childLabel = $child->menuLabel($locale);
                                             $grandChildren = $child->children ?? collect();
                                             $hasGrandChildren = $grandChildren->isNotEmpty();
                                             $isExtra = $index >= $visibleChildrenLimit;
@@ -70,28 +72,29 @@
                                                 <button type="button"
                                                         class="head-catalog-mega__link head-catalog-mega__toggle"
                                                         aria-expanded="false"
-                                                        title="{{ $child->name }}">
-                                                    <span class="head-catalog-mega__link-text">{{ $child->name }}</span>
+                                                        title="{{ $childLabel }}">
+                                                    <span class="head-catalog-mega__link-text">{{ $childLabel }}</span>
                                                     <span class="head-catalog-mega__chevron" aria-hidden="true"></span>
                                                 </button>
                                                 <ul class="head-catalog-mega__sublist">
                                                     <li class="head-catalog-mega__subitem">
                                                         <a href="{{ route('products.category', ['path' => $childPath]) }}"
                                                            class="head-catalog-mega__sublink"
-                                                           title="{{ $child->name }}">
-                                                            {{ $child->name }}
+                                                           title="{{ $childLabel }}">
+                                                            {{ $childLabel }}
                                                         </a>
                                                     </li>
                                                     @foreach($grandChildren as $grandChild)
                                                         @php
                                                             $grandChild->setRelation('parent', $child);
                                                             $grandPath = $grandChild->catalogPath($locale);
+                                                            $grandLabel = $grandChild->menuLabel($locale);
                                                         @endphp
                                                         <li class="head-catalog-mega__subitem">
                                                             <a href="{{ route('products.category', ['path' => $grandPath]) }}"
                                                                class="head-catalog-mega__sublink"
-                                                               title="{{ $grandChild->name }}">
-                                                                {{ $grandChild->name }}
+                                                               title="{{ $grandLabel }}">
+                                                                {{ $grandLabel }}
                                                             </a>
                                                         </li>
                                                     @endforeach
@@ -99,8 +102,8 @@
                                             @else
                                                 <a href="{{ route('products.category', ['path' => $childPath]) }}"
                                                    class="head-catalog-mega__link"
-                                                   title="{{ $child->name }}">
-                                                    <span class="head-catalog-mega__link-text">{{ $child->name }}</span>
+                                                   title="{{ $childLabel }}">
+                                                    <span class="head-catalog-mega__link-text">{{ $childLabel }}</span>
                                                 </a>
                                             @endif
                                         </li>

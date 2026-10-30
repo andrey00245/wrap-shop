@@ -56,6 +56,8 @@ return [
     'this_field_required' => 'This field is required',
     'input_locker' => 'Enter parcel locker',
     'house_apartment' => 'House, apartment',
+    'house' => 'House',
+    'apartment' => 'Apartment',
     'street' => 'Street',
     'input_branch' => 'Enter branch',
     'input_delivery_address' => 'Enter delivery address',

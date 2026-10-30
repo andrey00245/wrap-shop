@@ -7,6 +7,14 @@
         'en' => 'EN',
         default => 'UA',
     };
+    $localizedCategoryUrls = $localizedCategoryUrls ?? [];
+    $langUrl = static function (string $loc) use ($localizedCategoryUrls): string {
+        if (! empty($localizedCategoryUrls[$loc])) {
+            return $localizedCategoryUrls[$loc];
+        }
+
+        return LaravelLocalization::getLocalizedURL($loc);
+    };
     $popularChips = $productCategories
         ->flatMap(fn ($category) => $category->children ?? collect())
         ->take(4)
@@ -131,9 +139,9 @@
                             <i class="fas fa-chevron-down" aria-hidden="true"></i>
                         </button>
                         <div class="mob-menu-lang__list">
-                            <a href="{{ LaravelLocalization::getLocalizedURL('uk') }}" class="{{ $locale === 'uk' ? 'is-active' : '' }}">UA</a>
-                            <a href="{{ LaravelLocalization::getLocalizedURL('ru') }}" class="{{ $locale === 'ru' ? 'is-active' : '' }}">RU</a>
-                            <a href="{{ LaravelLocalization::getLocalizedURL('en') }}" class="{{ $locale === 'en' ? 'is-active' : '' }}">EN</a>
+                            <a href="{{ $langUrl('uk') }}" class="{{ $locale === 'uk' ? 'is-active' : '' }}">UA</a>
+                            <a href="{{ $langUrl('ru') }}" class="{{ $locale === 'ru' ? 'is-active' : '' }}">RU</a>
+                            <a href="{{ $langUrl('en') }}" class="{{ $locale === 'en' ? 'is-active' : '' }}">EN</a>
                         </div>
                     </div>
 
@@ -259,9 +267,9 @@
                                 <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             </button>
                             <div class="head-lang-dropdown__list">
-                                <a href="{{ LaravelLocalization::getLocalizedURL('uk') }}" class="{{ $locale === 'uk' ? 'is-active' : '' }}">UA</a>
-                                <a href="{{ LaravelLocalization::getLocalizedURL('ru') }}" class="{{ $locale === 'ru' ? 'is-active' : '' }}">RU</a>
-                                <a href="{{ LaravelLocalization::getLocalizedURL('en') }}" class="{{ $locale === 'en' ? 'is-active' : '' }}">EN</a>
+                                <a href="{{ $langUrl('uk') }}" class="{{ $locale === 'uk' ? 'is-active' : '' }}">UA</a>
+                                <a href="{{ $langUrl('ru') }}" class="{{ $locale === 'ru' ? 'is-active' : '' }}">RU</a>
+                                <a href="{{ $langUrl('en') }}" class="{{ $locale === 'en' ? 'is-active' : '' }}">EN</a>
                             </div>
                             <meta name="csrf-token" content="{{ csrf_token() }}">
                         </div>

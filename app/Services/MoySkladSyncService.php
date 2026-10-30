@@ -298,9 +298,25 @@ class MoySkladSyncService
             $comment .= "Швидка покупка\n";
         }
 
-        if (in_array($order->shipping_method, ['novaposhta', 'novaposhta_doors', 'my_addresses'])) {
-            $comment .= "\nНаселений пункт: " . $order->city;
-            $comment .= "\nВідділення / Адреса: " . $order->shipping_address;
+        // Адреса доставки в опис замовлення МойСклад (те, що видно в «коментарях»)
+        if (in_array($order->shipping_method, ['novaposhta', 'novaposhta_doors', 'my_addresses', 'flat'], true)) {
+            if ($order->shipping_method === 'flat') {
+                $comment .= "\nДоставка по Києву";
+                if (! empty($order->city)) {
+                    $comment .= "\nНаселений пункт: ".$order->city;
+                }
+                $kyivAddress = trim(preg_replace('/^Доставка по Києву:\s*/u', '', (string) $order->shipping_address) ?? '');
+                if ($kyivAddress !== '') {
+                    $comment .= "\n".$kyivAddress;
+                }
+            } else {
+                if (! empty($order->city)) {
+                    $comment .= "\nНаселений пункт: ".$order->city;
+                }
+                if (! empty($order->shipping_address)) {
+                    $comment .= "\nВідділення / Адреса: ".$order->shipping_address;
+                }
+            }
         }
 
         // Устанавливаем описание, если есть комментарий

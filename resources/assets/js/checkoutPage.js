@@ -37,29 +37,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function setKyivHouseEnabled(enabled) {
-        const house = document.querySelector('#kyiv_house');
-        if (!house) {
-            return;
-        }
-        house.disabled = !enabled;
-        house.required = Boolean(enabled);
-        if (!enabled) {
-            house.value = '';
-        }
-    }
-
     function syncKyivAddress() {
         const street = (document.querySelector('#kyiv_street')?.value || '').trim();
-        const house = (document.querySelector('#kyiv_house')?.value || '').trim();
         const address = document.querySelector('#kyiv_address');
         if (address) {
-            address.value = [street, house].filter(Boolean).join(', ');
+            address.value = street;
         }
     }
 
     window.setKyivStreetEnabled = setKyivStreetEnabled;
-    window.setKyivHouseEnabled = setKyivHouseEnabled;
     window.syncKyivAddress = syncKyivAddress;
 
     function updateAddressFields() {
@@ -74,14 +60,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 kyivFieldsOff.style.display = 'none';
             }
             setKyivStreetEnabled(false);
-            setKyivHouseEnabled(false);
         }
 
         if (selectedMethod && selectedMethod.id === 'pickup') {
             shippingMethodAddress.style.display = 'none';
             shippingAddressField.required = false;
         } else if (selectedMethod && selectedMethod.id === 'flat') {
-            // Доставка по Киеву: місто (Київщина) → вулиця (НП) → будинок
+            // Доставка по Киеву: місто (Київщина) → вулиця (НП)
             shippingMethodAddress.style.display = '';
             shippingAddressField.required = false;
 
@@ -109,9 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 kyivFields.style.display = 'block';
             }
             const kyivCityRef = document.querySelector('#kyiv_city_ref')?.value || '';
-            const kyivStreetRef = document.querySelector('#kyiv_street_ref')?.value || '';
             setKyivStreetEnabled(Boolean(kyivCityRef));
-            setKyivHouseEnabled(Boolean(kyivStreetRef));
 
             // Прячем select «Мої адреси», лишаємо input міста
             if (citySelectWrapper) {
@@ -268,20 +251,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const kyivFields = document.querySelector('#kyiv-fields');
         if (kyivFields && !isFlatDelivery) {
             kyivFields.style.display = 'none';
-            ['#kyiv_street', '#kyiv_house'].forEach(selector => {
-                const field = document.querySelector(selector);
-                if (field) {
-                    field.disabled = true;
-                    field.required = false;
-                }
-            });
+            const kyivStreet = document.querySelector('#kyiv_street');
+            if (kyivStreet) {
+                kyivStreet.disabled = true;
+                kyivStreet.required = false;
+            }
         }
 
         // Отключаем все поля и убираем required (kyiv — только если не flat)
         if (cityField) cityField.disabled = true;
         const fieldsToDisable = isFlatDelivery
             ? '#shipping_address, #locker_address, #courier_street, #courier_house'
-            : '#shipping_address, #locker_address, #courier_street, #courier_house, #kyiv_street, #kyiv_house';
+            : '#shipping_address, #locker_address, #courier_street, #courier_house, #kyiv_street';
         document.querySelectorAll(fieldsToDisable).forEach(field => {
             if (field) {
                 field.disabled = true;
@@ -541,7 +522,6 @@ $(document).ready(function() {
         $("#kyiv_city_ref").val('');
         $("#kyiv_street").val('');
         $("#kyiv_street_ref").val('');
-        $("#kyiv_house").val('');
         $("#kyiv_address").val('');
         $("#kyiv-street-suggestions").hide().empty();
         cityRefSelected = null;
@@ -607,11 +587,9 @@ $(document).ready(function() {
             $("#kyiv_city_ref").val('');
             $("#kyiv_street").val('');
             $("#kyiv_street_ref").val('');
-            $("#kyiv_house").val('');
             $("#kyiv_address").val('');
             $("#kyiv-street-suggestions").hide().empty();
             window.setKyivStreetEnabled(false);
-            window.setKyivHouseEnabled(false);
         }
 
         clearTimeout(debounceTimer);
@@ -698,11 +676,9 @@ $(document).ready(function() {
             $("#kyiv_city_ref").val(cityRef);
             $("#kyiv_street").val('');
             $("#kyiv_street_ref").val('');
-            $("#kyiv_house").val('');
             $("#kyiv_address").val('');
             $("#kyiv-street-suggestions").hide().empty();
             window.setKyivStreetEnabled(true);
-            window.setKyivHouseEnabled(false);
             $("#city-suggestions").hide();
             setTimeout(function() {
                 $("#kyiv_street").prop('disabled', false).trigger('focus');
@@ -983,8 +959,6 @@ $(document).ready(function() {
         }
 
         $("#kyiv_street_ref").val('');
-        $("#kyiv_house").val('');
-        window.setKyivHouseEnabled(false);
         window.syncKyivAddress();
 
         clearTimeout(kyivStreetDebounceTimer);
@@ -1016,7 +990,8 @@ $(document).ready(function() {
                             const type = street.streets_type || '';
                             const label = [type, name].filter(Boolean).join(' ');
                             const ref = street.ref || '';
-                            list += `<li data-id="${ref}" data-value="${String(name).replace(/"/g, '&quot;')}">${label}</li>`;
+                            const safeLabel = String(label).replace(/"/g, '&quot;');
+                            list += `<li data-id="${ref}" data-value="${safeLabel}">${label}</li>`;
                         });
                     } else {
                         list = "<li class='no-results'>Вулицю не знайдено</li>";
@@ -1041,12 +1016,6 @@ $(document).ready(function() {
         $("#kyiv_street").val(streetName);
         $("#kyiv_street_ref").val(streetRef);
         $("#kyiv-street-suggestions").hide().empty();
-        window.setKyivHouseEnabled(true);
-        window.syncKyivAddress();
-        $("#kyiv_house").prop('disabled', false).trigger('focus');
-    });
-
-    $("#kyiv_house").on("input", function() {
         window.syncKyivAddress();
     });
 

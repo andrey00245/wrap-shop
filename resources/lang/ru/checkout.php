@@ -56,6 +56,8 @@ return [
     'this_field_required' => 'Это поле обязательно для заполнения',
     'input_locker' => 'Введите почтомат',
     'house_apartment' => 'Дом, квартира',
+    'house' => 'Дом',
+    'apartment' => 'Квартира',
     'street' => 'Улица',
     'input_branch' => 'Введите отделение',
     'input_delivery_address' => 'Введите адрес доставки',

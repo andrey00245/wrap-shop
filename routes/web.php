@@ -483,11 +483,6 @@ Route::group([
     return view('base.pages.delivery');
   })->name('delivery');
 
-    Route::get('/videoreviews', [VideosController::class, 'index'])->name('videoreviews');
-
-    Route::get('/videoreviews/{category}', [VideosController::class, 'show'])->name('videos.show');
-
-
     Route::group(['prefix' => '/news'], function(){
 
       Route::get('/', [NewsController::class, 'index'])->name('news.index');

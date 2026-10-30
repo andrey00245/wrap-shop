@@ -234,7 +234,7 @@
                                                             @enderror
                                                         </div>
 
-                                                        <!-- Поля для доставки по Киеву (НП підказки: місто Київщини → вулиця → будинок) -->
+                                                        <!-- Поля для доставки по Киеву (НП підказки: місто Київщини → вулиця) -->
                                                         <div id="kyiv-fields" style="display: none;">
                                                             <input type="hidden" name="kyiv_city_ref" id="kyiv_city_ref" value="{{ old('kyiv_city_ref') }}">
                                                             <input type="hidden" name="kyiv_street_ref" id="kyiv_street_ref" value="{{ old('kyiv_street_ref') }}">
@@ -264,25 +264,6 @@
                                                                      data-for="kyiv_street_ref"
                                                                      class="simplecheckout-error-text simplecheckout-rule">
                                                                     {{ __('checkout.kyiv_select_street') }}
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="input-group" id="kyiv-house-fields">
-                                                                <label for="kyiv_house">{{__('checkout.house_apartment')}}</label>
-                                                                <input type="text" id="kyiv_house"
-                                                                       name="kyiv_house" class="form-control"
-                                                                       value="{{ old('kyiv_house') }}"
-                                                                       placeholder="{{__('checkout.house_apartment')}}"
-                                                                       disabled>
-                                                                @error('kyiv_house')
-                                                                <div class="error">{{ $message }}</div>
-                                                                @enderror
-                                                                <div style="display:none;"
-                                                                     data-for="kyiv_house"
-                                                                     data-for-type="text"
-                                                                     data-rule="notEmpty"
-                                                                     class="simplecheckout-error-text simplecheckout-rule"
-                                                                     data-not-empty="1" data-required="true">{{__('checkout.this_field_required')}}
                                                                 </div>
                                                             </div>
                                                             @error('kyiv_address')

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\MediaHelper;
 use App\Helpers\MoySkladApiHelper;
 use App\Http\Enums\ProductAttributeEnum;
 use App\Jobs\GalleryImageDownloadJob;
@@ -937,6 +938,19 @@ class ProductService
                 return;
             }
 
+            $extension = MediaHelper::imageExtensionFromContent($content);
+            if ($extension === null) {
+                $this->deleteStoredBannerIfNotImage($product, $url);
+                Log::warning('Ответ дополнительной галереи не является изображением, файл не сохранён', [
+                    'product_id' => $product->id,
+                    'attribute' => $attributeName,
+                    'url' => $url,
+                    'content_type' => $response->header('Content-Type'),
+                ]);
+
+                return;
+            }
+
             $hash = md5($content);
 
             // Дедупликация: проверяем по хешу или исходному URL в кастомных свойствах
@@ -949,18 +963,22 @@ class ProductService
                 });
 
             if ($alreadyExists) {
-                Log::info('Изображение из дополнительной галереи уже существует, пропуск', [
-                    'product_id' => $product->id,
-                    'attribute' => $attributeName,
-                    'url' => $url,
-                ]);
+                if (! MediaHelper::mediaFileIsImage($alreadyExists)) {
+                    $alreadyExists->delete();
+                } else {
+                    Log::info('Изображение из дополнительной галереи уже существует, пропуск', [
+                        'product_id' => $product->id,
+                        'attribute' => $attributeName,
+                        'url' => $url,
+                    ]);
 
-                return;
+                    return;
+                }
             }
 
             // Определяем имя файла по URL или по хешу
             $parsed = parse_url($url);
-            $filename = 'banner_'.($parsed['path'] ?? 'image').'_'.substr($hash, 0, 8).'.jpg';
+            $filename = 'banner_'.($parsed['path'] ?? 'image').'_'.substr($hash, 0, 8).'.'.$extension;
             $filename = preg_replace('/[^a-zA-Z0-9_\-.]/', '_', $filename);
 
             // Сохраняем в медиаколлекцию
@@ -987,6 +1005,27 @@ class ProductService
                 'url' => $url,
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+    /**
+     * Удаляет ранее сохранённый по этому URL файл, если это не картинка.
+     * Так повторный вебхук убирает HTML страницы логина, записанный как .jpg.
+     */
+    private function deleteStoredBannerIfNotImage(Product $product, string $url): void
+    {
+        foreach ($product->getMedia('banner_images') as $media) {
+            if ($media->getCustomProperty('source_url') !== $url) {
+                continue;
+            }
+            if (! MediaHelper::mediaFileIsImage($media)) {
+                $media->delete();
+                Log::info('Удалён не-изображение из дополнительной галереи', [
+                    'product_id' => $product->id,
+                    'media_id' => $media->id,
+                    'url' => $url,
+                ]);
+            }
         }
     }
 

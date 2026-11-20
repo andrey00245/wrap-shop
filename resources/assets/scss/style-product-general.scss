@@ -1010,19 +1010,38 @@
 }
 
 .product-page-example {
+    position: relative;
     margin-bottom: 50px;
     width: 100%;
-    height: fit-content;
+    overflow: hidden;
 
     .item {
         text-align: center;
     }
 
+    // Кадр всегда 2:1, как у нормальных фото 3600×1800.
+    // Картинка вынута из потока, поэтому оригинал любого размера
+    // не может растянуть слайд.
     .splide__track {
         .splide__list {
             .splide__slide {
-                img {
+                a {
+                    position: relative;
+                    display: block;
                     width: 100%;
+                    aspect-ratio: 2 / 1;
+                    overflow: hidden;
+                    background: #111;
+                }
+
+                img {
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    object-position: center;
+                    display: block;
                 }
             }
         }

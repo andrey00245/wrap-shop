@@ -1,6 +1,7 @@
 <?php
 namespace App\Jobs;
 
+use App\Helpers\MediaHelper;
 use App\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -32,6 +33,14 @@ class GalleryImageDownloadJob implements ShouldQueue
 
         if ($imageResponse->successful()) {
             $fileContent = $imageResponse->body();
+            if (MediaHelper::imageExtensionFromContent($fileContent) === null) {
+                Log::warning("Gallery URL did not return an image for product ID {$product->external_id}.", [
+                    'url' => $imageUrl,
+                    'content_type' => $imageResponse->header('Content-Type'),
+                ]);
+
+                return;
+            }
             $hash = md5($imageUrl);
             $uniqueFilename = $hash . '.png';
             $existingImage = $product->getMedia('banner_images')->firstWhere('file_name', $uniqueFilename);

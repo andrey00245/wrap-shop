@@ -18,12 +18,46 @@ $(document).ready(function () {
     thumbnails.mount();
 
     try {
-        var productExampleImages = new Splide('#product-example-slider', {
-            pagination: false,
-            arrows: true,
-            type: 'loop'
-        });
-        productExampleImages.mount()
+        const exampleRoot = document.querySelector('#product-example-slider');
+        if (exampleRoot) {
+            const dropBrokenExampleSlide = (img) => {
+                const slide = img.closest('.splide__slide');
+                if (!slide || slide.dataset.broken === '1') {
+                    return;
+                }
+                slide.dataset.broken = '1';
+                slide.remove();
+            };
+
+            exampleRoot.querySelectorAll('img').forEach((img) => {
+                if (img.complete && img.naturalWidth === 0) {
+                    dropBrokenExampleSlide(img);
+                }
+            });
+
+            const exampleSlides = exampleRoot.querySelectorAll('.splide__slide');
+            if (exampleSlides.length === 0) {
+                exampleRoot.remove();
+            } else {
+                var productExampleImages = new Splide('#product-example-slider', {
+                    pagination: false,
+                    arrows: exampleSlides.length > 1,
+                    type: exampleSlides.length > 1 ? 'loop' : 'slide',
+                });
+                exampleRoot.querySelectorAll('img').forEach((img) => {
+                    img.addEventListener('error', () => {
+                        dropBrokenExampleSlide(img);
+                        if (exampleRoot.querySelectorAll('.splide__slide').length === 0) {
+                            productExampleImages.destroy();
+                            exampleRoot.remove();
+                            return;
+                        }
+                        productExampleImages.refresh();
+                    });
+                });
+                productExampleImages.mount();
+            }
+        }
     } catch (e) {
         // Галерея примеров может отсутствовать на некоторых страницах - это нормально
     }

@@ -103,6 +103,53 @@ class MediaHelper
     }
 
     /**
+     * Расширение по сигнатуре файла. null, если это не картинка
+     * (например HTML страницы логина Google, сохранённый как .jpg).
+     */
+    public static function imageExtensionFromContent(string $content): ?string
+    {
+        if ($content === '') {
+            return null;
+        }
+
+        if (str_starts_with($content, "\xFF\xD8\xFF")) {
+            return 'jpg';
+        }
+
+        if (str_starts_with($content, "\x89PNG\r\n\x1a\n")) {
+            return 'png';
+        }
+
+        if (str_starts_with($content, 'GIF87a') || str_starts_with($content, 'GIF89a')) {
+            return 'gif';
+        }
+
+        if (strlen($content) >= 12 && substr($content, 0, 4) === 'RIFF' && substr($content, 8, 4) === 'WEBP') {
+            return 'webp';
+        }
+
+        return null;
+    }
+
+    public static function mediaFileIsImage(Media $media): bool
+    {
+        $path = $media->getPath();
+        if (! is_string($path) || ! is_file($path)) {
+            return false;
+        }
+
+        $handle = fopen($path, 'rb');
+        if ($handle === false) {
+            return false;
+        }
+
+        $head = fread($handle, 16);
+        fclose($handle);
+
+        return is_string($head) && self::imageExtensionFromContent($head) !== null;
+    }
+
+    /**
      * Получить информацию о конверсиях
      */
     public static function getConversionsInfo(Media $media): array
